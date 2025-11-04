@@ -526,26 +526,12 @@
         </div>
     </div>
     
-    <!-- QR Modal -->
-    <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="qrModalLabel">Código QR del Líder</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <div id="qrCode" class="mb-3"></div>
-                    <p class="small text-muted">Escanea este código para acceder al formulario de registro</p>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="leaderLink" readonly>
-                        <button class="btn btn-outline-secondary" type="button" onclick="copyLeaderLink()">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="qrModal" class="modal" style="display:none;">
+      <div class="modal-content p-4" style="max-width:320px; margin:40px auto; background:#fff; border-radius:8px; text-align:center;">
+        <h3 id="qrModalTitle"></h3>
+        <div id="qrContainer" style="margin:16px auto;"></div>
+        <button class="btn btn-secondary" onclick="document.getElementById('qrModal').style.display='none'">Cerrar</button>
+      </div>
     </div>
     <!-- Modal de registro manual -->
 <div class="modal fade" id="adminRegistrationModal" tabindex="-1" aria-labelledby="adminRegistrationLabel" aria-hidden="true">
@@ -621,6 +607,8 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- Librería qrcodejs necesaria para generar QR simples -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- El bloque <script> duplicado ha sido eliminado. -->
 <script>
 const API_BASE = `${window.location.origin}/api`;
@@ -821,40 +809,52 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 });
 
 // ===================== 🔹 Funciones de QR y enlace =====================
-function showQRCode(leaderId) {
-  const leader = leaders.find(l => l._id === leaderId);
-  if (!leader) {
-    showToast('danger', 'No se encontró el líder');
-    return;
-  }
+function showQRCode(leader) {
+    // Acepta tanto el objeto leader como su _id
+    if (typeof leader === 'string' || typeof leader === 'number') {
+        leader = leaders.find(l => l._id === String(leader));
+    }
 
-  const leaderLink = `${window.location.origin}/?leader=${leader.token}`;
-  document.getElementById('leaderLink').value = leaderLink;
+    if (!leader) {
+        showToast('danger', 'No se encontró el líder');
+        return;
+    }
 
-  const qrContainer = document.getElementById('qrCode');
-  qrContainer.innerHTML = ''; // limpiar antes de generar
+    const qrContainer = document.getElementById('qrContainer');
+    if (!qrContainer) {
+        console.error('No se encontró #qrContainer en el DOM');
+        return;
+    }
+    qrContainer.innerHTML = ''; // limpiar el contenedor
 
-  // Generar QR con qrcodejs (funciona sin importar si es local o en Render)
-  new QRCode(qrContainer, {
-    text: leaderLink,
-    width: 200,
-    height: 200,
-    colorDark: "#000000",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
-  });
+    // Generar QR con qrcodejs
+    new QRCode(qrContainer, {
+        text: `${window.location.origin}/?leader=${leader.token}`,
+        width: 200,
+        height: 200,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
 
-  // Mostrar modal
-  new bootstrap.Modal(document.getElementById('qrModal')).show();
+    var titleEl = document.getElementById('qrModalTitle');
+    if (titleEl) titleEl.innerText = `QR de ${leader.name}`;
+
+    // Mostrar modal simple
+    document.getElementById('qrModal').style.display = 'block';
 }
 
 function copyLeaderLink() {
-  const leaderLink = document.getElementById('leaderLink');
-  leaderLink.select();
-  leaderLink.setSelectionRange(0, 99999); // Para dispositivos móviles
+    const leaderLink = document.getElementById('leaderLink');
+    if (!leaderLink) {
+        showToast('danger', 'No hay enlace para copiar');
+        return;
+    }
+    leaderLink.select();
+    leaderLink.setSelectionRange(0, 99999); // Para dispositivos móviles
 
-  document.execCommand("copy");
-  showToast('success', 'Enlace copiado al portapapeles');
+    document.execCommand("copy");
+    showToast('success', 'Enlace copiado al portapapeles');
 }
 
 // ===================== 🔹 Funciones de notificaciones =====================
