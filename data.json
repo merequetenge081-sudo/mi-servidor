@@ -1,0 +1,41 @@
+{
+  "leaders": [
+    {
+      "id": 1762247705280,
+      "name": "Jonnathan Peña",
+      "email": "jonatanyhelen@hotmail.com",
+      "phone": "+573203725182",
+      "area": "Toluca",
+      "isActive": true,
+      "token": "leader1762247705280",
+      "registrations": 1
+    },
+    {
+      "id": 1762248531299,
+      "name": "Jonnathan Peña",
+      "email": "jonatanyhelen@hotmail.com",
+      "phone": "+573203725182",
+      "area": "Toluca",
+      "isActive": true,
+      "token": "leader1762248531299",
+      "registrations": 0
+    }
+  ],
+  "registrations": [
+    {
+      "firstName": "Jonnathan",
+      "lastName": "Peña",
+      "cedula": "1000953821",
+      "email": "jonatanyhelen@hotmail.com",
+      "phone": "+573203725182",
+      "address": "",
+      "city": "",
+      "state": "",
+      "leaderId": 1762247705280,
+      "leaderName": "Jonnathan Peña",
+      "whatsappSent": false,
+      "id": 1762248446259,
+      "date": "2025-11-04"
+    }
+  ]
+}

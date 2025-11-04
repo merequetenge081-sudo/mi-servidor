@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Líderes</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+        }
+        
+        .main-content {
+            padding: 2rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card.blue {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #4cc9f0, #4895ef);
+        }
+        
+        .stat-card.purple {
+            background: linear-gradient(135deg, #7209b7, #560bad);
+        }
+        
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--dark);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .badge-active {
+            background-color: #4bb543;
+        }
+        
+        .badge-inactive {
+            background-color: #ff6b6b;
+        }
+        
+        .qr-code {
+            display: inline-block;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .public-form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .public-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .leader-card {
+            transition: transform 0.2s;
+        }
+        
+        .leader-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Panel de Administrador -->
+    <div id="adminPanel" class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar col-md-3 col-lg-2 p-0">
+            <div class="p-4">
+                <h4 class="text-white mb-4"><i class="bi bi-people-fill"></i> Sistema Líderes</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('leaders')">
+                            <i class="bi bi-person-badge"></i> Gestión de Líderes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('registrations')">
+                            <i class="bi bi-person-lines-fill"></i> Registros
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('exports')">
+                            <i class="bi bi-file-earmark-spreadsheet"></i> Exportar Datos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPublicForm()">
+                            <i class="bi bi-link-45deg"></i> Ver Formulario Público
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
+                    <h1 class="h3">Dashboard</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
+                            <i class="bi bi-plus-circle"></i> Nuevo Líder
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="openAdminRegistration()">
+    <i class="bi bi-person-plus"></i> Nuevo Registro
+</button>
+
+                <!-- Stats Cards -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="stat-card blue">
+                            <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
+                            <div class="number" id="totalLeaders">0</div>
+                            <div>Líderes Activos</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card green">
+                            <i class="bi bi-person-check" style="font-size: 2rem;"></i>
+                            <div class="number" id="totalRegistrations">0</div>
+                            <div>Personas Registradas</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card purple">
+                            <i class="bi bi-whatsapp" style="font-size: 2rem;"></i>
+                            <div class="number" id="whatsappSent">0</div>
+                            <div>Mensajes Enviados</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-clock-history"></i> Actividad Reciente
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Persona</th>
+                                                <th>Líder</th>
+                                                <th>Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentActivity">
+                                            <!-- Los datos se cargarán dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-graph-up"></i> Resumen
+                            </div>
+                            <div class="card-body">
+                                <canvas id="summaryChart" width="100%" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Leaders Section -->
+            <div id="leadersSection" style="display: none;">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
+                    <h1 class="h3">Gestión de Líderes</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
+                            <i class="bi bi-plus-circle"></i> Nuevo Líder
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Leaders List -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-list-ul"></i> Lista de Líderes
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Estado</th>
+                                        <th>Registros</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leadersTable">
+                                    <!-- Los datos se cargarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Registrations Section -->
+            <div id="registrationsSection" style="display: none;">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
+                    <h1 class="h3">Registros de Personas</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-primary" onclick="exportToExcel('registrations')">
+                            <i class="bi bi-file-earmark-spreadsheet"></i> Exportar a Excel
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Registrations List -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-person-lines-fill"></i> Personas Registradas
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Cédula</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Líder</th>
+                                        <th>Fecha</th>
+                                        <th>WhatsApp</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="registrationsTable">
+                                    <!-- Los datos se cargarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Exports Section -->
+            <div id="exportsSection" style="display: none;">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
+                    <h1 class="h3">Exportar Datos</h1>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card leader-card">
+                            <div class="card-body text-center p-4">
+                                <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
+                                <h4 class="my-3">Exportar Líderes</h4>
+                                <p class="text-muted">Descarga un archivo Excel con todos los líderes y su información.</p>
+                                <button class="btn btn-primary" onclick="exportToExcel('leaders')">
+                                    <i class="bi bi-download"></i> Exportar Líderes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card leader-card">
+                            <div class="card-body text-center p-4">
+                                <i class="bi bi-person-check text-success" style="font-size: 3rem;"></i>
+                                <h4 class="my-3">Exportar Registros</h4>
+                                <p class="text-muted">Descarga un archivo Excel con todas las personas registradas.</p>
+                                <button class="btn btn-success" onclick="exportToExcel('registrations')">
+                                    <i class="bi bi-download"></i> Exportar Registros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Public Form -->
+    <div id="publicForm" style="display: none;">
+        <div class="public-header">
+            <div class="container">
+                <h1 class="display-4">Formulario de Registro</h1>
+                <p class="lead">Completa tus datos para formar parte de nuestra comunidad</p>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="public-form">
+                <form id="registrationForm">
+                    <div class="form-section">
+                        <div class="form-section-title">Información Personal</div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Apellido</label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cedula" class="form-label">Cédula</label>
+                            <input type="text" class="form-control" id="cedula" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="phone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">Información Adicional</div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="address">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" id="city">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="state" class="form-label">Estado/Provincia</label>
+                                <input type="text" class="form-control" id="state">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="whatsappConsent" checked>
+                        <label class="form-check-label" for="whatsappConsent">
+                            Deseo recibir confirmación por WhatsApp
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-send-check"></i> Enviar Registro
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button class="btn btn-outline-secondary" onclick="showAdminPanel()">
+                    <i class="bi bi-arrow-left"></i> Volver al Panel de Administración
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leader Modal -->
+    <div class="modal fade" id="leaderModal" tabindex="-1" aria-labelledby="leaderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="leaderModalLabel">Nuevo Líder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="leaderForm">
+                        <input type="hidden" id="leaderId">
+                        <div class="mb-3">
+                            <label for="leaderName" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="leaderName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leaderEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="leaderEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leaderPhone" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="leaderPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leaderArea" class="form-label">Área/Zona</label>
+                            <input type="text" class="form-control" id="leaderArea">
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="leaderActive" checked>
+                            <label class="form-check-label" for="leaderActive">
+                                Líder Activo
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLeader()">Guardar Líder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- QR Modal -->
+    <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrModalLabel">Código QR del Líder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="qrCode" class="mb-3"></div>
+                    <p class="small text-muted">Escanea este código para acceder al formulario de registro</p>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="leaderLink" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyLeaderLink()">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de registro manual -->
+<div class="modal fade" id="adminRegistrationModal" tabindex="-1" aria-labelledby="adminRegistrationLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="adminRegistrationLabel">Registrar Persona</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="adminRegistrationForm">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="adminFirstName" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="adminLastName" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Cédula</label>
+            <input type="text" class="form-control" id="adminCedula" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="adminEmail" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Teléfono</label>
+            <input type="tel" class="form-control" id="adminPhone" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Líder</label>
+            <select class="form-select" id="adminLeaderSelect"></select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" onclick="saveAdminRegistration()">Guardar Registro</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <strong class="me-auto">Éxito</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Operación completada con éxito
+            </div>
+        </div>
+        
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong class="me-auto">Error</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Ha ocurrido un error
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Configuración de WhatsApp
+        const WHATSAPP_TOKEN = "EAAg3leuXGWkBPxY34UKhzhBFXN7DuxeLTnZBpaJBvRZBRcOiA3b5oBXwZBjBUb5djsZCzDL3KfjZBzsZAiTR9uLkCytkcafh9NrZCZCovnel07i6TnNhCLPKTpx8WeWUBlYVnxsheS9iWacnghBsw7xZBKJcfvnTGC8GKk6ZBcDtWy9d6JmRqgpPlvbb3VRz1ESjRZCEAZDZD";
+        const PHONE_NUMBER_ID = "898324643356961";
+        
+        // Variables globales
+let leaders = [];
+let registrations = [];
+function openAdminRegistration() {
+    // Rellenar lista de líderes
+    const select = document.getElementById('adminLeaderSelect');
+    select.innerHTML = leaders.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+    const modal = new bootstrap.Modal(document.getElementById('adminRegistrationModal'));
+    modal.show();
+}
+
+async function saveAdminRegistration() {
+    const firstName = document.getElementById('adminFirstName').value;
+    const lastName = document.getElementById('adminLastName').value;
+    const cedula = document.getElementById('adminCedula').value;
+    const email = document.getElementById('adminEmail').value;
+    const phone = document.getElementById('adminPhone').value;
+    const leaderId = parseInt(document.getElementById('adminLeaderSelect').value);
+    const leader = leaders.find(l => l.id === leaderId);
+
+    const response = await fetch(`${API_URL}/registrations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            firstName, lastName, cedula, email, phone,
+            address: '',
+            city: '',
+            state: '',
+            leaderId,
+            leaderName: leader ? leader.name : 'Sin líder',
+            whatsappSent: false
+        })
+    });
+
+    const saved = await response.json();
+    await loadData();
+
+    bootstrap.Modal.getInstance(document.getElementById('adminRegistrationModal')).hide();
+    document.getElementById('adminRegistrationForm').reset();
+    showToast('success', 'Registro guardado correctamente');
+}
+
+// URL del servidor backend
+const API_URL = "http://localhost:3000/api";
+
+// Cargar datos desde el servidor al iniciar
+async function loadData() {
+    const leadersRes = await fetch(`${API_URL}/leaders`);
+    leaders = await leadersRes.json();
+
+    const regRes = await fetch(`${API_URL}/registrations`);
+    registrations = await regRes.json();
+
+    updateDashboard();
+    loadLeadersTable();
+    loadRegistrationsTable();
+    initializeChart();
+}
+
+// Llamar a loadData() al iniciar
+document.addEventListener('DOMContentLoaded', loadData);
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDashboard();
+            loadLeadersTable();
+            loadRegistrationsTable();
+            initializeChart();
+        });
+        // Mostrar formulario público si viene con ?leader=
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const leaderToken = params.get('leader');
+
+    if (leaderToken) {
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('publicForm').style.display = 'block';
+    }
+});
+
+        // Funciones para mostrar/ocultar secciones
+        function showSection(section) {
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('leadersSection').style.display = 'none';
+            document.getElementById('registrationsSection').style.display = 'none';
+            document.getElementById('exportsSection').style.display = 'none';
+            
+            document.getElementById(section + 'Section').style.display = 'block';
+        }
+        
+        function showPublicForm() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('publicForm').style.display = 'block';
+        }
+        
+        function showAdminPanel() {
+            document.getElementById('publicForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'flex';
+        }
+        
+        // Actualizar dashboard
+        function updateDashboard() {
+            document.getElementById('totalLeaders').textContent = leaders.filter(l => l.isActive).length;
+            document.getElementById('totalRegistrations').textContent = registrations.length;
+            document.getElementById('whatsappSent').textContent = registrations.filter(r => r.whatsappSent).length;
+            
+            // Actualizar actividad reciente
+            let recentActivity = document.getElementById('recentActivity');
+            recentActivity.innerHTML = '';
+            
+            // Ordenar registros por fecha (más recientes primero)
+            let sortedRegistrations = [...registrations].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Mostrar solo los 5 más recientes
+            sortedRegistrations.slice(0, 5).forEach(reg => {
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(reg.date)}</td>
+                    <td>${reg.firstName} ${reg.lastName}</td>
+                    <td>${reg.leaderName}</td>
+                    <td><span class="badge bg-success">Registro</span></td>
+                `;
+                recentActivity.appendChild(row);
+            });
+        }
+        
+        // Cargar tabla de líderes
+        function loadLeadersTable() {
+            let leadersTable = document.getElementById('leadersTable');
+            leadersTable.innerHTML = '';
+            
+            leaders.forEach(leader => {
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${leader.name}</td>
+                    <td>${leader.email}</td>
+                    <td>${leader.phone}</td>
+                    <td>
+                        <span class="badge ${leader.isActive ? 'badge-active' : 'badge-inactive'}">
+                            ${leader.isActive ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </td>
+                    <td>${leader.registrations}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="showQRCode(${leader.id})" title="Ver QR">
+                            <i class="bi bi-qr-code"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="editLeader(${leader.id})" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteLeader(${leader.id})" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                leadersTable.appendChild(row);
+            });
+        }
+        
+        // Cargar tabla de registros
+        function loadRegistrationsTable() {
+            let registrationsTable = document.getElementById('registrationsTable');
+            registrationsTable.innerHTML = '';
+            
+            registrations.forEach(reg => {
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${reg.firstName} ${reg.lastName}</td>
+                    <td>${reg.cedula}</td>
+                    <td>${reg.email}</td>
+                    <td>${reg.phone}</td>
+                    <td>${reg.leaderName}</td>
+                    <td>${formatDate(reg.date)}</td>
+                    <td>
+                        <span class="badge ${reg.whatsappSent ? 'bg-success' : 'bg-secondary'}">
+                            ${reg.whatsappSent ? 'Enviado' : 'Pendiente'}
+                        </span>
+                    </td>
+                    <td>
+                        ${!reg.whatsappSent ? 
+                            `<button class="btn btn-sm btn-outline-success" onclick="sendWhatsAppConfirmation(${reg.id})" title="Enviar WhatsApp">
+                                <i class="bi bi-whatsapp"></i>
+                            </button>` : 
+                            ''
+                        }
+                    </td>
+                `;
+                registrationsTable.appendChild(row);
+            });
+        }
+        
+        // Inicializar gráfico
+        function initializeChart() {
+            const ctx = document.getElementById('summaryChart').getContext('2d');
+            
+            // Contar registros por líder
+            let leaderCounts = {};
+            leaders.forEach(leader => {
+                leaderCounts[leader.name] = registrations.filter(reg => reg.leaderId === leader.id).length;
+            });
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(leaderCounts),
+                    datasets: [{
+                        data: Object.values(leaderCounts),
+                        backgroundColor: [
+                            '#4361ee',
+                            '#4cc9f0',
+                            '#7209b7',
+                            '#f72585',
+                            '#4895ef'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        async function saveLeader() {
+    const leaderId = document.getElementById('leaderId').value;
+    const leader = {
+        id: leaderId ? parseInt(leaderId) : null,
+        name: document.getElementById('leaderName').value,
+        email: document.getElementById('leaderEmail').value,
+        phone: document.getElementById('leaderPhone').value,
+        area: document.getElementById('leaderArea').value,
+        isActive: document.getElementById('leaderActive').checked
+    };
+
+    // Enviar al backend
+    const response = await fetch(`${API_URL}/leaders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(leader)
+    });
+
+    const saved = await response.json();
+    await loadData(); // recargar tablas
+
+    bootstrap.Modal.getInstance(document.getElementById('leaderModal')).hide();
+    document.getElementById('leaderForm').reset();
+    showToast('success', 'Líder guardado correctamente');
+}
+
+        
+        // Eliminar líder
+        async function deleteLeader(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar este líder?')) {
+        await fetch(`${API_URL}/leaders/${id}`, { method: 'DELETE' });
+        await loadData();
+        showToast('success', 'Líder eliminado correctamente');
+    }
+}
+
+        
+        // Mostrar código QR
+        // Mostrar código QR del líder
+function showQRCode(leaderId) {
+    const leader = leaders.find(l => l.id === leaderId);
+    if (!leader) return;
+
+    // Generar el enlace de registro del líder
+    const leaderLink = `${window.location.origin}?leader=${leader.token}`;
+    document.getElementById('leaderLink').value = leaderLink;
+
+    // Limpiar contenedor QR y crear un canvas nuevo
+    const qrContainer = document.getElementById('qrCode');
+    qrContainer.innerHTML = ""; // limpiar contenido anterior
+
+    const canvas = document.createElement("canvas");
+    qrContainer.appendChild(canvas);
+
+    // Generar el código QR
+    QRCode.toCanvas(canvas, leaderLink, {
+        width: 200,
+        margin: 2,
+        color: {
+            dark: "#000000",
+            light: "#FFFFFF"
+        }
+    }, function (error) {
+        if (error) {
+            console.error("Error generando QR:", error);
+            showToast("error", "No se pudo generar el código QR");
+        }
+    });
+
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+    modal.show();
+}
+
+
+// Copiar enlace del líder
+function copyLeaderLink() {
+    const leaderLink = `${window.location.origin}?leader=${leader.token}`;
+
+    leaderLink.select();
+            leaderLink.setSelectionRange(0, 99999); // Para dispositivos móviles
+            document.execCommand('copy');
+            showToast('success', 'Enlace copiado al portapapeles');
+        }
+        
+// Enviar formulario de registro
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Obtener datos del formulario
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const cedula = document.getElementById('cedula').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            const whatsappConsent = document.getElementById('whatsappConsent').checked;
+            
+            // Obtener líder de la URL (en una implementación real)
+            const urlParams = new URLSearchParams(window.location.search);
+            const leaderToken = urlParams.get('leader');
+            const leader = leaders.find(l => l.token === leaderToken);
+            
+            if (!leader) {
+                showToast('error', 'Error: No se pudo identificar al líder. Contacte al administrador.');
+                return;
+            }
+            
+            // Crear nuevo registro
+            const response = await fetch(`${API_URL}/registrations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        firstName, lastName, cedula, email, phone, address, city, state,
+        leaderId: leader.id,
+        leaderName: leader.name,
+        whatsappSent: false
+    })
+});
+
+const savedReg = await response.json();
+await loadData();
+
+            // Actualizar contador del líder
+            const leaderIndex = leaders.findIndex(l => l.id === leader.id);
+            if (leaderIndex !== -1) {
+                leaders[leaderIndex].registrations++;
+            }
+            
+            // Enviar WhatsApp si está activado
+            if (whatsappConsent) {
+                sendWhatsAppConfirmation(savedReg.id);
+            }
+            
+            // Mostrar mensaje de éxito y limpiar formulario
+            showToast('success', '¡Registro completado con éxito!');
+            document.getElementById('registrationForm').reset();
+            
+            // Actualizar datos en el panel de administración
+            updateDashboard();
+            loadRegistrationsTable();
+            initializeChart();
+        });
+        
+        // Enviar confirmación por WhatsApp
+        async function sendWhatsAppConfirmation(registrationId) {
+            const registration = registrations.find(r => r.id === registrationId);
+            if (!registration) return;
+            
+            try {
+                // Formatear el número de teléfono (eliminar el + y cualquier carácter no numérico)
+                const phoneNumber = registration.phone.replace(/\D/g, '');
+                
+                // Crear el mensaje
+                const message = `Hola ${registration.firstName}, tu registro ha sido confirmado exitosamente. Gracias por unirte a nuestra comunidad.`;
+                
+                // Preparar la solicitud a la API de WhatsApp
+                const response = await fetch(`https://graph.facebook.com/v17.0/${PHONE_NUMBER_ID}/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messaging_product: "whatsapp",
+                        to: phoneNumber,
+                        type: "text",
+                        text: {
+                            body: message
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Actualizar el estado en nuestros datos
+                    registration.whatsappSent = true;
+                    
+                    // Actualizar la tabla
+                    loadRegistrationsTable();
+                    updateDashboard();
+                    
+                    // Mostrar notificación
+                    showToast('success', 'Mensaje de WhatsApp enviado correctamente');
+                } else {
+                    console.error('Error al enviar WhatsApp:', data);
+                    showToast('error', 'Error al enviar WhatsApp: ' + (data.error?.message || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error al enviar WhatsApp:', error);
+                showToast('error', 'Error al enviar WhatsApp: ' + error.message);
+            }
+        }
+        
+        // Exportar a Excel
+        function exportToExcel(type) {
+            let data, filename;
+            
+            if (type === 'leaders') {
+                data = leaders.map(leader => ({
+                    'Nombre': leader.name,
+                    'Email': leader.email,
+                    'Teléfono': leader.phone,
+                    'Área': leader.area,
+                    'Estado': leader.isActive ? 'Activo' : 'Inactivo',
+                    'Registros': leader.registrations
+                }));
+                filename = 'líderes.xlsx';
+            } else if (type === 'registrations') {
+                data = registrations.map(reg => ({
+                    'Nombre': `${reg.firstName} ${reg.lastName}`,
+                    'Cédula': reg.cedula,
+                    'Email': reg.email,
+                    'Teléfono': reg.phone,
+                    'Dirección': reg.address,
+                    'Ciudad': reg.city,
+                    'Estado/Provincia': reg.state,
+                    'Líder': reg.leaderName,
+                    'Fecha de Registro': formatDate(reg.date),
+                    'WhatsApp Enviado': reg.whatsappSent ? 'Sí' : 'No'
+                }));
+                filename = 'registros.xlsx';
+            }
+            
+            // Crear libro de trabajo y hoja
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+            
+            // Ajustar el ancho de las columnas
+            const colWidths = [];
+            const headers = Object.keys(data[0]);
+            headers.forEach(header => {
+                colWidths.push({ wch: header.length + 5 });
+            });
+            ws['!cols'] = colWidths;
+            
+            // Descargar archivo
+            XLSX.writeFile(wb, filename);
+            
+            // Mostrar notificación
+            showToast('success', 'Archivo exportado correctamente');
+        }
+        
+        // Mostrar notificaciones toast
+        function showToast(type, message) {
+            let toastElement;
+            
+            if (type === 'success') {
+                toastElement = document.getElementById('successToast');
+            } else {
+                toastElement = document.getElementById('errorToast');
+            }
+            
+            // Actualizar el mensaje
+            toastElement.querySelector('.toast-body').textContent = message;
+            
+            // Mostrar el toast
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+        
+        // Función auxiliar para formatear fechas
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+    </script>
+</body>
+</html>
