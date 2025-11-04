@@ -654,6 +654,9 @@ function updateLeadersTable() {
         <button class="btn btn-sm btn-outline-primary" onclick="showQRCode('${leader._id}')" title="Ver QR">
           <i class="bi bi-qr-code"></i>
         </button>
+        <button class="btn btn-sm btn-outline-warning" onclick="editLeader('${leader._id}')">
+          <i class="bi bi-pencil"></i>
+        </button>
         <button class="btn btn-sm btn-outline-danger" onclick="deleteLeader('${leader._id}')">
           <i class="bi bi-trash"></i>
         </button>
@@ -678,3 +681,218 @@ function updateRegistrationsTable() {
         `;
     }).join('');
 }
+
+// ===================== 🔹 Funciones de la interfaz =====================
+function showSection(section) {
+  const sections = ['dashboard', 'leaders', 'registrations', 'exports'];
+  sections.forEach(s => {
+    document.getElementById(s + 'Section').style.display = s === section ? 'block' : 'none';
+  });
+  
+  // Actualizar el estado de los botones de la barra lateral
+  const links = document.querySelectorAll('.sidebar .nav-link');
+  links.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('onclick')?.includes(section)) {
+      link.classList.add('active');
+    }
+  });
+}
+
+function showPublicForm() {
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('publicForm').style.display = 'block';
+}
+
+function showAdminPanel() {
+  document.getElementById('publicForm').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'flex';
+}
+
+function openAdminRegistration() {
+  // Limpiar formulario
+  document.getElementById('adminRegistrationForm').reset();
+  // Cargar líderes para el selector
+  const leaderSelect = document.getElementById('adminLeaderSelect');
+  leaderSelect.innerHTML = leaders.map(leader => `
+    <option value="${leader._id}">${leader.name}</option>
+  `).join('');
+  // Mostrar modal
+  new bootstrap.Modal(document.getElementById('adminRegistrationModal')).show();
+}
+
+// ===================== 🔹 Funciones de registro y exportación =====================
+async function saveLeader() {
+  const id = document.getElementById('leaderId').value;
+  const name = document.getElementById('leaderName').value;
+  const email = document.getElementById('leaderEmail').value;
+  const phone = document.getElementById('leaderPhone').value;
+  const area = document.getElementById('leaderArea').value;
+  const active = document.getElementById('leaderActive').checked;
+  
+  if (!name || !email || !phone) {
+    showToast('danger', 'Por favor complete todos los campos obligatorios');
+    return;
+  }
+  
+  const res = await fetch(`${API_BASE}/leaders${id ? '/' + id : ''}`, {
+    method: id ? 'PUT' : 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name,
+      email,
+      phone,
+      area,
+      active
+    })
+  });
+  
+  if (res.ok) {
+    showToast('success', 'Líder guardado con éxito');
+    loadLeaders();
+    // Cerrar modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('leaderModal'));
+    modal.hide();
+  } else {
+    showToast('danger', 'Error al guardar el líder');
+  }
+}
+
+async function deleteLeader(id) {
+  if (!confirm("¿Eliminar este líder?")) return;
+
+  const res = await fetch(`${API_BASE}/leaders/${id}`, { method: "DELETE" });
+  if (res.ok) {
+    leaders = leaders.filter(l => l._id !== id);
+    updateLeadersTable();
+    showToast('success', 'Líder eliminado correctamente');
+  } else {
+    showToast('danger', 'Error al eliminar líder');
+  }
+}
+
+async function exportToExcel(type) {
+  const res = await fetch(`${API_BASE}/export/${type}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (res.ok) {
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `export_${type}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    showToast('success', `Datos exportados a Excel (${type})`);
+  } else {
+    showToast('danger', 'Error al exportar datos');
+  }
+}
+
+// ===================== 🔹 Funciones de formulario público =====================
+document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
+  
+  const res = await fetch(`${API_BASE}/registrations`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+  
+  if (res.ok) {
+    showToast('success', 'Registro enviado con éxito');
+    this.reset();
+  } else {
+    showToast('danger', 'Error al enviar el registro');
+  }
+});
+
+// ===================== 🔹 Funciones de QR y enlace =====================
+function showQRCode(leaderId) {
+  const leader = leaders.find(l => l._id === leaderId);
+  if (!leader) {
+    showToast('danger', 'No se encontró el líder');
+    return;
+  }
+
+  const leaderLink = `${window.location.origin}/?leader=${leader.token}`;
+  document.getElementById('leaderLink').value = leaderLink;
+
+  const qrContainer = document.getElementById('qrCode');
+  qrContainer.innerHTML = ''; // limpiar antes de generar
+
+  // Generar QR con qrcodejs (funciona sin importar si es local o en Render)
+  new QRCode(qrContainer, {
+    text: leaderLink,
+    width: 200,
+    height: 200,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // Mostrar modal
+  new bootstrap.Modal(document.getElementById('qrModal')).show();
+}
+
+function copyLeaderLink() {
+  const leaderLink = document.getElementById('leaderLink');
+  leaderLink.select();
+  leaderLink.setSelectionRange(0, 99999); // Para dispositivos móviles
+
+  document.execCommand("copy");
+  showToast('success', 'Enlace copiado al portapapeles');
+}
+
+// ===================== 🔹 Funciones de notificaciones =====================
+function showToast(type, message) {
+  const toastId = type === 'success' ? 'successToast' : 'errorToast';
+  const toastEl = document.getElementById(toastId);
+  const toast = new bootstrap.Toast(toastEl);
+  
+  // Actualizar el mensaje
+  toastEl.querySelector('.toast-body').textContent = message;
+  
+  toast.show();
+}
+
+// Cargar datos iniciales
+loadLeaders();
+loadRegistrations();
+showSection('dashboard');
+
+// Función para editar líder
+async function editLeader(id) {
+  const leader = leaders.find(l => l._id === id);
+  if (!leader) return;
+
+  const nuevoNombre = prompt("Editar nombre del líder:", leader.name);
+  if (!nuevoNombre) return;
+
+  const res = await fetch(`${API_BASE}/leaders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ _id: id, name: nuevoNombre, token: leader.token, registrations: leader.registrations })
+  });
+
+  const updated = await res.json();
+  leaders = leaders.map(l => (l._id === updated._id ? updated : l));
+  updateLeadersTable();
+  showToast('success', 'Líder actualizado correctamente');
+}
+</script>
+</body>
+</html>
