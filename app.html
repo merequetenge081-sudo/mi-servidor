@@ -234,23 +234,32 @@
                 <!-- Stats Cards -->
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="stat-card blue">
+                        <div class="stat-card blue" id="activeLeadersCard">
                             <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
-                            <div class="number" id="totalLeaders">0</div>
+                            <div class="number">
+                                <span id="activeLeadersCount">0</span>
+                                <span id="totalLeaders" style="display:none">0</span>
+                            </div>
                             <div>Líderes Activos</div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card green">
+                        <div class="stat-card green" id="registrationsCard">
                             <i class="bi bi-person-check" style="font-size: 2rem;"></i>
-                            <div class="number" id="totalRegistrations">0</div>
+                            <div class="number">
+                                <span id="registrationsCount">0</span>
+                                <span id="totalRegistrations" style="display:none">0</span>
+                            </div>
                             <div>Personas Registradas</div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="stat-card purple">
+                        <div class="stat-card purple" id="messagesCard">
                             <i class="bi bi-whatsapp" style="font-size: 2rem;"></i>
-                            <div class="number" id="whatsappSent">0</div>
+                            <div class="number">
+                                <span id="messagesCount">0</span>
+                                <span id="whatsappSent" style="display:none">0</span>
+                            </div>
                             <div>Mensajes Enviados</div>
                         </div>
                     </div>
@@ -615,6 +624,33 @@ const API_BASE = `${window.location.origin}/api`;
 let leaders = [];
 let registrations = [];
 
+// 🔹 Define primero la función updateDashboard (solicitud del usuario)
+async function updateDashboard() {
+    try {
+        // Obtener líderes y registros
+        const [leadersRes, regsRes] = await Promise.all([
+            fetch('/api/leaders'),
+            fetch('/api/registrations'),
+        ]);
+        const leadersData = await leadersRes.json();
+        const regs = await regsRes.json();
+
+        // Calcular datos
+        const activeLeaders = (leadersData.filter(l => l.active).length) || leadersData.length;
+        const totalRegs = regs.length;
+
+        // Actualizar la UI (elementos nuevos)
+        const activeEl = document.getElementById('activeLeadersCount');
+        if (activeEl) activeEl.innerText = activeLeaders;
+        const regsEl = document.getElementById('registrationsCount');
+        if (regsEl) regsEl.innerText = totalRegs;
+        const msgsEl = document.getElementById('messagesCount');
+        if (msgsEl) msgsEl.innerText = 0; // placeholder
+    } catch (err) {
+        console.error('Error actualizando dashboard:', err);
+    }
+}
+
 // ===================== 🔹 Cargar datos del backend =====================
 async function loadLeaders() {
   const res = await fetch(`${API_BASE}/leaders`);
@@ -625,7 +661,6 @@ async function loadLeaders() {
 async function loadRegistrations() {
   const res = await fetch(`${API_BASE}/registrations`);
   registrations = await res.json();
-  updateDashboard();
   updateRegistrationsTable();
 }
 
@@ -857,6 +892,40 @@ function copyLeaderLink() {
     showToast('success', 'Enlace copiado al portapapeles');
 }
 
+// ===================== 🔹 Registro público (registerPerson) =====================
+async function registerPerson() {
+    try {
+        // intento de obtener leaderId de URL o variable global
+        const urlParams = new URLSearchParams(window.location.search);
+        const leaderId = window.currentLeaderId || urlParams.get('leader');
+        const firstName = document.getElementById('firstName')?.value || '';
+        const lastName = document.getElementById('lastName')?.value || '';
+        const email = document.getElementById('email')?.value || '';
+        const phone = document.getElementById('phone')?.value || '';
+
+        if (!leaderId) {
+            alert('No se encontró un líder asociado para este registro.');
+            return;
+        }
+
+        const res = await fetch('/api/registrations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ leaderId, firstName, lastName, email, phone })
+        });
+
+        if (res.ok) {
+            alert('✅ Persona registrada correctamente');
+            updateDashboard();
+        } else {
+            alert('❌ Error al registrar la persona');
+        }
+    } catch (err) {
+        console.error('Error registerPerson:', err);
+        alert('❌ Error al registrar la persona');
+    }
+}
+
 // ===================== 🔹 Funciones de notificaciones =====================
 function showToast(type, message) {
   const toastId = type === 'success' ? 'successToast' : 'errorToast';
@@ -870,9 +939,24 @@ function showToast(type, message) {
 }
 
 // Cargar datos iniciales
+// 🔹 Luego llama a las funciones de carga y al nuevo updateDashboard
 loadLeaders();
 loadRegistrations();
+updateDashboard();
 showSection('dashboard');
+
+// ===================== 🔹 Click handlers para tarjetas =====================
+(function(){
+    var activeCard = document.getElementById('activeLeadersCard');
+    if (activeCard) activeCard.addEventListener('click', function() {
+        document.getElementById('leadersSection').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    var regsCard = document.getElementById('registrationsCard');
+    if (regsCard) regsCard.addEventListener('click', function() {
+        document.getElementById('registrationsSection').scrollIntoView({ behavior: 'smooth' });
+    });
+})();
 
 // Función para editar líder
 async function editLeader(id) {
