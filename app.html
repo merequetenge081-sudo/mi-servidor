@@ -637,7 +637,7 @@ let registrations = [];
 function openAdminRegistration() {
     // Rellenar lista de líderes
     const select = document.getElementById('adminLeaderSelect');
-    select.innerHTML = leaders.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+    select.innerHTML = leaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
     const modal = new bootstrap.Modal(document.getElementById('adminRegistrationModal'));
     modal.show();
 }
@@ -648,8 +648,8 @@ async function saveAdminRegistration() {
     const cedula = document.getElementById('adminCedula').value;
     const email = document.getElementById('adminEmail').value;
     const phone = document.getElementById('adminPhone').value;
-    const leaderId = parseInt(document.getElementById('adminLeaderSelect').value);
-    const leader = leaders.find(l => l.id === leaderId);
+    const leaderId = document.getElementById('adminLeaderSelect').value;
+    const leader = leaders.find(l => l._id === leaderId);
 
     const response = await fetch(`${API_URL}/registrations`, {
         method: 'POST',
@@ -774,13 +774,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                     <td>${leader.registrations}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary" onclick="showQRCode(${leader.id})" title="Ver QR">
+                        <button class="btn btn-sm btn-outline-primary" onclick="showQRCode(${leader._id})" title="Ver QR">
                             <i class="bi bi-qr-code"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="editLeader(${leader.id})" title="Editar">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="editLeader(${leader._id})" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteLeader(${leader.id})" title="Eliminar">
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteLeader(${leader._id})" title="Eliminar">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
@@ -810,7 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                     <td>
                         ${!reg.whatsappSent ? 
-                            `<button class="btn btn-sm btn-outline-success" onclick="sendWhatsAppConfirmation(${reg.id})" title="Enviar WhatsApp">
+                            `<button class="btn btn-sm btn-outline-success" onclick="sendWhatsAppConfirmation(${reg._id})" title="Enviar WhatsApp">
                                 <i class="bi bi-whatsapp"></i>
                             </button>` : 
                             ''
@@ -828,7 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Contar registros por líder
             let leaderCounts = {};
             leaders.forEach(leader => {
-                leaderCounts[leader.name] = registrations.filter(reg => reg.leaderId === leader.id).length;
+                leaderCounts[leader.name] = registrations.filter(reg => reg.leaderId === leader._id).length;
             });
             
             new Chart(ctx, {
@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async function saveLeader() {
     const leaderId = document.getElementById('leaderId').value;
     const leader = {
-        id: leaderId ? parseInt(leaderId) : null,
+        _id: leaderId || null,
         name: document.getElementById('leaderName').value,
         email: document.getElementById('leaderEmail').value,
         phone: document.getElementById('leaderPhone').value,
@@ -898,7 +898,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mostrar código QR
         // Mostrar código QR del líder
 function showQRCode(leaderId) {
-    const leader = leaders.find(l => l.id === leaderId);
+    const leader = leaders.find(l => l._id === leaderId);
     if (!leader) return;
 
     // Generar el enlace de registro del líder
@@ -985,7 +985,7 @@ const savedReg = await response.json();
 await loadData();
 
             // Actualizar contador del líder
-            const leaderIndex = leaders.findIndex(l => l.id === leader.id);
+            const leaderIndex = leaders.findIndex(l => l._id === leader._id);
             if (leaderIndex !== -1) {
                 leaders[leaderIndex].registrations++;
             }
@@ -1007,7 +1007,7 @@ await loadData();
         
         // Enviar confirmación por WhatsApp
         async function sendWhatsAppConfirmation(registrationId) {
-            const registration = registrations.find(r => r.id === registrationId);
+            const registration = registrations.find(r => r._id === registrationId);
             if (!registration) return;
             
             try {
