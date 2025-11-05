@@ -78,19 +78,47 @@ app.get("/api/registrations", async (req, res) => {
 
 // 🔹 Nuevo registro
 app.post("/api/registrations", async (req, res) => {
-  const reg = req.body;
-  reg.date = new Date().toISOString().split("T")[0];
+  try {
+    const reg = req.body;
+    reg.date = new Date().toISOString();
 
-  // Agregar nombre del líder si existe
-  const leader = await Leader.findById(reg.leaderId);
-  if (leader) {
-    reg.leaderName = leader.name;
-    leader.registrations++;
-    await leader.save();
+    const leader = await Leader.findById(reg.leaderId);
+    if (leader) {
+      reg.leaderName = leader.name;
+      leader.registrations++;
+      await leader.save();
+    }
+
+    const newReg = await Registration.create(reg);
+    res.json(newReg);
+  } catch (err) {
+    console.error("Error al crear registro:", err);
+    res.status(500).json({ error: "Error al crear registro" });
   }
+});
 
-  const newReg = await Registration.create(reg);
-  res.json(newReg);
+// 🔹 Editar registro
+app.put("/api/registrations/:id", async (req, res) => {
+  try {
+    const updated = await Registration.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ error: "Registro no encontrado" });
+    res.json(updated);
+  } catch (err) {
+    console.error("Error al editar registro:", err);
+    res.status(500).json({ error: "Error al editar registro" });
+  }
+});
+
+// 🔹 Eliminar registro
+app.delete("/api/registrations/:id", async (req, res) => {
+  try {
+    const deleted = await Registration.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Registro no encontrado" });
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Error al eliminar registro:", err);
+    res.status(500).json({ error: "Error al eliminar registro" });
+  }
 });
 
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
