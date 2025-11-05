@@ -477,8 +477,8 @@
                     </div>
                     
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-send-check"></i> Enviar Registro
+                        <button type="button" class="btn btn-primary btn-lg" onclick="registerPerson()">
+                            <i class="bi bi-send-check"></i> Guardar
                         </button>
                     </div>
                 </form>
@@ -580,7 +580,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" onclick="saveAdminRegistration()">Guardar Registro</button>
+    <button type="button" class="btn btn-success" onclick="registerPerson()">Guardar Registro</button>
       </div>
     </div>
   </div>
@@ -623,6 +623,36 @@
 const API_BASE = `${window.location.origin}/api`;
 let leaders = [];
 let registrations = [];
+
+async function registerPerson() {
+  const firstName = document.getElementById("firstName").value;
+  const lastName = document.getElementById("lastName").value;
+  const email = document.getElementById("email").value;
+  const phone = document.getElementById("phone").value;
+
+  const leaderToken = localStorage.getItem("publicLeaderToken");
+  const resLeader = await fetch("/api/leaders");
+  const leaders = await resLeader.json();
+  const leader = leaders.find(l => l.token === leaderToken);
+  const leaderId = leader ? leader._id : null;
+
+  const res = await fetch("/api/registrations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ leaderId, firstName, lastName, email, phone }),
+  });
+
+  if (res.ok) {
+    alert("✅ Persona registrada correctamente");
+    updateDashboard();
+  } else {
+    alert("❌ Error al registrar la persona");
+  }
+}
+
+function saveAdminRegistration() {
+  registerPerson();
+}
 
 async function deleteRegistration(id) {
   if (!confirm("¿Eliminar este registro?")) return;
