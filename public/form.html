@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Formulario Público - Registro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container py-5">
+    <div class="card p-4 mx-auto" style="max-width:700px;">
+      <h2 class="mb-3">Formulario de Registro</h2>
+      <p id="infoToken" class="text-muted small"></p>
+      <form id="publicForm">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Nombre</label>
+            <input id="firstName" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Apellido</label>
+            <input id="lastName" class="form-control" required>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Cédula</label>
+          <input id="cedula" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input id="email" type="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Teléfono</label>
+          <input id="phone" class="form-control">
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Enviar Registro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Extraer token desde la ruta /registro/:token
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const token = pathParts[pathParts.length - 1] || null;
+    document.getElementById('infoToken').textContent = token ? `Registrando para el líder: ${token}` : 'Registrando (sin token)';
+
+    document.getElementById('publicForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const cedula = document.getElementById('cedula').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+
+      // Buscar el leaderId a partir del token
+      let leaderId = null;
+      if (token) {
+        try {
+          const res = await fetch('/api/leaders');
+          if (res.ok) {
+            const leaders = await res.json();
+            const leader = leaders.find(l => l.token === token);
+            if (leader) leaderId = leader._id;
+          }
+        } catch (err) {
+          console.error('Error buscando líder por token:', err);
+        }
+      }
+
+      const payload = { leaderId, firstName, lastName, cedula, email, phone };
+
+      try {
+        const r = await fetch('/api/registrations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (r.ok) {
+          alert('Registro enviado con éxito');
+          this.reset();
+        } else {
+          alert('Error al enviar registro');
+        }
+      } catch (err) {
+        console.error('Error enviando registro:', err);
+        alert('Error al enviar registro');
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

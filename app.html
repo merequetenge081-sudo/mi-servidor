@@ -578,10 +578,10 @@
           </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-    <button type="button" class="btn btn-success" onclick="registerPerson()">Guardar Registro</button>
-      </div>
+        <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" onclick="saveAdminRegistration()">Guardar Registro</button>
+            </div>
     </div>
   </div>
 </div>
@@ -650,8 +650,41 @@ async function registerPerson() {
   }
 }
 
-function saveAdminRegistration() {
-  registerPerson();
+// Guardar registro desde el modal del admin
+async function saveAdminRegistration() {
+    const first = document.getElementById("adminFirstName")?.value.trim() || '';
+    const last = document.getElementById("adminLastName")?.value.trim() || '';
+    const name = (first + ' ' + last).trim();
+    const leaderId = document.getElementById("adminLeaderSelect")?.value;
+
+    if (!name || !leaderId) {
+        alert("Por favor completa todos los campos antes de guardar.");
+        return;
+    }
+
+    const reg = { name, leaderId };
+
+    try {
+        const response = await fetch("/api/registrations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reg)
+        });
+
+        if (response.ok) {
+            alert("Registro guardado correctamente ✅");
+            document.getElementById("adminFirstName").value = "";
+            document.getElementById("adminLastName").value = "";
+            const modal = bootstrap.Modal.getInstance(document.getElementById("adminRegistrationModal"));
+            if (modal) modal.hide();
+            loadRegistrations(); // refresca la tabla
+        } else {
+            alert("Hubo un error al guardar el registro.");
+        }
+    } catch (err) {
+        console.error('Error guardando registro admin:', err);
+        alert('Hubo un error al guardar el registro.');
+    }
 }
 
 async function deleteRegistration(id) {
@@ -915,7 +948,7 @@ function showQRCode(leader) {
 
     // Generar QR con qrcodejs
     new QRCode(qrContainer, {
-        text: `${window.location.origin}/?leader=${leader.token}`,
+        text: `${window.location.origin}/registro/${leader.token}`,
         width: 200,
         height: 200,
         colorDark: '#000000',

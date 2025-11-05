@@ -121,4 +121,9 @@ app.delete("/api/registrations/:id", async (req, res) => {
   }
 });
 
+// Ruta pública de registro por token
+app.get("/registro/:token", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "form.html"));
+});
+
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
