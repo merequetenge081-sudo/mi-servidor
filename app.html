@@ -624,6 +624,17 @@ const API_BASE = `${window.location.origin}/api`;
 let leaders = [];
 let registrations = [];
 
+async function deleteRegistration(id) {
+  if (!confirm("¿Eliminar este registro?")) return;
+  await fetch(`/api/registrations/${id}`, { method: "DELETE" });
+  alert("✅ Registro eliminado");
+  loadRegistrations();
+}
+
+function editRegistration(id) {
+  alert("✏️ Función de edición pendiente — aquí puedes abrir un modal con los datos.");
+}
+
 // 🔹 Define primero la función updateDashboard (solicitud del usuario)
 async function updateDashboard() {
     try {
@@ -696,10 +707,13 @@ function updateRegistrationsTable() {
         const fecha = reg.date ? new Date(reg.date).toLocaleDateString() : 'Sin fecha';
         return `
             <tr>
-                <td>${fecha}</td>
+                <td>${new Date(reg.date).toLocaleDateString("es-CO")}</td>
                 <td>${nombre}</td>
                 <td>${lider}</td>
-                <td>Registro</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">✏️</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">🗑️</button>
+                </td>
             </tr>
         `;
     }).join('');
@@ -824,8 +838,15 @@ async function exportToExcel(type) {
 document.getElementById('registrationForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
+  const leaderToken = localStorage.getItem("publicLeaderToken");
+  const resLeader = await fetch("/api/leaders");
+  const leaders = await resLeader.json();
+  const leader = leaders.find(l => l.token === leaderToken);
+  const leaderId = leader ? leader._id : null;
+  
   const formData = new FormData(this);
   const data = Object.fromEntries(formData.entries());
+  data.leaderId = leaderId;
   
   const res = await fetch(`${API_BASE}/registrations`, {
     method: 'POST',
@@ -937,6 +958,25 @@ function showToast(type, message) {
   
   toast.show();
 }
+
+// Detectar si es una vista pública del formulario
+window.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const leaderToken = urlParams.get("leader");
+
+  if (leaderToken) {
+    // Ocultar todo el dashboard
+    document.getElementById("dashboardSection").style.display = "none";
+    document.getElementById("leadersSection").style.display = "none";
+    document.getElementById("registrationsSection").style.display = "none";
+
+    // Mostrar solo el formulario
+    document.getElementById("publicFormSection").style.display = "block";
+
+    // Guardar el token para registrar con ese líder
+    localStorage.setItem("publicLeaderToken", leaderToken);
+  }
+});
 
 // Cargar datos iniciales
 // 🔹 Luego llama a las funciones de carga y al nuevo updateDashboard
