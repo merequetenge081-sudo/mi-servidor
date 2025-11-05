@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
+import ExcelJS from "exceljs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -124,6 +125,45 @@ app.delete("/api/registrations/:id", async (req, res) => {
 // Ruta pública de registro por token
 app.get("/registro/:token", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "form.html"));
+});
+
+// Exportar registros a Excel
+app.get("/api/export/registrations", async (req, res) => {
+  try {
+    const registrations = await Registration.find().populate("leaderId", "name");
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Registros");
+
+    worksheet.columns = [
+      { header: "Fecha", key: "date", width: 15 },
+      { header: "Persona", key: "name", width: 25 },
+      { header: "Líder", key: "leaderName", width: 25 }
+    ];
+
+    registrations.forEach(reg => {
+      worksheet.addRow({
+        date: reg.date,
+        name: reg.name,
+        leaderName: reg.leaderId?.name || "Desconocido"
+      });
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=registros.xlsx"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error("❌ Error al exportar:", err);
+    res.status(500).json({ error: "Error al exportar los registros" });
+  }
 });
 
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
