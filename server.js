@@ -130,39 +130,70 @@ app.get("/registro/:token", (req, res) => {
 // Exportar registros a Excel
 app.get("/api/export/registrations", async (req, res) => {
   try {
-    const registrations = await Registration.find().populate("leaderId", "name");
+    const regs = await Registration.find().populate("leaderId");
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Registros");
 
+    // 🎨 Encabezados con estilo
     worksheet.columns = [
       { header: "Fecha", key: "date", width: 15 },
-      { header: "Persona", key: "name", width: 25 },
-      { header: "Líder", key: "leaderName", width: 25 }
+      { header: "Nombre de Persona", key: "name", width: 25 },
+      { header: "Nombre del Líder", key: "leaderName", width: 25 },
+      { header: "Token del Líder", key: "token", width: 25 }
     ];
 
-    registrations.forEach(reg => {
+    // 🔹 Estilo de los encabezados
+    worksheet.getRow(1).eachCell(cell => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "4472C4" } };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" }
+      };
+    });
+
+    // 📋 Agregar filas
+    regs.forEach(reg => {
       worksheet.addRow({
-        date: reg.date,
+        date: new Date(reg.date).toLocaleDateString("es-ES"),
         name: reg.name,
-        leaderName: reg.leaderId?.name || "Desconocido"
+        leaderName: reg.leaderId?.name || "Sin líder",
+        token: reg.leaderId?.token || "-"
       });
     });
 
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=registros.xlsx"
-    );
+    // 🟩 Bordes y formato de celdas
+    worksheet.eachRow((row, rowNumber) => {
+      row.eachCell(cell => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" }
+        };
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+      });
+      if (rowNumber % 2 === 0 && rowNumber > 1) {
+        row.eachCell(cell => {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "DDEBF7" } };
+        });
+      }
+    });
+
+    // 📁 Enviar el archivo
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", "attachment; filename=registros_formateados.xlsx");
 
     await workbook.xlsx.write(res);
     res.end();
+
   } catch (err) {
-    console.error("❌ Error al exportar:", err);
-    res.status(500).json({ error: "Error al exportar los registros" });
+    console.error("❌ Error al exportar Excel:", err);
+    res.status(500).send("Error al generar el archivo Excel");
   }
 });
 
