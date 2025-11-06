@@ -70,6 +70,7 @@ app.post("/api/leaders", async (req, res) => {
 });
 
 // 🔹 NUEVO: Endpoint para enviar notificaciones manualmente
+<<<<<<< HEAD
 // 🔹 Endpoint para enviar notificaciones manualmente
 app.post("/api/send-notification/:registrationId", async (req, res) => {
   try {
@@ -78,6 +79,12 @@ app.post("/api/send-notification/:registrationId", async (req, res) => {
     const registration = await Registration.findById(req.params.registrationId);
     if (!registration) {
       console.log('❌ Registro no encontrado');
+=======
+app.post("/api/send-notification/:registrationId", async (req, res) => {
+  try {
+    const registration = await Registration.findById(req.params.registrationId);
+    if (!registration) {
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
       return res.status(404).json({ error: "Registro no encontrado" });
     }
 
@@ -88,8 +95,11 @@ app.post("/api/send-notification/:registrationId", async (req, res) => {
       phone: registration.phone
     };
 
+<<<<<<< HEAD
     console.log('👤 Datos del usuario:', userData);
 
+=======
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
     const results = await NotificationService.sendAllNotifications(userData);
 
     // Actualizar estado de notificaciones
@@ -97,8 +107,11 @@ app.post("/api/send-notification/:registrationId", async (req, res) => {
     registration.notifications.smsSent = results.sms.success;
     await registration.save();
 
+<<<<<<< HEAD
     console.log('✅ Notificaciones procesadas:', results);
 
+=======
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
     res.json({
       success: true,
       message: "Notificaciones enviadas",
