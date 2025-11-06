@@ -70,10 +70,14 @@ app.post("/api/leaders", async (req, res) => {
 });
 
 // 🔹 NUEVO: Endpoint para enviar notificaciones manualmente
+// 🔹 Endpoint para enviar notificaciones manualmente
 app.post("/api/send-notification/:registrationId", async (req, res) => {
   try {
+    console.log('🔔 Solicitud de notificación recibida para ID:', req.params.registrationId);
+    
     const registration = await Registration.findById(req.params.registrationId);
     if (!registration) {
+      console.log('❌ Registro no encontrado');
       return res.status(404).json({ error: "Registro no encontrado" });
     }
 
@@ -84,12 +88,16 @@ app.post("/api/send-notification/:registrationId", async (req, res) => {
       phone: registration.phone
     };
 
+    console.log('👤 Datos del usuario:', userData);
+
     const results = await NotificationService.sendAllNotifications(userData);
 
     // Actualizar estado de notificaciones
     registration.notifications.emailSent = results.email.success;
     registration.notifications.smsSent = results.sms.success;
     await registration.save();
+
+    console.log('✅ Notificaciones procesadas:', results);
 
     res.json({
       success: true,
