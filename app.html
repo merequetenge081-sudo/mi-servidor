@@ -773,10 +773,13 @@ function updateRegistrationsTable() {
                 <td>${new Date(reg.date).toLocaleDateString("es-CO")}</td>
                 <td>${nombre}</td>
                 <td>${lider}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">✏️</button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">🗑️</button>
-                </td>
+                                <td>
+                                        <button class="btn btn-sm btn-outline-success" onclick="sendWhatsApp('${reg.phone}', '${(reg.firstName || reg.name || '').replace("'", "\'")}')">
+                                            <i class="bi bi-whatsapp"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">✏️</button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">🗑️</button>
+                                </td>
             </tr>
         `;
     }).join('');
@@ -1020,6 +1023,16 @@ function showToast(type, message) {
   toastEl.querySelector('.toast-body').textContent = message;
   
   toast.show();
+}
+
+function sendWhatsApp(phone, name) {
+    if (!phone) {
+        showToast("danger", "Este registro no tiene número de teléfono.");
+        return;
+    }
+    const cleaned = String(phone).replace(/[^0-9+]/g, '');
+    const message = encodeURIComponent(`Hola ${name || ''}! ✅ Gracias por registrarte con nosotros.`);
+    window.open(`https://wa.me/${cleaned}?text=${message}`, "_blank");
 }
 
 // Detectar si es una vista pública del formulario

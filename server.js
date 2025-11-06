@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import ExcelJS from "exceljs";
 
@@ -127,66 +128,81 @@ app.get("/registro/:token", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "form.html"));
 });
 
-// Exportar registros a Excel
-app.get("/api/export/registrations", async (req, res) => {
+// Exportar a Excel (genérico: /api/export/leaders o /api/export/registrations)
+app.get("/api/export/:type", async (req, res) => {
+  const { type } = req.params;
   try {
-    const regs = await Registration.find().populate("leaderId");
+    const dataFile = path.join(process.cwd(), "data.json");
+    let data = { leaders: [], registrations: [] };
+    if (fs.existsSync(dataFile)) {
+      data = JSON.parse(fs.readFileSync(dataFile, "utf8"));
+    } else {
+      // if no data.json, fallback to DB
+      const leadersFromDb = await Leader.find();
+      const regsFromDb = await Registration.find();
+      data.leaders = leadersFromDb;
+      data.registrations = regsFromDb;
+    }
+
+    let rows = [];
+    let headers = [];
+
+    if (type === "leaders") {
+      headers = ["Nombre", "Email", "Teléfono", "Área/Zona", "Activo", "Registros"];
+      rows = (data.leaders || []).map(l => [
+        l.name || "",
+        l.email || "",
+        l.phone || "",
+        l.area || "",
+        l.active ? "Sí" : "No",
+        l.registrations || 0
+      ]);
+    } else if (type === "registrations") {
+      headers = ["Fecha", "Nombre", "Email", "Teléfono", "Líder"];
+      rows = (data.registrations || []).map(r => [
+        r.date ? new Date(r.date).toLocaleDateString("es-CO") : "",
+        ((r.firstName || "") + " " + (r.lastName || "")).trim() || r.name || "",
+        r.email || "",
+        r.phone || "",
+        ((data.leaders || []).find(l => String(l._id) === String(r.leaderId))?.name) || r.leaderName || "Sin líder"
+      ]);
+    } else {
+      return res.status(400).send("Tipo no válido");
+    }
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Registros");
+    const sheet = workbook.addWorksheet(type === "leaders" ? "Líderes" : "Registros");
 
-    // 🎨 Encabezados con estilo
-    worksheet.columns = [
-      { header: "Fecha", key: "date", width: 15 },
-      { header: "Nombre de Persona", key: "name", width: 25 },
-      { header: "Nombre del Líder", key: "leaderName", width: 25 },
-      { header: "Token del Líder", key: "token", width: 25 }
-    ];
-
-    // 🔹 Estilo de los encabezados
-    worksheet.getRow(1).eachCell(cell => {
+    // Encabezado
+    const headerRow = sheet.addRow(headers);
+    headerRow.eachCell(cell => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "4472C4" } };
-      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF4361EE" } };
       cell.border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" }
+        top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" }
       };
+      cell.alignment = { horizontal: "center", vertical: "middle" };
     });
 
-    // 📋 Agregar filas
-    regs.forEach(reg => {
-      worksheet.addRow({
-        date: new Date(reg.date).toLocaleDateString("es-ES"),
-        name: reg.name,
-        leaderName: reg.leaderId?.name || "Sin líder",
-        token: reg.leaderId?.token || "-"
+    // Filas
+    rows.forEach(row => {
+      const r = sheet.addRow(row);
+      r.eachCell(cell => {
+        cell.border = { top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" } };
       });
     });
 
-    // 🟩 Bordes y formato de celdas
-    worksheet.eachRow((row, rowNumber) => {
-      row.eachCell(cell => {
-        cell.border = {
-          top: { style: "thin" },
-          left: { style: "thin" },
-          bottom: { style: "thin" },
-          right: { style: "thin" }
-        };
-        cell.alignment = { vertical: "middle", horizontal: "center" };
+    // Auto width
+    sheet.columns.forEach(column => {
+      let max = 10;
+      column.eachCell({ includeEmpty: true }, cell => {
+        max = Math.max(max, (cell.value ? cell.value.toString().length : 0) + 2);
       });
-      if (rowNumber % 2 === 0 && rowNumber > 1) {
-        row.eachCell(cell => {
-          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "DDEBF7" } };
-        });
-      }
+      column.width = max;
     });
 
-    // 📁 Enviar el archivo
+    res.setHeader("Content-Disposition", `attachment; filename=${type}_export.xlsx`);
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    res.setHeader("Content-Disposition", "attachment; filename=registros_formateados.xlsx");
 
     await workbook.xlsx.write(res);
     res.end();
