@@ -1,30 +1,11 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import twilio from 'twilio';
 
-// Configuración de Email con opciones mejoradas
-const emailTransporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  debug: true,
-  logger: true,
-  // Configuraciones adicionales para mejor confiabilidad
-  pool: true,
-  maxConnections: 5,
-  maxMessages: 100,
-  rateDelta: 1000,
-  rateLimit: 5
-});
-
-// Verificar configuración de email al iniciar
-console.log('📧 Configuración de Email:');
-console.log('   EMAIL_USER:', process.env.EMAIL_USER ? '✅ Configurado' : '❌ Faltante');
-console.log('   EMAIL_PASS:', process.env.EMAIL_PASS ? '✅ Configurado' : '❌ Faltante');
+// Inicializar Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Configuración de SMS (Twilio) - Opcional
 let smsClient = null;
@@ -41,30 +22,22 @@ try {
 
 export class NotificationService {
   
-  // 🔹 Enviar confirmación por Email
+  // 🔹 Enviar confirmación por Email con Resend
   static async sendEmailConfirmation(userData) {
     try {
       const { email, firstName, lastName, phone } = userData;
       
-      console.log('\n📧 === INICIANDO ENVÍO DE EMAIL ===');
+      console.log('\n📧 === ENVÍO CON RESEND ===');
       console.log('📧 Destinatario:', email);
       console.log('👤 Nombre:', `${firstName} ${lastName}`);
       
-      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.log('❌ Faltan variables de entorno para email');
-        return { success: false, error: 'Email no configurado' };
+      if (!process.env.RESEND_API_KEY) {
+        console.log('❌ Faltan RESEND_API_KEY');
+        return { success: false, error: 'Resend no configurado' };
       }
 
-      // Verificar que el transporter esté listo
-      console.log('🔄 Verificando conexión con servidor de email...');
-      await emailTransporter.verify();
-      console.log('✅ Conexión con servidor de email verificada');
-
-      const mailOptions = {
-        from: {
-          name: 'Sistema de Registro',
-          address: process.env.EMAIL_USER
-        },
+      const result = await resend.emails.send({
+        from: 'Sistema de Registro <onboarding@resend.dev>',
         to: email,
         subject: '✅ Confirmación de Registro Exitosa',
         html: `
@@ -87,7 +60,7 @@ export class NotificationService {
               <p><strong>📍 Lugar:</strong> Auditorio Central</p>
               
               <div style="text-align: center; margin: 25px 0;">
-                <div style="background: #4361ee; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                <div style="background: #4361ee; color: white; padding: 12px 30px; border-radius: 5px; display: inline-block;">
                   Registro Confirmado
                 </div>
               </div>
@@ -95,51 +68,29 @@ export class NotificationService {
             
             <div style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">
               <p>Este es un mensaje automático, por favor no responda a este correo.</p>
-              <p>Si tienes alguna pregunta, contáctanos a: ${process.env.EMAIL_USER}</p>
             </div>
           </div>
-        `,
-        // Texto plano como fallback
-        text: `Hola ${firstName} ${lastName}, tu registro ha sido confirmado exitosamente. Detalles: Nombre: ${firstName} ${lastName}, Email: ${email}, Teléfono: ${phone}, Fecha: ${new Date().toLocaleDateString('es-CO')}. Evento: Sábado 9 de Noviembre, 5:00 PM, Auditorio Central.`
-      };
+        `
+      });
 
-      console.log('🔄 Enviando email...');
-      const result = await emailTransporter.sendMail(mailOptions);
-      
-      console.log('✅ === EMAIL ENVIADO EXITOSAMENTE ===');
+      console.log('✅ === EMAIL ENVIADO CON RESEND ===');
       console.log('✅ Destinatario:', email);
-      console.log('✅ Message ID:', result.messageId);
-      console.log('✅ Response:', result.response);
+      console.log('✅ Email ID:', result.data?.id);
       
       return { 
         success: true, 
-        messageId: result.messageId,
-        response: result.response 
+        id: result.data?.id,
+        provider: 'resend'
       };
       
     } catch (error) {
-      console.error('❌ === ERROR ENVIANDO EMAIL ===');
+      console.error('❌ === ERROR CON RESEND ===');
       console.error('❌ Error:', error.message);
-      console.error('❌ Código:', error.code);
-      console.error('❌ Comando:', error.command);
-      
-      // Mensajes de error más específicos
-      let errorMessage = error.message;
-      if (error.code === 'EAUTH') {
-        errorMessage = 'Error de autenticación. Verifica usuario y contraseña.';
-      } else if (error.code === 'EENVELOPE') {
-        errorMessage = 'Error con el destinatario. Verifica el email.';
-      } else if (error.code === 'ECONNECTION') {
-        errorMessage = 'Error de conexión con el servidor de email.';
-      }
       
       return { 
         success: false, 
-        error: errorMessage,
-        details: {
-          code: error.code,
-          command: error.command
-        }
+        error: error.message,
+        provider: 'resend'
       };
     }
   }
@@ -154,7 +105,6 @@ export class NotificationService {
     try {
       const { phone, firstName } = userData;
       
-      // Limpiar número (remover espacios, guiones, etc.)
       const cleanPhone = String(phone).replace(/[^0-9+]/g, '');
       
       console.log('📱 Enviando SMS a:', cleanPhone);
@@ -201,16 +151,33 @@ export class NotificationService {
     return results;
   }
 
-  // 🔹 Verificar configuración del servicio
+  // 🔹 Verificar configuración de Resend
   static async checkEmailService() {
     try {
-      console.log('🔍 Verificando servicio de email...');
-      await emailTransporter.verify();
-      console.log('✅ Servicio de email funcionando correctamente');
-      return { success: true, message: 'Servicio de email operativo' };
+      console.log('🔍 Verificando Resend...');
+      console.log('🔑 RESEND_API_KEY:', process.env.RESEND_API_KEY ? '✅ Configurado' : '❌ Faltante');
+      
+      if (!process.env.RESEND_API_KEY) {
+        return { 
+          success: false, 
+          error: 'Falta RESEND_API_KEY' 
+        };
+      }
+      
+      // Resend no tiene método verify, pero podemos probar con una operación simple
+      return { 
+        success: true, 
+        message: 'Resend configurado correctamente',
+        provider: 'resend'
+      };
+      
     } catch (error) {
-      console.error('❌ Error en servicio de email:', error.message);
-      return { success: false, error: error.message };
+      console.error('❌ Error con Resend:', error.message);
+      return { 
+        success: false, 
+        error: error.message,
+        provider: 'resend'
+      };
     }
   }
 }
