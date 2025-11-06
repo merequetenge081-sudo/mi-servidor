@@ -1,15 +1,23 @@
 import nodemailer from 'nodemailer';
 import twilio from 'twilio';
 
+<<<<<<< HEAD
 // Configuración de Email con opciones de debugging/registro
+=======
+// Configuración de Email
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
 const emailTransporter = nodemailer.createTransport({
   service: 'gmail', // o tu proveedor: outlook, yahoo, etc.
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
+<<<<<<< HEAD
   },
   debug: true, // muestra detalles de conexión
   logger: true // habilita logger
+=======
+  }
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
 });
 
 // Configuración de SMS (Twilio) - Opcional
@@ -23,6 +31,7 @@ export class NotificationService {
     try {
       const { email, firstName, lastName, phone } = userData;
       
+<<<<<<< HEAD
       console.log('📧 Intentando enviar email a:', email);
       console.log('🔑 Usando EMAIL_USER:', process.env.EMAIL_USER ? '✅ Configurado' : '❌ No configurado');
       
@@ -31,6 +40,8 @@ export class NotificationService {
         return { success: false, error: 'Email no configurado' };
       }
 
+=======
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
@@ -68,11 +79,17 @@ export class NotificationService {
         `
       };
 
+<<<<<<< HEAD
   const result = await emailTransporter.sendMail(mailOptions);
   console.log('✅ Email enviado exitosamente a:', email);
   console.log('📨 Message ID:', result.messageId);
       
   return { success: true, messageId: result.messageId };
+=======
+      const result = await emailTransporter.sendMail(mailOptions);
+      console.log('✅ Email enviado a:', email);
+      return { success: true, messageId: result.messageId };
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
       
     } catch (error) {
       console.error('❌ Error enviando email:', error);
@@ -110,6 +127,7 @@ export class NotificationService {
 
   // 🔹 Enviar ambas notificaciones
   static async sendAllNotifications(userData) {
+<<<<<<< HEAD
     console.log('🚀 Iniciando envío de notificaciones para:', userData.email);
     
     const results = {
@@ -118,6 +136,13 @@ export class NotificationService {
     };
     
     console.log('📊 Resultados de notificaciones:', results);
+=======
+    const results = {
+      email: await this.sendEmailConfirmation(userData),
+      sms: await this.sendSMSConfirmation(userData)
+    };
+    
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
     return results;
   }
 }

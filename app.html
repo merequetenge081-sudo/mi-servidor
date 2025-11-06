@@ -1063,6 +1063,7 @@ async function sendWhatsApp(phone, name) {
 
 // Enviar notificaciones manualmente para un registro
 async function sendNotification(registrationId) {
+<<<<<<< HEAD
   try {
     console.log('🔄 Enviando notificación para registro:', registrationId);
     
@@ -1088,6 +1089,23 @@ async function sendNotification(registrationId) {
     console.error('💥 Error de conexión:', error);
     showToast('danger', 'Error de conexión al servidor');
   }
+=======
+    try {
+        const response = await fetch(`/api/send-notification/${registrationId}`, {
+            method: 'POST'
+        });
+    
+        const result = await response.json();
+        if (result.success) {
+            showToast('success', 'Notificaciones enviadas correctamente');
+        } else {
+            showToast('danger', 'Error enviando notificaciones');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('danger', 'Error de conexión');
+    }
+>>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
 }
 
 // Detectar si es una vista pública del formulario
