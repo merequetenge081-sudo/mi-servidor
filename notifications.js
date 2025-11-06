@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import nodemailer from 'nodemailer';
 import twilio from 'twilio';
 
@@ -13,8 +16,17 @@ const emailTransporter = nodemailer.createTransport({
 });
 
 // Configuración de SMS (Twilio) - Opcional
-const smsClient = process.env.TWILIO_ACCOUNT_SID ?
-  twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN) : null;
+let smsClient = null;
+try {
+  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+    smsClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    console.log('📱 Cliente Twilio inicializado');
+  } else {
+    console.log('📱 SMS desactivado (credenciales no configuradas)');
+  }
+} catch (error) {
+  console.log('⚠️ Error inicializando Twilio:', error.message);
+}
 
 export class NotificationService {
   
