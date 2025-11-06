@@ -70,7 +70,6 @@ app.post("/api/leaders", async (req, res) => {
 });
 
 // 🔹 NUEVO: Endpoint para enviar notificaciones manualmente
-// 🔹 NUEVO: Endpoint para enviar notificaciones manualmente
 app.post("/api/send-notification/:registrationId", async (req, res) => {
   try {
     console.log('🔔 Solicitud de notificación recibida para ID:', req.params.registrationId);
@@ -99,28 +98,6 @@ app.post("/api/send-notification/:registrationId", async (req, res) => {
 
     console.log('✅ Notificaciones procesadas:', results);
 
-    res.json({
-      success: true,
-      message: "Notificaciones enviadas",
-      results
-    });
-
-  } catch (error) {
-    console.error("❌ Error enviando notificaciones:", error);
-    res.status(500).json({ error: "Error enviando notificaciones" });
-  }
-});
-
-    // Actualizar estado de notificaciones
-    registration.notifications.emailSent = results.email.success;
-    registration.notifications.smsSent = results.sms.success;
-    await registration.save();
-
-<<<<<<< HEAD
-    console.log('✅ Notificaciones procesadas:', results);
-
-=======
->>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
     res.json({
       success: true,
       message: "Notificaciones enviadas",
@@ -192,7 +169,7 @@ app.post("/api/registrations", async (req, res) => {
       newReg.notifications.smsSent = notificationResults.sms.success;
       await newReg.save();
 
-      console.log('� Notificaciones enviadas:', notificationResults);
+      console.log('✅ Notificaciones enviadas:', notificationResults);
 
     } catch (notifyError) {
       console.error('❌ Error en notificaciones automáticas:', notifyError);
