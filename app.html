@@ -773,13 +773,13 @@ function updateRegistrationsTable() {
                 <td>${new Date(reg.date).toLocaleDateString("es-CO")}</td>
                 <td>${nombre}</td>
                 <td>${lider}</td>
-                                <td>
-                                        <button class="btn btn-sm btn-outline-success" onclick="sendWhatsApp('${reg.phone}', '${(reg.firstName || reg.name || '').replace("'", "\'")}')">
-                                            <i class="bi bi-whatsapp"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">✏️</button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">🗑️</button>
-                                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar Notificación">
+                    <i class="bi bi-envelope-check"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">✏️</button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">🗑️</button>
+                </td>
             </tr>
         `;
     }).join('');
@@ -1025,14 +1025,59 @@ function showToast(type, message) {
   toast.show();
 }
 
-function sendWhatsApp(phone, name) {
+async function sendWhatsApp(phone, name) {
     if (!phone) {
         showToast("danger", "Este registro no tiene número de teléfono.");
         return;
     }
     const cleaned = String(phone).replace(/[^0-9+]/g, '');
     const message = encodeURIComponent(`Hola ${name || ''}! ✅ Gracias por registrarte con nosotros.`);
-    window.open(`https://wa.me/${cleaned}?text=${message}`, "_blank");
+    
+    try {
+        // Enviar mensaje a través del bot de WhatsApp
+        const res = await fetch('http://localhost:4000/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                number: cleaned,
+                message: `Hola ${name || ''}! ✅ Gracias por registrarte con nosotros.`
+            })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            showToast('success', 'Mensaje de WhatsApp enviado correctamente');
+            // Actualizar contador de mensajes
+            const msgCount = document.getElementById('messagesCount');
+            if (msgCount) msgCount.innerText = (parseInt(msgCount.innerText) || 0) + 1;
+        } else {
+            showToast('danger', 'Error al enviar mensaje de WhatsApp');
+        }
+    } catch (err) {
+        console.error('Error al enviar WhatsApp:', err);
+        showToast('danger', 'Error al conectar con el bot de WhatsApp');
+        // Si falla el bot, usar el método de respaldo de abrir WhatsApp web
+        window.open(`https://wa.me/${cleaned}?text=${message}`, "_blank");
+    }
+}
+
+// Enviar notificaciones manualmente para un registro
+async function sendNotification(registrationId) {
+    try {
+        const response = await fetch(`/api/send-notification/${registrationId}`, {
+            method: 'POST'
+        });
+    
+        const result = await response.json();
+        if (result.success) {
+            showToast('success', 'Notificaciones enviadas correctamente');
+        } else {
+            showToast('danger', 'Error enviando notificaciones');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('danger', 'Error de conexión');
+    }
 }
 
 // Detectar si es una vista pública del formulario
