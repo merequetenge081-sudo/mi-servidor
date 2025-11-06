@@ -321,5 +321,32 @@ app.post('/api/send-whatsapp', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
+// 🔹 Ruta para probar el servicio de email
+app.get('/api/test-email', async (req, res) => {
+  try {
+    const result = await NotificationService.checkEmailService();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+// 🔹 Ruta para probar envío REAL de email
+app.get('/api/test-send-email', async (req, res) => {
+  try {
+    const testData = {
+      firstName: "Usuario",
+      lastName: "Prueba", 
+      email: "jonnathanpena1@gmail.com",
+      phone: "1234567890"
+    };
+    
+    console.log('🧪 Probando envío REAL de email...');
+    const result = await NotificationService.sendEmailConfirmation(testData);
+    
+    res.json(result);
+    
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
