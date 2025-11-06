@@ -70,8 +70,7 @@ app.post("/api/leaders", async (req, res) => {
 });
 
 // 🔹 NUEVO: Endpoint para enviar notificaciones manualmente
-<<<<<<< HEAD
-// 🔹 Endpoint para enviar notificaciones manualmente
+// 🔹 NUEVO: Endpoint para enviar notificaciones manualmente
 app.post("/api/send-notification/:registrationId", async (req, res) => {
   try {
     console.log('🔔 Solicitud de notificación recibida para ID:', req.params.registrationId);
@@ -79,12 +78,6 @@ app.post("/api/send-notification/:registrationId", async (req, res) => {
     const registration = await Registration.findById(req.params.registrationId);
     if (!registration) {
       console.log('❌ Registro no encontrado');
-=======
-app.post("/api/send-notification/:registrationId", async (req, res) => {
-  try {
-    const registration = await Registration.findById(req.params.registrationId);
-    if (!registration) {
->>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
       return res.status(404).json({ error: "Registro no encontrado" });
     }
 
@@ -95,12 +88,28 @@ app.post("/api/send-notification/:registrationId", async (req, res) => {
       phone: registration.phone
     };
 
-<<<<<<< HEAD
     console.log('👤 Datos del usuario:', userData);
 
-=======
->>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
     const results = await NotificationService.sendAllNotifications(userData);
+
+    // Actualizar estado de notificaciones
+    registration.notifications.emailSent = results.email.success;
+    registration.notifications.smsSent = results.sms.success;
+    await registration.save();
+
+    console.log('✅ Notificaciones procesadas:', results);
+
+    res.json({
+      success: true,
+      message: "Notificaciones enviadas",
+      results
+    });
+
+  } catch (error) {
+    console.error("❌ Error enviando notificaciones:", error);
+    res.status(500).json({ error: "Error enviando notificaciones" });
+  }
+});
 
     // Actualizar estado de notificaciones
     registration.notifications.emailSent = results.email.success;
