@@ -1063,49 +1063,30 @@ async function sendWhatsApp(phone, name) {
 
 // Enviar notificaciones manualmente para un registro
 async function sendNotification(registrationId) {
-<<<<<<< HEAD
-  try {
-    console.log('🔄 Enviando notificación para registro:', registrationId);
-    
-    const response = await fetch(`/api/send-notification/${registrationId}`, {
-      method: 'POST'
-    });
-    
-    const result = await response.json();
-    console.log('📨 Respuesta del servidor:', result);
-    
-    if (result.success) {
-      showToast('success', 'Notificaciones enviadas correctamente');
-      // Muestra detalles en consola
-      if (result.results.email.success) {
-        console.log('✅ Email enviado exitosamente');
-      } else {
-        console.log('❌ Error en email:', result.results.email.error);
-      }
-    } else {
-      showToast('danger', 'Error enviando notificaciones: ' + (result.error || 'Error desconocido'));
-    }
-  } catch (error) {
-    console.error('💥 Error de conexión:', error);
-    showToast('danger', 'Error de conexión al servidor');
-  }
-=======
     try {
+        console.log('🔄 Enviando notificación para registro:', registrationId);
+        
         const response = await fetch(`/api/send-notification/${registrationId}`, {
             method: 'POST'
         });
-    
+        
         const result = await response.json();
+        console.log('📨 Respuesta del servidor:', result);
+        
         if (result.success) {
             showToast('success', 'Notificaciones enviadas correctamente');
+            if (result.results?.email?.success) {
+                console.log('✅ Email enviado exitosamente');
+            } else if (result.results?.email?.error) {
+                console.log('❌ Error en email:', result.results.email.error);
+            }
         } else {
-            showToast('danger', 'Error enviando notificaciones');
+            showToast('danger', 'Error enviando notificaciones: ' + (result.error || 'Error desconocido'));
         }
     } catch (error) {
-        console.error('Error:', error);
-        showToast('danger', 'Error de conexión');
+        console.error('💥 Error de conexión:', error);
+        showToast('danger', 'Error de conexión al servidor');
     }
->>>>>>> 1297e60cd246b90088fd5e5d99e46fd0eb82ed1d
 }
 
 // Detectar si es una vista pública del formulario
