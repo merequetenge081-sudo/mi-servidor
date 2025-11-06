@@ -5,7 +5,11 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import ExcelJS from "exceljs";
+import fetch from 'node-fetch';
+import dotenv from "dotenv";
+import { NotificationService } from './notifications.js';
 
+dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
@@ -34,7 +38,12 @@ const RegistrationSchema = new mongoose.Schema({
   cedula: String,
   email: String,
   phone: String,
-  date: String
+  date: String,
+  notifications: {
+    emailSent: { type: Boolean, default: false },
+    smsSent: { type: Boolean, default: false },
+    whatsappSent: { type: Boolean, default: false }
+  }
 });
 const Leader = mongoose.model("Leader", LeaderSchema);
 const Registration = mongoose.model("Registration", RegistrationSchema);
@@ -60,6 +69,40 @@ app.post("/api/leaders", async (req, res) => {
   res.json(newLeader);
 });
 
+// 🔹 NUEVO: Endpoint para enviar notificaciones manualmente
+app.post("/api/send-notification/:registrationId", async (req, res) => {
+  try {
+    const registration = await Registration.findById(req.params.registrationId);
+    if (!registration) {
+      return res.status(404).json({ error: "Registro no encontrado" });
+    }
+
+    const userData = {
+      firstName: registration.firstName,
+      lastName: registration.lastName,
+      email: registration.email,
+      phone: registration.phone
+    };
+
+    const results = await NotificationService.sendAllNotifications(userData);
+
+    // Actualizar estado de notificaciones
+    registration.notifications.emailSent = results.email.success;
+    registration.notifications.smsSent = results.sms.success;
+    await registration.save();
+
+    res.json({
+      success: true,
+      message: "Notificaciones enviadas",
+      results
+    });
+
+  } catch (error) {
+    console.error("❌ Error enviando notificaciones:", error);
+    res.status(500).json({ error: "Error enviando notificaciones" });
+  }
+});
+
 // 🔹 Editar líder
 app.put("/api/leaders/:id", async (req, res) => {
   const updated = await Leader.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -78,23 +121,58 @@ app.get("/api/registrations", async (req, res) => {
   res.json(regs);
 });
 
-// 🔹 Nuevo registro
+// 🔹 Nuevo registro (VERSIÓN MEJORADA)
 app.post("/api/registrations", async (req, res) => {
   try {
     const reg = req.body;
     reg.date = new Date().toISOString();
 
-    const leader = await Leader.findById(reg.leaderId);
+    // Buscar líder
+    let leader;
+    if (reg.leaderId) {
+      leader = await Leader.findById(reg.leaderId);
+    } else if (reg.leaderToken) {
+      leader = await Leader.findOne({ token: reg.leaderToken });
+      if (leader) reg.leaderId = leader._id;
+    }
+
     if (leader) {
       reg.leaderName = leader.name;
-      leader.registrations++;
+      leader.registrations = (leader.registrations || 0) + 1;
       await leader.save();
+    } else {
+      return res.status(400).json({ error: "Líder no encontrado" });
     }
 
     const newReg = await Registration.create(reg);
+
+    // 🔹 ENVIAR NOTIFICACIONES AUTOMÁTICAS (Email + SMS)
+    try {
+      const userData = {
+        firstName: newReg.firstName,
+        lastName: newReg.lastName,
+        email: newReg.email,
+        phone: newReg.phone
+      };
+
+      const notificationResults = await NotificationService.sendAllNotifications(userData);
+
+      // Actualizar estado
+      newReg.notifications.emailSent = notificationResults.email.success;
+      newReg.notifications.smsSent = notificationResults.sms.success;
+      await newReg.save();
+
+      console.log('� Notificaciones enviadas:', notificationResults);
+
+    } catch (notifyError) {
+      console.error('❌ Error en notificaciones automáticas:', notifyError);
+      // No falla el registro principal por error en notificaciones
+    }
+
     res.json(newReg);
+
   } catch (err) {
-    console.error("Error al crear registro:", err);
+    console.error("❌ Error al crear registro:", err);
     res.status(500).json({ error: "Error al crear registro" });
   }
 });
@@ -210,6 +288,30 @@ app.get("/api/export/:type", async (req, res) => {
   } catch (err) {
     console.error("❌ Error al exportar Excel:", err);
     res.status(500).send("Error al generar el archivo Excel");
+  }
+});
+
+// 🔹 Endpoint para que el frontend o cualquier servicio solicite el envío
+//     de un WhatsApp a través del bot (puede apuntar a Render o local).
+//     Cambia BOT_URL en .env o directamente aquí si usas otra URL.
+const BOT_URL = process.env.BOT_URL || "https://wa-bot.onrender.com/send";
+
+app.post('/api/send-whatsapp', async (req, res) => {
+  try {
+    const { numero, mensaje } = req.body;
+    if (!numero || !mensaje) return res.status(400).json({ error: 'Faltan parametros numero o mensaje' });
+
+    const response = await fetch(BOT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numero, mensaje })
+    });
+
+    const data = await response.json();
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('❌ Error al enviar mensaje a WhatsApp:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
