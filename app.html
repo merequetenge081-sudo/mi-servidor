@@ -921,15 +921,31 @@ async function updateDashboard() {
 
 // ===================== 🔹 Cargar datos del backend =====================
 async function loadLeaders() {
-  const res = await fetch(`${API_BASE}/leaders`);
-  leaders = await res.json();
-  updateLeadersTable();
+  try {
+    const res = await fetch(`${API_BASE}/leaders`);
+    if (!res.ok) throw new Error('Error cargando líderes');
+    leaders = await res.json();
+    updateLeadersTable();
+    return leaders;
+  } catch (error) {
+    console.error('Error en loadLeaders:', error);
+    showToast('danger', 'Error cargando líderes');
+    throw error;
+  }
 }
 
 async function loadRegistrations() {
-  const res = await fetch(`${API_BASE}/registrations`);
-  registrations = await res.json();
-  updateRegistrationsTable();
+  try {
+    const res = await fetch(`${API_BASE}/registrations`);
+    if (!res.ok) throw new Error('Error cargando registros');
+    registrations = await res.json();
+    updateRegistrationsTable();
+    return registrations;
+  } catch (error) {
+    console.error('Error en loadRegistrations:', error);
+    showToast('danger', 'Error cargando registros');
+    throw error;
+  }
 }
 
 // ===================== 🔹 Actualizar tablas =====================
@@ -981,10 +997,18 @@ function updateRegistrationsTable() {
 
 // ===================== 🔹 Funciones de la interfaz =====================
 function showSection(section) {
-  const sections = ['dashboard', 'leaders', 'registrations', 'exports'];
+  const sections = ['dashboard', 'leaders', 'registrations', 'exports', 'analysis'];
   sections.forEach(s => {
-    document.getElementById(s + 'Section').style.display = s === section ? 'block' : 'none';
+    const el = document.getElementById(s + 'Section');
+    if (el) {
+      el.style.display = s === section ? 'block' : 'none';
+    }
   });
+  
+  // Si es la sección de análisis, actualizar datos
+  if (section === 'analysis') {
+    refreshAnalysis();
+  }
   
   // Actualizar el estado de los botones de la barra lateral
   const links = document.querySelectorAll('.sidebar .nav-link');
@@ -1305,10 +1329,12 @@ window.addEventListener("DOMContentLoaded", () => {
 // ===================== 🔹 Funciones de Análisis de Datos =====================
 async function refreshAnalysis() {
     try {
+        console.log('Iniciando refreshAnalysis');
         const [leadersData, registrationsData] = await Promise.all([
-            fetch(`${API_BASE}/leaders`).then(r => r.json()),
-            fetch(`${API_BASE}/registrations`).then(r => r.json())
+            loadLeaders(),
+            loadRegistrations()
         ]);
+        console.log('Datos cargados:', { leadersData, registrationsData });
 
         // Estadísticas generales
         const totalLeaders = leadersData.length;
@@ -1662,12 +1688,21 @@ async function exportLeaderData(leaderId) {
     }
 }
 
+// Función para inicializar la página
+async function initializePage() {
+    try {
+        await loadLeaders();
+        await loadRegistrations();
+        await updateDashboard();
+        showSection('dashboard');
+    } catch (error) {
+        console.error('Error inicializando la página:', error);
+        showToast('danger', 'Error cargando los datos iniciales');
+    }
+}
+
 // Cargar datos iniciales
-loadLeaders();
-loadRegistrations();
-updateDashboard();
-refreshAnalysis();
-showSection('dashboard');
+initializePage();
 
 // ===================== 🔹 Click handlers para tarjetas =====================
 (function(){
