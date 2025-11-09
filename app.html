@@ -1750,10 +1750,10 @@ async function confirmRegistration(regId) {
             confirmedAt: new Date().toISOString()
         };
 
-        const res = await fetch(`${API_BASE}/registrations/${regId}`, {
-            method: 'PUT',
+        const res = await fetch(`${API_BASE}/registrations/${regId}/confirm`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ confirmedBy: confirmer })
         });
 
         if (!res.ok) {
@@ -1797,10 +1797,10 @@ async function toggleConfirm(regId, value) {
             delete payload.confirmedAt;
         }
 
-        const res = await fetch(`${API_BASE}/registrations/${regId}`, {
-            method: 'PUT',
+        const res = await fetch(`${API_BASE}/registrations/${regId}/${value ? 'confirm' : 'unconfirm'}`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: value ? JSON.stringify({ confirmedBy: payload.confirmedBy }) : null
         });
 
         if (!res.ok) {
