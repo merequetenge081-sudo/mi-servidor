@@ -17,8 +17,76 @@
             --primary: #4361ee;
             --secondary: #3f37c9;
             --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f4a261;
             --light: #f8f9fa;
             --dark: #212529;
+        }
+        
+        /* Estilos para la sección de análisis */
+        #analysisSection .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: all 0.3s ease;
+        }
+        
+        #analysisSection .card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        #analysisSection .display-4 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            line-height: 1.2;
+            color: var(--primary);
+        }
+        
+        #analysisSection .border-primary {
+            border-top: 3px solid var(--primary) !important;
+        }
+        
+        #analysisSection .border-success {
+            border-top: 3px solid var(--success) !important;
+        }
+        
+        #analysisSection .border-info {
+            border-top: 3px solid var(--info) !important;
+        }
+        
+        #analysisSection .border-warning {
+            border-top: 3px solid var(--warning) !important;
+        }
+        
+        #analysisSection .table th {
+            border-top: none;
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        #analysisSection .progress {
+            height: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        .status-badge {
+            padding: 0.25em 0.6em;
+            font-size: 0.75em;
+            font-weight: 600;
+            border-radius: 0.25rem;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
         }
         
         body {
@@ -207,6 +275,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('analysis')">
+                            <i class="bi bi-graph-up"></i> Análisis de Datos
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#" onclick="showPublicForm()">
                             <i class="bi bi-link-45deg"></i> Ver Formulario Público
                         </a>
@@ -377,6 +450,127 @@
                 </div>
             </div>
             
+            <!-- Analysis Section -->
+            <div id="analysisSection" style="display: none;">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
+                    <h1 class="h3">Análisis de Datos</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="refreshAnalysis()">
+                                <i class="bi bi-arrow-clockwise"></i> Actualizar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Líderes</h5>
+                                <p class="display-4" id="totalLeaders">-</p>
+                                <p class="text-muted" id="activeLeaders">- activos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 border-success">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Registros</h5>
+                                <p class="display-4" id="totalRegistrations">-</p>
+                                <p class="text-muted" id="todayRegistrations">- hoy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 border-info">
+                            <div class="card-body">
+                                <h5 class="card-title">Promedio por Líder</h5>
+                                <p class="display-4" id="avgRegistrations">-</p>
+                                <p class="text-muted">registros/líder</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 border-warning">
+                            <div class="card-body">
+                                <h5 class="card-title">Última Actividad</h5>
+                                <p class="h5" id="lastActivity">-</p>
+                                <p class="text-muted" id="lastActivityTime">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaders Performance -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Desempeño de Líderes</h5>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary" onclick="sortLeadersList('registrations')">
+                                        <i class="bi bi-sort-numeric-down"></i> Registros
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="sortLeadersList('name')">
+                                        <i class="bi bi-sort-alpha-down"></i> Nombre
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Líder</th>
+                                                <th>Área</th>
+                                                <th>Registros</th>
+                                                <th>Estado</th>
+                                                <th>Último Registro</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="leaderAnalysisList">
+                                            <!-- Se llenará dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Últimos Registros</h5>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-secondary active" onclick="filterRegistrations('today')">Hoy</button>
+                                    <button class="btn btn-outline-secondary" onclick="filterRegistrations('week')">Semana</button>
+                                    <button class="btn btn-outline-secondary" onclick="filterRegistrations('all')">Todos</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Nombre</th>
+                                                <th>Líder</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentRegistrationsList">
+                                            <!-- Se llenará dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Exports Section -->
             <div id="exportsSection" style="display: none;">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
@@ -1108,11 +1302,147 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// ===================== 🔹 Funciones de Análisis de Datos =====================
+async function refreshAnalysis() {
+    try {
+        const [leadersData, registrationsData] = await Promise.all([
+            fetch(`${API_BASE}/leaders`).then(r => r.json()),
+            fetch(`${API_BASE}/registrations`).then(r => r.json())
+        ]);
+
+        // Estadísticas generales
+        const totalLeaders = leadersData.length;
+        const activeLeaders = leadersData.filter(l => l.active).length;
+        const totalRegistrations = registrationsData.length;
+        const today = new Date().setHours(0,0,0,0);
+        const todayRegistrations = registrationsData.filter(r => 
+            new Date(r.date).setHours(0,0,0,0) === today
+        ).length;
+        const avgRegistrations = totalLeaders ? (totalRegistrations / totalLeaders).toFixed(1) : 0;
+
+        // Última actividad
+        const lastReg = registrationsData.sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+        const lastActivity = lastReg ? `${lastReg.firstName || ''} ${lastReg.lastName || ''}`.trim() : '-';
+        const lastActivityTime = lastReg ? new Date(lastReg.date).toLocaleString('es-CO') : '-';
+
+        // Actualizar cards
+        document.getElementById('totalLeaders').textContent = totalLeaders;
+        document.getElementById('activeLeaders').textContent = `${activeLeaders} activos`;
+        document.getElementById('totalRegistrations').textContent = totalRegistrations;
+        document.getElementById('todayRegistrations').textContent = `${todayRegistrations} hoy`;
+        document.getElementById('avgRegistrations').textContent = avgRegistrations;
+        document.getElementById('lastActivity').textContent = lastActivity;
+        document.getElementById('lastActivityTime').textContent = lastActivityTime;
+
+        // Actualizar tabla de líderes
+        updateLeaderAnalysisList(leadersData, registrationsData);
+        
+        // Actualizar tabla de registros recientes
+        updateRecentRegistrationsList(registrationsData, leadersData, 'today');
+
+        showToast('success', 'Análisis actualizado');
+    } catch (error) {
+        console.error('Error al actualizar análisis:', error);
+        showToast('danger', 'Error al actualizar análisis');
+    }
+}
+
+function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registrations') {
+    const leaderStats = leaders.map(leader => {
+        const leaderRegs = registrations.filter(r => r.leaderId === leader._id);
+        const lastReg = leaderRegs.length ? 
+            new Date(Math.max(...leaderRegs.map(r => new Date(r.date)))) : null;
+        
+        return {
+            ...leader,
+            registrationCount: leaderRegs.length,
+            lastRegistration: lastReg
+        };
+    });
+
+    if (sortBy === 'registrations') {
+        leaderStats.sort((a, b) => b.registrationCount - a.registrationCount);
+    } else if (sortBy === 'name') {
+        leaderStats.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    const tbody = document.getElementById('leaderAnalysisList');
+    tbody.innerHTML = leaderStats.map(leader => `
+        <tr>
+            <td>${leader.name}</td>
+            <td>${leader.area || '-'}</td>
+            <td>
+                ${leader.registrationCount}
+                <div class="progress">
+                    <div class="progress-bar bg-primary" role="progressbar" 
+                         style="width: ${(leader.registrationCount / Math.max(...leaderStats.map(l => l.registrationCount)) * 100)}%">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <span class="status-badge ${leader.active ? 'status-active' : 'status-inactive'}">
+                    ${leader.active ? 'Activo ✅' : 'Inactivo ❌'}
+                </span>
+            </td>
+            <td>${leader.lastRegistration ? leader.lastRegistration.toLocaleString('es-CO') : 'Sin registros'}</td>
+        </tr>
+    `).join('');
+}
+
+function updateRecentRegistrationsList(registrations, leaders, filter = 'today') {
+    const today = new Date().setHours(0,0,0,0);
+    const weekAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
+    
+    let filteredRegs = [...registrations];
+    if (filter === 'today') {
+        filteredRegs = registrations.filter(r => 
+            new Date(r.date).setHours(0,0,0,0) === today
+        );
+    } else if (filter === 'week') {
+        filteredRegs = registrations.filter(r => 
+            new Date(r.date) >= weekAgo
+        );
+    }
+
+    filteredRegs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const tbody = document.getElementById('recentRegistrationsList');
+    tbody.innerHTML = filteredRegs.map(reg => {
+        const leader = leaders.find(l => l._id === reg.leaderId);
+        const nombre = `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || reg.name || '-';
+        return `
+            <tr>
+                <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
+                <td>${nombre}</td>
+                <td>${leader ? leader.name : 'Sin líder'}</td>
+                <td>
+                    <span class="status-badge ${reg.notifications?.emailSent ? 'status-active' : 'status-pending'}">
+                        ${reg.notifications?.emailSent ? 'Notificado ✅' : 'Pendiente ⏳'}
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function filterRegistrations(period) {
+    const buttons = document.querySelectorAll('#analysisSection .btn-group .btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Actualizar lista de registros con el filtro seleccionado
+    updateRecentRegistrationsList(registrations, leaders, period);
+}
+
+function sortLeadersList(criteria) {
+    updateLeaderAnalysisList(leaders, registrations, criteria);
+}
+
 // Cargar datos iniciales
-// 🔹 Luego llama a las funciones de carga y al nuevo updateDashboard
 loadLeaders();
 loadRegistrations();
 updateDashboard();
+refreshAnalysis();
 showSection('dashboard');
 
 // ===================== 🔹 Click handlers para tarjetas =====================
