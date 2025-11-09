@@ -45,6 +45,13 @@ const RegistrationSchema = new mongoose.Schema({
     whatsappSent: { type: Boolean, default: false }
   }
 });
+
+// Campos para control de asistencia/confirmación en el evento
+RegistrationSchema.add({
+  confirmed: { type: Boolean, default: false },
+  confirmedBy: { type: String, default: '' },
+  confirmedAt: { type: Date, default: null }
+});
 const Leader = mongoose.model("Leader", LeaderSchema);
 const Registration = mongoose.model("Registration", RegistrationSchema);
 
