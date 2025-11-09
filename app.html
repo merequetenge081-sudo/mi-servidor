@@ -1315,6 +1315,39 @@ async function refreshAnalysis() {
         const activeLeaders = leadersData.filter(l => l.active).length;
         const totalRegistrations = registrationsData.length;
         const today = new Date().setHours(0,0,0,0);
+        
+        // Análisis de duplicados
+        const cedulas = {};
+        const duplicados = [];
+        registrationsData.forEach(reg => {
+            if (reg.cedula) {
+                if (cedulas[reg.cedula]) {
+                    duplicados.push(reg);
+                } else {
+                    cedulas[reg.cedula] = reg;
+                }
+            }
+        });
+
+        // Estadísticas por líder
+        const regsByLeader = {};
+        registrationsData.forEach(reg => {
+            if (reg.leaderId) {
+                if (!regsByLeader[reg.leaderId]) {
+                    regsByLeader[reg.leaderId] = {
+                        count: 0,
+                        today: 0,
+                        registrations: []
+                    };
+                }
+                regsByLeader[reg.leaderId].count++;
+                regsByLeader[reg.leaderId].registrations.push(reg);
+                if (new Date(reg.date).setHours(0,0,0,0) === today) {
+                    regsByLeader[reg.leaderId].today++;
+                }
+            }
+        });
+
         const todayRegistrations = registrationsData.filter(r => 
             new Date(r.date).setHours(0,0,0,0) === today
         ).length;
@@ -1348,15 +1381,37 @@ async function refreshAnalysis() {
 }
 
 function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registrations') {
+    const today = new Date().setHours(0,0,0,0);
     const leaderStats = leaders.map(leader => {
         const leaderRegs = registrations.filter(r => r.leaderId === leader._id);
         const lastReg = leaderRegs.length ? 
             new Date(Math.max(...leaderRegs.map(r => new Date(r.date)))) : null;
         
+        // Contar registros de hoy
+        const todayRegs = leaderRegs.filter(r => 
+            new Date(r.date).setHours(0,0,0,0) === today
+        ).length;
+        
+        // Identificar duplicados por cédula
+        const cedulas = {};
+        const duplicados = leaderRegs.filter(reg => {
+            if (reg.cedula) {
+                if (cedulas[reg.cedula]) {
+                    return true;
+                }
+                cedulas[reg.cedula] = true;
+                return false;
+            }
+            return false;
+        });
+        
         return {
             ...leader,
             registrationCount: leaderRegs.length,
-            lastRegistration: lastReg
+            lastRegistration: lastReg,
+            todayCount: todayRegs,
+            duplicateCount: duplicados.length,
+            registrations: leaderRegs // incluimos todos los registros para referencia
         };
     });
 
@@ -1369,10 +1424,18 @@ function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registration
     const tbody = document.getElementById('leaderAnalysisList');
     tbody.innerHTML = leaderStats.map(leader => `
         <tr>
-            <td>${leader.name}</td>
-            <td>${leader.area || '-'}</td>
             <td>
-                ${leader.registrationCount}
+                ${leader.name}
+                <br>
+                <small class="text-muted">${leader.area || '-'}</small>
+            </td>
+            <td>
+                Total: ${leader.registrationCount}
+                <br>
+                <small class="text-primary">Hoy: ${leader.todayCount}</small>
+                ${leader.duplicateCount > 0 ? 
+                    `<br><small class="text-danger">Duplicados: ${leader.duplicateCount}</small>` : 
+                    ''}
                 <div class="progress">
                     <div class="progress-bar bg-primary" role="progressbar" 
                          style="width: ${(leader.registrationCount / Math.max(...leaderStats.map(l => l.registrationCount)) * 100)}%">
@@ -1383,8 +1446,17 @@ function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registration
                 <span class="status-badge ${leader.active ? 'status-active' : 'status-inactive'}">
                     ${leader.active ? 'Activo ✅' : 'Inactivo ❌'}
                 </span>
+                <br>
+                <small class="text-muted">Último: ${leader.lastRegistration ? leader.lastRegistration.toLocaleString('es-CO') : 'Sin registros'}</small>
             </td>
-            <td>${leader.lastRegistration ? leader.lastRegistration.toLocaleString('es-CO') : 'Sin registros'}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary mb-1" onclick="showLeaderDetails('${leader._id}')">
+                    Ver Detalle 📊
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="exportLeaderData('${leader._id}')">
+                    Exportar 📥
+                </button>
+            </td>
         </tr>
     `).join('');
 }
@@ -1436,6 +1508,158 @@ function filterRegistrations(period) {
 
 function sortLeadersList(criteria) {
     updateLeaderAnalysisList(leaders, registrations, criteria);
+}
+
+// Función para mostrar detalles de un líder específico
+function showLeaderDetails(leaderId) {
+    const leader = leaders.find(l => l._id === leaderId);
+    const leaderRegs = registrations.filter(r => r.leaderId === leaderId);
+    
+    // Ordenar registros por fecha descendente
+    leaderRegs.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Agrupar registros por fecha
+    const regsByDate = {};
+    leaderRegs.forEach(reg => {
+        const date = new Date(reg.date).toLocaleDateString('es-CO');
+        if (!regsByDate[date]) {
+            regsByDate[date] = [];
+        }
+        regsByDate[date].push(reg);
+    });
+    
+    // Encontrar duplicados
+    const cedulas = {};
+    const duplicados = leaderRegs.filter(reg => {
+        if (reg.cedula) {
+            if (cedulas[reg.cedula]) {
+                return true;
+            }
+            cedulas[reg.cedula] = reg;
+            return false;
+        }
+        return false;
+    });
+    
+    // Crear modal de detalles
+    const modalHtml = `
+        <div class="modal fade" id="leaderDetailsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalles de ${leader.name}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h6>Total Registros</h6>
+                                        <h3>${leaderRegs.length}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card ${duplicados.length > 0 ? 'border-warning' : 'border-success'}">
+                                    <div class="card-body">
+                                        <h6>Duplicados</h6>
+                                        <h3>${duplicados.length}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-info">
+                                    <div class="card-body">
+                                        <h6>Último Registro</h6>
+                                        <h6>${leaderRegs.length ? new Date(leaderRegs[0].date).toLocaleString('es-CO') : '-'}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mb-3">Registros por Fecha</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Nombre</th>
+                                        <th>Cédula</th>
+                                        <th>Teléfono</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${leaderRegs.map(reg => `
+                                        <tr>
+                                            <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
+                                            <td>${reg.firstName} ${reg.lastName}</td>
+                                            <td>${reg.cedula || '-'}
+                                                ${duplicados.find(d => d.cedula === reg.cedula) ? 
+                                                    '<span class="badge bg-warning text-dark">Duplicado</span>' : 
+                                                    ''}
+                                            </td>
+                                            <td>${reg.phone || '-'}</td>
+                                            <td>
+                                                <span class="status-badge ${reg.notifications?.emailSent ? 'status-active' : 'status-pending'}">
+                                                    ${reg.notifications?.emailSent ? 'Notificado ✅' : 'Pendiente ⏳'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal anterior si existe
+    const oldModal = document.getElementById('leaderDetailsModal');
+    if (oldModal) {
+        oldModal.remove();
+    }
+    
+    // Agregar nuevo modal al DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('leaderDetailsModal'));
+    modal.show();
+}
+
+// Función para exportar datos de un líder específico
+async function exportLeaderData(leaderId) {
+    const leader = leaders.find(l => l._id === leaderId);
+    const leaderRegs = registrations.filter(r => r.leaderId === leaderId);
+    
+    try {
+        // Preparar datos para Excel
+        const worksheet = XLSX.utils.json_to_sheet(leaderRegs.map(reg => ({
+            'Fecha': new Date(reg.date).toLocaleString('es-CO'),
+            'Nombre': `${reg.firstName} ${reg.lastName}`,
+            'Cédula': reg.cedula || '',
+            'Teléfono': reg.phone || '',
+            'Email': reg.email || '',
+            'Estado': reg.notifications?.emailSent ? 'Notificado' : 'Pendiente'
+        })));
+        
+        // Crear libro de Excel
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros');
+        
+        // Guardar archivo
+        const filename = `registros_${leader.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(workbook, filename);
+        
+        showToast('success', 'Datos exportados correctamente');
+    } catch (error) {
+        console.error('Error exportando datos:', error);
+        showToast('danger', 'Error al exportar datos');
+    }
 }
 
 // Cargar datos iniciales
