@@ -438,6 +438,7 @@
                                         <th>Fecha</th>
                                         <th>Nombre</th>
                                         <th>Líder</th>
+                                        <th>Confirmado</th>
                                         <th>Acción</th>
                                     </tr>
                                 </thead>
@@ -978,14 +979,33 @@ function updateRegistrationsTable() {
         const nombre = reg.name || ((reg.firstName || '') + ' ' + (reg.lastName || '')).trim() || 'Sin nombre';
         const lider = (leaders.find(l => l._id === reg.leaderId)?.name) || reg.leaderName || 'Sin líder';
         const fecha = reg.date ? new Date(reg.date).toLocaleDateString() : 'Sin fecha';
+        const confirmed = reg.confirmed ? true : false;
+        const confirmedBy = reg.confirmedBy ? reg.confirmedBy : '';
+        const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
+
         return `
             <tr>
                 <td>${new Date(reg.date).toLocaleDateString("es-CO")}</td>
                 <td>${nombre}</td>
                 <td>${lider}</td>
                 <td>
+                    ${confirmed ? `
+                        <div>
+                            <span class="badge bg-success">Asistió ✅</span>
+                            <br><small>${confirmedBy} - ${confirmedAt}</small>
+                        </div>
+                    ` : `
+                        <div>
+                            <span class="badge bg-secondary">No confirmado</span>
+                        </div>
+                    `}
+                </td>
+                <td>
                   <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar Notificación">
                     <i class="bi bi-envelope-check"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-success" onclick="confirmRegistration('${reg._id}')" title="Confirmar Asistencia">
+                    <i class="bi bi-check2-circle"></i>
                   </button>
                   <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">✏️</button>
                   <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">🗑️</button>
@@ -1508,15 +1528,28 @@ function updateRecentRegistrationsList(registrations, leaders, filter = 'today')
     tbody.innerHTML = filteredRegs.map(reg => {
         const leader = leaders.find(l => l._id === reg.leaderId);
         const nombre = `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || reg.name || '-';
+        const confirmed = reg.confirmed ? true : false;
+        const confirmedBy = reg.confirmedBy || '';
+        const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
+
         return `
             <tr>
                 <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
                 <td>${nombre}</td>
                 <td>${leader ? leader.name : 'Sin líder'}</td>
                 <td>
-                    <span class="status-badge ${reg.notifications?.emailSent ? 'status-active' : 'status-pending'}">
-                        ${reg.notifications?.emailSent ? 'Notificado ✅' : 'Pendiente ⏳'}
-                    </span>
+                    ${confirmed ? `
+                        <div>
+                            <span class="badge bg-success">Asistió ✅</span>
+                            <br><small>${confirmedBy} - ${confirmedAt}</small>
+                            <br><button class="btn btn-sm btn-outline-danger mt-1" onclick="toggleConfirm('${reg._id}', false)">Desconfirmar</button>
+                        </div>
+                    ` : `
+                        <div>
+                            <span class="badge bg-secondary">No confirmado</span>
+                            <br><button class="btn btn-sm btn-outline-success mt-1" onclick="confirmRegistration('${reg._id}')">Confirmar</button>
+                        </div>
+                    `}
                 </td>
             </tr>
         `;
@@ -1628,9 +1661,18 @@ function showLeaderDetails(leaderId) {
                                             </td>
                                             <td>${reg.phone || '-'}</td>
                                             <td>
-                                                <span class="status-badge ${reg.notifications?.emailSent ? 'status-active' : 'status-pending'}">
-                                                    ${reg.notifications?.emailSent ? 'Notificado ✅' : 'Pendiente ⏳'}
-                                                </span>
+                                                ${reg.confirmed ? `
+                                                    <div>
+                                                        <span class="badge bg-success">Asistió ✅</span>
+                                                        <br><small>${reg.confirmedBy || ''} - ${reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''}</small>
+                                                        <br><button class="btn btn-sm btn-outline-danger mt-1" onclick="toggleConfirm('${reg._id}', false)">Desconfirmar</button>
+                                                    </div>
+                                                ` : `
+                                                    <div>
+                                                        <span class="badge bg-secondary">No confirmado</span>
+                                                        <br><button class="btn btn-sm btn-outline-success mt-1" onclick="confirmRegistration('${reg._id}')">Confirmar</button>
+                                                    </div>
+                                                `}
                                             </td>
                                         </tr>
                                     `).join('')}
@@ -1685,6 +1727,94 @@ async function exportLeaderData(leaderId) {
     } catch (error) {
         console.error('Error exportando datos:', error);
         showToast('danger', 'Error al exportar datos');
+    }
+}
+
+// Funciones para confirmar/desconfirmar asistencia (no tocan QR)
+async function confirmRegistration(regId) {
+    try {
+        const reg = registrations.find(r => r._id === regId);
+        if (!reg) {
+            showToast('danger', 'Registro no encontrado');
+            return;
+        }
+
+        // Pedir quién confirma (puede ser nombre del voluntario en el evento)
+        const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
+        if (!confirmer) return;
+
+        const payload = {
+            ...reg,
+            confirmed: true,
+            confirmedBy: confirmer,
+            confirmedAt: new Date().toISOString()
+        };
+
+        const res = await fetch(`${API_BASE}/registrations/${regId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            showToast('danger', 'Error al confirmar asistencia');
+            return;
+        }
+
+        // Actualizar array local y UI
+        const updated = await res.json();
+        registrations = registrations.map(r => r._id === updated._id ? updated : r);
+        updateRegistrationsTable();
+        refreshAnalysis();
+        showToast('success', 'Asistencia confirmada');
+    } catch (err) {
+        console.error('Error confirmando registro:', err);
+        showToast('danger', 'Error al confirmar asistencia');
+    }
+}
+
+async function toggleConfirm(regId, value) {
+    try {
+        const reg = registrations.find(r => r._id === regId);
+        if (!reg) {
+            showToast('danger', 'Registro no encontrado');
+            return;
+        }
+
+        const payload = { ...reg };
+        if (value) {
+            // confirmar
+            const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
+            if (!confirmer) return;
+            payload.confirmed = true;
+            payload.confirmedBy = confirmer;
+            payload.confirmedAt = new Date().toISOString();
+        } else {
+            // desconfirmar
+            payload.confirmed = false;
+            delete payload.confirmedBy;
+            delete payload.confirmedAt;
+        }
+
+        const res = await fetch(`${API_BASE}/registrations/${regId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            showToast('danger', 'Error al actualizar confirmación');
+            return;
+        }
+
+        const updated = await res.json();
+        registrations = registrations.map(r => r._id === updated._id ? updated : r);
+        updateRegistrationsTable();
+        refreshAnalysis();
+        showToast('success', value ? 'Confirmado' : 'Desconfirmado');
+    } catch (err) {
+        console.error('Error toggling confirm:', err);
+        showToast('danger', 'Error actualizando confirmación');
     }
 }
 
