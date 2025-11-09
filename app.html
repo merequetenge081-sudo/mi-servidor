@@ -1757,15 +1757,16 @@ async function confirmRegistration(regId) {
         });
 
         if (!res.ok) {
-            showToast('danger', 'Error al confirmar asistencia');
+            const text = await res.text().catch(() => '');
+            console.error('Confirm failed', res.status, text);
+            showToast('danger', 'Error al confirmar asistencia: ' + res.status);
             return;
         }
 
         // Actualizar array local y UI
-        const updated = await res.json();
-        registrations = registrations.map(r => r._id === updated._id ? updated : r);
-        updateRegistrationsTable();
-        refreshAnalysis();
+        // Preferir recargar desde servidor para evitar inconsistencias
+        await loadRegistrations();
+        await refreshAnalysis();
         showToast('success', 'Asistencia confirmada');
     } catch (err) {
         console.error('Error confirmando registro:', err);
@@ -1803,14 +1804,15 @@ async function toggleConfirm(regId, value) {
         });
 
         if (!res.ok) {
-            showToast('danger', 'Error al actualizar confirmación');
+            const txt = await res.text().catch(() => '');
+            console.error('ToggleConfirm failed', res.status, txt);
+            showToast('danger', 'Error al actualizar confirmación: ' + res.status);
             return;
         }
 
-        const updated = await res.json();
-        registrations = registrations.map(r => r._id === updated._id ? updated : r);
-        updateRegistrationsTable();
-        refreshAnalysis();
+        // Recargar desde servidor para mantener consistencia
+        await loadRegistrations();
+        await refreshAnalysis();
         showToast('success', value ? 'Confirmado' : 'Desconfirmado');
     } catch (err) {
         console.error('Error toggling confirm:', err);
