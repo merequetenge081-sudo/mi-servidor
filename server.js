@@ -203,6 +203,41 @@ app.put("/api/registrations/:id", async (req, res) => {
   }
 });
 
+// 🔹 Endpoint dedicado para confirmar asistencia (evita enviar todo el objeto)
+app.post('/api/registrations/:id/confirm', async (req, res) => {
+  try {
+    const { confirmedBy } = req.body;
+    const updated = await Registration.findByIdAndUpdate(req.params.id, {
+      confirmed: true,
+      confirmedBy: confirmedBy || 'Admin',
+      confirmedAt: new Date()
+    }, { new: true });
+
+    if (!updated) return res.status(404).json({ error: 'Registro no encontrado' });
+    res.json(updated);
+  } catch (err) {
+    console.error('Error confirmando registro:', err);
+    res.status(500).json({ error: 'Error confirmando registro' });
+  }
+});
+
+// 🔹 Endpoint para desconfirmar asistencia
+app.post('/api/registrations/:id/unconfirm', async (req, res) => {
+  try {
+    const updated = await Registration.findByIdAndUpdate(req.params.id, {
+      confirmed: false,
+      confirmedBy: '',
+      confirmedAt: null
+    }, { new: true });
+
+    if (!updated) return res.status(404).json({ error: 'Registro no encontrado' });
+    res.json(updated);
+  } catch (err) {
+    console.error('Error desconfirmando registro:', err);
+    res.status(500).json({ error: 'Error desconfirmando registro' });
+  }
+});
+
 // 🔹 Eliminar registro
 app.delete("/api/registrations/:id", async (req, res) => {
   try {
