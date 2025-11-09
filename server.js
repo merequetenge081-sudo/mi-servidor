@@ -232,59 +232,161 @@ app.get("/api/export/:type", async (req, res) => {
     let rows = [];
     let headers = [];
 
+    const formatFecha = (fecha) => {
+      if (!fecha) return "";
+      const date = new Date(fecha);
+      return new Intl.DateTimeFormat('es-CO', { 
+        day: '2-digit',
+        month: 'long', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    };
+
     if (type === "leaders") {
-      headers = ["Nombre", "Email", "Teléfono", "Área/Zona", "Activo", "Registros"];
-      rows = (data.leaders || []).map(l => [
-        l.name || "",
-        l.email || "",
-        l.phone || "",
-        l.area || "",
-        l.active ? "Sí" : "No",
-        l.registrations || 0
-      ]);
+      headers = [
+        "ID",
+        "Nombre Completo",
+        "Correo Electrónico",
+        "Teléfono",
+        "Área/Grupo",
+        "Estado",
+        "Total Registros",
+        "Último Registro",
+        "Token"
+      ];
+      
+      rows = (data.leaders || []).map(l => {
+        const registrosLider = (data.registrations || [])
+          .filter(r => String(r.leaderId) === String(l._id));
+        const ultimoRegistro = registrosLider.length > 0 ? 
+          Math.max(...registrosLider.map(r => new Date(r.date))) : null;
+        
+        return [
+          l._id || "",
+          l.name || "",
+          l.email || "",
+          l.phone || "",
+          l.area || 'No especificada',
+          l.active ? 'Activo ✅' : 'Inactivo ❌',
+          registrosLider.length || 0,
+          ultimoRegistro ? formatFecha(ultimoRegistro) : 'Sin registros',
+          l.token || ""
+        ];
+      });
     } else if (type === "registrations") {
-      headers = ["Fecha", "Nombre", "Email", "Teléfono", "Líder"];
-      rows = (data.registrations || []).map(r => [
-        r.date ? new Date(r.date).toLocaleDateString("es-CO") : "",
-        ((r.firstName || "") + " " + (r.lastName || "")).trim() || r.name || "",
-        r.email || "",
-        r.phone || "",
-        ((data.leaders || []).find(l => String(l._id) === String(r.leaderId))?.name) || r.leaderName || "Sin líder"
-      ]);
+      headers = [
+        "ID",
+        "Fecha y Hora",
+        "Nombre Completo",
+        "Correo Electrónico",
+        "Teléfono",
+        "Líder Asignado",
+        "Área del Líder",
+        "Notificaciones"
+      ];
+      
+      rows = (data.registrations || []).map(r => {
+        const lider = (data.leaders || []).find(l => String(l._id) === String(r.leaderId));
+        const nombreCompleto = ((r.firstName || "") + " " + (r.lastName || "")).trim() || r.name || "";
+        const notificaciones = [];
+        if (r.notifications) {
+          if (r.notifications.emailSent) notificaciones.push('Email ✅');
+          if (r.notifications.smsSent) notificaciones.push('SMS ✅');
+          if (r.notifications.whatsappSent) notificaciones.push('WhatsApp ✅');
+        }
+        
+        return [
+          r._id || "",
+          formatFecha(r.date),
+          nombreCompleto,
+          r.email || 'No proporcionado',
+          r.phone || 'No proporcionado',
+          lider?.name || r.leaderName || "Sin líder",
+          lider?.area || 'No especificada',
+          notificaciones.length ? notificaciones.join(', ') : 'Pendientes'
+        ];
+      });
     } else {
       return res.status(400).send("Tipo no válido");
     }
 
     const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet(type === "leaders" ? "Líderes" : "Registros");
+    workbook.creator = 'Sistema de Registro';
+    workbook.created = new Date();
+    
+    const sheet = workbook.addWorksheet(type === "leaders" ? "Líderes" : "Registros", {
+      pageSetup: { paperSize: 9, orientation: 'landscape' },
+      properties: { tabColor: { argb: 'FF4361EE' } }
+    });
 
-    // Encabezado
+    // Título del reporte
+    const titleRow = sheet.addRow([`Reporte de ${type === "leaders" ? "Líderes" : "Registros"}`]);
+    titleRow.font = { size: 16, bold: true };
+    titleRow.alignment = { horizontal: 'center' };
+    sheet.mergeCells(1, 1, 1, headers.length);
+    
+    // Espacio después del título
+    sheet.addRow([]);
+
+    // Encabezados
     const headerRow = sheet.addRow(headers);
     headerRow.eachCell(cell => {
-      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF4361EE" } };
-      cell.border = {
-        top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" }
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
+      cell.fill = { 
+        type: 'pattern', 
+        pattern: 'solid', 
+        fgColor: { argb: 'FF4361EE' } 
       };
-      cell.alignment = { horizontal: "center", vertical: "middle" };
+      cell.border = {
+        top: { style: 'medium', color: { argb: 'FF4361EE' } },
+        left: { style: 'thin', color: { argb: 'FF4361EE' } },
+        bottom: { style: 'medium', color: { argb: 'FF4361EE' } },
+        right: { style: 'thin', color: { argb: 'FF4361EE' } }
+      };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
     });
 
-    // Filas
-    rows.forEach(row => {
-      const r = sheet.addRow(row);
-      r.eachCell(cell => {
-        cell.border = { top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" } };
+    // Filas de datos
+    rows.forEach((row, index) => {
+      const dataRow = sheet.addRow(row);
+      dataRow.height = 25; // Altura consistente
+      
+      dataRow.eachCell(cell => {
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFD3D3D3' } },
+          left: { style: 'thin', color: { argb: 'FFD3D3D3' } },
+          bottom: { style: 'thin', color: { argb: 'FFD3D3D3' } },
+          right: { style: 'thin', color: { argb: 'FFD3D3D3' } }
+        };
+        cell.alignment = { vertical: 'middle', wrapText: true };
+        
+        // Color alternado para filas
+        if (index % 2 === 0) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFF8F9FA' }
+          };
+        }
       });
     });
 
-    // Auto width
+    // Auto-ajustar columnas con márgenes
     sheet.columns.forEach(column => {
-      let max = 10;
+      let maxLength = 0;
       column.eachCell({ includeEmpty: true }, cell => {
-        max = Math.max(max, (cell.value ? cell.value.toString().length : 0) + 2);
+        const length = cell.value ? cell.value.toString().length : 10;
+        maxLength = Math.max(maxLength, length);
       });
-      column.width = max;
+      column.width = Math.min(Math.max(maxLength + 4, 12), 50); // Mínimo 12, máximo 50
     });
+
+    // Congelar panel de encabezado
+    sheet.views = [
+      { state: 'frozen', xSplit: 0, ySplit: 3, activeCell: 'A4' }
+    ];
 
     res.setHeader("Content-Disposition", `attachment; filename=${type}_export.xlsx`);
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
