@@ -535,8 +535,13 @@
                     <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Desempeño de Líderes</h5>
-                                <div class="btn-group btn-group-sm">
+                                <div>
+                                    <button class="btn btn-link p-0 me-2" id="toggleLeadersBtn" onclick="toggleLeadersPerformance()" title="Minimizar/Expandir">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                    <h5 class="mb-0 d-inline"><i class="bi bi-graph-up"></i> Desempeño de Líderes</h5>
+                                </div>
+                                <div class="btn-group btn-group-sm" id="leadersToolbar">
                                     <button class="btn btn-outline-secondary" onclick="sortLeadersList('registrations')">
                                         <i class="bi bi-sort-numeric-down"></i> Por Registros
                                     </button>
@@ -545,7 +550,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body" id="leadersPerformanceBody">
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
@@ -1389,6 +1394,7 @@ let allLeadersData = [];
 let currentFilterLeaderId = '';
 let currentSearchTerm = '';
 let currentConfirmedFilter = '';
+let leadersPerformanceMinimized = false;
 
 async function refreshAnalysis() {
     try {
@@ -1683,6 +1689,25 @@ async function exportLeaderData(leaderId) {
 
 function sortLeadersList(criteria) {
     updateLeaderAnalysisList(allLeadersData, allRegistrationsData, criteria);
+}
+
+function toggleLeadersPerformance() {
+    const body = document.getElementById('leadersPerformanceBody');
+    const btn = document.getElementById('toggleLeadersBtn');
+    
+    if (leadersPerformanceMinimized) {
+        // Expandir
+        body.style.display = 'block';
+        btn.innerHTML = '<i class="bi bi-chevron-down"></i>';
+        document.getElementById('leadersToolbar').style.display = 'flex';
+        leadersPerformanceMinimized = false;
+    } else {
+        // Minimizar
+        body.style.display = 'none';
+        btn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+        document.getElementById('leadersToolbar').style.display = 'none';
+        leadersPerformanceMinimized = true;
+    }
 }
 
 // Función para inicializar la página
