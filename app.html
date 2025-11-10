@@ -962,6 +962,9 @@ function updateLeadersTable() {
         <button class="btn btn-sm btn-outline-primary" onclick="showQRCode('${leader._id}')" title="Ver QR">
           <i class="bi bi-qr-code"></i>
         </button>
+        <button class="btn btn-sm btn-success" onclick="sendQRToLeader('${leader._id}')" title="Enviar QR">
+          <i class="bi bi-send"></i>
+        </button>
         <button class="btn btn-sm btn-outline-warning" onclick="editLeader('${leader._id}')">
           <i class="bi bi-pencil"></i>
         </button>
@@ -1867,6 +1870,34 @@ async function editLeader(id) {
   leaders = leaders.map(l => (l._id === updated._id ? updated : l));
   updateLeadersTable();
   showToast('success', 'Líder actualizado correctamente');
+}
+
+async function sendQRToLeader(leaderId) {
+    try {
+        const leader = leaders.find(l => l._id === leaderId);
+        if (!leader) {
+            showToast('danger', 'No se encontró el líder');
+            return;
+        }
+
+        const response = await fetch(`/api/leaders/${leaderId}/send-qr`, {
+            method: 'POST'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            let mensaje = 'QR enviado';
+            if (result.whatsappSent) mensaje += ' por WhatsApp';
+            if (result.emailSent) mensaje += ' por email';
+            showToast('success', mensaje);
+        } else {
+            showToast('danger', result.error || 'Error al enviar QR');
+        }
+    } catch (error) {
+        console.error('Error enviando QR:', error);
+        showToast('danger', 'Error al enviar QR');
+    }
 }
 </script>
 </body>

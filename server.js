@@ -465,6 +465,84 @@ app.post('/api/send-whatsapp', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// 🔹 Enviar QR de registro a un líder
+app.post('/api/leaders/:id/send-qr', async (req, res) => {
+  try {
+    const leader = await Leader.findById(req.params.id);
+    if (!leader) return res.status(404).json({ error: 'Líder no encontrado' });
+
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const registrationUrl = `${baseUrl}/registro/${leader.token}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(registrationUrl)}`;
+
+    // Preparar mensaje para WhatsApp
+    const whatsappMessage = `¡Hola ${leader.name}! Aquí está tu código QR para registrar asistentes:\n\n${qrUrl}\n\nO puedes compartir este enlace directamente:\n${registrationUrl}`;
+
+    // Enviar por WhatsApp si hay número
+    let whatsappResult = { success: false };
+    if (leader.phone) {
+      try {
+        const whatsappResponse = await fetch(BOT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            numero: leader.phone, 
+            mensaje: whatsappMessage 
+          })
+        });
+        whatsappResult = await whatsappResponse.json();
+      } catch (whatsappError) {
+        console.error('Error enviando WhatsApp:', whatsappError);
+      }
+    }
+
+    // Enviar por email
+    let emailResult = { success: false };
+    if (leader.email) {
+      try {
+        emailResult = await resend.emails.send({
+          from: 'Sistema de Registro <onboarding@resend.dev>',
+          to: leader.email,
+          subject: '🎫 Tu código QR para registros',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #4361ee; text-align: center;">Tu Código QR para Registros</h2>
+              
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h3 style="color: #333;">Hola ${leader.name},</h3>
+                <p>Aquí está tu código QR para registrar asistentes:</p>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                  <img src="${qrUrl}" alt="Código QR" style="max-width: 300px; width: 100%;">
+                </div>
+                
+                <p>También puedes compartir este enlace directamente:</p>
+                <p style="background: #fff; padding: 10px; border-radius: 5px;">
+                  <a href="${registrationUrl}">${registrationUrl}</a>
+                </p>
+              </div>
+            </div>
+          `
+        });
+      } catch (emailError) {
+        console.error('Error enviando email:', emailError);
+      }
+    }
+
+    res.json({
+      success: true,
+      whatsappSent: whatsappResult.success,
+      emailSent: emailResult?.id ? true : false,
+      registrationUrl,
+      qrUrl
+    });
+
+  } catch (error) {
+    console.error('❌ Error enviando QR al líder:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 // 🔹 Ruta para probar el servicio de email
 app.get('/api/test-email', async (req, res) => {
   try {
