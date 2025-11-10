@@ -259,17 +259,14 @@ app.get("/registro/:token", (req, res) => {
 app.get("/api/export/:type", async (req, res) => {
   const { type } = req.params;
   try {
-    const dataFile = path.join(process.cwd(), "data.json");
-    let data = { leaders: [], registrations: [] };
-    if (fs.existsSync(dataFile)) {
-      data = JSON.parse(fs.readFileSync(dataFile, "utf8"));
-    } else {
-      // if no data.json, fallback to DB
-      const leadersFromDb = await Leader.find();
-      const regsFromDb = await Registration.find();
-      data.leaders = leadersFromDb;
-      data.registrations = regsFromDb;
-    }
+    // 🔹 SIEMPRE obtener datos de la base de datos MongoDB
+    const leadersFromDb = await Leader.find();
+    const regsFromDb = await Registration.find();
+    
+    const data = {
+      leaders: leadersFromDb,
+      registrations: regsFromDb
+    };
 
     let rows = [];
     let headers = [];
@@ -290,9 +287,9 @@ app.get("/api/export/:type", async (req, res) => {
       headers = [
         "ID",
         "Nombre Completo",
-        "Correo Electrónico",
+        "Email",
         "Teléfono",
-        "Área/Grupo",
+        "Área",
         "Estado",
         "Total Registros",
         "Último Registro",
@@ -306,12 +303,12 @@ app.get("/api/export/:type", async (req, res) => {
           Math.max(...registrosLider.map(r => new Date(r.date))) : null;
         
         return [
-          l._id || "",
+          String(l._id) || "",
           l.name || "",
           l.email || "",
           l.phone || "",
           l.area || 'No especificada',
-          l.active ? 'Activo ✅' : 'Inactivo ❌',
+          l.active ? 'Activo' : 'Inactivo',
           registrosLider.length || 0,
           ultimoRegistro ? formatFecha(ultimoRegistro) : 'Sin registros',
           l.token || ""
@@ -319,35 +316,36 @@ app.get("/api/export/:type", async (req, res) => {
       });
     } else if (type === "registrations") {
       headers = [
-        "ID",
-        "Fecha y Hora",
-        "Nombre Completo",
-        "Correo Electrónico",
+        "Fecha",
+        "Nombre",
+        "Apellido",
+        "Cédula",
+        "Email",
         "Teléfono",
-        "Líder Asignado",
-        "Área del Líder",
-        "Notificaciones"
+        "Líder",
+        "Confirmado",
+        "Confirmado Por",
+        "Confirmado En",
+        "Email Enviado",
+        "SMS Enviado"
       ];
       
       rows = (data.registrations || []).map(r => {
         const lider = (data.leaders || []).find(l => String(l._id) === String(r.leaderId));
-        const nombreCompleto = ((r.firstName || "") + " " + (r.lastName || "")).trim() || r.name || "";
-        const notificaciones = [];
-        if (r.notifications) {
-          if (r.notifications.emailSent) notificaciones.push('Email ✅');
-          if (r.notifications.smsSent) notificaciones.push('SMS ✅');
-          if (r.notifications.whatsappSent) notificaciones.push('WhatsApp ✅');
-        }
         
         return [
-          r._id || "",
           formatFecha(r.date),
-          nombreCompleto,
-          r.email || 'No proporcionado',
-          r.phone || 'No proporcionado',
+          r.firstName || "",
+          r.lastName || "",
+          r.cedula || "",
+          r.email || "",
+          r.phone || "",
           lider?.name || r.leaderName || "Sin líder",
-          lider?.area || 'No especificada',
-          notificaciones.length ? notificaciones.join(', ') : 'Pendientes'
+          r.confirmed ? 'Sí' : 'No',
+          r.confirmedBy || "",
+          r.confirmedAt ? formatFecha(r.confirmedAt) : "",
+          r.notifications?.emailSent ? 'Sí' : 'No',
+          r.notifications?.smsSent ? 'Sí' : 'No'
         ];
       });
     } else {
@@ -430,7 +428,7 @@ app.get("/api/export/:type", async (req, res) => {
       { state: 'frozen', xSplit: 0, ySplit: 3, activeCell: 'A4' }
     ];
 
-    res.setHeader("Content-Disposition", `attachment; filename=${type}_export.xlsx`);
+    res.setHeader("Content-Disposition", `attachment; filename=${type}_export_${new Date().toISOString().slice(0, 10)}.xlsx`);
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
     await workbook.xlsx.write(res);
