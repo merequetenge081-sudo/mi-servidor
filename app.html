@@ -971,6 +971,63 @@ async function loadLeaders() {
     showToast('danger', 'Error cargando líderes');
     throw error;
   }
+
+// ===================== 🔹 Auto-refresh en tiempo real =====================
+async function checkForNewRegistrations() {
+    try {
+        const regsRes = await fetch(`${API_BASE}/registrations`);
+        const registrations = await regsRes.json();
+        const currentCount = registrations.length;
+        
+        // Si hay nuevos registros, actualizar automáticamente
+        if (currentCount > lastRegistrationCount) {
+            lastRegistrationCount = currentCount;
+            console.log(`✅ Nuevo(s) registro(s) detectado(s). Total: ${currentCount}`);
+            
+            // Actualizar todos los datos
+            await loadLeaders();
+            await loadRegistrations();
+            
+            // Actualizar las tablas visibles
+            if (document.getElementById('dashboardSection').style.display !== 'none') {
+                await updateDashboard();
+            }
+            
+            if (document.getElementById('registrationsSection').style.display !== 'none') {
+                updateRegistrationsTable();
+            }
+            
+            if (document.getElementById('analysisSection').style.display !== 'none') {
+                await refreshAnalysis();
+            }
+            
+            // Mostrar notificación
+            showToast('success', `✅ Nuevo registro detectado! Total: ${currentCount}`);
+        }
+    } catch (error) {
+        console.error('Error en checkForNewRegistrations:', error);
+    }
+}
+
+function startAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+    
+    // Verificar cada 5 segundos si hay nuevos registros
+    autoRefreshInterval = setInterval(() => {
+        checkForNewRegistrations();
+    }, 5000);
+    
+    console.log('🔄 Auto-refresh iniciado (cada 5 segundos)');
+}
+
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+        console.log('⏹️ Auto-refresh detenido');
+    }
 }
 
 async function loadRegistrations() {
@@ -1395,6 +1452,10 @@ let currentFilterLeaderId = '';
 let currentSearchTerm = '';
 let currentConfirmedFilter = '';
 let leadersPerformanceMinimized = false;
+let autoRefreshInterval = null;
+let lastRegistrationCount = 0;
+
+async function refreshAnalysis() {
 
 async function refreshAnalysis() {
     try {
@@ -1534,9 +1595,7 @@ function filterBySearchTerm() {
     currentSearchTerm = document.getElementById('searchUserName').value.toLowerCase();
     currentFilterLeaderId = '';
     document.getElementById('filterLeaderSelect').value = '';
-    applyFilters();
-}
-
+    async function refreshAnalysis() {
 function filterByConfirmed() {
     currentConfirmedFilter = document.getElementById('filterConfirmedSelect').value;
     applyFilters();
@@ -1725,6 +1784,9 @@ async function initializePage() {
 
 // Cargar datos iniciales
 initializePage();
+
+// Iniciar auto-refresh automático
+startAutoRefresh();
 
 // ===================== 🔹 Click handlers para tarjetas =====================
 (function(){
