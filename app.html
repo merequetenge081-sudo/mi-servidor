@@ -464,6 +464,32 @@
                     </div>
                 </div>
 
+                <!-- Filtros -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Filtrar por Líder:</label>
+                                <select class="form-select" id="filterLeaderSelect" onchange="filterByLeader()">
+                                    <option value="">-- Todos los Líderes --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Buscar por Nombre:</label>
+                                <input type="text" class="form-control" id="searchUserName" placeholder="Buscar nombre..." onkeyup="filterBySearchTerm()">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Estado de Confirmación:</label>
+                                <select class="form-select" id="filterConfirmedSelect" onchange="filterByConfirmed()">
+                                    <option value="">-- Todos --</option>
+                                    <option value="confirmed">Confirmados</option>
+                                    <option value="unconfirmed">No Confirmados</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Dashboard Cards -->
                 <div class="row mb-4">
                     <div class="col-md-3">
@@ -487,9 +513,9 @@
                     <div class="col-md-3">
                         <div class="card h-100 border-info">
                             <div class="card-body">
-                                <h5 class="card-title">Promedio por Líder</h5>
-                                <p class="display-4" id="avgRegistrations">-</p>
-                                <p class="text-muted">registros/líder</p>
+                                <h5 class="card-title">Confirmados</h5>
+                                <p class="display-4" id="confirmedCount">-</p>
+                                <p class="text-muted" id="confirmationRate">- %</p>
                             </div>
                         </div>
                     </div>
@@ -506,16 +532,16 @@
 
                 <!-- Leaders Performance -->
                 <div class="row">
-                    <div class="col-md-6 mb-4">
+                    <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Desempeño de Líderes</h5>
+                                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Desempeño de Líderes</h5>
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn btn-outline-secondary" onclick="sortLeadersList('registrations')">
-                                        <i class="bi bi-sort-numeric-down"></i> Registros
+                                        <i class="bi bi-sort-numeric-down"></i> Por Registros
                                     </button>
                                     <button class="btn btn-outline-secondary" onclick="sortLeadersList('name')">
-                                        <i class="bi bi-sort-alpha-down"></i> Nombre
+                                        <i class="bi bi-sort-alpha-down"></i> Por Nombre
                                     </button>
                                 </div>
                             </div>
@@ -527,8 +553,10 @@
                                                 <th>Líder</th>
                                                 <th>Área</th>
                                                 <th>Registros</th>
-                                                <th>Estado</th>
+                                                <th>Confirmados</th>
+                                                <th>% Confirmación</th>
                                                 <th>Último Registro</th>
+                                                <th>Estado</th>
                                             </tr>
                                         </thead>
                                         <tbody id="leaderAnalysisList">
@@ -539,29 +567,34 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-md-6 mb-4">
+                <!-- Registros del Líder Seleccionado -->
+                <div class="row">
+                    <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Últimos Registros</h5>
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-secondary active" onclick="filterRegistrations('today')">Hoy</button>
-                                    <button class="btn btn-outline-secondary" onclick="filterRegistrations('week')">Semana</button>
-                                    <button class="btn btn-outline-secondary" onclick="filterRegistrations('all')">Todos</button>
-                                </div>
+                                <h5 class="mb-0">
+                                    <i class="bi bi-people-fill"></i> 
+                                    <span id="selectedLeaderTitle">Todos los Registros</span>
+                                </h5>
+                                <div class="badge bg-info" id="registroCount">0 registros</div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover table-sm">
                                         <thead>
                                             <tr>
                                                 <th>Fecha</th>
                                                 <th>Nombre</th>
-                                                <th>Líder</th>
+                                                <th>Cédula</th>
+                                                <th>Teléfono</th>
                                                 <th>Estado</th>
+                                                <th>Confirmado Por</th>
+                                                <th>Acciones</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="recentRegistrationsList">
+                                        <tbody id="filteredRegistrationsList">
                                             <!-- Se llenará dinámicamente -->
                                         </tbody>
                                     </table>
@@ -1350,6 +1383,13 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // ===================== 🔹 Funciones de Análisis de Datos =====================
+// Variables globales para filtrado
+let allRegistrationsData = [];
+let allLeadersData = [];
+let currentFilterLeaderId = '';
+let currentSearchTerm = '';
+let currentConfirmedFilter = '';
+
 async function refreshAnalysis() {
     try {
         console.log('Iniciando refreshAnalysis');
@@ -1357,50 +1397,27 @@ async function refreshAnalysis() {
             loadLeaders(),
             loadRegistrations()
         ]);
-        console.log('Datos cargados:', { leadersData, registrationsData });
+        
+        // Guardar datos globales para filtrado
+        allLeadersData = leadersData;
+        allRegistrationsData = registrationsData;
+        
+        // Llenar selector de líderes
+        const leaderSelect = document.getElementById('filterLeaderSelect');
+        leaderSelect.innerHTML = '<option value="">-- Todos los Líderes --</option>' + 
+            leadersData.map(l => `<option value="${l._id}">${l.name} (${leadersData.filter(ld => ld._id === l._id).length ? leadersData.filter(ld => ld._id === l._id).reduce((acc, li) => acc + (registrationsData.filter(r => r.leaderId === li._id).length), 0) : 0} registros)</option>`).join('');
 
         // Estadísticas generales
         const totalLeaders = leadersData.length;
         const activeLeaders = leadersData.filter(l => l.active).length;
         const totalRegistrations = registrationsData.length;
+        const confirmedRegs = registrationsData.filter(r => r.confirmed).length;
+        const confirmationRate = totalRegistrations > 0 ? ((confirmedRegs / totalRegistrations) * 100).toFixed(1) : 0;
         const today = new Date().setHours(0,0,0,0);
         
-        // Análisis de duplicados
-        const cedulas = {};
-        const duplicados = [];
-        registrationsData.forEach(reg => {
-            if (reg.cedula) {
-                if (cedulas[reg.cedula]) {
-                    duplicados.push(reg);
-                } else {
-                    cedulas[reg.cedula] = reg;
-                }
-            }
-        });
-
-        // Estadísticas por líder
-        const regsByLeader = {};
-        registrationsData.forEach(reg => {
-            if (reg.leaderId) {
-                if (!regsByLeader[reg.leaderId]) {
-                    regsByLeader[reg.leaderId] = {
-                        count: 0,
-                        today: 0,
-                        registrations: []
-                    };
-                }
-                regsByLeader[reg.leaderId].count++;
-                regsByLeader[reg.leaderId].registrations.push(reg);
-                if (new Date(reg.date).setHours(0,0,0,0) === today) {
-                    regsByLeader[reg.leaderId].today++;
-                }
-            }
-        });
-
         const todayRegistrations = registrationsData.filter(r => 
             new Date(r.date).setHours(0,0,0,0) === today
         ).length;
-        const avgRegistrations = totalLeaders ? (totalRegistrations / totalLeaders).toFixed(1) : 0;
 
         // Última actividad
         const lastReg = registrationsData.sort((a,b) => new Date(b.date) - new Date(a.date))[0];
@@ -1412,15 +1429,16 @@ async function refreshAnalysis() {
         document.getElementById('activeLeaders').textContent = `${activeLeaders} activos`;
         document.getElementById('totalRegistrations').textContent = totalRegistrations;
         document.getElementById('todayRegistrations').textContent = `${todayRegistrations} hoy`;
-        document.getElementById('avgRegistrations').textContent = avgRegistrations;
+        document.getElementById('confirmedCount').textContent = confirmedRegs;
+        document.getElementById('confirmationRate').textContent = `${confirmationRate}%`;
         document.getElementById('lastActivity').textContent = lastActivity;
         document.getElementById('lastActivityTime').textContent = lastActivityTime;
 
         // Actualizar tabla de líderes
         updateLeaderAnalysisList(leadersData, registrationsData);
         
-        // Actualizar tabla de registros recientes
-        updateRecentRegistrationsList(registrationsData, leadersData, 'today');
+        // Aplicar filtros iniciales
+        applyFilters();
 
         showToast('success', 'Análisis actualizado');
     } catch (error) {
@@ -1433,34 +1451,20 @@ function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registration
     const today = new Date().setHours(0,0,0,0);
     const leaderStats = leaders.map(leader => {
         const leaderRegs = registrations.filter(r => r.leaderId === leader._id);
+        const confirmedRegs = leaderRegs.filter(r => r.confirmed);
         const lastReg = leaderRegs.length ? 
             new Date(Math.max(...leaderRegs.map(r => new Date(r.date)))) : null;
         
-        // Contar registros de hoy
-        const todayRegs = leaderRegs.filter(r => 
-            new Date(r.date).setHours(0,0,0,0) === today
-        ).length;
-        
-        // Identificar duplicados por cédula
-        const cedulas = {};
-        const duplicados = leaderRegs.filter(reg => {
-            if (reg.cedula) {
-                if (cedulas[reg.cedula]) {
-                    return true;
-                }
-                cedulas[reg.cedula] = true;
-                return false;
-            }
-            return false;
-        });
+        const confirmationRate = leaderRegs.length > 0 ? 
+            ((confirmedRegs.length / leaderRegs.length) * 100).toFixed(1) : 0;
         
         return {
             ...leader,
             registrationCount: leaderRegs.length,
+            confirmedCount: confirmedRegs.length,
+            confirmationRate: confirmationRate,
             lastRegistration: lastReg,
-            todayCount: todayRegs,
-            duplicateCount: duplicados.length,
-            registrations: leaderRegs // incluimos todos los registros para referencia
+            registrations: leaderRegs
         };
     });
 
@@ -1472,86 +1476,163 @@ function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registration
 
     const tbody = document.getElementById('leaderAnalysisList');
     tbody.innerHTML = leaderStats.map(leader => `
-        <tr>
+        <tr style="cursor: pointer;" onclick="selectLeaderFilter('${leader._id}')">
             <td>
-                ${leader.name}
+                <strong>${leader.name}</strong>
                 <br>
-                <small class="text-muted">${leader.area || '-'}</small>
+                <small class="text-muted">${leader.email}</small>
             </td>
             <td>
-                Total: ${leader.registrationCount}
-                <br>
-                <small class="text-primary">Hoy: ${leader.todayCount}</small>
-                ${leader.duplicateCount > 0 ? 
-                    `<br><small class="text-danger">Duplicados: ${leader.duplicateCount}</small>` : 
-                    ''}
-                <div class="progress">
-                    <div class="progress-bar bg-primary" role="progressbar" 
-                         style="width: ${(leader.registrationCount / Math.max(...leaderStats.map(l => l.registrationCount)) * 100)}%">
+                <span class="badge bg-secondary">${leader.area || 'Sin especificar'}</span>
+            </td>
+            <td>
+                <span class="badge bg-primary">${leader.registrationCount}</span>
+            </td>
+            <td>
+                <span class="badge bg-success">${leader.confirmedCount}</span>
+            </td>
+            <td>
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: ${leader.confirmationRate}%"
+                         title="${leader.confirmationRate}%">
+                        ${leader.confirmationRate}%
                     </div>
                 </div>
+            </td>
+            <td>
+                <small class="text-muted">${leader.lastRegistration ? leader.lastRegistration.toLocaleString('es-CO') : 'Sin registros'}</small>
             </td>
             <td>
                 <span class="status-badge ${leader.active ? 'status-active' : 'status-inactive'}">
                     ${leader.active ? 'Activo ✅' : 'Inactivo ❌'}
                 </span>
-                <br>
-                <small class="text-muted">Último: ${leader.lastRegistration ? leader.lastRegistration.toLocaleString('es-CO') : 'Sin registros'}</small>
-            </td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary mb-1" onclick="showLeaderDetails('${leader._id}')">
-                    Ver Detalle 📊
-                </button>
-                <button class="btn btn-sm btn-outline-secondary" onclick="exportLeaderData('${leader._id}')">
-                    Exportar 📥
-                </button>
             </td>
         </tr>
     `).join('');
 }
 
-function updateRecentRegistrationsList(registrations, leaders, filter = 'today') {
-    const today = new Date().setHours(0,0,0,0);
-    const weekAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
-    
-    let filteredRegs = [...registrations];
-    if (filter === 'today') {
-        filteredRegs = registrations.filter(r => 
-            new Date(r.date).setHours(0,0,0,0) === today
-        );
-    } else if (filter === 'week') {
-        filteredRegs = registrations.filter(r => 
-            new Date(r.date) >= weekAgo
-        );
+function selectLeaderFilter(leaderId) {
+    document.getElementById('filterLeaderSelect').value = leaderId;
+    filterByLeader();
+}
+
+function filterByLeader() {
+    currentFilterLeaderId = document.getElementById('filterLeaderSelect').value;
+    currentSearchTerm = '';
+    document.getElementById('searchUserName').value = '';
+    applyFilters();
+}
+
+function filterBySearchTerm() {
+    currentSearchTerm = document.getElementById('searchUserName').value.toLowerCase();
+    currentFilterLeaderId = '';
+    document.getElementById('filterLeaderSelect').value = '';
+    applyFilters();
+}
+
+function filterByConfirmed() {
+    currentConfirmedFilter = document.getElementById('filterConfirmedSelect').value;
+    applyFilters();
+}
+
+function applyFilters() {
+    let filtered = [...allRegistrationsData];
+
+    // Filtrar por líder
+    if (currentFilterLeaderId) {
+        filtered = filtered.filter(r => r.leaderId === currentFilterLeaderId);
     }
 
-    filteredRegs.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Filtrar por búsqueda de nombre
+    if (currentSearchTerm) {
+        filtered = filtered.filter(r => {
+            const fullName = `${r.firstName || ''} ${r.lastName || ''}`.toLowerCase();
+            return fullName.includes(currentSearchTerm);
+        });
+    }
 
-    const tbody = document.getElementById('recentRegistrationsList');
-    tbody.innerHTML = filteredRegs.map(reg => {
-        const leader = leaders.find(l => l._id === reg.leaderId);
-        const nombre = `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || reg.name || '-';
+    // Filtrar por confirmación
+    if (currentConfirmedFilter === 'confirmed') {
+        filtered = filtered.filter(r => r.confirmed);
+    } else if (currentConfirmedFilter === 'unconfirmed') {
+        filtered = filtered.filter(r => !r.confirmed);
+    }
+
+    // Ordenar por fecha descendente
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Actualizar título
+    let titleText = 'Todos los Registros';
+    if (currentFilterLeaderId) {
+        const leader = allLeadersData.find(l => l._id === currentFilterLeaderId);
+        titleText = `Registros de ${leader?.name || 'Líder'}`;
+    } else if (currentSearchTerm) {
+        titleText = `Búsqueda: "${currentSearchTerm}"`;
+    }
+    document.getElementById('selectedLeaderTitle').textContent = titleText;
+    document.getElementById('registroCount').textContent = `${filtered.length} registros`;
+
+    // Actualizar tabla
+    updateFilteredRegistrationsList(filtered);
+}
+
+function updateFilteredRegistrationsList(registrations) {
+    const tbody = document.getElementById('filteredRegistrationsList');
+    
+    if (registrations.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                    <p>No hay registros que coincidan con los filtros</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = registrations.map(reg => {
         const confirmed = reg.confirmed ? true : false;
         const confirmedBy = reg.confirmedBy || '';
         const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
+        const fullName = `${reg.firstName || ''} ${reg.lastName || ''}`.trim();
 
         return `
             <tr>
                 <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
-                <td>${nombre}</td>
-                <td>${leader ? leader.name : 'Sin líder'}</td>
+                <td>
+                    <strong>${fullName}</strong>
+                </td>
+                <td>
+                    <code>${reg.cedula || 'N/A'}</code>
+                </td>
+                <td>${reg.phone || 'N/A'}</td>
                 <td>
                     ${confirmed ? `
-                        <div>
-                            <span class="badge bg-success">Asistió ✅</span>
-                            <br><small>${confirmedBy} - ${confirmedAt}</small>
-                            <br><button class="btn btn-sm btn-outline-danger mt-1" onclick="toggleConfirm('${reg._id}', false)">Desconfirmar</button>
-                        </div>
+                        <span class="badge bg-success">Asistió ✅</span>
                     ` : `
-                        <div>
-                            <span class="badge bg-secondary">No confirmado</span>
-                            <br><button class="btn btn-sm btn-outline-success mt-1" onclick="confirmRegistration('${reg._id}')">Confirmar</button>
-                        </div>
+                        <span class="badge bg-secondary">No confirmado</span>
+                    `}
+                </td>
+                <td>
+                    ${confirmedBy ? `
+                        <small class="text-success">${confirmedBy}</small>
+                        <br>
+                        <small class="text-muted">${confirmedAt}</small>
+                    ` : `
+                        <small class="text-muted">-</small>
+                    `}
+                </td>
+                <td>
+                    ${confirmed ? `
+                        <button class="btn btn-sm btn-outline-danger" onclick="toggleConfirm('${reg._id}', false)" title="Desconfirmar">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    ` : `
+                        <button class="btn btn-sm btn-outline-success" onclick="confirmRegistration('${reg._id}')" title="Confirmar">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
                     `}
                 </td>
             </tr>
@@ -1559,153 +1640,18 @@ function updateRecentRegistrationsList(registrations, leaders, filter = 'today')
     }).join('');
 }
 
-function filterRegistrations(period) {
-    const buttons = document.querySelectorAll('#analysisSection .btn-group .btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    // Actualizar lista de registros con el filtro seleccionado
-    updateRecentRegistrationsList(registrations, leaders, period);
-}
-
-function sortLeadersList(criteria) {
-    updateLeaderAnalysisList(leaders, registrations, criteria);
-}
-
 // Función para mostrar detalles de un líder específico
 function showLeaderDetails(leaderId) {
-    const leader = leaders.find(l => l._id === leaderId);
-    const leaderRegs = registrations.filter(r => r.leaderId === leaderId);
-    
-    // Ordenar registros por fecha descendente
-    leaderRegs.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    // Agrupar registros por fecha
-    const regsByDate = {};
-    leaderRegs.forEach(reg => {
-        const date = new Date(reg.date).toLocaleDateString('es-CO');
-        if (!regsByDate[date]) {
-            regsByDate[date] = [];
-        }
-        regsByDate[date].push(reg);
-    });
-    
-    // Encontrar duplicados
-    const cedulas = {};
-    const duplicados = leaderRegs.filter(reg => {
-        if (reg.cedula) {
-            if (cedulas[reg.cedula]) {
-                return true;
-            }
-            cedulas[reg.cedula] = reg;
-            return false;
-        }
-        return false;
-    });
-    
-    // Crear modal de detalles
-    const modalHtml = `
-        <div class="modal fade" id="leaderDetailsModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Detalles de ${leader.name}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="card border-primary">
-                                    <div class="card-body">
-                                        <h6>Total Registros</h6>
-                                        <h3>${leaderRegs.length}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card ${duplicados.length > 0 ? 'border-warning' : 'border-success'}">
-                                    <div class="card-body">
-                                        <h6>Duplicados</h6>
-                                        <h3>${duplicados.length}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card border-info">
-                                    <div class="card-body">
-                                        <h6>Último Registro</h6>
-                                        <h6>${leaderRegs.length ? new Date(leaderRegs[0].date).toLocaleString('es-CO') : '-'}</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <h6 class="mb-3">Registros por Fecha</h6>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Nombre</th>
-                                        <th>Cédula</th>
-                                        <th>Teléfono</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${leaderRegs.map(reg => `
-                                        <tr>
-                                            <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
-                                            <td>${reg.firstName} ${reg.lastName}</td>
-                                            <td>${reg.cedula || '-'}
-                                                ${duplicados.find(d => d.cedula === reg.cedula) ? 
-                                                    '<span class="badge bg-warning text-dark">Duplicado</span>' : 
-                                                    ''}
-                                            </td>
-                                            <td>${reg.phone || '-'}</td>
-                                            <td>
-                                                ${reg.confirmed ? `
-                                                    <div>
-                                                        <span class="badge bg-success">Asistió ✅</span>
-                                                        <br><small>${reg.confirmedBy || ''} - ${reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''}</small>
-                                                        <br><button class="btn btn-sm btn-outline-danger mt-1" onclick="toggleConfirm('${reg._id}', false)">Desconfirmar</button>
-                                                    </div>
-                                                ` : `
-                                                    <div>
-                                                        <span class="badge bg-secondary">No confirmado</span>
-                                                        <br><button class="btn btn-sm btn-outline-success mt-1" onclick="confirmRegistration('${reg._id}')">Confirmar</button>
-                                                    </div>
-                                                `}
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Remover modal anterior si existe
-    const oldModal = document.getElementById('leaderDetailsModal');
-    if (oldModal) {
-        oldModal.remove();
-    }
-    
-    // Agregar nuevo modal al DOM
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    // Mostrar modal
-    const modal = new bootstrap.Modal(document.getElementById('leaderDetailsModal'));
-    modal.show();
+    selectLeaderFilter(leaderId);
+    const leader = allLeadersData.find(l => l._id === leaderId);
+    if (!leader) return;
+    showToast('success', `Mostrando registros de ${leader.name}`);
 }
 
 // Función para exportar datos de un líder específico
 async function exportLeaderData(leaderId) {
-    const leader = leaders.find(l => l._id === leaderId);
-    const leaderRegs = registrations.filter(r => r.leaderId === leaderId);
+    const leader = allLeadersData.find(l => l._id === leaderId);
+    const leaderRegs = allRegistrationsData.filter(r => r.leaderId === leaderId);
     
     try {
         // Preparar datos para Excel
@@ -1715,7 +1661,9 @@ async function exportLeaderData(leaderId) {
             'Cédula': reg.cedula || '',
             'Teléfono': reg.phone || '',
             'Email': reg.email || '',
-            'Estado': reg.notifications?.emailSent ? 'Notificado' : 'Pendiente'
+            'Confirmado': reg.confirmed ? 'Sí' : 'No',
+            'Confirmado Por': reg.confirmedBy || '',
+            'Confirmado En': reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''
         })));
         
         // Crear libro de Excel
@@ -1733,94 +1681,8 @@ async function exportLeaderData(leaderId) {
     }
 }
 
-// Funciones para confirmar/desconfirmar asistencia (no tocan QR)
-async function confirmRegistration(regId) {
-    try {
-        const reg = registrations.find(r => r._id === regId);
-        if (!reg) {
-            showToast('danger', 'Registro no encontrado');
-            return;
-        }
-
-        // Pedir quién confirma (puede ser nombre del voluntario en el evento)
-        const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
-        if (!confirmer) return;
-
-        const payload = {
-            ...reg,
-            confirmed: true,
-            confirmedBy: confirmer,
-            confirmedAt: new Date().toISOString()
-        };
-
-        const res = await fetch(`${API_BASE}/registrations/${regId}/confirm`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ confirmedBy: confirmer })
-        });
-
-        if (!res.ok) {
-            const text = await res.text().catch(() => '');
-            console.error('Confirm failed', res.status, text);
-            showToast('danger', 'Error al confirmar asistencia: ' + res.status);
-            return;
-        }
-
-        // Actualizar array local y UI
-        // Preferir recargar desde servidor para evitar inconsistencias
-        await loadRegistrations();
-        await refreshAnalysis();
-        showToast('success', 'Asistencia confirmada');
-    } catch (err) {
-        console.error('Error confirmando registro:', err);
-        showToast('danger', 'Error al confirmar asistencia');
-    }
-}
-
-async function toggleConfirm(regId, value) {
-    try {
-        const reg = registrations.find(r => r._id === regId);
-        if (!reg) {
-            showToast('danger', 'Registro no encontrado');
-            return;
-        }
-
-        const payload = { ...reg };
-        if (value) {
-            // confirmar
-            const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
-            if (!confirmer) return;
-            payload.confirmed = true;
-            payload.confirmedBy = confirmer;
-            payload.confirmedAt = new Date().toISOString();
-        } else {
-            // desconfirmar
-            payload.confirmed = false;
-            delete payload.confirmedBy;
-            delete payload.confirmedAt;
-        }
-
-        const res = await fetch(`${API_BASE}/registrations/${regId}/${value ? 'confirm' : 'unconfirm'}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: value ? JSON.stringify({ confirmedBy: payload.confirmedBy }) : null
-        });
-
-        if (!res.ok) {
-            const txt = await res.text().catch(() => '');
-            console.error('ToggleConfirm failed', res.status, txt);
-            showToast('danger', 'Error al actualizar confirmación: ' + res.status);
-            return;
-        }
-
-        // Recargar desde servidor para mantener consistencia
-        await loadRegistrations();
-        await refreshAnalysis();
-        showToast('success', value ? 'Confirmado' : 'Desconfirmado');
-    } catch (err) {
-        console.error('Error toggling confirm:', err);
-        showToast('danger', 'Error actualizando confirmación');
-    }
+function sortLeadersList(criteria) {
+    updateLeaderAnalysisList(allLeadersData, allRegistrationsData, criteria);
 }
 
 // Función para inicializar la página
@@ -1897,6 +1759,85 @@ async function sendQRToLeader(leaderId) {
     } catch (error) {
         console.error('Error enviando QR:', error);
         showToast('danger', 'Error al enviar QR');
+    }
+}
+
+// Funciones para confirmar/desconfirmar asistencia
+async function confirmRegistration(regId) {
+    try {
+        const reg = allRegistrationsData.find(r => r._id === regId);
+        if (!reg) {
+            showToast('danger', 'Registro no encontrado');
+            return;
+        }
+
+        // Pedir quién confirma
+        const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
+        if (!confirmer) return;
+
+        const res = await fetch(`${API_BASE}/registrations/${regId}/confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ confirmedBy: confirmer })
+        });
+
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            console.error('Confirm failed', res.status, text);
+            showToast('danger', 'Error al confirmar asistencia');
+            return;
+        }
+
+        await loadRegistrations();
+        applyFilters();
+        showToast('success', 'Asistencia confirmada');
+    } catch (err) {
+        console.error('Error confirmando registro:', err);
+        showToast('danger', 'Error al confirmar asistencia');
+    }
+}
+
+async function toggleConfirm(regId, value) {
+    try {
+        const reg = allRegistrationsData.find(r => r._id === regId);
+        if (!reg) {
+            showToast('danger', 'Registro no encontrado');
+            return;
+        }
+
+        if (value) {
+            // confirmar
+            const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
+            if (!confirmer) return;
+            
+            const res = await fetch(`${API_BASE}/registrations/${regId}/confirm`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ confirmedBy: confirmer })
+            });
+
+            if (!res.ok) {
+                showToast('danger', 'Error al confirmar asistencia');
+                return;
+            }
+        } else {
+            // desconfirmar
+            const res = await fetch(`${API_BASE}/registrations/${regId}/unconfirm`, {
+                method: 'POST'
+            });
+
+            if (!res.ok) {
+                showToast('danger', 'Error al desconfirmar asistencia');
+                return;
+            }
+        }
+
+        await loadRegistrations();
+        applyFilters();
+        showToast('success', value ? 'Confirmado' : 'Desconfirmado');
+    } catch (err) {
+        console.error('Error toggling confirm:', err);
+        showToast('danger', 'Error actualizando confirmación');
     }
 }
 </script>
