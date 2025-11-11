@@ -1072,13 +1072,24 @@ async function saveAdminRegistration() {
     const last = document.getElementById("adminLastName")?.value.trim() || '';
     const name = (first + ' ' + last).trim();
     const leaderId = document.getElementById("adminLeaderSelect")?.value;
+    const cedula = document.getElementById("adminCedula")?.value || '';
+    const email = document.getElementById("adminEmail")?.value || '';
+    const phone = document.getElementById("adminPhone")?.value || '';
 
     if (!name || !leaderId) {
         alert("Por favor completa todos los campos antes de guardar.");
         return;
     }
 
-    const reg = { name, leaderId };
+    const reg = { 
+      firstName: first,
+      lastName: last,
+      cedula,
+      email,
+      phone,
+      leaderId,
+      eventId: activeEventId // Asociar al evento actual
+    };
 
     try {
         const response = await fetch("/api/registrations", {
@@ -1088,14 +1099,35 @@ async function saveAdminRegistration() {
         });
 
         if (response.ok) {
+            const newReg = await response.json();
+            console.log('✅ Registro guardado:', newReg);
+            
             alert("Registro guardado correctamente ✅");
+            
+            // Limpiar formulario
+            document.getElementById("adminRegistrationForm").reset();
             document.getElementById("adminFirstName").value = "";
             document.getElementById("adminLastName").value = "";
-            const modal = bootstrap.Modal.getInstance(document.getElementById("adminRegistrationModal"));
+            document.getElementById("adminCedula").value = "";
+            document.getElementById("adminEmail").value = "";
+            document.getElementById("adminPhone").value = "";
+            
+            // Cerrar modal
+            const modalElement = document.getElementById("adminRegistrationModal");
+            const modal = bootstrap.Modal.getInstance(modalElement);
             if (modal) modal.hide();
-            loadRegistrations(); // refresca la tabla
+            
+            // Recargar datos
+            await loadLeaders();
+            await loadRegistrations();
+            await updateDashboard();
+            
+            // Mostrar notificación
+            showToast('success', '✅ Registro guardado correctamente');
+            
         } else {
-            alert("Hubo un error al guardar el registro.");
+            const errorData = await response.json();
+            alert(`Error al guardar el registro: ${errorData.error}`);
         }
     } catch (err) {
         console.error('Error guardando registro admin:', err);
@@ -1464,28 +1496,58 @@ async function saveLeader() {
     return;
   }
   
-  const res = await fetch(`${API_BASE}/leaders${id ? '/' + id : ''}`, {
-    method: id ? 'PUT' : 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      phone,
-      area,
-      active
-    })
-  });
+  const leaderData = {
+    name,
+    email,
+    phone,
+    area,
+    active
+  };
   
-  if (res.ok) {
-    showToast('success', 'Líder guardado con éxito');
-    loadLeaders();
-    // Cerrar modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('leaderModal'));
-    modal.hide();
-  } else {
-    showToast('danger', 'Error al guardar el líder');
+  // Asociar el líder al evento actual si existe
+  if (activeEventId) {
+    leaderData.eventId = activeEventId;
+  }
+  
+  try {
+    const res = await fetch(`${API_BASE}/leaders${id ? '/' + id : ''}`, {
+      method: id ? 'PUT' : 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(leaderData)
+    });
+    
+    if (res.ok) {
+      const newLeader = await res.json();
+      console.log('✅ Líder guardado:', newLeader);
+      
+      showToast('success', 'Líder guardado con éxito');
+      
+      // Recargar líderes desde el backend
+      await loadLeaders();
+      
+      // Actualizar dashboard
+      await updateDashboard();
+      
+      // Cerrar modal
+      const modalElement = document.getElementById('leaderModal');
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
+      
+      // Limpiar formulario
+      document.getElementById('leaderForm').reset();
+      document.getElementById('leaderId').value = '';
+      
+    } else {
+      const errorData = await res.json();
+      showToast('danger', `Error al guardar el líder: ${errorData.error}`);
+    }
+  } catch (err) {
+    console.error('Error saveLeader:', err);
+    showToast('danger', 'Error de conexión al guardar el líder');
   }
 }
 
@@ -1717,7 +1779,7 @@ async function sendNotification(registrationId) {
 }
 
 // Detectar si es una vista pública del formulario
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const leaderToken = urlParams.get("leader");
 
@@ -1732,6 +1794,28 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // Guardar el token para registrar con ese líder
     localStorage.setItem("publicLeaderToken", leaderToken);
+  } else {
+    // Realizar migración automática al cargar la página
+    try {
+      console.log('🔄 Iniciando migración automática de datos...');
+      const migrateRes = await fetch('/api/migrate', { method: 'POST' });
+      const migrateData = await migrateRes.json();
+      
+      if (migrateData.success) {
+        console.log(`✅ Migración completada: ${migrateData.migratedLeaders} líderes, ${migrateData.migratedRegistrations} registros`);
+        
+        // Recargar datos después de migrar
+        setTimeout(() => {
+          if (activeEventId) {
+            loadLeaders();
+            loadRegistrations();
+            updateDashboard();
+          }
+        }, 500);
+      }
+    } catch (err) {
+      console.error('❌ Error en migración:', err);
+    }
   }
 });
 

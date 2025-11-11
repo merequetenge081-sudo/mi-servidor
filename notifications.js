@@ -10,11 +10,14 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Configuración de SMS (Twilio) - Opcional
 let smsClient = null;
 try {
-  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+  if (process.env.TWILIO_ACCOUNT_SID && 
+      process.env.TWILIO_AUTH_TOKEN && 
+      process.env.TWILIO_ACCOUNT_SID !== 'tu_account_sid' &&
+      process.env.TWILIO_AUTH_TOKEN !== 'tu_auth_token') {
     smsClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
     console.log('📱 Cliente Twilio inicializado');
   } else {
-    console.log('📱 SMS desactivado (credenciales no configuradas)');
+    console.log('📱 SMS desactivado (credenciales de Twilio no configuradas)');
   }
 } catch (error) {
   console.log('⚠️ Error inicializando Twilio:', error.message);
