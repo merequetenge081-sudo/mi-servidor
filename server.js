@@ -21,6 +21,16 @@ mongoose.connect(mongoURL)
   .catch(err => console.error("❌ Error al conectar a MongoDB:", err));
 
 // 🔹 Esquemas y modelos
+const EventSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  date: { type: Date, default: null },
+  description: { type: String, default: '' },
+  token: { type: String, default: () => `event-${Date.now()}` },
+  active: { type: Boolean, default: true },
+  createdAt: { type: Date, default: () => new Date() }
+});
+const Event = mongoose.model('Event', EventSchema);
+
 const LeaderSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -28,11 +38,13 @@ const LeaderSchema = new mongoose.Schema({
   area: String,
   active: Boolean,
   token: String,
+  eventId: { type: String, default: '' },
   registrations: { type: Number, default: 0 }
 });
 const RegistrationSchema = new mongoose.Schema({
   leaderId: String,
   leaderName: String,
+  eventId: String,
   firstName: String,
   lastName: String,
   cedula: String,
@@ -55,6 +67,7 @@ RegistrationSchema.add({
 const Leader = mongoose.model("Leader", LeaderSchema);
 const Registration = mongoose.model("Registration", RegistrationSchema);
 
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -63,8 +76,12 @@ app.use(express.static(__dirname));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "app.html")));
 
 // 🔹 Obtener líderes
+// Opcional: filtrar líderes por eventId (/?eventId=...)
 app.get("/api/leaders", async (req, res) => {
-  const leaders = await Leader.find();
+  const { eventId } = req.query;
+  const filter = {};
+  if (eventId) filter.eventId = eventId;
+  const leaders = await Leader.find(filter);
   res.json(leaders);
 });
 
@@ -72,8 +89,47 @@ app.get("/api/leaders", async (req, res) => {
 app.post("/api/leaders", async (req, res) => {
   const leader = req.body;
   leader.token = leader.token || "leader" + Date.now();
+  // allow association to an event via eventId
   const newLeader = await Leader.create(leader);
   res.json(newLeader);
+});
+
+// 🔹 Events CRUD
+app.get('/api/events', async (req, res) => {
+  const events = await Event.find();
+  res.json(events);
+});
+
+app.post('/api/events', async (req, res) => {
+  try {
+    const ev = req.body;
+    ev.token = ev.token || `event-${Date.now()}`;
+    const created = await Event.create(ev);
+    res.json(created);
+  } catch (err) {
+    console.error('Error creando evento:', err);
+    res.status(500).json({ error: 'Error creando evento' });
+  }
+});
+
+app.put('/api/events/:id', async (req, res) => {
+  try {
+    const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    console.error('Error actualizando evento:', err);
+    res.status(500).json({ error: 'Error actualizando evento' });
+  }
+});
+
+app.delete('/api/events/:id', async (req, res) => {
+  try {
+    await Event.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error eliminando evento:', err);
+    res.status(500).json({ error: 'Error eliminando evento' });
+  }
 });
 
 // 🔹 NUEVO: Endpoint para enviar notificaciones manualmente
@@ -129,9 +185,12 @@ app.delete("/api/leaders/:id", async (req, res) => {
   res.json({ success: true });
 });
 
-// 🔹 Obtener registros
+// 🔹 Obtener registros (opcionalmente filtrar por eventId)
 app.get("/api/registrations", async (req, res) => {
-  const regs = await Registration.find();
+  const { eventId } = req.query;
+  const filter = {};
+  if (eventId) filter.eventId = eventId;
+  const regs = await Registration.find(filter);
   res.json(regs);
 });
 
@@ -148,6 +207,11 @@ app.post("/api/registrations", async (req, res) => {
     } else if (reg.leaderToken) {
       leader = await Leader.findOne({ token: reg.leaderToken });
       if (leader) reg.leaderId = leader._id;
+    }
+
+    // Asignar eventId si viene en body o si el líder pertenece a un evento
+    if (!reg.eventId && leader && leader.eventId) {
+      reg.eventId = leader.eventId;
     }
 
     if (leader) {
@@ -258,10 +322,17 @@ app.get("/registro/:token", (req, res) => {
 // Exportar a Excel (genérico: /api/export/leaders o /api/export/registrations)
 app.get("/api/export/:type", async (req, res) => {
   const { type } = req.params;
+  const { eventId } = req.query;
   try {
     // 🔹 SIEMPRE obtener datos de la base de datos MongoDB
-    const leadersFromDb = await Leader.find();
-    const regsFromDb = await Registration.find();
+    let leadersFromDb = await Leader.find();
+    let regsFromDb = await Registration.find();
+
+    // Si se especifica eventId, filtrar resultados
+    if (eventId) {
+      leadersFromDb = leadersFromDb.filter(l => String(l.eventId) === String(eventId));
+      regsFromDb = regsFromDb.filter(r => String(r.eventId) === String(eventId));
+    }
     
     const data = {
       leaders: leadersFromDb,
@@ -283,7 +354,7 @@ app.get("/api/export/:type", async (req, res) => {
       }).format(date);
     };
 
-    if (type === "leaders") {
+  if (type === "leaders") {
       headers = [
         "ID",
         "Nombre Completo",
@@ -314,7 +385,7 @@ app.get("/api/export/:type", async (req, res) => {
           l.token || ""
         ];
       });
-    } else if (type === "registrations") {
+  } else if (type === "registrations") {
       headers = [
         "Fecha",
         "Nombre",
