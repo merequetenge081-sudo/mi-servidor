@@ -1022,10 +1022,21 @@
     </div>
     
     <div id="qrModal" class="modal" style="display:none;">
-      <div class="modal-content p-4" style="max-width:320px; margin:40px auto; background:#fff; border-radius:8px; text-align:center;">
+      <div class="modal-content p-4" style="max-width:420px; margin:40px auto; background:#fff; border-radius:8px; text-align:center;">
         <h3 id="qrModalTitle"></h3>
         <div id="qrContainer" style="margin:16px auto;"></div>
-        <button class="btn btn-secondary" onclick="document.getElementById('qrModal').style.display='none'">Cerrar</button>
+        
+        <!-- Link del registro (nuevo) -->
+        <div style="margin-top:20px; padding-top:20px; border-top:1px solid #eee;">
+          <label class="form-label fw-bold">Link de Registro:</label>
+          <div class="input-group mb-2">
+            <input type="text" id="leaderRegistrationLink" class="form-control" readonly>
+            <button class="btn btn-outline-primary" type="button" onclick="copyLeaderRegistrationLink()">Copiar</button>
+          </div>
+          <small class="text-muted">Comparte este enlace directamente con tus registros</small>
+        </div>
+        
+        <button class="btn btn-secondary mt-3" onclick="document.getElementById('qrModal').style.display='none'">Cerrar</button>
       </div>
     </div>
     <!-- Modal de registro manual -->
@@ -1806,8 +1817,28 @@ function showQRCode(leader) {
     var titleEl = document.getElementById('qrModalTitle');
     if (titleEl) titleEl.innerText = `QR de ${leader.name}`;
 
+    // Rellenar el link del registro en el input
+    const registrationLink = `${window.location.origin}/registro/${leader.token}`;
+    const linkInput = document.getElementById('leaderRegistrationLink');
+    if (linkInput) {
+        linkInput.value = registrationLink;
+    }
+
     // Mostrar modal simple
     document.getElementById('qrModal').style.display = 'block';
+}
+
+// Copiar link de registro desde el modal del QR
+function copyLeaderRegistrationLink() {
+    const linkInput = document.getElementById('leaderRegistrationLink');
+    if (!linkInput || !linkInput.value) {
+        showToast('danger', 'No hay enlace para copiar');
+        return;
+    }
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // Para dispositivos móviles
+    document.execCommand("copy");
+    showToast('success', 'Enlace copiado al portapapeles');
 }
 
 function copyLeaderLink() {
