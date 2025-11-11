@@ -1535,12 +1535,17 @@ async function loadRegistrations() {
 // ===================== 🔹 Actualizar tablas =====================
 function updateLeadersTable() {
   const tbody = document.getElementById('leadersTableBody');
-  tbody.innerHTML = leaders.map((leader, i) => `
+  tbody.innerHTML = leaders.map((leader, i) => {
+    // Recalcular el contador de registros desde el array registrations para mayor precisión
+    const leaderRegsCount = registrations.filter(r => r.leaderId === leader._id).length;
+    const registrationsDisplay = leaderRegsCount || leader.registrations || 0;
+    
+    return `
     <tr>
       <td>${i + 1}</td>
       <td>${leader.name}</td>
       <td>${leader.token}</td>
-      <td>${leader.registrations || 0}</td>
+      <td>${registrationsDisplay}</td>
       <td>
         <button class="btn btn-sm btn-outline-primary" onclick="showQRCode('${leader._id}')" title="Ver QR">
           <i class="bi bi-qr-code"></i>
@@ -1556,7 +1561,7 @@ function updateLeadersTable() {
         </button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 }
 
 function updateRegistrationsTable() {
