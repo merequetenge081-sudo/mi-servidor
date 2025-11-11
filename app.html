@@ -690,6 +690,18 @@
                     </div>
                 </div>
 
+                <!-- Series diaria (chart) -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Registros por Día</h5>
+                                <canvas id="analysisDailyChart" height="120"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Leaders Performance -->
                 <div class="row">
                     <div class="col-md-12 mb-4">
@@ -1872,6 +1884,7 @@ let currentConfirmedFilter = '';
 let leadersPerformanceMinimized = false;
 let autoRefreshInterval = null;
 let lastRegistrationCount = 0;
+let analysisDailyChart = null;
 
 async function refreshAnalysis() {
     try {
@@ -1923,10 +1936,75 @@ async function refreshAnalysis() {
         // Aplicar filtros iniciales
         applyFilters();
 
+        // Obtener series diarias y renderizar chart
+        try {
+            const dailyRes = await fetch(`${API_BASE}/stats/daily${activeEventId ? '?eventId=' + activeEventId : ''}`);
+            if (dailyRes.ok) {
+                const dailyData = await dailyRes.json();
+                renderDailyChart(dailyData);
+            }
+        } catch (err) {
+            console.warn('No se pudo obtener series diarias:', err);
+        }
+
         showToast('success', 'Análisis actualizado');
     } catch (error) {
         console.error('Error al actualizar análisis:', error);
         showToast('danger', 'Error al actualizar análisis');
+    }
+}
+
+function renderDailyChart(dailyData) {
+    try {
+        const labels = dailyData.map(d => d._id);
+        const totals = dailyData.map(d => d.total);
+        const confirmed = dailyData.map(d => d.confirmed);
+
+        const ctx = document.getElementById('analysisDailyChart').getContext('2d');
+        if (analysisDailyChart) {
+            analysisDailyChart.data.labels = labels;
+            analysisDailyChart.data.datasets[0].data = totals;
+            analysisDailyChart.data.datasets[1].data = confirmed;
+            analysisDailyChart.update();
+            return;
+        }
+
+        analysisDailyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Total Registros',
+                        data: totals,
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67,97,238,0.12)',
+                        fill: true,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'Confirmados',
+                        data: confirmed,
+                        borderColor: '#4cc9f0',
+                        backgroundColor: 'rgba(76,201,240,0.12)',
+                        fill: true,
+                        tension: 0.2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { display: true, title: { display: false } },
+                    y: { display: true, beginAtZero: true }
+                }
+            }
+        });
+    } catch (err) {
+        console.error('Error renderDailyChart:', err);
     }
 }
 
