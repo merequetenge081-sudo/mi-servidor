@@ -646,6 +646,44 @@
         </div>
     </div>
     
+        <!-- Event Modal -->
+        <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="eventModalLabel">Seleccionar o Crear Evento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="eventsList" class="mb-3">
+                            <!-- Lista de eventos se carga dinámicamente -->
+                        </div>
+
+                        <hr />
+                        <h6>Crear nuevo evento</h6>
+                        <form id="eventForm">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre del Evento</label>
+                                <input class="form-control" id="eventName" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="eventDate" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea class="form-control" id="eventDescription"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="saveEvent()">Crear y Seleccionar Evento</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <!-- Public Form -->
     <div id="publicForm" style="display: none;">
         <div class="public-header">
@@ -856,6 +894,8 @@
 const API_BASE = `${window.location.origin}/api`;
 let leaders = [];
 let registrations = [];
+let activeEventId = localStorage.getItem('activeEventId') || '';
+let activeEvent = null;
 
 async function registerPerson() {
   const firstName = document.getElementById("firstName").value;
@@ -935,9 +975,11 @@ function editRegistration(id) {
 async function updateDashboard() {
     try {
         // Obtener líderes y registros
+        const leadersUrl = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
+        const regsUrl = `${API_BASE}/registrations${activeEventId ? '?eventId=' + activeEventId : ''}`;
         const [leadersRes, regsRes] = await Promise.all([
-            fetch('/api/leaders'),
-            fetch('/api/registrations'),
+            fetch(leadersUrl),
+            fetch(regsUrl),
         ]);
         const leadersData = await leadersRes.json();
         const regs = await regsRes.json();
@@ -958,10 +1000,113 @@ async function updateDashboard() {
     }
 }
 
+// ===================== 🔹 Events management =====================
+async function loadEvents() {
+    try {
+        const res = await fetch(`${API_BASE}/events`);
+        if (!res.ok) throw new Error('Error cargando eventos');
+        const events = await res.json();
+        const container = document.getElementById('eventsList');
+        if (container) {
+            if (events.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay eventos. Crea uno nuevo abajo.</p>';
+            } else {
+                container.innerHTML = events.map(ev => `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>${ev.name}</strong>
+                            <div><small class="text-muted">${ev.date ? new Date(ev.date).toLocaleDateString() : ''} - ${ev.description || ''}</small></div>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="selectEvent('${ev._id}')">Seleccionar</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="editEvent('${ev._id}')">Editar</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        return events;
+    } catch (err) {
+        console.error('Error loadEvents:', err);
+        showToast('danger', 'Error cargando eventos');
+        return [];
+    }
+}
+
+async function saveEvent() {
+    const name = document.getElementById('eventName').value.trim();
+    const date = document.getElementById('eventDate').value || null;
+    const description = document.getElementById('eventDescription').value || '';
+    if (!name) return showToast('danger', 'El nombre del evento es obligatorio');
+
+    try {
+        const res = await fetch(`${API_BASE}/events`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, date, description })
+        });
+        if (!res.ok) throw new Error('Error creando evento');
+        const ev = await res.json();
+        // seleccionar evento creado
+        selectEvent(ev._id);
+        // cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
+        if (modal) modal.hide();
+        showToast('success', 'Evento creado y seleccionado');
+    } catch (err) {
+        console.error('Error saveEvent:', err);
+        showToast('danger', 'Error creando evento');
+    }
+}
+
+async function selectEvent(eventId) {
+    try {
+        // cargar evento para mostrar nombre y persistir selección
+        const res = await fetch(`${API_BASE}/events`);
+        const events = await res.json();
+        const ev = events.find(e => String(e._id) === String(eventId));
+        if (!ev) return showToast('danger', 'Evento no encontrado');
+        activeEventId = ev._id;
+        activeEvent = ev;
+        localStorage.setItem('activeEventId', activeEventId);
+        // cerrar modal si está abierto
+        const modalEl = document.getElementById('eventModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+
+        // refrescar datos con el evento seleccionado
+        await loadLeaders();
+        await loadRegistrations();
+        await updateDashboard();
+        showToast('success', `Evento seleccionado: ${ev.name}`);
+        showSection('dashboard');
+    } catch (err) {
+        console.error('Error selectEvent:', err);
+        showToast('danger', 'Error seleccionando evento');
+    }
+}
+
+function openEventModal() {
+    loadEvents();
+    const modal = new bootstrap.Modal(document.getElementById('eventModal'));
+    modal.show();
+}
+
+function editEvent(id) {
+    // placeholder: simple prompt edit
+    const name = prompt('Nuevo nombre del evento:');
+    if (!name) return;
+    fetch(`${API_BASE}/events/${id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name })
+    }).then(() => loadEvents());
+}
+
+
 // ===================== 🔹 Cargar datos del backend =====================
 async function loadLeaders() {
   try {
-    const res = await fetch(`${API_BASE}/leaders`);
+        const url = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
+        const res = await fetch(url);
     if (!res.ok) throw new Error('Error cargando líderes');
     leaders = await res.json();
     updateLeadersTable();
@@ -971,6 +1116,7 @@ async function loadLeaders() {
     showToast('danger', 'Error cargando líderes');
     throw error;
   }
+}
 
 // ===================== 🔹 Auto-refresh en tiempo real =====================
 async function checkForNewRegistrations() {
@@ -1032,7 +1178,8 @@ function stopAutoRefresh() {
 
 async function loadRegistrations() {
   try {
-    const res = await fetch(`${API_BASE}/registrations`);
+        const url = `${API_BASE}/registrations${activeEventId ? '?eventId=' + activeEventId : ''}`;
+        const res = await fetch(url);
     if (!res.ok) throw new Error('Error cargando registros');
     registrations = await res.json();
     updateRegistrationsTable();
@@ -1213,7 +1360,8 @@ async function deleteLeader(id) {
 }
 
 async function exportToExcel(type) {
-  const res = await fetch(`${API_BASE}/export/${type}`, {
+    const url = `${API_BASE}/export/${type}${activeEventId ? '?eventId=' + activeEventId : ''}`;
+    const res = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -1437,7 +1585,7 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("registrationsSection").style.display = "none";
 
     // Mostrar solo el formulario
-    document.getElementById("publicFormSection").style.display = "block";
+        document.getElementById("publicForm").style.display = "block";
 
     // Guardar el token para registrar con ese líder
     localStorage.setItem("publicLeaderToken", leaderToken);
@@ -1454,8 +1602,6 @@ let currentConfirmedFilter = '';
 let leadersPerformanceMinimized = false;
 let autoRefreshInterval = null;
 let lastRegistrationCount = 0;
-
-async function refreshAnalysis() {
 
 async function refreshAnalysis() {
     try {
@@ -1595,7 +1741,9 @@ function filterBySearchTerm() {
     currentSearchTerm = document.getElementById('searchUserName').value.toLowerCase();
     currentFilterLeaderId = '';
     document.getElementById('filterLeaderSelect').value = '';
-    async function refreshAnalysis() {
+    applyFilters();
+}
+
 function filterByConfirmed() {
     currentConfirmedFilter = document.getElementById('filterConfirmedSelect').value;
     applyFilters();
@@ -1772,10 +1920,25 @@ function toggleLeadersPerformance() {
 // Función para inicializar la página
 async function initializePage() {
     try {
-        await loadLeaders();
-        await loadRegistrations();
-        await updateDashboard();
-        showSection('dashboard');
+        // Cargar eventos y si hay un evento activo, cargar datos del mismo
+        await loadEvents();
+        if (activeEventId) {
+            // cargar evento activo desde server
+            try {
+                const evRes = await fetch(`${API_BASE}/events`);
+                const events = await evRes.json();
+                activeEvent = events.find(e => String(e._id) === String(activeEventId)) || null;
+            } catch (e) {
+                console.warn('No se pudo cargar evento activo desde server');
+            }
+            await loadLeaders();
+            await loadRegistrations();
+            await updateDashboard();
+            showSection('dashboard');
+        } else {
+            // Pedir al usuario que seleccione o cree un evento
+            openEventModal();
+        }
     } catch (error) {
         console.error('Error inicializando la página:', error);
         showToast('danger', 'Error cargando los datos iniciales');
@@ -1926,10 +2089,6 @@ async function toggleConfirm(regId, value) {
         console.error('Error toggling confirm:', err);
         showToast('danger', 'Error actualizando confirmación');
     }
-}
-}
-}
-}
 }
 </script>
 </body>
