@@ -75,6 +75,98 @@ app.use(express.static(__dirname));
 // 🔹 Ruta principal
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "app.html")));
 
+// 🔹 ENDPOINT PARA MIGRAR DATOS DE data.json A MONGODB (DESARROLLO)
+app.post("/api/migrate", async (req, res) => {
+  try {
+    const dataPath = path.join(__dirname, "data.json");
+    const fileContent = fs.readFileSync(dataPath, "utf-8");
+    const data = JSON.parse(fileContent);
+
+    let migratedLeaders = 0;
+    let migratedRegistrations = 0;
+
+    // Migrar líderes
+    if (data.leaders && Array.isArray(data.leaders)) {
+      for (const leader of data.leaders) {
+        const existingLeader = await Leader.findOne({ email: leader.email, phone: leader.phone });
+        if (!existingLeader) {
+          const newLeader = new Leader({
+            name: leader.name,
+            email: leader.email,
+            phone: leader.phone,
+            area: leader.area || "",
+            active: leader.isActive !== false,
+            token: leader.token || `leader-${leader.id}`,
+            registrations: leader.registrations || 0
+          });
+          await newLeader.save();
+          migratedLeaders++;
+          console.log(`✅ Líder migrado: ${leader.name}`);
+        }
+      }
+    }
+
+    // Migrar registros
+    if (data.registrations && Array.isArray(data.registrations)) {
+      for (const reg of data.registrations) {
+        const existingReg = await Registration.findOne({ 
+          email: reg.email, 
+          cedula: reg.cedula 
+        });
+        if (!existingReg) {
+          // Buscar el líder por id antiguo
+          const leader = data.leaders?.find(l => l.id === reg.leaderId);
+          let leaderId = null;
+          
+          if (leader) {
+            const dbLeader = await Leader.findOne({ 
+              email: leader.email, 
+              phone: leader.phone 
+            });
+            leaderId = dbLeader ? dbLeader._id : null;
+          }
+
+          const newReg = new Registration({
+            leaderId: leaderId,
+            leaderName: reg.leaderName || "",
+            firstName: reg.firstName || "",
+            lastName: reg.lastName || "",
+            cedula: reg.cedula || "",
+            email: reg.email || "",
+            phone: reg.phone || "",
+            date: reg.date || new Date().toISOString(),
+            confirmed: false,
+            confirmedBy: "",
+            confirmedAt: null,
+            notifications: {
+              emailSent: false,
+              smsSent: false,
+              whatsappSent: reg.whatsappSent || false
+            }
+          });
+          await newReg.save();
+          migratedRegistrations++;
+          console.log(`✅ Registro migrado: ${reg.firstName} ${reg.lastName}`);
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Migración completada`,
+      migratedLeaders,
+      migratedRegistrations
+    });
+
+  } catch (error) {
+    console.error('❌ Error en migración:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
 // 🔹 Obtener líderes
 // Opcional: filtrar líderes por eventId (/?eventId=...)
 app.get("/api/leaders", async (req, res) => {
@@ -87,11 +179,19 @@ app.get("/api/leaders", async (req, res) => {
 
 // 🔹 Crear líder
 app.post("/api/leaders", async (req, res) => {
-  const leader = req.body;
-  leader.token = leader.token || "leader" + Date.now();
-  // allow association to an event via eventId
-  const newLeader = await Leader.create(leader);
-  res.json(newLeader);
+  try {
+    const leader = req.body;
+    leader.token = leader.token || "leader" + Date.now();
+    leader.active = leader.active !== false; // Asegurar que active sea booleano
+    leader.registrations = 0; // Inicializar en 0
+    
+    const newLeader = await Leader.create(leader);
+    console.log('✅ Líder creado:', newLeader);
+    res.json(newLeader);
+  } catch (err) {
+    console.error('❌ Error creando líder:', err);
+    res.status(500).json({ error: 'Error creando líder' });
+  }
 });
 
 // 🔹 Events CRUD
