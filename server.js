@@ -611,6 +611,107 @@ app.get("/api/export/:type", async (req, res) => {
   }
 });
 
+// 🔹 Estadísticas generales por evento
+app.get('/api/stats', async (req, res) => {
+  try {
+    const { eventId } = req.query;
+    const match = {};
+    if (eventId) match.eventId = String(eventId);
+
+    const leadersCount = await Leader.countDocuments(eventId ? { eventId: String(eventId) } : {});
+    const activeLeadersCount = await Leader.countDocuments(Object.assign({}, match, { active: true }));
+
+    const regs = await Registration.find(match);
+    const totalRegistrations = regs.length;
+    const confirmedCount = regs.filter(r => r.confirmed).length;
+
+    const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    const weekStart = new Date(); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate() - 7);
+    const monthStart = new Date(); monthStart.setHours(0,0,0,0); monthStart.setMonth(monthStart.getMonth() - 1);
+
+    const todayRegistrations = regs.filter(r => new Date(r.date) >= todayStart).length;
+    const weekRegistrations = regs.filter(r => new Date(r.date) >= weekStart).length;
+    const monthRegistrations = regs.filter(r => new Date(r.date) >= monthStart).length;
+
+    // top leader
+    const topAgg = await Registration.aggregate([
+      { $match: match },
+      { $group: { _id: '$leaderId', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 1 },
+      { $lookup: { from: 'leaders', localField: '_id', foreignField: '_id', as: 'leader' } },
+      { $unwind: { path: '$leader', preserveNullAndEmptyArrays: true } },
+      { $project: { _id: 0, leaderId: '$_id', count: 1, leaderName: '$leader.name' } }
+    ]);
+
+    res.json({
+      totalLeaders: leadersCount,
+      activeLeaders: activeLeadersCount,
+      totalRegistrations,
+      confirmedCount,
+      confirmationRate: totalRegistrations > 0 ? (confirmedCount / totalRegistrations) * 100 : 0,
+      todayRegistrations,
+      weekRegistrations,
+      monthRegistrations,
+      topLeader: topAgg[0] || null
+    });
+  } catch (err) {
+    console.error('Error /api/stats:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 🔹 Series diarias (registros por día)
+app.get('/api/stats/daily', async (req, res) => {
+  try {
+    const { eventId } = req.query;
+    const match = {};
+    if (eventId) match.eventId = String(eventId);
+
+    const pipeline = [
+      { $match: match },
+      { $addFields: { dateObj: { $toDate: '$date' } } },
+      { $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$dateObj' } },
+          total: { $sum: 1 },
+          confirmed: { $sum: { $cond: ['$confirmed', 1, 0] } }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ];
+
+    const data = await Registration.aggregate(pipeline);
+    res.json(data);
+  } catch (err) {
+    console.error('Error /api/stats/daily:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 🔹 Top líderes (por registros)
+app.get('/api/leaders/top', async (req, res) => {
+  try {
+    const { eventId, limit = 10 } = req.query;
+    const match = {};
+    if (eventId) match.eventId = String(eventId);
+
+    const agg = await Registration.aggregate([
+      { $match: match },
+      { $group: { _id: '$leaderId', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: parseInt(limit, 10) },
+      { $lookup: { from: 'leaders', localField: '_id', foreignField: '_id', as: 'leader' } },
+      { $unwind: { path: '$leader', preserveNullAndEmptyArrays: true } },
+      { $project: { leaderId: '$_id', count: 1, name: '$leader.name', email: '$leader.email', phone: '$leader.phone', area: '$leader.area' } }
+    ]);
+
+    res.json(agg);
+  } catch (err) {
+    console.error('Error /api/leaders/top:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 🔹 Endpoint para que el frontend o cualquier servicio solicite el envío
 //     de un WhatsApp a través del bot (puede apuntar a Render o local).
 //     Cambia BOT_URL en .env o directamente aquí si usas otra URL.
