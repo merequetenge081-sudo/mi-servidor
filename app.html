@@ -326,8 +326,8 @@
     </div>
 
     <!-- Create Event Page -->
-    <div id="createEventPage" style="display: none;">
-        <div style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white; padding: 2rem; text-align: center;">
+    <div id="createEventPage" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow-y: auto; background: white; z-index: 7000;">
+        <div style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white; padding: 2rem; text-align: center; position: sticky; top: 0; z-index: 100;">
             <h1 class="display-4 mb-2"><i class="bi bi-plus-circle"></i> Crear Nuevo Evento</h1>
             <p class="lead">Llena los datos para crear tu evento</p>
             <button class="btn btn-light" onclick="backToLanding()" style="margin-top: 1rem;">
@@ -364,8 +364,8 @@
     </div>
 
     <!-- View Events Page -->
-    <div id="viewEventsPage" style="display: none;">
-        <div style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white; padding: 2rem; text-align: center;">
+    <div id="viewEventsPage" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow-y: auto; background: white; z-index: 7000;">
+        <div style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white; padding: 2rem; text-align: center; position: sticky; top: 0; z-index: 100;">
             <h1 class="display-4 mb-2"><i class="bi bi-calendar2-event"></i> Mis Eventos</h1>
             <p class="lead">Selecciona un evento para comenzar</p>
             <button class="btn btn-light" onclick="backToLanding()" style="margin-top: 1rem;">
@@ -421,6 +421,9 @@
                 </div>
                 <div class="mt-auto">
                     <hr class="bg-light" />
+                    <button class="btn btn-info w-100 mb-2" onclick="refreshEventData()" title="Actualizar datos del evento">
+                        <i class="bi bi-arrow-clockwise"></i> Actualizar Evento
+                    </button>
                     <button class="btn btn-light w-100" onclick="changeEvent()" title="Cambiar de evento">
                         <i class="bi bi-arrow-left-circle"></i> Cambiar Evento
                     </button>
@@ -825,7 +828,7 @@
         </div>
 
     <!-- Public Form -->
-    <div id="publicForm" style="display: none;">
+    <div id="publicForm" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow-y: auto; background: white; z-index: 8000;">
         <div class="public-header">
             <div class="container">
                 <h1 class="display-4">Formulario de Registro</h1>
@@ -2070,6 +2073,19 @@ function changeEvent() {
     document.getElementById('adminPanel').style.display = 'none';
     
     showToast('info', 'Selecciona un evento para continuar');
+}
+
+async function refreshEventData() {
+    try {
+        showToast('info', 'Actualizando datos del evento...');
+        await loadLeaders();
+        await loadRegistrations();
+        await updateDashboard();
+        showToast('success', 'Datos del evento actualizados correctamente');
+    } catch (error) {
+        console.error('Error actualizando evento:', error);
+        showToast('danger', 'Error al actualizar los datos del evento');
+    }
 }
 
 function goToCreateEvent() {
