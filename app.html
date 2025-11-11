@@ -1249,9 +1249,26 @@ async function saveAdminRegistration() {
 
 async function deleteRegistration(id) {
   if (!confirm("¿Eliminar este registro?")) return;
-  await fetch(`/api/registrations/${id}`, { method: "DELETE" });
-  alert("✅ Registro eliminado");
-  loadRegistrations();
+  try {
+    const response = await fetch(`/api/registrations/${id}`, { method: "DELETE" });
+    if (response.ok) {
+      alert("✅ Registro eliminado");
+      // Recargar registros y líderes para actualizar contadores
+      await loadRegistrations();
+      await loadLeaders();
+      // Actualizar tabla de líderes
+      updateLeadersTable();
+      // Actualizar dashboard si está visible
+      if (document.getElementById('dashboardSection').style.display !== 'none') {
+        await updateDashboard();
+      }
+    } else {
+      alert("❌ Error al eliminar el registro");
+    }
+  } catch (err) {
+    console.error('Error al eliminar registro:', err);
+    alert("❌ Error al eliminar el registro");
+  }
 }
 
 function editRegistration(id) {

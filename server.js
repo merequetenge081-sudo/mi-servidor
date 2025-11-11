@@ -418,6 +418,14 @@ app.delete("/api/registrations/:id", async (req, res) => {
   try {
     const deleted = await Registration.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: "Registro no encontrado" });
+    
+    // Recalcular contador de registros del líder asociado
+    if (deleted.leaderId) {
+      const leaderRegsCount = await Registration.countDocuments({ leaderId: deleted.leaderId });
+      await Leader.findByIdAndUpdate(deleted.leaderId, { registrations: leaderRegsCount }, { new: true });
+      console.log(`✅ Contador de registros del líder ${deleted.leaderId} actualizado a ${leaderRegsCount}`);
+    }
+    
     res.json({ success: true });
   } catch (err) {
     console.error("Error al eliminar registro:", err);
