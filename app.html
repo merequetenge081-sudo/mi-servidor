@@ -61,6 +61,13 @@
             background-color: #f8f9fa;
             font-weight: 600;
         }
+
+        /* Hacer la sección de análisis desplazable internamente */
+        #analysisSection {
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+            padding-right: 12px; /* espacio para el scrollbar */
+        }
         
         #analysisSection .progress {
             height: 4px;
@@ -94,7 +101,7 @@
             padding: 0;
             height: 100%;
             width: 100%;
-            overflow: hidden;
+            overflow: auto; /* permitir scroll general */
         }
         
         body {
@@ -435,8 +442,18 @@
         <div class="col-md-9 col-lg-10 main-content">
             <!-- Dashboard Section -->
             <div id="dashboardSection">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
-                    <h1 class="h3">Dashboard</h1>
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4 w-100">
+                    <div class="d-flex align-items-center" style="min-width:160px;">
+                        <h1 class="h3 mb-0">Dashboard</h1>
+                    </div>
+
+                    <div class="text-center mx-auto" style="min-width:300px; max-width:50%;">
+                        <h5 id="activeEventName" class="mb-0" style="font-weight:700; color: var(--primary);">
+                            Evento: <span id="activeEventNameText">-</span>
+                        </h5>
+                        <small class="text-muted" id="activeEventDate"></small>
+                    </div>
+
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
                             <i class="bi bi-plus-circle"></i> Nuevo Líder
@@ -1170,6 +1187,32 @@ async function updateDashboard() {
         if (regsEl) regsEl.innerText = totalRegs;
         const msgsEl = document.getElementById('messagesCount');
         if (msgsEl) msgsEl.innerText = 0; // placeholder
+        // Mostrar nombre/fecha del evento activo en el dashboard
+        try {
+            const evtNameEl = document.getElementById('activeEventNameText');
+            const evtDateEl = document.getElementById('activeEventDate');
+            if (activeEvent && activeEvent.name) {
+                if (evtNameEl) evtNameEl.textContent = activeEvent.name;
+                if (evtDateEl) evtDateEl.textContent = activeEvent.date ? new Date(activeEvent.date).toLocaleDateString() : '';
+            } else if (activeEventId) {
+                // intentar obtener evento por id
+                const evRes = await fetch(`${API_BASE}/events`);
+                if (evRes.ok) {
+                    const evs = await evRes.json();
+                    const ev = evs.find(e => String(e._id) === String(activeEventId));
+                    if (ev) {
+                        activeEvent = ev;
+                        if (evtNameEl) evtNameEl.textContent = ev.name;
+                        if (evtDateEl) evtDateEl.textContent = ev.date ? new Date(ev.date).toLocaleDateString() : '';
+                    }
+                }
+            } else {
+                if (evtNameEl) evtNameEl.textContent = 'Sin evento seleccionado';
+                if (evtDateEl) evtDateEl.textContent = '';
+            }
+        } catch (e) {
+            console.warn('No se pudo actualizar visual del evento:', e);
+        }
     } catch (err) {
         console.error('Error actualizando dashboard:', err);
     }
