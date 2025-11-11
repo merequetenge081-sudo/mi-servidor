@@ -712,6 +712,37 @@ app.get('/api/leaders/top', async (req, res) => {
   }
 });
 
+// 🔹 Detección de duplicados en registros
+// Agrupa por cedula y por email+phone para encontrar grupos con count > 1
+app.get('/api/duplicates', async (req, res) => {
+  try {
+    const { eventId } = req.query;
+    const match = {};
+    if (eventId) match.eventId = String(eventId);
+
+    // Por cédula
+    const byCedula = await Registration.aggregate([
+      { $match: Object.assign({}, match, { cedula: { $ne: null, $ne: '' } }) },
+      { $group: { _id: '$cedula', count: { $sum: 1 }, items: { $push: '$$ROOT' } } },
+      { $match: { count: { $gt: 1 } } },
+      { $project: { key: '$_id', count: 1, items: 1, _id: 0 } }
+    ]);
+
+    // Por email + phone
+    const byContact = await Registration.aggregate([
+      { $match: Object.assign({}, match, { email: { $ne: null, $ne: '' }, phone: { $ne: null, $ne: '' } }) },
+      { $group: { _id: { email: '$email', phone: '$phone' }, count: { $sum: 1 }, items: { $push: '$$ROOT' } } },
+      { $match: { count: { $gt: 1 } } },
+      { $project: { key: { $concat: ['$_id.email', ' | ', '$_id.phone'] }, count: 1, items: 1, _id: 0 } }
+    ]);
+
+    res.json({ byCedula, byContact });
+  } catch (err) {
+    console.error('Error /api/duplicates:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 🔹 Endpoint para que el frontend o cualquier servicio solicite el envío
 //     de un WhatsApp a través del bot (puede apuntar a Render o local).
 //     Cambia BOT_URL en .env o directamente aquí si usas otra URL.
