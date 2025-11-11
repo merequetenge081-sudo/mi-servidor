@@ -7,11 +7,14 @@ dotenv.config();
 // Configuración del correo SMTP de Hostinger
 const transporter = nodemailer.createTransport({
   host: "smtp.hostinger.com",
-  port: 465,
-  secure: true, // SSL
+  port: 587,
+  secure: false, // TLS (más compatible con Render/Railway)
   auth: {
     user: process.env.EMAIL_USER, // guardianes@fulars.com
     pass: process.env.EMAIL_PASS, // tu contraseña
+  },
+  tls: {
+    rejectUnauthorized: false, // evita error de certificado en Render/Railway
   },
 });
 
