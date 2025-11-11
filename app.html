@@ -1263,22 +1263,33 @@ async function deleteRegistration(id) {
   try {
     const response = await fetch(`/api/registrations/${id}`, { method: "DELETE" });
     if (response.ok) {
+      console.log(`✅ Registro ${id} eliminado`);
       alert("✅ Registro eliminado");
-      // Recargar registros y líderes para actualizar contadores
+      
+      // Recargar datos del servidor para asegurar sincronización
       await loadRegistrations();
       await loadLeaders();
-      // Actualizar tabla de líderes
+      
+      // Actualizar tabla de líderes inmediatamente
       updateLeadersTable();
+      
+      // Actualizar tabla de registros
+      updateRegistrationsTable();
+      
       // Actualizar dashboard si está visible
       if (document.getElementById('dashboardSection').style.display !== 'none') {
         await updateDashboard();
       }
+      
+      showToast('success', '✅ Registro eliminado correctamente');
     } else {
       alert("❌ Error al eliminar el registro");
+      showToast('danger', '❌ Error al eliminar el registro');
     }
   } catch (err) {
     console.error('Error al eliminar registro:', err);
     alert("❌ Error al eliminar el registro");
+    showToast('danger', '❌ Error al eliminar el registro');
   }
 }
 
@@ -1537,8 +1548,12 @@ function updateLeadersTable() {
   const tbody = document.getElementById('leadersTableBody');
   tbody.innerHTML = leaders.map((leader, i) => {
     // Recalcular el contador de registros desde el array registrations para mayor precisión
-    const leaderRegsCount = registrations.filter(r => r.leaderId === leader._id).length;
-    const registrationsDisplay = leaderRegsCount || leader.registrations || 0;
+    // Comparar como strings para evitar problemas de tipo
+    const leaderId = String(leader._id);
+    const leaderRegsCount = registrations.filter(r => String(r.leaderId) === leaderId).length;
+    const registrationsDisplay = leaderRegsCount;
+    
+    console.log(`[updateLeadersTable] ${leader.name}: leaderId=${leaderId}, count=${leaderRegsCount}`);
     
     return `
     <tr>
