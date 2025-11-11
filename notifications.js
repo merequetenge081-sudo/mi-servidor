@@ -127,3 +127,17 @@ export class NotificationService {
     return { email: emailResult, sms: smsResult };
   }
 }
+
+// 🧪 Prueba directa desde tu servidor
+if (process.env.NODE_ENV !== "production") {
+  (async () => {
+    console.log("🧪 Enviando correo de prueba...");
+    const result = await NotificationService.sendEmailConfirmation({
+      email: "jonnathanpena1@gmail.com",
+      firstName: "Juan",
+      lastName: "Perez",
+      phone: "3001234567"
+    });
+    console.log("Resultado:", result);
+  })();
+}
