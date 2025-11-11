@@ -288,6 +288,44 @@
         </div>
     </div>
 
+    <!-- Create Event Page -->
+    <div id="createEventPage" style="display: none;">
+        <div style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white; padding: 2rem; text-align: center;">
+            <h1 class="display-4 mb-2"><i class="bi bi-plus-circle"></i> Crear Nuevo Evento</h1>
+            <p class="lead">Llena los datos para crear tu evento</p>
+            <button class="btn btn-light" onclick="backToLanding()" style="margin-top: 1rem;">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+        <div class="container mt-5 pb-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-body p-5">
+                            <form id="createEventFormPage">
+                                <div class="mb-3">
+                                    <label for="createEventNameInput" class="form-label">Nombre del Evento</label>
+                                    <input type="text" class="form-control" id="createEventNameInput" placeholder="Ej: Conferencia 2025" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="createEventDateInput" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" id="createEventDateInput" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="createEventDescriptionInput" class="form-label">Descripción (Opcional)</label>
+                                    <textarea class="form-control" id="createEventDescriptionInput" rows="3" placeholder="Descripción del evento..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100" onclick="saveEventFromPage(event)">
+                                    <i class="bi bi-plus-circle"></i> Crear Evento
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- View Events Page -->
     <div id="viewEventsPage" style="display: none;">
         <div style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white; padding: 2rem; text-align: center;">
@@ -1991,36 +2029,57 @@ function changeEvent() {
     
     document.getElementById('landingPage').style.display = 'flex';
     document.getElementById('viewEventsPage').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('createEventPage').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'none';
     
     showToast('info', 'Selecciona un evento para continuar');
 }
 
 function goToCreateEvent() {
-    // Mostrar el formulario de crear evento
+    // Mostrar página de crear evento
     document.getElementById('landingPage').style.display = 'none';
     document.getElementById('viewEventsPage').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('createEventPage').style.display = 'block';
     document.getElementById('adminPanel').style.display = 'none';
     
-    // Mostrar modal de crear evento
-    const modal = document.getElementById('eventModal');
-    if (modal) {
-        // Limpiar campos del formulario
-        const form = document.getElementById('eventForm');
-        if (form) form.reset();
+    // Limpiar formulario
+    const form = document.getElementById('createEventFormPage');
+    if (form) form.reset();
+}
+
+async function saveEventFromPage(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('createEventNameInput')?.value;
+    const date = document.getElementById('createEventDateInput')?.value;
+    const description = document.getElementById('createEventDescriptionInput')?.value;
+    
+    if (!name || !date) {
+        showToast('warning', 'Por favor llena el nombre y la fecha');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/events`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, date, description })
+        });
         
-        // Cambiar modal a modo "crear"
-        document.getElementById('modalEventName').value = '';
-        document.getElementById('modalEventDate').value = '';
-        document.getElementById('modalEventDescription').value = '';
-        document.getElementById('editingEventId').value = '';
-        
-        const title = modal.querySelector('.modal-title');
-        if (title) title.innerHTML = '<i class="bi bi-plus-circle"></i> Crear Nuevo Evento';
-        
-        modal.style.display = 'block';
+        if (response.ok) {
+            const newEvent = await response.json();
+            showToast('success', `Evento "${name}" creado exitosamente`);
+            
+            // Cargar el nuevo evento automáticamente
+            setTimeout(() => {
+                selectEventFromLanding(newEvent._id);
+            }, 500);
+        } else {
+            showToast('danger', 'Error al crear el evento');
+        }
+    } catch (error) {
+        console.error('Error creando evento:', error);
+        showToast('danger', 'Error al crear el evento');
     }
 }
 
@@ -2028,7 +2087,7 @@ function goToViewEvents() {
     // Cargar y mostrar lista de eventos
     document.getElementById('landingPage').style.display = 'none';
     document.getElementById('viewEventsPage').style.display = 'block';
-    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('createEventPage').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'none';
     
     loadEventsForSelection();
@@ -2037,7 +2096,7 @@ function goToViewEvents() {
 function backToLanding() {
     document.getElementById('landingPage').style.display = 'flex';
     document.getElementById('viewEventsPage').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('createEventPage').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'none';
 }
 
@@ -2116,7 +2175,7 @@ async function selectEventFromLanding(eventId) {
         // Mostrar dashboard
         document.getElementById('landingPage').style.display = 'none';
         document.getElementById('viewEventsPage').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('createEventPage').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         
         showSection('dashboard');
@@ -2170,7 +2229,7 @@ async function initializePage() {
             // Mostrar dashboard
             document.getElementById('landingPage').style.display = 'none';
             document.getElementById('viewEventsPage').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('createEventPage').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             
             showSection('dashboard');
@@ -2178,7 +2237,7 @@ async function initializePage() {
             // Mostrar página de inicio (landing page)
             document.getElementById('landingPage').style.display = 'flex';
             document.getElementById('viewEventsPage').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('createEventPage').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'none';
         }
     } catch (error) {
