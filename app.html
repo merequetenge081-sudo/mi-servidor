@@ -705,7 +705,7 @@
                                 <div class="card shadow-sm">
                                     <div class="card-body p-3">
                                         <h6 class="card-title mb-2">Registros por Día</h6>
-                                        <canvas id="analysisDailyChart" style="width:100%; height:160px;"></canvas>
+                                        <canvas id="analysisDailyChart" style="width:100%; height:140px; max-height:180px;"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -929,6 +929,30 @@
                                 <input type="text" class="form-control" id="state">
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="localidad" class="form-label">Localidad</label>
+                            <input type="text" class="form-control" id="localidad" name="localidad" placeholder="Barrio / Localidad">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">¿Tienes inscrita la cédula para votar?</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="registeredToVote" id="registeredYes" value="true" onchange="toggleVotingPlace(true)">
+                                    <label class="form-check-label" for="registeredYes">Sí</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="registeredToVote" id="registeredNo" value="false" onchange="toggleVotingPlace(false)" checked>
+                                    <label class="form-check-label" for="registeredNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="votingPlaceGroup" style="display:none;">
+                            <label for="votingPlace" class="form-label">Puesto de Votación</label>
+                            <input type="text" class="form-control" id="votingPlace" name="votingPlace" placeholder="Nombre del puesto de votación">
+                            <div class="form-text">No estás seguro? <a href="https://www.google.com/search?q=dónde+voto" target="_blank">Buscar puesto de votación</a></div>
+                        </div>
                     </div>
                     
                     <div class="form-check mb-4">
@@ -1038,6 +1062,28 @@
             <label class="form-label">Líder</label>
             <select class="form-select" id="adminLeaderSelect"></select>
           </div>
+                    <div class="mb-3">
+                        <label class="form-label">Localidad</label>
+                        <input type="text" class="form-control" id="adminLocalidad" name="adminLocalidad" placeholder="Barrio / Localidad">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">¿Tiene inscrita la cédula para votar?</label>
+                        <div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="adminRegisteredToVote" id="adminRegisteredYes" value="true" onchange="toggleAdminVotingPlace(true)">
+                                                <label class="form-check-label" for="adminRegisteredYes">Sí</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="adminRegisteredToVote" id="adminRegisteredNo" value="false" checked onchange="toggleAdminVotingPlace(false)">
+                                                <label class="form-check-label" for="adminRegisteredNo">No</label>
+                                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="adminVotingPlaceGroup" style="display:none;">
+                        <label class="form-label">Puesto de Votación</label>
+                        <input type="text" class="form-control" id="adminVotingPlace" name="adminVotingPlace" placeholder="Nombre del puesto de votación">
+                        <div class="form-text">Buscar: <a href="https://www.google.com/search?q=dónde+voto" target="_blank">¿Dónde voto?</a></div>
+                    </div>
         </form>
       </div>
         <div class="modal-footer">
@@ -1109,31 +1155,7 @@ let registrations = [];
 let activeEventId = localStorage.getItem('activeEventId') || '';
 let activeEvent = null;
 
-async function registerPerson() {
-  const firstName = document.getElementById("firstName").value;
-  const lastName = document.getElementById("lastName").value;
-  const email = document.getElementById("email").value;
-  const phone = document.getElementById("phone").value;
-
-  const leaderToken = localStorage.getItem("publicLeaderToken");
-  const resLeader = await fetch("/api/leaders");
-  const leaders = await resLeader.json();
-  const leader = leaders.find(l => l.token === leaderToken);
-  const leaderId = leader ? leader._id : null;
-
-  const res = await fetch("/api/registrations", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ leaderId, firstName, lastName, email, phone }),
-  });
-
-  if (res.ok) {
-    alert("✅ Persona registrada correctamente");
-    updateDashboard();
-  } else {
-    alert("❌ Error al registrar la persona");
-  }
-}
+// registerPerson is defined later in the file (single implementation). Removed duplicate to avoid conflicts.
 
 // Guardar registro desde el modal del admin
 async function saveAdminRegistration() {
@@ -1159,6 +1181,19 @@ async function saveAdminRegistration() {
       leaderId,
       eventId: activeEventId // Asociar al evento actual
     };
+        // campos electorales desde el modal admin
+        const adminLocalidad = document.getElementById('adminLocalidad')?.value || '';
+        const adminRegRadio = document.querySelector('input[name="adminRegisteredToVote"]:checked');
+        const adminRegisteredToVote = adminRegRadio ? (adminRegRadio.value === 'true') : false;
+        const adminVotingPlace = document.getElementById('adminVotingPlace')?.value || '';
+
+        if (adminLocalidad) reg.localidad = adminLocalidad;
+        reg.registeredToVote = adminRegisteredToVote;
+        if (adminRegisteredToVote && !adminVotingPlace) {
+            alert('Si indicó que está inscrito para votar, por favor indique el puesto de votación.');
+            return;
+        }
+        if (adminVotingPlace) reg.votingPlace = adminVotingPlace;
 
     try {
         const response = await fetch("/api/registrations", {
@@ -1180,6 +1215,14 @@ async function saveAdminRegistration() {
             document.getElementById("adminCedula").value = "";
             document.getElementById("adminEmail").value = "";
             document.getElementById("adminPhone").value = "";
+            // ocultar puestro de votación si estaba visible
+            const adminVotingGroup = document.getElementById('adminVotingPlaceGroup');
+            if (adminVotingGroup) adminVotingGroup.style.display = 'none';
+            // reset radios
+            const adminYes = document.getElementById('adminRegisteredYes');
+            const adminNo = document.getElementById('adminRegisteredNo');
+            if (adminYes) adminYes.checked = false;
+            if (adminNo) adminNo.checked = true;
             
             // Cerrar modal
             const modalElement = document.getElementById("adminRegistrationModal");
@@ -1769,20 +1812,30 @@ async function registerPerson() {
         // intento de obtener leaderId de URL o variable global
         const urlParams = new URLSearchParams(window.location.search);
         const leaderId = window.currentLeaderId || urlParams.get('leader');
-        const firstName = document.getElementById('firstName')?.value || '';
-        const lastName = document.getElementById('lastName')?.value || '';
-        const email = document.getElementById('email')?.value || '';
-        const phone = document.getElementById('phone')?.value || '';
+    const firstName = document.getElementById('firstName')?.value || '';
+    const lastName = document.getElementById('lastName')?.value || '';
+    const email = document.getElementById('email')?.value || '';
+    const phone = document.getElementById('phone')?.value || '';
+    const localidad = document.getElementById('localidad') ? document.getElementById('localidad').value : '';
+    const regRadio = document.querySelector('input[name="registeredToVote"]:checked');
+    const registeredToVote = regRadio ? (regRadio.value === 'true') : false;
+    const votingPlace = document.getElementById('votingPlace') ? document.getElementById('votingPlace').value : '';
 
         if (!leaderId) {
             alert('No se encontró un líder asociado para este registro.');
             return;
         }
 
+        // Validación: si declaró que está inscrito para votar, debe indicar puesto de votación
+        if (registeredToVote && !votingPlace) {
+            alert('Si indicó que está inscrito para votar, por favor indique el puesto de votación.');
+            return;
+        }
+
         const res = await fetch('/api/registrations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ leaderId, firstName, lastName, email, phone })
+            body: JSON.stringify({ leaderId, firstName, lastName, email, phone, localidad, registeredToVote, votingPlace })
         });
 
         if (res.ok) {
@@ -1807,6 +1860,20 @@ function showToast(type, message) {
   toastEl.querySelector('.toast-body').textContent = message;
   
   toast.show();
+}
+
+// Mostrar / ocultar el campo de puesto de votación en el formulario público
+function toggleVotingPlace(show) {
+    const group = document.getElementById('votingPlaceGroup');
+    if (!group) return;
+    group.style.display = show ? 'block' : 'none';
+}
+
+// Mostrar / ocultar el campo de puesto de votación en el modal admin
+function toggleAdminVotingPlace(show) {
+    const group = document.getElementById('adminVotingPlaceGroup');
+    if (!group) return;
+    group.style.display = show ? 'block' : 'none';
 }
 
 async function sendWhatsApp(phone, name) {
@@ -2079,7 +2146,7 @@ function renderDailyChart(dailyData) {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
                 interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { position: 'top' } },
                 scales: {

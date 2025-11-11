@@ -50,6 +50,10 @@ const RegistrationSchema = new mongoose.Schema({
   cedula: String,
   email: String,
   phone: String,
+  // Campos electorales / de votación
+  localidad: { type: String, default: '' },
+  registeredToVote: { type: Boolean, default: false },
+  votingPlace: { type: String, default: '' },
   date: String,
   notifications: {
     emailSent: { type: Boolean, default: false },
@@ -312,6 +316,13 @@ app.post("/api/registrations", async (req, res) => {
     // Asignar eventId si viene en body o si el líder pertenece a un evento
     if (!reg.eventId && leader && leader.eventId) {
       reg.eventId = leader.eventId;
+    }
+
+    // Validación: si marca que está inscrito para votar, debe proporcionar puesto de votación
+    if (reg.registeredToVote === true || reg.registeredToVote === 'true') {
+      if (!reg.votingPlace || String(reg.votingPlace).trim() === '') {
+        return res.status(400).json({ error: 'Puesto de votación requerido cuando registeredToVote es verdadero' });
+      }
     }
 
     if (leader) {
