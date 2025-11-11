@@ -247,44 +247,109 @@
     </style>
 </head>
 <body>
+    <!-- Landing Page (Crear/Ver Eventos) -->
+    <div id="landingPage" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h1 class="display-3 text-white mb-4">
+                        <i class="bi bi-calendar-event"></i> Sistema de Gestión de Eventos
+                    </h1>
+                    <p class="lead text-white mb-5">Crea un nuevo evento o accede a uno existente para gestionar líderes y registros</p>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-lg h-100">
+                                <div class="card-body p-5">
+                                    <i class="bi bi-plus-circle" style="font-size: 3rem; color: #4361ee;"></i>
+                                    <h3 class="card-title mt-3 mb-3">Crear Evento</h3>
+                                    <p class="card-text text-muted mb-4">Crea un nuevo evento para organizar líderes y registros</p>
+                                    <button class="btn btn-primary btn-lg w-100" onclick="goToCreateEvent()">
+                                        <i class="bi bi-plus-circle"></i> Crear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-lg h-100">
+                                <div class="card-body p-5">
+                                    <i class="bi bi-calendar2-check" style="font-size: 3rem; color: #4cc9f0;"></i>
+                                    <h3 class="card-title mt-3 mb-3">Ver Eventos</h3>
+                                    <p class="card-text text-muted mb-4">Accede a eventos existentes para gestionar tu información</p>
+                                    <button class="btn btn-info btn-lg w-100" onclick="goToViewEvents()">
+                                        <i class="bi bi-list-check"></i> Ver
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Events Page -->
+    <div id="viewEventsPage" style="display: none;">
+        <div style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white; padding: 2rem; text-align: center;">
+            <h1 class="display-4 mb-2"><i class="bi bi-calendar2-event"></i> Mis Eventos</h1>
+            <p class="lead">Selecciona un evento para comenzar</p>
+            <button class="btn btn-light" onclick="backToLanding()" style="margin-top: 1rem;">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+        <div class="container mt-5 pb-5">
+            <div id="eventsListContainer" class="row g-4">
+                <!-- Lista de eventos se cargará aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+
     <!-- Panel de Administrador -->
     <div id="adminPanel" class="d-flex">
         <!-- Sidebar -->
         <div class="sidebar col-md-3 col-lg-2 p-0">
-            <div class="p-4">
-                <h4 class="text-white mb-4"><i class="bi bi-people-fill"></i> Sistema Líderes</h4>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#" onclick="showSection('dashboard')">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('leaders')">
-                            <i class="bi bi-person-badge"></i> Gestión de Líderes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('registrations')">
-                            <i class="bi bi-person-lines-fill"></i> Registros
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('exports')">
-                            <i class="bi bi-file-earmark-spreadsheet"></i> Exportar Datos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('analysis')">
-                            <i class="bi bi-graph-up"></i> Análisis de Datos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showPublicForm()">
-                            <i class="bi bi-link-45deg"></i> Ver Formulario Público
-                        </a>
-                    </li>
-                </ul>
+            <div class="p-4 d-flex flex-column h-100">
+                <div>
+                    <h4 class="text-white mb-4"><i class="bi bi-people-fill"></i> Sistema Líderes</h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('leaders')">
+                                <i class="bi bi-person-badge"></i> Gestión de Líderes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('registrations')">
+                                <i class="bi bi-person-lines-fill"></i> Registros
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('exports')">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Exportar Datos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('analysis')">
+                                <i class="bi bi-graph-up"></i> Análisis de Datos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPublicForm()">
+                                <i class="bi bi-link-45deg"></i> Ver Formulario Público
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-auto">
+                    <hr class="bg-light" />
+                    <button class="btn btn-light w-100" onclick="changeEvent()" title="Cambiar de evento">
+                        <i class="bi bi-arrow-left-circle"></i> Cambiar Evento
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -1917,6 +1982,173 @@ function toggleLeadersPerformance() {
     }
 }
 
+// ===================== 🔹 Landing Page Functions =====================
+function changeEvent() {
+    // Limpiar active event y volver a landing
+    localStorage.removeItem('activeEventId');
+    activeEventId = null;
+    activeEvent = null;
+    
+    document.getElementById('landingPage').style.display = 'flex';
+    document.getElementById('viewEventsPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    
+    showToast('info', 'Selecciona un evento para continuar');
+}
+
+function goToCreateEvent() {
+    // Mostrar el formulario de crear evento
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('viewEventsPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    
+    // Mostrar modal de crear evento
+    const modal = document.getElementById('eventModal');
+    if (modal) {
+        // Limpiar campos del formulario
+        const form = document.getElementById('eventForm');
+        if (form) form.reset();
+        
+        // Cambiar modal a modo "crear"
+        document.getElementById('modalEventName').value = '';
+        document.getElementById('modalEventDate').value = '';
+        document.getElementById('modalEventDescription').value = '';
+        document.getElementById('editingEventId').value = '';
+        
+        const title = modal.querySelector('.modal-title');
+        if (title) title.innerHTML = '<i class="bi bi-plus-circle"></i> Crear Nuevo Evento';
+        
+        modal.style.display = 'block';
+    }
+}
+
+function goToViewEvents() {
+    // Cargar y mostrar lista de eventos
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('viewEventsPage').style.display = 'block';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    
+    loadEventsForSelection();
+}
+
+function backToLanding() {
+    document.getElementById('landingPage').style.display = 'flex';
+    document.getElementById('viewEventsPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+}
+
+async function loadEventsForSelection() {
+    try {
+        const response = await fetch(`${API_BASE}/events`);
+        const events = await response.json();
+        
+        const container = document.getElementById('eventsListContainer');
+        container.innerHTML = '';
+        
+        if (events.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <p class="text-muted">No hay eventos disponibles. Crea uno para comenzar.</p>
+                    <button class="btn btn-primary" onclick="goToCreateEvent()">
+                        <i class="bi bi-plus-circle"></i> Crear Evento
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        events.forEach(event => {
+            const eventCard = document.createElement('div');
+            eventCard.className = 'col-md-6 col-lg-4';
+            eventCard.innerHTML = `
+                <div class="card border-0 shadow-sm cursor-pointer h-100" style="cursor: pointer; transition: transform 0.2s;" 
+                     onmouseover="this.style.transform='translateY(-5px)'" 
+                     onmouseout="this.style.transform='translateY(0)'"
+                     onclick="selectEventFromLanding('${event._id}')">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-calendar-event"></i> ${event.name}
+                        </h5>
+                        <p class="card-text text-muted">
+                            <small>
+                                <i class="bi bi-calendar"></i> ${new Date(event.date).toLocaleDateString('es-CO')}
+                            </small>
+                        </p>
+                        ${event.description ? `<p class="card-text">${event.description}</p>` : ''}
+                        <div class="d-flex gap-2 mt-3">
+                            <button class="btn btn-sm btn-primary flex-grow-1" onclick="selectEventFromLanding('${event._id}'); event.stopPropagation();">
+                                <i class="bi bi-box-arrow-in-right"></i> Entrar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEventFromLanding('${event._id}'); event.stopPropagation();" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(eventCard);
+        });
+    } catch (error) {
+        console.error('Error cargando eventos:', error);
+        showToast('danger', 'Error al cargar los eventos');
+    }
+}
+
+async function selectEventFromLanding(eventId) {
+    try {
+        localStorage.setItem('activeEventId', eventId);
+        activeEventId = eventId;
+        
+        // Cargar evento desde servidor
+        const evRes = await fetch(`${API_BASE}/events`);
+        const events = await evRes.json();
+        activeEvent = events.find(e => String(e._id) === String(eventId)) || null;
+        
+        // Cargar datos del evento
+        await loadLeaders();
+        await loadRegistrations();
+        await updateDashboard();
+        
+        // Mostrar dashboard
+        document.getElementById('landingPage').style.display = 'none';
+        document.getElementById('viewEventsPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('adminPanel').style.display = 'block';
+        
+        showSection('dashboard');
+        showToast('success', `Evento "${activeEvent?.name}" cargado correctamente`);
+    } catch (error) {
+        console.error('Error seleccionando evento:', error);
+        showToast('danger', 'Error al seleccionar el evento');
+    }
+}
+
+async function deleteEventFromLanding(eventId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este evento? Se perderán todos los datos asociados.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/events/${eventId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showToast('success', 'Evento eliminado correctamente');
+            loadEventsForSelection();
+        } else {
+            showToast('danger', 'Error al eliminar el evento');
+        }
+    } catch (error) {
+        console.error('Error eliminando evento:', error);
+        showToast('danger', 'Error al eliminar el evento');
+    }
+}
+
 // Función para inicializar la página
 async function initializePage() {
     try {
@@ -1934,10 +2166,20 @@ async function initializePage() {
             await loadLeaders();
             await loadRegistrations();
             await updateDashboard();
+            
+            // Mostrar dashboard
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('viewEventsPage').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'block';
+            
             showSection('dashboard');
         } else {
-            // Pedir al usuario que seleccione o cree un evento
-            openEventModal();
+            // Mostrar página de inicio (landing page)
+            document.getElementById('landingPage').style.display = 'flex';
+            document.getElementById('viewEventsPage').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
         }
     } catch (error) {
         console.error('Error inicializando la página:', error);
