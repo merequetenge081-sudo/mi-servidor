@@ -434,8 +434,10 @@ app.delete("/api/registrations/:id", async (req, res) => {
 });
 
 // Ruta pública de registro por token
+// Redirige a app.html con el token como parámetro query
 app.get("/registro/:token", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "form.html"));
+  const token = req.params.token;
+  res.redirect(`/?leader=${encodeURIComponent(token)}`);
 });
 
 // Exportar a Excel (genérico: /api/export/leaders o /api/export/registrations)
