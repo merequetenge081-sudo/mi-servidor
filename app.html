@@ -1813,7 +1813,7 @@ function showQRCode(leader) {
 
     // Generar QR con qrcodejs
     new QRCode(qrContainer, {
-        text: `${window.location.origin}/registro/${leader.token}`,
+        text: `${window.location.origin}/?leader=${leader.token}`,
         width: 200,
         height: 200,
         colorDark: '#000000',
@@ -1825,7 +1825,7 @@ function showQRCode(leader) {
     if (titleEl) titleEl.innerText = `QR de ${leader.name}`;
 
     // Rellenar el link del registro en el input
-    const registrationLink = `${window.location.origin}/registro/${leader.token}`;
+    const registrationLink = `${window.location.origin}/?leader=${leader.token}`;
     const linkInput = document.getElementById('leaderRegistrationLink');
     if (linkInput) {
         linkInput.value = registrationLink;
