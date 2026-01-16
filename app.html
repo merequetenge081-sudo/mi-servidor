@@ -878,11 +878,11 @@
     <!-- Public Form -->
     <div id="publicForm" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow-y: auto; background: white; z-index: 8000;">
         <div class="public-header">
-            <div class="container">
-                <h1 class="display-4">Formulario de Registro</h1>
-                <p class="lead">Completa tus datos para formar parte de nuestra comunidad</p>
+                <div class="container">
+                    <h1 class="display-4">Elecciones 2026</h1>
+                    <p class="lead">Regístrate para Elecciones 2026</p>
+                </div>
             </div>
-        </div>
         
         <div class="container">
             <div class="public-form">
@@ -896,16 +896,17 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="lastName" class="form-label">Apellido</label>
-                                <input type="text" class="form-control" id="lastName" required>
+                                <input type="text" class="form-control" id="lastName">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="cedula" class="form-label">Cédula</label>
-                            <input type="text" class="form-control" id="cedula" required>
+                            <input type="text" class="form-control" id="cedula">
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
+                            <label for="email" class="form-label">Email <small class="text-muted">(Opcional)</small></label>
+                            <input type="email" class="form-control" id="email">
+                            <div class="form-text">No es necesario</div>
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Teléfono</label>
@@ -916,22 +917,8 @@
                     <div class="form-section">
                         <div class="form-section-title">Información Adicional</div>
                         <div class="mb-3">
-                            <label for="address" class="form-label">Dirección</label>
-                            <input type="text" class="form-control" id="address">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">Ciudad</label>
-                                <input type="text" class="form-control" id="city">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="state" class="form-label">Departamento</label>
-                                <input type="text" class="form-control" id="state">
-                            </div>
-                        </div>
-                        <div class="mb-3">
                             <label for="localidad" class="form-label">Localidad</label>
-                            <input type="text" class="form-control" id="localidad" name="localidad" placeholder="Barrio / Localidad">
+                            <input type="text" class="form-control" id="localidad" name="localidad" placeholder="Barrio / Localidad" required>
                         </div>
 
                         <div class="mb-3">
