@@ -1866,8 +1866,9 @@ async function registerPerson() {
     try {
         // intento de obtener leaderId de URL o variable global
         const urlParams = new URLSearchParams(window.location.search);
-        const leaderId = window.currentLeaderId || urlParams.get('leader');
-        const leaderToken = urlParams.get('leader') || null;
+        const urlLeaderToken = urlParams.get('leader');
+        const leaderId = window.currentLeaderId || null;
+        const leaderToken = urlLeaderToken || null;
         const firstName = document.getElementById('firstName')?.value || '';
         const lastName = document.getElementById('lastName')?.value || '';
         const email = document.getElementById('email')?.value || '';
@@ -1877,7 +1878,7 @@ async function registerPerson() {
         const registeredToVote = regRadio ? (regRadio.value === 'true') : false;
         const votingPlace = document.getElementById('votingPlace') ? document.getElementById('votingPlace').value : '';
 
-        if (!leaderId) {
+        if (!leaderId && !leaderToken) {
             alert('No se encontró un líder asociado para este registro.');
             return;
         }
