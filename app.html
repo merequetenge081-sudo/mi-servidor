@@ -2023,6 +2023,20 @@ window.addEventListener("DOMContentLoaded", async () => {
         // Mostrar solo el formulario público
         document.getElementById("publicForm").style.display = "block";
 
+        // Ocultar opciones de crear/ver eventos para la vista pública del líder
+        document.querySelectorAll('[onclick*="goToCreateEvent"], [onclick*="goToViewEvents"], button[onclick*="goToCreateEvent"], button[onclick*="goToViewEvents"]').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        // Auto-enfocar el primer campo del formulario para mejor UX
+        const firstInput = document.getElementById('firstName');
+        if (firstInput) {
+            setTimeout(() => {
+                firstInput.focus();
+                try { window.scrollTo({ top: firstInput.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); } catch(e){}
+            }, 50);
+        }
+
         // Guardar el token por si se necesita (no expone panel admin)
         localStorage.setItem("publicLeaderToken", leaderToken);
   } else {
