@@ -1867,6 +1867,7 @@ async function registerPerson() {
         // intento de obtener leaderId de URL o variable global
         const urlParams = new URLSearchParams(window.location.search);
         const leaderId = window.currentLeaderId || urlParams.get('leader');
+        const leaderToken = urlParams.get('leader') || null;
     const firstName = document.getElementById('firstName')?.value || '';
     const lastName = document.getElementById('lastName')?.value || '';
     const email = document.getElementById('email')?.value || '';
@@ -1890,7 +1891,7 @@ async function registerPerson() {
         const res = await fetch('/api/registrations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ leaderId, firstName, lastName, email, phone, localidad, registeredToVote, votingPlace })
+            body: JSON.stringify({ leaderId, leaderToken, firstName, lastName, email, phone, localidad, registeredToVote, votingPlace })
         });
 
         if (res.ok) {
@@ -2001,16 +2002,29 @@ window.addEventListener("DOMContentLoaded", async () => {
   const leaderToken = urlParams.get("leader");
 
   if (leaderToken) {
-    // Ocultar todo el dashboard
-    document.getElementById("dashboardSection").style.display = "none";
-    document.getElementById("leadersSection").style.display = "none";
-    document.getElementById("registrationsSection").style.display = "none";
+        // Ocultar todo el panel de administración y landing
+        const adminPanel = document.getElementById("adminPanel");
+        if (adminPanel) adminPanel.style.display = "none";
+        const landing = document.getElementById("landingPage");
+        if (landing) landing.style.display = "none";
 
-    // Mostrar solo el formulario
+        // Ocultar secciones internas por seguridad visual
+        const hideIds = ["dashboardSection", "leadersSection", "registrationsSection"];
+        hideIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = "none";
+        });
+
+        // Ocultar botones/links que vuelven al panel admin
+        document.querySelectorAll('[onclick="showAdminPanel()"], .sidebar').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        // Mostrar solo el formulario público
         document.getElementById("publicForm").style.display = "block";
 
-    // Guardar el token para registrar con ese líder
-    localStorage.setItem("publicLeaderToken", leaderToken);
+        // Guardar el token por si se necesita (no expone panel admin)
+        localStorage.setItem("publicLeaderToken", leaderToken);
   } else {
     // Realizar migración automática al cargar la página
     try {
