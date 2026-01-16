@@ -1868,14 +1868,14 @@ async function registerPerson() {
         const urlParams = new URLSearchParams(window.location.search);
         const leaderId = window.currentLeaderId || urlParams.get('leader');
         const leaderToken = urlParams.get('leader') || null;
-    const firstName = document.getElementById('firstName')?.value || '';
-    const lastName = document.getElementById('lastName')?.value || '';
-    const email = document.getElementById('email')?.value || '';
-    const phone = document.getElementById('phone')?.value || '';
-    const localidad = document.getElementById('localidad') ? document.getElementById('localidad').value : '';
-    const regRadio = document.querySelector('input[name="registeredToVote"]:checked');
-    const registeredToVote = regRadio ? (regRadio.value === 'true') : false;
-    const votingPlace = document.getElementById('votingPlace') ? document.getElementById('votingPlace').value : '';
+        const firstName = document.getElementById('firstName')?.value || '';
+        const lastName = document.getElementById('lastName')?.value || '';
+        const email = document.getElementById('email')?.value || '';
+        const phone = document.getElementById('phone')?.value || '';
+        const localidad = document.getElementById('localidad') ? document.getElementById('localidad').value : '';
+        const regRadio = document.querySelector('input[name="registeredToVote"]:checked');
+        const registeredToVote = regRadio ? (regRadio.value === 'true') : false;
+        const votingPlace = document.getElementById('votingPlace') ? document.getElementById('votingPlace').value : '';
 
         if (!leaderId) {
             alert('No se encontró un líder asociado para este registro.');
