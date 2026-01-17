@@ -1885,7 +1885,16 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     data.leaderId = leaderId;
     if (!data.leaderId && leaderToken) data.leaderToken = leaderToken;
 
-    // Verificación: evitar re-registro por cédula
+    // Si no hay líder, no continuar
+    if (!data.leaderId && !data.leaderToken) {
+        showToast('danger', 'No se encontró un líder asociado para este registro.');
+        return;
+    }
+
+    // Mostrar pantalla de éxito inmediatamente (optimista)
+    showRegistrationSuccess();
+
+    // Verificación: evitar re-registro por cédula (si existe, revertir la vista)
     try {
         const cedula = data.cedula || '';
         if (cedula) {
@@ -1894,7 +1903,8 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
             if (checkRes.ok) {
                 const existing = await checkRes.json();
                 if (existing.length > 0) {
-                    showToast('danger', '❌ Ya existe un registro con esa cédula.');
+                    showToast('danger', 'usuario ya registrado');
+                    resetPublicForm();
                     return;
                 }
             }
@@ -1903,28 +1913,26 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         console.warn('No se pudo verificar cédula, continuando:', err);
     }
 
-    const res = await fetch(`${API_BASE}/registrations`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
+    // Enviar petición al servidor en background
+    try {
+        const res = await fetch(`${API_BASE}/registrations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-    if (res.ok) {
-        showToast('success', 'Registro guardado');
-        // Mostrar pantalla de éxito inmediatamente
-        showRegistrationSuccess();
-        // Actualizar datos en segundo plano
-        (async () => {
-            try {
-                await loadRegistrations();
-                await updateDashboard();
-            } catch (err) { console.warn('Error actualizando datos tras registro:', err); }
-        })();
-    } else {
-        const err = await res.json().catch(() => ({}));
-        showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
+        if (res.ok) {
+            // petición exitosa: actualizar datos en background
+            (async () => { try { await loadRegistrations(); await updateDashboard(); } catch (e) { console.warn(e); } })();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
+            resetPublicForm();
+        }
+    } catch (err) {
+        console.error('Error enviando registro:', err);
+        showToast('danger', 'Error de conexión al enviar el registro');
+        resetPublicForm();
     }
 });
 
@@ -2145,56 +2153,8 @@ function showToast(type, message) {
         if (now - ts > 10000) _recentToasts.delete(msg);
     }
 
-    // Asegurar que exista un contenedor de toasts de bootstrap
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'toast-container position-fixed top-0 end-0 p-3';
-        document.body.appendChild(container);
-    }
-
-    // Elegir id base según tipo para reusar el toast estático (evita duplicados visuales)
-    const baseId = type === 'success' ? 'successToast' : 'errorToast';
-    let toastEl = document.getElementById(baseId);
-
-    // Si existe, actualizar el cuerpo; si no, crear uno pequeño compatible con bootstrap
-    if (!toastEl || !container.contains(toastEl)) {
-        toastEl = document.createElement('div');
-        toastEl.className = 'toast';
-        toastEl.id = baseId;
-        toastEl.setAttribute('role', 'alert');
-        toastEl.setAttribute('aria-live', 'assertive');
-        toastEl.setAttribute('aria-atomic', 'true');
-
-        const header = document.createElement('div');
-        header.className = 'toast-header ' + (type === 'success' ? 'bg-success text-white' : 'bg-danger text-white');
-        header.style.display = 'flex';
-        header.style.alignItems = 'center';
-        header.innerHTML = `
-            <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2"></i>
-            <strong class="me-auto">${type === 'success' ? 'Éxito' : 'Aviso'}</strong>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-        `;
-
-        const body = document.createElement('div');
-        body.className = 'toast-body';
-        body.textContent = message;
-
-        toastEl.appendChild(header);
-        toastEl.appendChild(body);
-        container.appendChild(toastEl);
-    } else {
-        const body = toastEl.querySelector('.toast-body');
-        if (body) body.textContent = message;
-    }
-
-    // Mostrar el toast con Bootstrap si está disponible
-    try {
-        const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4500 });
-        bsToast.show();
-    } catch (err) {
-        console.error('showToast bootstrap error:', err);
-    }
+    // We use only the manual toast for visibility and consistent styling.
+    // (Bootstrap toasts were removed to avoid legacy styles appearing.)
 
     // Además, crear un toast manual (fallback garantizado) para asegurar visibilidad
     try {
