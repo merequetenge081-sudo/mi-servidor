@@ -1877,11 +1877,24 @@ async function exportToExcel(type) {
 document.getElementById('registrationForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
-  const leaderToken = localStorage.getItem("publicLeaderToken");
-  const resLeader = await fetch("/api/leaders");
-  const leaders = await resLeader.json();
-  const leader = leaders.find(l => l.token === leaderToken);
-  const leaderId = leader ? leader._id : null;
+    // Obtener token del líder: preferir localStorage, si no existe usar la querystring
+    let leaderToken = null;
+    try {
+        leaderToken = localStorage.getItem('publicLeaderToken');
+    } catch (e) { /* ignorar si localStorage no está disponible */ }
+
+    if (!leaderToken) {
+        const urlParams = new URLSearchParams(window.location.search);
+        leaderToken = urlParams.get('leader') || null;
+        if (leaderToken) {
+            try { localStorage.setItem('publicLeaderToken', leaderToken); } catch (e) { /* ignore */ }
+        }
+    }
+
+    const resLeader = await fetch("/api/leaders");
+    const leaders = await resLeader.json();
+    const leader = leaderToken ? leaders.find(l => l.token === leaderToken) : null;
+    const leaderId = leader ? leader._id : null;
   
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
@@ -1891,8 +1904,9 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         data.localidad = document.getElementById('localidadOtra')?.value || '';
     }
 
-    // Asegurar que el leaderId se asigne
+    // Asegurar que el leaderId se asigne. Si no está disponible, enviar token para que el servidor lo resuelva
     data.leaderId = leaderId;
+    if (!data.leaderId && leaderToken) data.leaderToken = leaderToken;
 
     // Verificación: evitar re-registro por cédula
     try {
@@ -2267,6 +2281,13 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     // Agregar clase al body para aplicar estilos CSS de modo público
     document.body.classList.add('public-registration-mode');
+
+        // Guardar token público para que el submit lo use como fallback
+        try {
+            localStorage.setItem('publicLeaderToken', leaderToken);
+        } catch (e) {
+            console.warn('No se pudo guardar publicLeaderToken en localStorage:', e);
+        }
 
     // Forzar ocultar landing page y admin panel inmediatamente
     const landingPage = document.getElementById("landingPage");
