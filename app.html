@@ -2019,13 +2019,13 @@ async function registerPerson() {
         const votingPlace = document.getElementById('votingPlace') ? document.getElementById('votingPlace').value : '';
 
         if (!leaderId && !leaderToken) {
-            alert('No se encontró un líder asociado para este registro.');
+            showToast('danger', 'No se encontró un líder asociado para este registro.');
             return;
         }
 
         // Validación: si declaró que está inscrito para votar, debe indicar puesto de votación
         if (registeredToVote && !votingPlace) {
-            alert('Si indicó que está inscrito para votar, por favor indique el puesto de votación.');
+            showToast('danger', 'Si indicó que está inscrito para votar, por favor indique el puesto de votación.');
             return;
         }
 
@@ -2035,7 +2035,7 @@ async function registerPerson() {
             if (checkRes.ok) {
                 const existingRegs = await checkRes.json();
                 if (existingRegs.length > 0) {
-                    alert('❌ Este número de teléfono ya está registrado en el sistema. No se permiten registros duplicados.');
+                    showToast('danger', '❌ Este número de teléfono ya está registrado en el sistema. No se permiten registros duplicados.');
                     return;
                 }
             }
@@ -2052,13 +2052,13 @@ async function registerPerson() {
 
         if (res.ok) {
             const result = await res.json();
-            alert(`✅ ¡Registro completado exitosamente!\n\n📋 Datos registrados:\n• Nombre: ${firstName} ${lastName || ''}\n• Teléfono: ${phone}\n• Localidad: ${localidad}\n\n🎉 Gracias por registrarte. Tu información ha sido guardada correctamente.`);
+            showToast('success', `✅ ¡Registro completado exitosamente!`);
             // Limpiar formulario después del registro exitoso
             document.getElementById('registrationForm').reset();
             updateDashboard();
         } else {
             const errorData = await res.json().catch(() => ({}));
-            alert(`❌ Error al registrar: ${errorData.error || 'Error desconocido'}`);
+            showToast('danger', `❌ Error al registrar: ${errorData.error || 'Error desconocido'}`);
         }
     } catch (err) {
         console.error('Error registerPerson:', err);
@@ -2068,14 +2068,21 @@ async function registerPerson() {
 
 // ===================== 🔹 Funciones de notificaciones =====================
 function showToast(type, message) {
-  const toastId = type === 'success' ? 'successToast' : 'errorToast';
-  const toastEl = document.getElementById(toastId);
-  const toast = new bootstrap.Toast(toastEl);
-  
-  // Actualizar el mensaje
-  toastEl.querySelector('.toast-body').textContent = message;
-  
-  toast.show();
+    const toastId = type === 'success' ? 'successToast' : 'errorToast';
+    const toastEl = document.getElementById(toastId);
+    if (!toastEl) {
+        console.warn('Toast element not found:', toastId, message);
+        try { alert(message); } catch (e) { console.log(message); }
+        return;
+    }
+
+    // Actualizar el mensaje
+    const body = toastEl.querySelector('.toast-body');
+    if (body) body.textContent = message;
+
+    // Usar instancia de Bootstrap con delay visible
+    const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
+    bsToast.show();
 }
 
 // Mostrar / ocultar el campo de puesto de votación en el formulario público
