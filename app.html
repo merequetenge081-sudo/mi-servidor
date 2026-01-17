@@ -1936,12 +1936,15 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
     if (res.ok) {
         showToast('success', 'Registro guardado');
-        // Mostrar pantalla de éxito en lugar del formulario
-        try {
-            await loadRegistrations();
-            await updateDashboard();
-        } catch (err) { console.warn('Error actualizando datos tras registro:', err); }
+        // Mostrar pantalla de éxito inmediatamente
         showRegistrationSuccess();
+        // Actualizar datos en segundo plano
+        (async () => {
+            try {
+                await loadRegistrations();
+                await updateDashboard();
+            } catch (err) { console.warn('Error actualizando datos tras registro:', err); }
+        })();
     } else {
         const err = await res.json().catch(() => ({}));
         showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
@@ -2106,9 +2109,11 @@ async function registerPerson() {
         if (res.ok) {
             const result = await res.json();
             showToast('success', 'Registro guardado');
-            // Limpiar formulario después del registro exitoso
-            document.getElementById('registrationForm').reset();
-            updateDashboard();
+            // Mostrar pantalla de éxito inmediatamente
+            showRegistrationSuccess();
+            // Limpiar formulario y actualizar dashboard en background
+            try { document.getElementById('registrationForm').reset(); } catch (e) {}
+            (async () => { try { await updateDashboard(); } catch(e){ console.warn(e); } })();
         } else {
             const errorData = await res.json().catch(() => ({}));
             showToast('danger', `❌ Error al registrar: ${errorData.error || 'Error desconocido'}`);
@@ -2120,11 +2125,27 @@ async function registerPerson() {
 }
 
 // ===================== 🔹 Funciones de notificaciones =====================
+// Tracker para evitar mostrar toasts duplicados en ventana corta
+const _recentToasts = new Map(); // message -> timestamp
+
 function showToast(type, message) {
     // registro rápido para depuración
     try { console.log('[showToast]', type, message); } catch (e) { /* no bloquear */ }
 
-    // Asegurar que exista un contenedor de toasts
+    const now = Date.now();
+    const last = _recentToasts.get(message) || 0;
+    // Si el mismo mensaje fue mostrado hace menos de 3.5s, ignorar duplicado
+    if (now - last < 3500) {
+        console.log('[showToast] duplicate suppressed:', message);
+        return;
+    }
+    _recentToasts.set(message, now);
+    // Limpiar entradas antiguas (cada llamada)
+    for (const [msg, ts] of _recentToasts) {
+        if (now - ts > 10000) _recentToasts.delete(msg);
+    }
+
+    // Asegurar que exista un contenedor de toasts de bootstrap
     let container = document.querySelector('.toast-container');
     if (!container) {
         container = document.createElement('div');
@@ -2132,11 +2153,11 @@ function showToast(type, message) {
         document.body.appendChild(container);
     }
 
-    // Elegir id base según tipo
-    const baseId = type === 'success' ? 'successToast' : (type === 'danger' || type === 'error' ? 'errorToast' : (type === 'info' ? 'successToast' : 'errorToast'));
+    // Elegir id base según tipo para reusar el toast estático (evita duplicados visuales)
+    const baseId = type === 'success' ? 'successToast' : 'errorToast';
     let toastEl = document.getElementById(baseId);
 
-    // Si no existe el toast estático o no está en el contenedor, crear uno dinámico
+    // Si existe, actualizar el cuerpo; si no, crear uno pequeño compatible con bootstrap
     if (!toastEl || !container.contains(toastEl)) {
         toastEl = document.createElement('div');
         toastEl.className = 'toast';
@@ -2147,9 +2168,11 @@ function showToast(type, message) {
 
         const header = document.createElement('div');
         header.className = 'toast-header ' + (type === 'success' ? 'bg-success text-white' : 'bg-danger text-white');
+        header.style.display = 'flex';
+        header.style.alignItems = 'center';
         header.innerHTML = `
             <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2"></i>
-            <strong class="me-auto">${type === 'success' ? 'Éxito' : 'Error'}</strong>
+            <strong class="me-auto">${type === 'success' ? 'Éxito' : 'Aviso'}</strong>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
         `;
 
@@ -2165,13 +2188,12 @@ function showToast(type, message) {
         if (body) body.textContent = message;
     }
 
-    // Mostrar el toast con Bootstrap si está disponible, si no usar fallback
+    // Mostrar el toast con Bootstrap si está disponible
     try {
-        const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
+        const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4500 });
         bsToast.show();
     } catch (err) {
         console.error('showToast bootstrap error:', err);
-        try { alert(message); } catch (e) { console.log(message); }
     }
 
     // Además, crear un toast manual (fallback garantizado) para asegurar visibilidad
@@ -2190,21 +2212,77 @@ function showToast(type, message) {
             document.body.appendChild(manualContainer);
         }
 
+        // Evitar duplicados manuales: si hay un item con mismo texto, actualizar su timer
+        for (const child of Array.from(manualContainer.children)) {
+            if (child.dataset && child.dataset.msg === message) {
+                // reset timer by removing and recreating visual effect
+                child.style.opacity = '1';
+                child.style.transform = 'translateY(0)';
+                // move to top
+                manualContainer.insertBefore(child, manualContainer.firstChild);
+                return;
+            }
+        }
+
         const manual = document.createElement('div');
         manual.className = 'manual-toast-item';
-        manual.style.minWidth = '220px';
-        manual.style.maxWidth = '380px';
-        manual.style.background = (type === 'success') ? '#198754' : '#dc3545';
+        manual.dataset.msg = message;
+        manual.style.minWidth = '240px';
+        manual.style.maxWidth = '420px';
+        manual.style.background = 'linear-gradient(90deg,' + (type === 'success' ? '#2dd4bf' : '#ff6b6b') + ', ' + (type === 'success' ? '#198754' : '#dc3545') + ')';
         manual.style.color = 'white';
         manual.style.padding = '12px 14px';
-        manual.style.borderRadius = '8px';
-        manual.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+        manual.style.borderRadius = '12px';
+        manual.style.boxShadow = '0 10px 30px rgba(0,0,0,0.12)';
         manual.style.opacity = '0';
-        manual.style.transform = 'translateY(-6px)';
-        manual.style.transition = 'opacity 220ms ease, transform 220ms ease';
-        manual.textContent = message;
+        manual.style.transform = 'translateY(-8px)';
+        manual.style.transition = 'opacity 240ms cubic-bezier(.2,.9,.3,1), transform 240ms cubic-bezier(.2,.9,.3,1)';
 
-        manualContainer.appendChild(manual);
+        // contenido con icono y texto
+        const inner = document.createElement('div');
+        inner.style.display = 'flex';
+        inner.style.alignItems = 'center';
+        inner.style.gap = '10px';
+
+        const icon = document.createElement('i');
+        icon.className = 'bi ' + (type === 'success' ? 'bi-check-square-fill' : 'bi-exclamation-triangle-fill');
+        icon.style.fontSize = '20px';
+        icon.style.opacity = '0.95';
+
+        const textWrap = document.createElement('div');
+        const title = document.createElement('div');
+        title.style.fontWeight = '700';
+        title.style.fontSize = '14px';
+        title.textContent = (type === 'success') ? '¡Listo!' : 'Atención';
+        const text = document.createElement('div');
+        text.style.fontSize = '13px';
+        text.textContent = message;
+
+        textWrap.appendChild(title);
+        textWrap.appendChild(text);
+        inner.appendChild(icon);
+        inner.appendChild(textWrap);
+
+        // close button
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '×';
+        closeBtn.style.marginLeft = '12px';
+        closeBtn.style.background = 'transparent';
+        closeBtn.style.border = 'none';
+        closeBtn.style.color = 'white';
+        closeBtn.style.fontSize = '18px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.onclick = () => { try { manual.remove(); } catch (e) {} };
+
+        const contentLine = document.createElement('div');
+        contentLine.style.display = 'flex';
+        contentLine.style.alignItems = 'center';
+        contentLine.style.justifyContent = 'space-between';
+        contentLine.appendChild(inner);
+        contentLine.appendChild(closeBtn);
+
+        manual.appendChild(contentLine);
+        manualContainer.insertBefore(manual, manualContainer.firstChild);
 
         // Forzar reflow para activar transición
         void manual.offsetWidth;
@@ -2214,11 +2292,10 @@ function showToast(type, message) {
         // Auto eliminar después de 5s
         setTimeout(() => {
             manual.style.opacity = '0';
-            manual.style.transform = 'translateY(-6px)';
-            setTimeout(() => { try { manual.remove(); } catch (e) {} }, 240);
+            manual.style.transform = 'translateY(-8px)';
+            setTimeout(() => { try { manual.remove(); } catch (e) {} }, 260);
         }, 5000);
     } catch (e) {
-        // no bloquear en caso de error
         console.warn('manual toast error', e);
     }
 }
