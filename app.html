@@ -1005,6 +1005,18 @@
                         </button>
                     </div>
                 </form>
+                <!-- Pantalla de éxito: se muestra después de guardar -->
+                <div id="registrationSuccessScreen" style="display:none; text-align:center; padding:2rem;">
+                    <div style="padding:2rem;">
+                        <h2 class="text-success">¡Registro exitoso!</h2>
+                        <p class="lead">Gracias por registrarte. Hemos recibido tus datos correctamente.</p>
+                        <p>Si necesitas volver a la página de administración, usa el botón abajo.</p>
+                        <div style="margin-top:1.5rem;">
+                            <button class="btn btn-outline-primary" onclick="showAdminPanel()">Volver al Panel de Administración</button>
+                            <button class="btn btn-secondary ms-2" onclick="resetPublicForm()">Registrar otra persona</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="text-center mt-4">
@@ -1910,15 +1922,42 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
     if (res.ok) {
         showToast('success', '✅ Registro guardado correctamente');
-        this.reset();
-        // actualizar dashboard y tablas
-        await loadRegistrations();
-        await updateDashboard();
+        // Mostrar pantalla de éxito en lugar del formulario
+        try {
+            await loadRegistrations();
+            await updateDashboard();
+        } catch (err) { console.warn('Error actualizando datos tras registro:', err); }
+        showRegistrationSuccess();
     } else {
         const err = await res.json().catch(() => ({}));
         showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
     }
 });
+
+function showRegistrationSuccess() {
+    const form = document.getElementById('registrationForm');
+    const success = document.getElementById('registrationSuccessScreen');
+    const publicForm = document.getElementById('publicForm');
+    if (form) form.style.display = 'none';
+    if (success) success.style.display = 'block';
+    // En modo público asegurarnos de ocultar admin
+    const adminPanel = document.getElementById('adminPanel');
+    if (adminPanel) adminPanel.style.display = 'none';
+}
+
+function resetPublicForm() {
+    // Mostrar de nuevo el formulario y resetear campos
+    const form = document.getElementById('registrationForm');
+    const success = document.getElementById('registrationSuccessScreen');
+    if (form) {
+        form.reset();
+        form.style.display = 'block';
+    }
+    if (success) success.style.display = 'none';
+    // enfocar primer campo
+    const first = document.getElementById('firstName');
+    if (first) first.focus();
+}
 
 // ===================== 🔹 Funciones de QR y enlace =====================
 function showQRCode(leader) {
