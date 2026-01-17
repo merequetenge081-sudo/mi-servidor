@@ -617,6 +617,9 @@
                                         <th>Fecha</th>
                                         <th>Nombre</th>
                                         <th>Líder</th>
+                                        <th>Localidad</th>
+                                        <th>¿Votante?</th>
+                                        <th>Puesto Votación</th>
                                         <th>Confirmado</th>
                                         <th>Acción</th>
                                     </tr>
@@ -804,6 +807,9 @@
                                                 <th>Nombre</th>
                                                 <th>Cédula</th>
                                                 <th>Teléfono</th>
+                                                <th>Localidad</th>
+                                                <th>¿Votante?</th>
+                                                <th>Puesto Votación</th>
                                                 <th>Estado</th>
                                                 <th>Confirmado Por</th>
                                                 <th>Acciones</th>
@@ -1594,12 +1600,18 @@ function updateRegistrationsTable() {
         const confirmed = reg.confirmed ? true : false;
         const confirmedBy = reg.confirmedBy ? reg.confirmedBy : '';
         const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
+        const localidad = reg.localidad || '-';
+        const votante = reg.registeredToVote ? 'Sí' : 'No';
+        const votingPlace = reg.votingPlace || '-';
 
         return `
             <tr>
                 <td>${new Date(reg.date).toLocaleDateString("es-CO")}</td>
                 <td>${nombre}</td>
                 <td>${lider}</td>
+                <td>${localidad}</td>
+                <td>${votante}</td>
+                <td>${votingPlace}</td>
                 <td>
                     ${confirmed ? `
                         <div>
@@ -2449,6 +2461,9 @@ function updateFilteredRegistrationsList(registrations) {
         const confirmedBy = reg.confirmedBy || '';
         const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
         const fullName = `${reg.firstName || ''} ${reg.lastName || ''}`.trim();
+        const localidad = reg.localidad || '-';
+        const votante = reg.registeredToVote ? 'Sí' : 'No';
+        const votingPlace = reg.votingPlace || '-';
 
         return `
             <tr>
@@ -2460,6 +2475,9 @@ function updateFilteredRegistrationsList(registrations) {
                     <code>${reg.cedula || 'N/A'}</code>
                 </td>
                 <td>${reg.phone || 'N/A'}</td>
+                <td>${localidad}</td>
+                <td>${votante}</td>
+                <td>${votingPlace}</td>
                 <td>
                     ${confirmed ? `
                         <span class="badge bg-success">Asistió ✅</span>
