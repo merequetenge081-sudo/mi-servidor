@@ -1272,6 +1272,23 @@ async function saveAdminRegistration() {
         if (adminVotingPlace) reg.votingPlace = adminVotingPlace;
 
     try {
+        // Verificar duplicados por cédula antes de enviar
+        if (reg.cedula) {
+            try {
+                const q = `/api/registrations?cedula=${encodeURIComponent(reg.cedula)}${activeEventId ? '&eventId=' + activeEventId : ''}`;
+                const check = await fetch(q);
+                if (check.ok) {
+                    const existing = await check.json();
+                    if (existing.length > 0) {
+                        showToast('danger', '❌ Ya existe un registro con esa cédula.');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('No se pudo verificar duplicados por cédula:', e);
+            }
+        }
+
         const response = await fetch("/api/registrations", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1281,9 +1298,9 @@ async function saveAdminRegistration() {
         if (response.ok) {
             const newReg = await response.json();
             console.log('✅ Registro guardado:', newReg);
-            
-            alert("Registro guardado correctamente ✅");
-            
+
+            showToast('success', '✅ Registro guardado correctamente');
+
             // Limpiar formulario
             document.getElementById("adminRegistrationForm").reset();
             document.getElementById("adminFirstName").value = "";
@@ -1291,7 +1308,7 @@ async function saveAdminRegistration() {
             document.getElementById("adminCedula").value = "";
             document.getElementById("adminEmail").value = "";
             document.getElementById("adminPhone").value = "";
-            // ocultar puestro de votación si estaba visible
+            // ocultar puesto de votación si estaba visible
             const adminVotingGroup = document.getElementById('adminVotingPlaceGroup');
             if (adminVotingGroup) adminVotingGroup.style.display = 'none';
             // reset radios
@@ -1299,27 +1316,24 @@ async function saveAdminRegistration() {
             const adminNo = document.getElementById('adminRegisteredNo');
             if (adminYes) adminYes.checked = false;
             if (adminNo) adminNo.checked = true;
-            
+
             // Cerrar modal
             const modalElement = document.getElementById("adminRegistrationModal");
             const modal = bootstrap.Modal.getInstance(modalElement);
             if (modal) modal.hide();
-            
+
             // Recargar datos
             await loadLeaders();
             await loadRegistrations();
             await updateDashboard();
-            
-            // Mostrar notificación
-            showToast('success', '✅ Registro guardado correctamente');
-            
+
         } else {
-            const errorData = await response.json();
-            alert(`Error al guardar el registro: ${errorData.error}`);
+            const errorData = await response.json().catch(() => ({}));
+            showToast('danger', `❌ Error al guardar el registro: ${errorData.error || 'desconocido'}`);
         }
     } catch (err) {
         console.error('Error guardando registro admin:', err);
-        alert('Hubo un error al guardar el registro.');
+        showToast('danger', '❌ Hubo un error al guardar el registro.');
     }
 }
 
