@@ -1311,7 +1311,7 @@ async function saveAdminRegistration() {
             const newReg = await response.json();
             console.log('Registro guardado:', newReg);
 
-            showToast('success', 'registro guardado con exito');
+            showToast('success', 'Registro guardado');
 
             // Limpiar formulario
             document.getElementById("adminRegistrationForm").reset();
@@ -1935,7 +1935,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     });
 
     if (res.ok) {
-        showToast('success', '✅ Registro guardado correctamente');
+        showToast('success', 'Registro guardado');
         // Mostrar pantalla de éxito en lugar del formulario
         try {
             await loadRegistrations();
@@ -2105,7 +2105,7 @@ async function registerPerson() {
 
         if (res.ok) {
             const result = await res.json();
-            showToast('success', `✅ ¡Registro completado exitosamente!`);
+            showToast('success', 'Registro guardado');
             // Limpiar formulario después del registro exitoso
             document.getElementById('registrationForm').reset();
             updateDashboard();
