@@ -1292,7 +1292,7 @@ async function saveAdminRegistration() {
                 if (check.ok) {
                     const existing = await check.json();
                     if (existing.length > 0) {
-                        showToast('danger', '❌ Ya existe un registro con esa cédula.');
+                        showToast('danger', 'usuario ya registrado');
                         return;
                     }
                 }
@@ -1309,9 +1309,9 @@ async function saveAdminRegistration() {
 
         if (response.ok) {
             const newReg = await response.json();
-            console.log('✅ Registro guardado:', newReg);
+            console.log('Registro guardado:', newReg);
 
-            showToast('success', '✅ Registro guardado correctamente');
+            showToast('success', 'registro guardado con exito');
 
             // Limpiar formulario
             document.getElementById("adminRegistrationForm").reset();
@@ -2107,21 +2107,58 @@ async function registerPerson() {
 
 // ===================== 🔹 Funciones de notificaciones =====================
 function showToast(type, message) {
-    const toastId = type === 'success' ? 'successToast' : 'errorToast';
-    const toastEl = document.getElementById(toastId);
-    if (!toastEl) {
-        console.warn('Toast element not found:', toastId, message);
-        try { alert(message); } catch (e) { console.log(message); }
-        return;
+    // registro rápido para depuración
+    try { console.log('[showToast]', type, message); } catch (e) { /* no bloquear */ }
+
+    // Asegurar que exista un contenedor de toasts
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        document.body.appendChild(container);
     }
 
-    // Actualizar el mensaje
-    const body = toastEl.querySelector('.toast-body');
-    if (body) body.textContent = message;
+    // Elegir id base según tipo
+    const baseId = type === 'success' ? 'successToast' : (type === 'danger' || type === 'error' ? 'errorToast' : (type === 'info' ? 'successToast' : 'errorToast'));
+    let toastEl = document.getElementById(baseId);
 
-    // Usar instancia de Bootstrap con delay visible
-    const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
-    bsToast.show();
+    // Si no existe el toast estático o no está en el contenedor, crear uno dinámico
+    if (!toastEl || !container.contains(toastEl)) {
+        toastEl = document.createElement('div');
+        toastEl.className = 'toast';
+        toastEl.id = baseId;
+        toastEl.setAttribute('role', 'alert');
+        toastEl.setAttribute('aria-live', 'assertive');
+        toastEl.setAttribute('aria-atomic', 'true');
+
+        const header = document.createElement('div');
+        header.className = 'toast-header ' + (type === 'success' ? 'bg-success text-white' : 'bg-danger text-white');
+        header.innerHTML = `
+            <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2"></i>
+            <strong class="me-auto">${type === 'success' ? 'Éxito' : 'Error'}</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        `;
+
+        const body = document.createElement('div');
+        body.className = 'toast-body';
+        body.textContent = message;
+
+        toastEl.appendChild(header);
+        toastEl.appendChild(body);
+        container.appendChild(toastEl);
+    } else {
+        const body = toastEl.querySelector('.toast-body');
+        if (body) body.textContent = message;
+    }
+
+    // Mostrar el toast con Bootstrap si está disponible, si no usar fallback
+    try {
+        const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
+        bsToast.show();
+    } catch (err) {
+        console.error('showToast bootstrap error:', err);
+        try { alert(message); } catch (e) { console.log(message); }
+    }
 }
 
 // Mostrar / ocultar el campo de puesto de votación en el formulario público
