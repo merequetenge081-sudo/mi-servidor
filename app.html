@@ -1889,6 +1889,21 @@ async function registerPerson() {
             return;
         }
 
+        // Validación: verificar duplicados por teléfono
+        try {
+            const checkRes = await fetch(`/api/registrations?phone=${encodeURIComponent(phone)}`);
+            if (checkRes.ok) {
+                const existingRegs = await checkRes.json();
+                if (existingRegs.length > 0) {
+                    alert('❌ Este número de teléfono ya está registrado en el sistema. No se permiten registros duplicados.');
+                    return;
+                }
+            }
+        } catch (checkErr) {
+            console.error('Error verificando duplicados:', checkErr);
+            // Continuar con el registro si falla la verificación
+        }
+
         const res = await fetch('/api/registrations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1896,10 +1911,14 @@ async function registerPerson() {
         });
 
         if (res.ok) {
-            alert('✅ Persona registrada correctamente');
+            const result = await res.json();
+            alert(`✅ ¡Registro completado exitosamente!\n\n📋 Datos registrados:\n• Nombre: ${firstName} ${lastName || ''}\n• Teléfono: ${phone}\n• Localidad: ${localidad}\n\n🎉 Gracias por registrarte. Tu información ha sido guardada correctamente.`);
+            // Limpiar formulario después del registro exitoso
+            document.getElementById('registrationForm').reset();
             updateDashboard();
         } else {
-            alert('❌ Error al registrar la persona');
+            const errorData = await res.json().catch(() => ({}));
+            alert(`❌ Error al registrar: ${errorData.error || 'Error desconocido'}`);
         }
     } catch (err) {
         console.error('Error registerPerson:', err);

@@ -289,11 +289,12 @@ app.delete("/api/leaders/:id", async (req, res) => {
   res.json({ success: true });
 });
 
-// 🔹 Obtener registros (opcionalmente filtrar por eventId)
+// 🔹 Obtener registros (opcionalmente filtrar por eventId o phone)
 app.get("/api/registrations", async (req, res) => {
-  const { eventId } = req.query;
+  const { eventId, phone } = req.query;
   const filter = {};
   if (eventId) filter.eventId = eventId;
+  if (phone) filter.phone = phone;
   const regs = await Registration.find(filter);
   res.json(regs);
 });
