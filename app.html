@@ -278,6 +278,24 @@
             display: block !important;
             visibility: visible !important;
         }
+        /* Mobile sidebar / top bar */
+        #mobileTopBar {
+            display: none;
+        }
+
+        @media (max-width: 767.98px) {
+            body { padding-top: 56px; }
+            #mobileTopBar { display: flex; position: fixed; top: 0; left: 0; right: 0; z-index: 11000; background: white; border-bottom: 1px solid rgba(0,0,0,0.06); align-items: center; padding: 8px 12px; }
+            #mobileTopBar .app-title { font-weight: 700; font-size: 1rem; }
+            .sidebar {
+                position: fixed; left: -320px; top: 0; height: 100vh; width: 280px; z-index: 12000; transition: left 220ms ease; box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            }
+            .sidebar.open { left: 0; }
+            .main-content { padding-top: 0; }
+            /* small overlay when sidebar open */
+            #sidebarBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.32); z-index: 11900; display: none; }
+            #sidebarBackdrop.visible { display: block; }
+        }
         /* Responsive adjustments for mobile devices */
         /* Make manual toasts more accessible on small screens and avoid covering content */
         #manualToastContainer {
@@ -337,6 +355,14 @@
     </style>
 </head>
 <body>
+    <!-- Barra superior móvil: botón hamburguesa para mostrar el sidebar en pantallas pequeñas -->
+    <div id="mobileTopBar" class="d-md-none">
+        <button id="sidebarToggle" class="btn btn-outline-secondary me-2" style="padding:6px 8px;"><i class="bi bi-list"></i></button>
+        <div class="app-title">Red Social y Política</div>
+    </div>
+
+    <!-- Backdrop para el sidebar en móvil (se gestiona por JS) -->
+    <div id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
     <!-- Landing Page (Crear/Ver Eventos) -->
     <div id="landingPage" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); overflow: hidden; position: fixed; top: 0; left: 0; z-index: 9000;">
         <div style="width: 100%; max-width: 900px; text-align: center; padding: 2rem;">
@@ -1381,6 +1407,34 @@ async function saveAdminRegistration() {
         showToast('danger', '❌ Hubo un error al guardar el registro.');
     }
 }
+
+// ===================== 🔹 Mobile sidebar toggle helpers =====================
+function openMobileSidebar() {
+    const sb = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sb) sb.classList.add('open');
+    if (backdrop) backdrop.classList.add('visible');
+}
+
+function closeMobileSidebar() {
+    const sb = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sb) sb.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('visible');
+}
+
+document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'sidebarToggle') {
+        openMobileSidebar();
+    }
+});
+
+// Cerrar sidebar si se redimensiona a ancho de escritorio
+window.addEventListener('resize', function () {
+    if (window.innerWidth > 768) {
+        closeMobileSidebar();
+    }
+});
 
 async function deleteRegistration(id) {
   if (!confirm("¿Eliminar este registro?")) return;
