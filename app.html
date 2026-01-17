@@ -1199,30 +1199,7 @@
                 </div>
             </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header bg-success text-white">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                <strong class="me-auto">Éxito</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                Operación completada con éxito
-            </div>
-        </div>
-        
-        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header bg-danger text-white">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <strong class="me-auto">Error</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                Ha ocurrido un error
-            </div>
-        </div>
-    </div>
+    <!-- Toast Notifications (static markup removed - dynamic toasts used) -->
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1955,8 +1932,31 @@ function showRegistrationSuccess() {
     const form = document.getElementById('registrationForm');
     const success = document.getElementById('registrationSuccessScreen');
     const publicForm = document.getElementById('publicForm');
+
+    // Asegurar que el contenedor público esté visible
+    if (publicForm) {
+        publicForm.style.display = 'block';
+        publicForm.style.visibility = 'visible';
+        publicForm.style.pointerEvents = 'auto';
+    }
+
+    // Ocultar el formulario y mostrar la pantalla de éxito inmediatamente
     if (form) form.style.display = 'none';
-    if (success) success.style.display = 'block';
+    if (success) {
+        success.style.display = 'block';
+        success.style.zIndex = '31000';
+        success.style.opacity = '0';
+        success.style.transition = 'opacity 180ms ease, transform 180ms ease';
+        success.style.transform = 'translateY(6px)';
+        // force reflow
+        void success.offsetWidth;
+        success.style.opacity = '1';
+        success.style.transform = 'translateY(0)';
+        try {
+            success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (e) {}
+    }
+
     // En modo público asegurarnos de ocultar admin
     const adminPanel = document.getElementById('adminPanel');
     if (adminPanel) adminPanel.style.display = 'none';
