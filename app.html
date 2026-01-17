@@ -2079,6 +2079,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       console.error('❌ Error en migración:', err);
     }
   }
+
+  // Inicializar página después de configurar el modo
+  await initializePage();
 });
 
 // ===================== 🔹 Funciones de Análisis de Datos =====================
@@ -2736,7 +2739,10 @@ async function deleteEventFromLanding(eventId) {
 // Función para inicializar la página
 async function initializePage() {
     // No inicializar si estamos en modo de registro público
-    if (isPublicRegistrationMode) return;
+    if (isPublicRegistrationMode) {
+        console.log('🚫 initializePage() bloqueado - modo registro público activo');
+        return;
+    }
 
     try {
         // Cargar eventos y si hay un evento activo, cargar datos del mismo
@@ -2774,8 +2780,8 @@ async function initializePage() {
     }
 }
 
-// Cargar datos iniciales
-initializePage();
+// Cargar datos iniciales - MOVIDO DENTRO DE DOMContentLoaded
+// initializePage();
 
 // Iniciar auto-refresh automático
 startAutoRefresh();
