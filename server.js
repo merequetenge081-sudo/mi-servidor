@@ -54,6 +54,7 @@ const RegistrationSchema = new mongoose.Schema({
   localidad: { type: String, default: '' },
   registeredToVote: { type: Boolean, default: false },
   votingPlace: { type: String, default: '' },
+  votingTable: { type: String, default: '' },
   date: String,
   notifications: {
     emailSent: { type: Boolean, default: false },
@@ -528,6 +529,7 @@ app.get("/api/export/:type", async (req, res) => {
         "Localidad",
         "¿Inscrito para votar?",
         "Puesto de Votación",
+        "Nº Mesa",
         "Confirmado",
         "Confirmado Por",
         "Confirmado En",
@@ -538,7 +540,7 @@ app.get("/api/export/:type", async (req, res) => {
       rows = (data.registrations || []).map(r => {
         const lider = (data.leaders || []).find(l => String(l._id) === String(r.leaderId));
         
-        return [
+          return [
           formatFecha(r.date),
           r.firstName || "",
           r.lastName || "",
@@ -549,6 +551,7 @@ app.get("/api/export/:type", async (req, res) => {
           r.localidad || "",
           r.registeredToVote ? 'Sí' : 'No',
           r.votingPlace || "",
+          r.votingTable || "",
           r.confirmed ? 'Sí' : 'No',
           r.confirmedBy || "",
           r.confirmedAt ? formatFecha(r.confirmedAt) : "",
