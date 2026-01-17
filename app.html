@@ -2173,6 +2173,54 @@ function showToast(type, message) {
         console.error('showToast bootstrap error:', err);
         try { alert(message); } catch (e) { console.log(message); }
     }
+
+    // Además, crear un toast manual (fallback garantizado) para asegurar visibilidad
+    try {
+        let manualContainer = document.getElementById('manualToastContainer');
+        if (!manualContainer) {
+            manualContainer = document.createElement('div');
+            manualContainer.id = 'manualToastContainer';
+            manualContainer.style.position = 'fixed';
+            manualContainer.style.top = '20px';
+            manualContainer.style.right = '20px';
+            manualContainer.style.zIndex = '30000';
+            manualContainer.style.display = 'flex';
+            manualContainer.style.flexDirection = 'column';
+            manualContainer.style.gap = '8px';
+            document.body.appendChild(manualContainer);
+        }
+
+        const manual = document.createElement('div');
+        manual.className = 'manual-toast-item';
+        manual.style.minWidth = '220px';
+        manual.style.maxWidth = '380px';
+        manual.style.background = (type === 'success') ? '#198754' : '#dc3545';
+        manual.style.color = 'white';
+        manual.style.padding = '12px 14px';
+        manual.style.borderRadius = '8px';
+        manual.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+        manual.style.opacity = '0';
+        manual.style.transform = 'translateY(-6px)';
+        manual.style.transition = 'opacity 220ms ease, transform 220ms ease';
+        manual.textContent = message;
+
+        manualContainer.appendChild(manual);
+
+        // Forzar reflow para activar transición
+        void manual.offsetWidth;
+        manual.style.opacity = '1';
+        manual.style.transform = 'translateY(0)';
+
+        // Auto eliminar después de 5s
+        setTimeout(() => {
+            manual.style.opacity = '0';
+            manual.style.transform = 'translateY(-6px)';
+            setTimeout(() => { try { manual.remove(); } catch (e) {} }, 240);
+        }, 5000);
+    } catch (e) {
+        // no bloquear en caso de error
+        console.warn('manual toast error', e);
+    }
 }
 
 // Mostrar / ocultar el campo de puesto de votación en el formulario público
