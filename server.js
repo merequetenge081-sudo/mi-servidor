@@ -291,10 +291,11 @@ app.delete("/api/leaders/:id", async (req, res) => {
 
 // 🔹 Obtener registros (opcionalmente filtrar por eventId o phone)
 app.get("/api/registrations", async (req, res) => {
-  const { eventId, phone } = req.query;
+  const { eventId, phone, cedula } = req.query;
   const filter = {};
   if (eventId) filter.eventId = eventId;
   if (phone) filter.phone = phone;
+  if (cedula) filter.cedula = cedula;
   const regs = await Registration.find(filter);
   res.json(regs);
 });
@@ -323,6 +324,14 @@ app.post("/api/registrations", async (req, res) => {
     if (reg.registeredToVote === true || reg.registeredToVote === 'true') {
       if (!reg.votingPlace || String(reg.votingPlace).trim() === '') {
         return res.status(400).json({ error: 'Puesto de votación requerido cuando registeredToVote es verdadero' });
+      }
+    }
+
+    // Prevención de duplicados por cédula (mismo evento)
+    if (reg.cedula && String(reg.cedula).trim() !== '') {
+      const existing = await Registration.findOne({ cedula: reg.cedula, eventId: reg.eventId || '' });
+      if (existing) {
+        return res.status(400).json({ error: 'Ya existe un registro con esta cédula para este evento' });
       }
     }
 

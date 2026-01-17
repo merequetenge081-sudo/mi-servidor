@@ -918,11 +918,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="firstName" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="firstName" required>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="lastName" class="form-label">Apellido</label>
-                                <input type="text" class="form-control" id="lastName">
+                                <input type="text" class="form-control" id="lastName" name="lastName">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -931,12 +931,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email <small class="text-muted">(Opcional)</small></label>
-                            <input type="email" class="form-control" id="email">
+                            <input type="email" class="form-control" id="email" name="email">
                             <div class="form-text">No es necesario</div>
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Teléfono</label>
-                            <input type="tel" class="form-control" id="phone" required>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
                         </div>
                     </div>
                     
@@ -1857,8 +1857,9 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
   const leader = leaders.find(l => l.token === leaderToken);
   const leaderId = leader ? leader._id : null;
   
-  const formData = new FormData(this);
-  const data = Object.fromEntries(formData.entries());
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
     // Si seleccionó 'Otra' en localidad, obtener el texto especificado
     if (data.localidad === 'Otra') {
         data.localidad = document.getElementById('localidadOtra')?.value || '';
@@ -1866,21 +1867,43 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
     // Asegurar que el leaderId se asigne
     data.leaderId = leaderId;
-  
-  const res = await fetch(`${API_BASE}/registrations`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  });
-  
-  if (res.ok) {
-    showToast('success', 'Registro enviado con éxito');
-    this.reset();
-  } else {
-    showToast('danger', 'Error al enviar el registro');
-  }
+
+    // Verificación: evitar re-registro por cédula
+    try {
+        const cedula = data.cedula || '';
+        if (cedula) {
+            const checkUrl = `/api/registrations?cedula=${encodeURIComponent(cedula)}${activeEventId ? '&eventId=' + activeEventId : ''}`;
+            const checkRes = await fetch(checkUrl);
+            if (checkRes.ok) {
+                const existing = await checkRes.json();
+                if (existing.length > 0) {
+                    showToast('danger', '❌ Ya existe un registro con esa cédula.');
+                    return;
+                }
+            }
+        }
+    } catch (err) {
+        console.warn('No se pudo verificar cédula, continuando:', err);
+    }
+
+    const res = await fetch(`${API_BASE}/registrations`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        showToast('success', '✅ Registro guardado correctamente');
+        this.reset();
+        // actualizar dashboard y tablas
+        await loadRegistrations();
+        await updateDashboard();
+    } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
+    }
 });
 
 // ===================== 🔹 Funciones de QR y enlace =====================
