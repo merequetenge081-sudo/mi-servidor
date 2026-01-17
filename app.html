@@ -2016,20 +2016,26 @@ async function sendNotification(registrationId) {
     }
 }
 
+// Variable global para controlar el modo
+let isPublicRegistrationMode = false;
+
 // Detectar si es una vista pública del formulario
 window.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const leaderToken = urlParams.get("leader");
 
   if (leaderToken) {
+    isPublicRegistrationMode = true;
     console.log('🎯 Modo registro público activado para líder:', leaderToken);
 
-    // Ocultar inmediatamente landing page y admin panel
-    document.getElementById("landingPage").style.display = "none";
-    document.getElementById("adminPanel").style.display = "none";
+    // Forzar ocultar landing page y admin panel inmediatamente
+    const landingPage = document.getElementById("landingPage");
+    const adminPanel = document.getElementById("adminPanel");
+    const publicForm = document.getElementById("publicForm");
 
-    // Mostrar formulario público
-    document.getElementById("publicForm").style.display = "block";
+    if (landingPage) landingPage.style.display = "none";
+    if (adminPanel) adminPanel.style.display = "none";
+    if (publicForm) publicForm.style.display = "block";
 
     // Ocultar cualquier elemento de navegación admin
     document.querySelectorAll('.sidebar, [onclick="showAdminPanel()"], [onclick*="goToCreateEvent"], [onclick*="goToViewEvents"]').forEach(el => {
@@ -2046,6 +2052,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }, 100);
 
   } else {
+    isPublicRegistrationMode = false;
     console.log('🏠 Modo landing page normal');
     // Mostrar landing page solo en modo normal
     document.getElementById("landingPage").style.display = "flex";
@@ -2512,16 +2519,19 @@ function toggleLeadersPerformance() {
 
 // ===================== 🔹 Landing Page Functions =====================
 function changeEvent() {
+    // No hacer nada si estamos en modo de registro público
+    if (isPublicRegistrationMode) return;
+
     // Limpiar active event y volver a landing
     localStorage.removeItem('activeEventId');
     activeEventId = null;
     activeEvent = null;
-    
+
     document.getElementById('landingPage').style.display = 'flex';
     document.getElementById('viewEventsPage').style.display = 'none';
     document.getElementById('createEventPage').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'none';
-    
+
     showToast('info', 'Selecciona un evento para continuar');
 }
 
@@ -2539,12 +2549,15 @@ async function refreshEventData() {
 }
 
 function goToCreateEvent() {
+    // No hacer nada si estamos en modo de registro público
+    if (isPublicRegistrationMode) return;
+
     // Mostrar página de crear evento
     document.getElementById('landingPage').style.display = 'none';
     document.getElementById('viewEventsPage').style.display = 'none';
     document.getElementById('createEventPage').style.display = 'block';
     document.getElementById('adminPanel').style.display = 'none';
-    
+
     // Limpiar formulario
     const form = document.getElementById('createEventFormPage');
     if (form) form.reset();
@@ -2587,16 +2600,22 @@ async function saveEventFromPage(event) {
 }
 
 function goToViewEvents() {
+    // No hacer nada si estamos en modo de registro público
+    if (isPublicRegistrationMode) return;
+
     // Cargar y mostrar lista de eventos
     document.getElementById('landingPage').style.display = 'none';
     document.getElementById('viewEventsPage').style.display = 'block';
     document.getElementById('createEventPage').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'none';
-    
+
     loadEventsForSelection();
 }
 
 function backToLanding() {
+    // No hacer nada si estamos en modo de registro público
+    if (isPublicRegistrationMode) return;
+
     document.getElementById('landingPage').style.display = 'flex';
     document.getElementById('viewEventsPage').style.display = 'none';
     document.getElementById('createEventPage').style.display = 'none';
@@ -2661,6 +2680,9 @@ async function loadEventsForSelection() {
 }
 
 async function selectEventFromLanding(eventId) {
+    // No hacer nada si estamos en modo de registro público
+    if (isPublicRegistrationMode) return;
+
     try {
         localStorage.setItem('activeEventId', eventId);
         activeEventId = eventId;
@@ -2713,6 +2735,9 @@ async function deleteEventFromLanding(eventId) {
 
 // Función para inicializar la página
 async function initializePage() {
+    // No inicializar si estamos en modo de registro público
+    if (isPublicRegistrationMode) return;
+
     try {
         // Cargar eventos y si hay un evento activo, cargar datos del mismo
         await loadEvents();
