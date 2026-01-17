@@ -263,7 +263,7 @@
 </head>
 <body>
     <!-- Landing Page (Crear/Ver Eventos) -->
-    <div id="landingPage" style="display: flex; align-items: center; justify-content: center; height: 100vh; width: 100vw; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); overflow: hidden; position: fixed; top: 0; left: 0; z-index: 9000;">
+    <div id="landingPage" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); overflow: hidden; position: fixed; top: 0; left: 0; z-index: 9000;">
         <div style="width: 100%; max-width: 900px; text-align: center; padding: 2rem;">
             <h1 style="font-size: 3.5rem; font-weight: 700; color: white; margin-bottom: 1rem;">
                 <i class="bi bi-calendar-event" style="margin-right: 0.5rem;"></i>Red Social y Política
@@ -2022,53 +2022,43 @@ window.addEventListener("DOMContentLoaded", async () => {
   const leaderToken = urlParams.get("leader");
 
   if (leaderToken) {
-        // Ocultar todo el panel de administración y landing
-        const adminPanel = document.getElementById("adminPanel");
-        if (adminPanel) adminPanel.style.display = "none";
-        const landing = document.getElementById("landingPage");
-        if (landing) landing.style.display = "none";
+    console.log('🎯 Modo registro público activado para líder:', leaderToken);
 
-        // Ocultar secciones internas por seguridad visual
-        const hideIds = ["dashboardSection", "leadersSection", "registrationsSection"];
-        hideIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = "none";
-        });
+    // Ocultar inmediatamente landing page y admin panel
+    document.getElementById("landingPage").style.display = "none";
+    document.getElementById("adminPanel").style.display = "none";
 
-        // Ocultar botones/links que vuelven al panel admin
-        document.querySelectorAll('[onclick="showAdminPanel()"], .sidebar').forEach(el => {
-            el.style.display = 'none';
-        });
+    // Mostrar formulario público
+    document.getElementById("publicForm").style.display = "block";
 
-        // Mostrar solo el formulario público
-        document.getElementById("publicForm").style.display = "block";
+    // Ocultar cualquier elemento de navegación admin
+    document.querySelectorAll('.sidebar, [onclick="showAdminPanel()"], [onclick*="goToCreateEvent"], [onclick*="goToViewEvents"]').forEach(el => {
+      el.style.display = 'none';
+    });
 
-        // Ocultar opciones de crear/ver eventos para la vista pública del líder
-        document.querySelectorAll('[onclick*="goToCreateEvent"], [onclick*="goToViewEvents"], button[onclick*="goToCreateEvent"], button[onclick*="goToViewEvents"]').forEach(el => {
-            el.style.display = 'none';
-        });
+    // Auto-enfocar el primer campo del formulario
+    setTimeout(() => {
+      const firstInput = document.getElementById('firstName');
+      if (firstInput) {
+        firstInput.focus();
+        firstInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
 
-        // Auto-enfocar el primer campo del formulario para mejor UX
-        const firstInput = document.getElementById('firstName');
-        if (firstInput) {
-            setTimeout(() => {
-                firstInput.focus();
-                try { window.scrollTo({ top: firstInput.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' }); } catch(e){}
-            }, 50);
-        }
-
-        // Guardar el token por si se necesita (no expone panel admin)
-        localStorage.setItem("publicLeaderToken", leaderToken);
   } else {
+    console.log('🏠 Modo landing page normal');
+    // Mostrar landing page solo en modo normal
+    document.getElementById("landingPage").style.display = "flex";
+
     // Realizar migración automática al cargar la página
     try {
       console.log('🔄 Iniciando migración automática de datos...');
       const migrateRes = await fetch('/api/migrate', { method: 'POST' });
       const migrateData = await migrateRes.json();
-      
+
       if (migrateData.success) {
         console.log(`✅ Migración completada: ${migrateData.migratedLeaders} líderes, ${migrateData.migratedRegistrations} registros`);
-        
+
         // Recargar datos después de migrar
         setTimeout(() => {
           if (activeEventId) {
