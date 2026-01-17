@@ -278,6 +278,62 @@
             display: block !important;
             visibility: visible !important;
         }
+        /* Responsive adjustments for mobile devices */
+        /* Make manual toasts more accessible on small screens and avoid covering content */
+        #manualToastContainer {
+            /* default set by JS; these CSS rules ensure better mobile placement */
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none; /* allow clicks to pass through gaps */
+        }
+
+        .manual-toast-item {
+            pointer-events: auto;
+        }
+
+        @media (max-width: 576px) {
+            /* On small devices place toasts near the bottom and widen them */
+            #manualToastContainer {
+                left: 12px !important;
+                right: 12px !important;
+                top: auto !important;
+                bottom: 12px !important;
+                align-items: stretch;
+                z-index: 40000;
+            }
+
+            .manual-toast-item {
+                min-width: 0 !important;
+                max-width: none !important;
+                width: 100% !important;
+                border-radius: 10px !important;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.14) !important;
+                padding: 10px 12px !important;
+            }
+
+            .manual-toast-item .bi {
+                font-size: 18px !important;
+            }
+
+            /* Success screen: reduce padding and stack buttons */
+            #registrationSuccessScreen {
+                padding: 1rem !important;
+            }
+
+            #registrationSuccessScreen > div {
+                padding: 1rem !important;
+            }
+
+            #registrationSuccessScreen .btn {
+                width: 100% !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            #registrationSuccessScreen .btn + .btn {
+                margin-left: 0 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2093,42 +2149,56 @@ async function registerPerson() {
             return;
         }
 
-        // Validación: verificar duplicados por teléfono
-        try {
-            const checkRes = await fetch(`/api/registrations?phone=${encodeURIComponent(phone)}`);
-            if (checkRes.ok) {
-                const existingRegs = await checkRes.json();
-                if (existingRegs.length > 0) {
-                    showToast('danger', '❌ Este número de teléfono ya está registrado en el sistema. No se permiten registros duplicados.');
-                    return;
+        // Optimistic UX: mostrar éxito inmediatamente y realizar verificación + POST en background.
+        showToast('success', 'Registro guardado');
+        showRegistrationSuccess();
+        try { document.getElementById('registrationForm').reset(); } catch (e) {}
+
+        // Ejecutar validaciones y el POST en background. Si falla algo, revertimos la UI.
+        (async () => {
+            // Validación: verificar duplicados por teléfono
+            try {
+                const checkRes = await fetch(`/api/registrations?phone=${encodeURIComponent(phone)}`);
+                if (checkRes.ok) {
+                    const existingRegs = await checkRes.json();
+                    if (existingRegs.length > 0) {
+                        resetPublicForm();
+                        showToast('danger', '❌ Este número de teléfono ya está registrado en el sistema. No se permiten registros duplicados.');
+                        return;
+                    }
                 }
+            } catch (checkErr) {
+                console.error('Error verificando duplicados (continuando):', checkErr);
+                // Continuar con el registro si falla la verificación
             }
-        } catch (checkErr) {
-            console.error('Error verificando duplicados:', checkErr);
-            // Continuar con el registro si falla la verificación
-        }
 
-        const res = await fetch('/api/registrations', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ leaderId, leaderToken, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace })
-        });
+            // Enviar al backend
+            try {
+                const res = await fetch('/api/registrations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ leaderId, leaderToken, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace })
+                });
 
-        if (res.ok) {
-            const result = await res.json();
-            showToast('success', 'Registro guardado');
-            // Mostrar pantalla de éxito inmediatamente
-            showRegistrationSuccess();
-            // Limpiar formulario y actualizar dashboard en background
-            try { document.getElementById('registrationForm').reset(); } catch (e) {}
-            (async () => { try { await updateDashboard(); } catch(e){ console.warn(e); } })();
-        } else {
-            const errorData = await res.json().catch(() => ({}));
-            showToast('danger', `❌ Error al registrar: ${errorData.error || 'Error desconocido'}`);
-        }
+                if (res.ok) {
+                    try { await updateDashboard(); } catch (e) { console.warn(e); }
+                    // Nothing else to do; success already shown optimistically.
+                } else {
+                    const errorData = await res.json().catch(() => ({}));
+                    resetPublicForm();
+                    showToast('danger', `❌ Error al registrar: ${errorData.error || 'Error desconocido'}`);
+                }
+            } catch (postErr) {
+                console.error('Error en POST registerPerson:', postErr);
+                resetPublicForm();
+                showToast('danger', '❌ Error al registrar la persona (problema de red).');
+            }
+        })();
+
     } catch (err) {
         console.error('Error registerPerson:', err);
-        alert('❌ Error al registrar la persona');
+        resetPublicForm();
+        showToast('danger', '❌ Error al procesar el registro');
     }
 }
 
