@@ -728,6 +728,7 @@
                                         <th>Localidad</th>
                                         <th>¿Votante?</th>
                                         <th>Puesto Votación</th>
+                                        <th>Nº Mesa</th>
                                         <th>Confirmado</th>
                                         <th>Acción</th>
                                     </tr>
@@ -1095,6 +1096,10 @@
                         <div class="mb-3" id="votingPlaceGroup" style="display:none;">
                             <label for="votingPlace" class="form-label">Puesto de Votación</label>
                             <input type="text" class="form-control" id="votingPlace" name="votingPlace" placeholder="Nombre del puesto de votación">
+                            <div class="mt-2">
+                                <label for="votingTable" class="form-label">Número de mesa</label>
+                                <input type="text" class="form-control" id="votingTable" name="votingTable" placeholder="Número de mesa (ej. 023)">
+                            </div>
                             <div class="form-text">No estás seguro? <a href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank" rel="noopener noreferrer">¿Dónde voto?</a></div>
                         </div>
                     </div>
@@ -1273,6 +1278,10 @@
                     <div class="mb-3" id="adminVotingPlaceGroup" style="display:none;">
                         <label class="form-label">Puesto de Votación</label>
                         <input type="text" class="form-control" id="adminVotingPlace" name="adminVotingPlace" placeholder="Nombre del puesto de votación">
+                        <div class="mt-2">
+                            <label for="adminVotingTable" class="form-label">Número de mesa</label>
+                            <input type="text" class="form-control" id="adminVotingTable" name="adminVotingTable" placeholder="Número de mesa (ej. 023)">
+                        </div>
                         <div class="form-text">Buscar: <a href="https://www.google.com/search?q=dónde+voto" target="_blank">¿Dónde voto?</a></div>
                     </div>
         </form>
@@ -1358,6 +1367,7 @@ async function saveAdminRegistration() {
         const adminRegRadio = document.querySelector('input[name="adminRegisteredToVote"]:checked');
         const adminRegisteredToVote = adminRegRadio ? (adminRegRadio.value === 'true') : false;
         const adminVotingPlace = document.getElementById('adminVotingPlace')?.value || '';
+        const adminVotingTable = document.getElementById('adminVotingTable')?.value || '';
 
         if (adminLocalidad) reg.localidad = adminLocalidad;
         reg.registeredToVote = adminRegisteredToVote;
@@ -1366,6 +1376,7 @@ async function saveAdminRegistration() {
             return;
         }
         if (adminVotingPlace) reg.votingPlace = adminVotingPlace;
+        if (adminVotingTable) reg.votingTable = adminVotingTable;
 
     try {
         // Verificar duplicados por cédula antes de enviar
@@ -1792,6 +1803,7 @@ function updateRegistrationsTable() {
         const localidad = reg.localidad || '-';
         const votante = reg.registeredToVote ? 'Sí' : 'No';
         const votingPlace = reg.votingPlace || '-';
+        const votingTable = reg.votingTable || '-';
 
         return `
             <tr>
@@ -1802,6 +1814,7 @@ function updateRegistrationsTable() {
                 <td>${localidad}</td>
                 <td>${votante}</td>
                 <td>${votingPlace}</td>
+                <td>${votingTable}</td>
                 <td>
                     ${confirmed ? `
                         <div>
@@ -2214,6 +2227,7 @@ async function registerPerson() {
         const regRadio = document.querySelector('input[name="registeredToVote"]:checked');
         const registeredToVote = regRadio ? (regRadio.value === 'true') : false;
         const votingPlace = document.getElementById('votingPlace') ? document.getElementById('votingPlace').value : '';
+        const votingTable = document.getElementById('votingTable') ? document.getElementById('votingTable').value : '';
 
         if (!leaderId && !leaderToken) {
             showToast('danger', 'No se encontró un líder asociado para este registro.');
@@ -2254,7 +2268,7 @@ async function registerPerson() {
                 const res = await fetch('/api/registrations', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ leaderId, leaderToken, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace })
+                    body: JSON.stringify({ leaderId, leaderToken, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace, votingTable })
                 });
 
                 if (res.ok) {
