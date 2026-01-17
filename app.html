@@ -278,6 +278,31 @@
             display: block !important;
             visibility: visible !important;
         }
+
+        /* Mejoras de usabilidad táctil en móviles */
+        @media (max-width: 576px) {
+            .form-control {
+                padding: 0.75rem 0.85rem;
+                font-size: 1rem;
+                min-height: 44px;
+            }
+
+            .form-label { font-size: 0.95rem; }
+
+            .form-section { margin-bottom: 1rem; }
+
+            .btn {
+                padding: 0.65rem 0.9rem;
+                font-size: 1rem;
+                border-radius: 10px;
+            }
+
+            /* Botones principales a ancho completo para facilidad táctil */
+            .public-form .btn, .d-grid .btn { width: 100% !important; }
+
+            /* Inputs de formularios en admin también más altos */
+            #adminRegistrationForm .form-control { min-height: 44px; }
+        }
         /* Mobile sidebar / top bar */
         #mobileTopBar {
             display: none;
@@ -1311,7 +1336,7 @@ async function saveAdminRegistration() {
     const phone = document.getElementById("adminPhone")?.value || '';
 
     if (!name || !leaderId) {
-        alert("Por favor completa todos los campos antes de guardar.");
+        showToast('danger', 'Por favor completa todos los campos antes de guardar.');
         return;
     }
 
@@ -1337,7 +1362,7 @@ async function saveAdminRegistration() {
         if (adminLocalidad) reg.localidad = adminLocalidad;
         reg.registeredToVote = adminRegisteredToVote;
         if (adminRegisteredToVote && !adminVotingPlace) {
-            alert('Si indicó que está inscrito para votar, por favor indique el puesto de votación.');
+            showToast('danger', 'Si indicó que está inscrito para votar, por favor indique el puesto de votación.');
             return;
         }
         if (adminVotingPlace) reg.votingPlace = adminVotingPlace;
@@ -1440,9 +1465,9 @@ async function deleteRegistration(id) {
   if (!confirm("¿Eliminar este registro?")) return;
   try {
     const response = await fetch(`/api/registrations/${id}`, { method: "DELETE" });
-    if (response.ok) {
-      console.log(`✅ Registro ${id} eliminado`);
-      alert("✅ Registro eliminado");
+        if (response.ok) {
+            console.log(`✅ Registro ${id} eliminado`);
+            showToast('success', '✅ Registro eliminado');
       
       // Recargar datos del servidor para asegurar sincronización
       await loadRegistrations();
@@ -1460,19 +1485,17 @@ async function deleteRegistration(id) {
       }
       
       showToast('success', '✅ Registro eliminado correctamente');
-    } else {
-      alert("❌ Error al eliminar el registro");
-      showToast('danger', '❌ Error al eliminar el registro');
+        } else {
+            showToast('danger', '❌ Error al eliminar el registro');
     }
   } catch (err) {
     console.error('Error al eliminar registro:', err);
-    alert("❌ Error al eliminar el registro");
-    showToast('danger', '❌ Error al eliminar el registro');
+        showToast('danger', '❌ Error al eliminar el registro');
   }
 }
 
 function editRegistration(id) {
-  alert("✏️ Función de edición pendiente — aquí puedes abrir un modal con los datos.");
+    showToast('info', '✏️ Función de edición pendiente — aquí puedes abrir un modal con los datos.');
 }
 
 // 🔹 Define primero la función updateDashboard (solicitud del usuario)
@@ -2313,7 +2336,12 @@ function showToast(type, message) {
         manual.dataset.msg = message;
         manual.style.minWidth = '240px';
         manual.style.maxWidth = '420px';
-        manual.style.background = 'linear-gradient(90deg,' + (type === 'success' ? '#2dd4bf' : '#ff6b6b') + ', ' + (type === 'success' ? '#198754' : '#dc3545') + ')';
+        // Color mapping for toast types
+        let bgStart = '#ff6b6b', bgEnd = '#dc3545';
+        if (type === 'success') { bgStart = '#2dd4bf'; bgEnd = '#198754'; }
+        else if (type === 'warning') { bgStart = '#f6c84c'; bgEnd = '#f59e0b'; }
+        else if (type === 'info') { bgStart = '#38bdf8'; bgEnd = '#0ea5e9'; }
+        manual.style.background = 'linear-gradient(90deg,' + bgStart + ', ' + bgEnd + ')';
         manual.style.color = 'white';
         manual.style.padding = '12px 14px';
         manual.style.borderRadius = '12px';
@@ -2329,7 +2357,11 @@ function showToast(type, message) {
         inner.style.gap = '10px';
 
         const icon = document.createElement('i');
-        icon.className = 'bi ' + (type === 'success' ? 'bi-check-square-fill' : 'bi-exclamation-triangle-fill');
+        let iconClass = 'bi-exclamation-triangle-fill';
+        if (type === 'success') iconClass = 'bi-check-square-fill';
+        else if (type === 'warning') iconClass = 'bi-exclamation-diamond-fill';
+        else if (type === 'info') iconClass = 'bi-info-circle-fill';
+        icon.className = 'bi ' + iconClass;
         icon.style.fontSize = '20px';
         icon.style.opacity = '0.95';
 
@@ -2337,7 +2369,7 @@ function showToast(type, message) {
         const title = document.createElement('div');
         title.style.fontWeight = '700';
         title.style.fontSize = '14px';
-        title.textContent = (type === 'success') ? '¡Listo!' : 'Atención';
+        title.textContent = (type === 'success') ? '¡Listo!' : (type === 'warning' ? 'Aviso' : (type === 'info' ? 'Info' : 'Atención'));
         const text = document.createElement('div');
         text.style.fontSize = '13px';
         text.textContent = message;
