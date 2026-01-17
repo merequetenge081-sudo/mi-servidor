@@ -912,7 +912,15 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef;"></div>
+                                                        <div id="bogotaMapWrapper" style="position:relative;">
+                                                            <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef;"></div>
+                                                            <div id="bogotaMapSpinner" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:20000; display:flex; align-items:center; justify-content:center;">
+                                                                <div style="text-align:center;">
+                                                                    <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;"></div>
+                                                                    <div class="mt-2">Cargando mapa...</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                 <div id="bogotaMapLegend" style="margin-top:10px;"></div>
                             </div>
                         </div>
@@ -1473,22 +1481,32 @@ let _bogotaLayer = null;
 let _bogotaGeo = null;
 
 function getLocalidadKey(feature) {
-    // Try common property names
-    return (feature.properties && (feature.properties.NOMBRE || feature.properties.nombre || feature.properties.NAME || feature.properties.name || feature.properties.NOM_LOC || feature.properties.NOM_POBL)) || '';
+    // Try common property names that might contain the locality name
+    if (!feature || !feature.properties) return '';
+    const props = feature.properties;
+    const keys = ['NOMBRE','nombre','NAME','name','NOM_LOC','NOM_POBL','LOCALIDAD','localidad','LOCAL','NOM_LOCALI','NOMLOCAL','DPTO','MUNICIPIO','NOM_MUN'];
+    for (const k of keys) {
+        if (props[k] && String(props[k]).trim()) return String(props[k]).trim();
+    }
+    return '';
 }
 
 function computeLocalidadStats() {
     // registrations array is global
     const counts = {};
+    // Normalizer: strip diacritics and lowercase for stable matching
+    const norm = s => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
     registrations.forEach(r => {
-        const loc = (r.localidad || '').trim() || 'Sin Localidad';
-        const key = loc;
-        counts[key] = (counts[key] || 0) + 1;
+        const raw = (r.localidad || '').trim() || 'Sin Localidad';
+        const k = norm(raw) || 'sin localidad';
+        if (!counts[k]) counts[k] = { raw, count: 0 };
+        counts[k].count += 1;
     });
     const total = registrations.length || 0;
     const stats = {};
     for (const k of Object.keys(counts)) {
-        stats[k] = { count: counts[k], pct: total ? (counts[k] / total) * 100 : 0 };
+        const c = counts[k].count;
+        stats[k] = { count: c, pct: total ? (c / total) * 100 : 0, label: counts[k].raw };
     }
     return { stats, total };
 }
@@ -1500,6 +1518,7 @@ async function loadBogotaMapFromInput() {
         return;
     }
     try {
+        document.getElementById('bogotaMapSpinner').style.display = 'flex';
         const res = await fetch(url);
         if (!res.ok) throw new Error('No se pudo descargar GeoJSON');
         _bogotaGeo = await res.json();
@@ -1509,19 +1528,24 @@ async function loadBogotaMapFromInput() {
         console.error('Error cargando GeoJSON:', err);
         showToast('danger', 'Error cargando GeoJSON: ' + err.message);
     }
+    finally {
+        try { document.getElementById('bogotaMapSpinner').style.display = 'none'; } catch(e){}
+    }
 }
 
 async function ensureBogotaGeo() {
     if (_bogotaGeo) return _bogotaGeo;
     // Try local path first
     const localPath = '/bogota_localidades.geojson';
+    const altLocal = '/MANZANA.geojson';
     try {
         const r = await fetch(localPath);
-        if (r.ok) {
-            _bogotaGeo = await r.json();
-            return _bogotaGeo;
-        }
-    } catch(e) { /* ignore */ }
+        if (r.ok) { _bogotaGeo = await r.json(); return _bogotaGeo; }
+    } catch(e) {}
+    try {
+        const r2 = await fetch(altLocal);
+        if (r2.ok) { _bogotaGeo = await r2.json(); return _bogotaGeo; }
+    } catch(e) {}
     // Otherwise ask user to paste URL
     showToast('info', 'No se encontró GeoJSON local. Pega una URL en el campo de arriba.');
     return null;
@@ -1538,7 +1562,10 @@ function getColorForPct(pct) {
 }
 
 function styleFeature(feature) {
-    const key = (getLocalidadKey(feature) || '').trim();
+    // Determine the locality key from feature; normalize for match
+    const rawKey = getLocalidadKey(feature) || '';
+    const norm = s => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+    const key = norm(rawKey);
     const { stats } = computeLocalidadStats();
     const s = stats[key] || { pct: 0 };
     return {
@@ -1552,9 +1579,11 @@ function styleFeature(feature) {
 }
 
 function onEachFeature(feature, layer) {
-    const name = getLocalidadKey(feature) || 'Sin nombre';
+    const nameRaw = getLocalidadKey(feature) || '';
+    const norm = s => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+    const name = nameRaw || 'Sin nombre';
     const { stats, total } = computeLocalidadStats();
-    const s = stats[name] || { count: 0, pct: 0 };
+    const s = stats[norm(nameRaw)] || { count: 0, pct: 0 };
     layer.bindPopup(`<strong>${name}</strong><br/>Registros: ${s.count || 0}<br/>Porcentaje: ${s.pct ? s.pct.toFixed(2) : '0.00'}%`);
 }
 
@@ -1602,7 +1631,7 @@ async function renderLocalityMap() {
     // Also list top localidades
     const topList = Object.keys(stats).map(k => ({ k, ...stats[k] })).sort((a,b)=>b.count-a.count).slice(0,10);
     const topHtml = ['<div class="mt-3"><strong>Top localidades</strong><ol style="padding-left:18px;">'];
-    topList.forEach(t=> topHtml.push(`<li>${t.k} — ${t.count} (${t.pct.toFixed(2)}%)</li>`));
+    topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} — ${t.count} (${t.pct.toFixed(2)}%)</li>`));
     topHtml.push('</ol></div>');
     legendEl.innerHTML += topHtml.join('');
 }
