@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Leaflet CSS/JS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2jGqk3VQm0s8Hf3Kqk2tYtS3bQ0p2vR3R0Qv0yg=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-8b+Q4yV0Zr5n2k1q3P0I4y9KX2s3c9Zb4qv3y5g6h7k=" crossorigin=""></script>
     <!-- Excel Export -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -896,6 +899,26 @@
                     </div>
                 </div>
 
+                <!-- Mapa de Bogotá por localidades -->
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Mapa - Registros por Localidad (Bogotá)</h5>
+                                <div>
+                                    <input id="geojsonUrlInput" class="form-control form-control-sm d-inline-block" style="width:320px;" placeholder="URL GeoJSON (opcional)" />
+                                    <button class="btn btn-sm btn-primary ms-2" onclick="loadBogotaMapFromInput()">Cargar mapa</button>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="renderLocalityMap()">Refrescar datos</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef;"></div>
+                                <div id="bogotaMapLegend" style="margin-top:10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Registros del Líder Seleccionado -->
                 <div class="row">
                     <div class="col-md-12 mb-4">
@@ -1442,6 +1465,146 @@ async function saveAdminRegistration() {
         console.error('Error guardando registro admin:', err);
         showToast('danger', '❌ Hubo un error al guardar el registro.');
     }
+}
+
+// ===================== 🔹 Map: Bogotá localidades choropleth =====================
+let _bogotaMap = null;
+let _bogotaLayer = null;
+let _bogotaGeo = null;
+
+function getLocalidadKey(feature) {
+    // Try common property names
+    return (feature.properties && (feature.properties.NOMBRE || feature.properties.nombre || feature.properties.NAME || feature.properties.name || feature.properties.NOM_LOC || feature.properties.NOM_POBL)) || '';
+}
+
+function computeLocalidadStats() {
+    // registrations array is global
+    const counts = {};
+    registrations.forEach(r => {
+        const loc = (r.localidad || '').trim() || 'Sin Localidad';
+        const key = loc;
+        counts[key] = (counts[key] || 0) + 1;
+    });
+    const total = registrations.length || 0;
+    const stats = {};
+    for (const k of Object.keys(counts)) {
+        stats[k] = { count: counts[k], pct: total ? (counts[k] / total) * 100 : 0 };
+    }
+    return { stats, total };
+}
+
+async function loadBogotaMapFromInput() {
+    const url = document.getElementById('geojsonUrlInput').value.trim();
+    if (!url) {
+        showToast('warning', 'Pega la URL del GeoJSON o coloca el archivo en `public/bogota_localidades.geojson`');
+        return;
+    }
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('No se pudo descargar GeoJSON');
+        _bogotaGeo = await res.json();
+        renderLocalityMap();
+        showToast('success', 'GeoJSON cargado');
+    } catch (err) {
+        console.error('Error cargando GeoJSON:', err);
+        showToast('danger', 'Error cargando GeoJSON: ' + err.message);
+    }
+}
+
+async function ensureBogotaGeo() {
+    if (_bogotaGeo) return _bogotaGeo;
+    // Try local path first
+    const localPath = '/bogota_localidades.geojson';
+    try {
+        const r = await fetch(localPath);
+        if (r.ok) {
+            _bogotaGeo = await r.json();
+            return _bogotaGeo;
+        }
+    } catch(e) { /* ignore */ }
+    // Otherwise ask user to paste URL
+    showToast('info', 'No se encontró GeoJSON local. Pega una URL en el campo de arriba.');
+    return null;
+}
+
+function getColorForPct(pct) {
+    // Green (low) -> Yellow -> Red (high)
+    if (pct === 0) return '#f0f0f0';
+    if (pct < 5) return '#d4f7d9';
+    if (pct < 10) return '#a8e6a3';
+    if (pct < 20) return '#ffe98a';
+    if (pct < 40) return '#ffb86b';
+    return '#ff6b6b';
+}
+
+function styleFeature(feature) {
+    const key = (getLocalidadKey(feature) || '').trim();
+    const { stats } = computeLocalidadStats();
+    const s = stats[key] || { pct: 0 };
+    return {
+        weight: 1,
+        opacity: 1,
+        color: '#444',
+        dashArray: '0',
+        fillOpacity: 0.85,
+        fillColor: getColorForPct(s.pct)
+    };
+}
+
+function onEachFeature(feature, layer) {
+    const name = getLocalidadKey(feature) || 'Sin nombre';
+    const { stats, total } = computeLocalidadStats();
+    const s = stats[name] || { count: 0, pct: 0 };
+    layer.bindPopup(`<strong>${name}</strong><br/>Registros: ${s.count || 0}<br/>Porcentaje: ${s.pct ? s.pct.toFixed(2) : '0.00'}%`);
+}
+
+async function renderLocalityMap() {
+    const geo = await ensureBogotaGeo();
+    if (!geo) return;
+    // compute stats to prepare legend
+    const { stats, total } = computeLocalidadStats();
+
+    if (!_bogotaMap) {
+        _bogotaMap = L.map('bogotaMap', { scrollWheelZoom: false }).setView([4.6486, -74.0826], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(_bogotaMap);
+    }
+
+    if (_bogotaLayer) {
+        _bogotaMap.removeLayer(_bogotaLayer);
+        _bogotaLayer = null;
+    }
+
+    _bogotaLayer = L.geoJSON(geo, {
+        style: styleFeature,
+        onEachFeature: onEachFeature
+    }).addTo(_bogotaMap);
+
+    // fit bounds
+    try { _bogotaMap.fitBounds(_bogotaLayer.getBounds(), { padding: [20,20] }); } catch(e) {}
+
+    // Legend
+    const legendEl = document.getElementById('bogotaMapLegend');
+    legendEl.innerHTML = '';
+    const legendHtml = [
+        '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">',
+        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#f0f0f0;border:1px solid #ccc"></span> 0%</div>',
+        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#d4f7d9"></span> <5%</div>',
+        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#a8e6a3"></span> 5-10%</div>',
+        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ffe98a"></span> 10-20%</div>',
+        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ffb86b"></span> 20-40%</div>',
+        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ff6b6b"></span> >40%</div>',
+        '</div>'
+    ].join(' ');
+    legendEl.innerHTML = legendHtml;
+
+    // Also list top localidades
+    const topList = Object.keys(stats).map(k => ({ k, ...stats[k] })).sort((a,b)=>b.count-a.count).slice(0,10);
+    const topHtml = ['<div class="mt-3"><strong>Top localidades</strong><ol style="padding-left:18px;">'];
+    topList.forEach(t=> topHtml.push(`<li>${t.k} — ${t.count} (${t.pct.toFixed(2)}%)</li>`));
+    topHtml.push('</ol></div>');
+    legendEl.innerHTML += topHtml.join('');
 }
 
 // ===================== 🔹 Mobile sidebar toggle helpers =====================
