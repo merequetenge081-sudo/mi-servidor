@@ -616,6 +616,7 @@
                                     <tr>
                                         <th>Fecha</th>
                                         <th>Nombre</th>
+                                        <th>Cédula</th>
                                         <th>Líder</th>
                                         <th>Localidad</th>
                                         <th>¿Votante?</th>
@@ -926,7 +927,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="cedula" class="form-label">Cédula</label>
-                            <input type="text" class="form-control" id="cedula">
+                            <input type="text" class="form-control" id="cedula" name="cedula">
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email <small class="text-muted">(Opcional)</small></label>
@@ -942,8 +943,32 @@
                     <div class="form-section">
                         <div class="form-section-title">Información Adicional</div>
                         <div class="mb-3">
-                            <label for="localidad" class="form-label">Localidad</label>
-                            <input type="text" class="form-control" id="localidad" name="localidad" placeholder="Barrio / Localidad" required>
+                            <label for="localidadSelect" class="form-label">Localidad</label>
+                            <select id="localidadSelect" name="localidad" class="form-select" onchange="toggleLocalidadOther(this.value)" required>
+                                <option value="">-- Seleccione Localidad --</option>
+                                <option>Usaquén</option>
+                                <option>Chapinero</option>
+                                <option>Santa Fe</option>
+                                <option>San Cristóbal</option>
+                                <option>Usme</option>
+                                <option>Tunjuelito</option>
+                                <option>Bosa</option>
+                                <option>Kennedy</option>
+                                <option>Fontibón</option>
+                                <option>Engativá</option>
+                                <option>Suba</option>
+                                <option>Barrios Unidos</option>
+                                <option>Teusaquillo</option>
+                                <option>Los Mártires</option>
+                                <option>Antonio Nariño</option>
+                                <option>Puente Aranda</option>
+                                <option>La Candelaria</option>
+                                <option>Rafael Uribe Uribe</option>
+                                <option>Ciudad Bolívar</option>
+                                <option>Sumapaz</option>
+                                <option value="Otra">Otra</option>
+                            </select>
+                            <input type="text" id="localidadOtra" name="localidadOtra" class="form-control mt-2" placeholder="Especifique otra localidad" style="display:none;" />
                         </div>
 
                         <div class="mb-3">
@@ -975,7 +1000,7 @@
                     </div>
                     
                     <div class="d-grid">
-                        <button type="button" class="btn btn-primary btn-lg" onclick="registerPerson()">
+                        <button type="submit" class="btn btn-primary btn-lg">
                             <i class="bi bi-send-check"></i> Guardar
                         </button>
                     </div>
@@ -1087,7 +1112,31 @@
           </div>
                     <div class="mb-3">
                         <label class="form-label">Localidad</label>
-                        <input type="text" class="form-control" id="adminLocalidad" name="adminLocalidad" placeholder="Barrio / Localidad">
+                        <select id="adminLocalidadSelect" name="adminLocalidad" class="form-select" onchange="toggleAdminLocalidadOther(this.value)">
+                            <option value="">-- Seleccione Localidad --</option>
+                            <option>Usaquén</option>
+                            <option>Chapinero</option>
+                            <option>Santa Fe</option>
+                            <option>San Cristóbal</option>
+                            <option>Usme</option>
+                            <option>Tunjuelito</option>
+                            <option>Bosa</option>
+                            <option>Kennedy</option>
+                            <option>Fontibón</option>
+                            <option>Engativá</option>
+                            <option>Suba</option>
+                            <option>Barrios Unidos</option>
+                            <option>Teusaquillo</option>
+                            <option>Los Mártires</option>
+                            <option>Antonio Nariño</option>
+                            <option>Puente Aranda</option>
+                            <option>La Candelaria</option>
+                            <option>Rafael Uribe Uribe</option>
+                            <option>Ciudad Bolívar</option>
+                            <option>Sumapaz</option>
+                            <option value="Otra">Otra</option>
+                        </select>
+                        <input type="text" id="adminLocalidadOtra" name="adminLocalidadOtra" class="form-control mt-2" placeholder="Especifique otra localidad" style="display:none;" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">¿Tiene inscrita la cédula para votar?</label>
@@ -1205,7 +1254,11 @@ async function saveAdminRegistration() {
       eventId: activeEventId // Asociar al evento actual
     };
         // campos electorales desde el modal admin
-        const adminLocalidad = document.getElementById('adminLocalidad')?.value || '';
+        const adminLocalidadSelect = document.getElementById('adminLocalidadSelect');
+        let adminLocalidad = '';
+        if (adminLocalidadSelect) {
+            adminLocalidad = adminLocalidadSelect.value === 'Otra' ? (document.getElementById('adminLocalidadOtra')?.value || '') : (adminLocalidadSelect.value || '');
+        }
         const adminRegRadio = document.querySelector('input[name="adminRegisteredToVote"]:checked');
         const adminRegisteredToVote = adminRegRadio ? (adminRegRadio.value === 'true') : false;
         const adminVotingPlace = document.getElementById('adminVotingPlace')?.value || '';
@@ -1608,6 +1661,7 @@ function updateRegistrationsTable() {
             <tr>
                 <td>${new Date(reg.date).toLocaleDateString("es-CO")}</td>
                 <td>${nombre}</td>
+                <td>${reg.cedula || '-'}</td>
                 <td>${lider}</td>
                 <td>${localidad}</td>
                 <td>${votante}</td>
@@ -1805,7 +1859,13 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
   
   const formData = new FormData(this);
   const data = Object.fromEntries(formData.entries());
-  data.leaderId = leaderId;
+    // Si seleccionó 'Otra' en localidad, obtener el texto especificado
+    if (data.localidad === 'Otra') {
+        data.localidad = document.getElementById('localidadOtra')?.value || '';
+    }
+
+    // Asegurar que el leaderId se asigne
+    data.leaderId = leaderId;
   
   const res = await fetch(`${API_BASE}/registrations`, {
     method: 'POST',
@@ -1902,9 +1962,21 @@ async function registerPerson() {
         const leaderToken = urlLeaderToken || null;
         const firstName = document.getElementById('firstName')?.value || '';
         const lastName = document.getElementById('lastName')?.value || '';
+        const cedula = document.getElementById('cedula')?.value || '';
         const email = document.getElementById('email')?.value || '';
         const phone = document.getElementById('phone')?.value || '';
-        const localidad = document.getElementById('localidad') ? document.getElementById('localidad').value : '';
+        // Localidad: puede ser select con opción 'Otra'
+        const localidadSelect = document.getElementById('localidadSelect');
+        let localidad = '';
+        if (localidadSelect) {
+            if (localidadSelect.value === 'Otra') {
+                localidad = document.getElementById('localidadOtra')?.value || '';
+            } else {
+                localidad = localidadSelect.value || '';
+            }
+        } else {
+            localidad = document.getElementById('localidad') ? document.getElementById('localidad').value : '';
+        }
         const regRadio = document.querySelector('input[name="registeredToVote"]:checked');
         const registeredToVote = regRadio ? (regRadio.value === 'true') : false;
         const votingPlace = document.getElementById('votingPlace') ? document.getElementById('votingPlace').value : '';
@@ -1938,7 +2010,7 @@ async function registerPerson() {
         const res = await fetch('/api/registrations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ leaderId, leaderToken, firstName, lastName, email, phone, localidad, registeredToVote, votingPlace })
+            body: JSON.stringify({ leaderId, leaderToken, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace })
         });
 
         if (res.ok) {
@@ -1981,6 +2053,20 @@ function toggleAdminVotingPlace(show) {
     const group = document.getElementById('adminVotingPlaceGroup');
     if (!group) return;
     group.style.display = show ? 'block' : 'none';
+}
+
+// Mostrar/ocultar campo 'Otra' para localidad (público)
+function toggleLocalidadOther(value) {
+    const other = document.getElementById('localidadOtra');
+    if (!other) return;
+    other.style.display = (value === 'Otra') ? 'block' : 'none';
+}
+
+// Mostrar/ocultar campo 'Otra' para localidad (admin)
+function toggleAdminLocalidadOther(value) {
+    const other = document.getElementById('adminLocalidadOtra');
+    if (!other) return;
+    other.style.display = (value === 'Otra') ? 'block' : 'none';
 }
 
 async function sendWhatsApp(phone, name) {
