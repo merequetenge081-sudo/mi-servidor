@@ -259,6 +259,25 @@
             right: 20px;
             z-index: 9999;
         }
+
+        /* Ocultar completamente landing page en modo público */
+        .public-registration-mode #landingPage,
+        .public-registration-mode #createEventPage,
+        .public-registration-mode #viewEventsPage {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .public-registration-mode #adminPanel {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        .public-registration-mode #publicForm {
+            display: block !important;
+            visibility: visible !important;
+        }
     </style>
 </head>
 <body>
@@ -2028,18 +2047,34 @@ window.addEventListener("DOMContentLoaded", async () => {
     isPublicRegistrationMode = true;
     console.log('🎯 Modo registro público activado para líder:', leaderToken);
 
+    // Agregar clase al body para aplicar estilos CSS de modo público
+    document.body.classList.add('public-registration-mode');
+
     // Forzar ocultar landing page y admin panel inmediatamente
     const landingPage = document.getElementById("landingPage");
     const adminPanel = document.getElementById("adminPanel");
     const publicForm = document.getElementById("publicForm");
 
-    if (landingPage) landingPage.style.display = "none";
-    if (adminPanel) adminPanel.style.display = "none";
-    if (publicForm) publicForm.style.display = "block";
+    if (landingPage) {
+      landingPage.style.display = "none";
+      landingPage.style.visibility = "hidden";
+      landingPage.style.pointerEvents = "none";
+    }
+    if (adminPanel) {
+      adminPanel.style.display = "none";
+      adminPanel.style.visibility = "hidden";
+    }
+    if (publicForm) {
+      publicForm.style.display = "block";
+      publicForm.style.visibility = "visible";
+      publicForm.style.pointerEvents = "auto";
+    }
 
     // Ocultar cualquier elemento de navegación admin
     document.querySelectorAll('.sidebar, [onclick="showAdminPanel()"], [onclick*="goToCreateEvent"], [onclick*="goToViewEvents"]').forEach(el => {
       el.style.display = 'none';
+      el.style.visibility = 'hidden';
+      el.style.pointerEvents = 'none';
     });
 
     // Auto-enfocar el primer campo del formulario
@@ -2054,6 +2089,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   } else {
     isPublicRegistrationMode = false;
     console.log('🏠 Modo landing page normal');
+    document.body.classList.remove('public-registration-mode');
     // Mostrar landing page solo en modo normal
     document.getElementById("landingPage").style.display = "flex";
 
@@ -2553,7 +2589,10 @@ async function refreshEventData() {
 
 function goToCreateEvent() {
     // No hacer nada si estamos en modo de registro público
-    if (isPublicRegistrationMode) return;
+    if (isPublicRegistrationMode) {
+        console.log('🚫 goToCreateEvent() bloqueado - modo registro público');
+        return;
+    }
 
     // Mostrar página de crear evento
     document.getElementById('landingPage').style.display = 'none';
@@ -2604,7 +2643,10 @@ async function saveEventFromPage(event) {
 
 function goToViewEvents() {
     // No hacer nada si estamos en modo de registro público
-    if (isPublicRegistrationMode) return;
+    if (isPublicRegistrationMode) {
+        console.log('🚫 goToViewEvents() bloqueado - modo registro público');
+        return;
+    }
 
     // Cargar y mostrar lista de eventos
     document.getElementById('landingPage').style.display = 'none';
@@ -2617,7 +2659,10 @@ function goToViewEvents() {
 
 function backToLanding() {
     // No hacer nada si estamos en modo de registro público
-    if (isPublicRegistrationMode) return;
+    if (isPublicRegistrationMode) {
+        console.log('🚫 backToLanding() bloqueado - modo registro público');
+        return;
+    }
 
     document.getElementById('landingPage').style.display = 'flex';
     document.getElementById('viewEventsPage').style.display = 'none';
