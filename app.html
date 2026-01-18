@@ -2161,6 +2161,28 @@ window.addEventListener('resize', function () {
     }
 });
 
+// Ajusta la altura de la sección de Análisis para que su scroll interno coincida con la ventana
+function adjustAnalysisSectionHeight() {
+    try {
+        const el = document.getElementById('analysisSection');
+        if (!el || el.style.display === 'none') return;
+        // calcular espacio disponible desde la posición superior del elemento hasta el fondo de la ventana
+        const rect = el.getBoundingClientRect();
+        const topOffset = Math.max(0, rect.top);
+        const paddingBottom = 20; // espacio para evitar que quede justo en el borde
+        const avail = Math.max(120, window.innerHeight - topOffset - paddingBottom);
+        el.style.maxHeight = avail + 'px';
+        el.style.overflowY = 'auto';
+    } catch (e) {
+        console.warn('adjustAnalysisSectionHeight failed', e);
+    }
+}
+
+// Reajustar al redimensionar
+window.addEventListener('resize', function () {
+    try { adjustAnalysisSectionHeight(); } catch(e) {}
+});
+
 async function deleteRegistration(id) {
   if (!confirm("¿Eliminar este registro?")) return;
   try {
@@ -2543,9 +2565,14 @@ function showSection(section) {
   });
   
   // Si es la sección de análisis, actualizar datos
-  if (section === 'analysis') {
-    refreshAnalysis();
-  }
+    if (section === 'analysis') {
+        try {
+            // refreshAnalysis is async; after it completes adjust the section height
+            refreshAnalysis().then(() => { try { adjustAnalysisSectionHeight(); } catch(e){} }).catch(() => { try { adjustAnalysisSectionHeight(); } catch(e){} });
+        } catch(e) {
+            try { adjustAnalysisSectionHeight(); } catch(err){}
+        }
+    }
   
   // Actualizar el estado de los botones de la barra lateral
   const links = document.querySelectorAll('.sidebar .nav-link');
