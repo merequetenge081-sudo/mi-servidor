@@ -381,7 +381,7 @@
             }
         }
         /* SVG map labels and tooltip styles */
-        .svg-label { font-family: Arial, Helvetica, sans-serif; font-size: 10px; fill: #333; pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: #fff; stroke-width: 2px; }
+        .svg-label { font-family: Arial, Helvetica, sans-serif; font-size: 11px; fill: #1f2d3d; pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: #ffffff; stroke-width: 2px; dominant-baseline: central; }
         .svg-label.hidden { display: none; }
         #svgMapTooltip { background: rgba(0,0,0,0.78); color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 13px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
     </style>
@@ -1582,7 +1582,7 @@ async function ensureBogotaGeo() {
 
 function getColorForPct(pct) {
     // Softer palette (teal/blue) that combines with page colors
-    if (!pct || pct === 0) return '#f6f7fb';
+    if (!pct || pct === 0) return '#dfeef6';
     if (pct < 10) return '#dff5fb';
     if (pct < 25) return '#bfeaf7';
     if (pct < 50) return '#86d4ef';
@@ -1755,35 +1755,39 @@ function onEachFeature(feature, layer) {
 
             // Generate optional labels (centered text) and a small toggle button
             try {
-                function createSvgLabels() {
-                    try {
-                        // remove old labels group
-                        const old = svg.querySelector('#labels-group');
-                        if (old) old.remove();
-                        const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-                        g.setAttribute('id','labels-group');
-                        svg.appendChild(g);
-                        const items2 = svg.querySelectorAll('[data-name]');
-                        items2.forEach(el2 => {
+                        function createSvgLabels() {
                             try {
-                                const name2 = el2.getAttribute('data-name');
-                                const bbox = el2.getBBox();
-                                const x = bbox.x + bbox.width/2;
-                                const y = bbox.y + bbox.height/2;
-                                const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-                                t.setAttribute('x', x);
-                                t.setAttribute('y', y);
-                                t.setAttribute('class', 'svg-label hidden');
-                                t.setAttribute('data-for', name2);
-                                // shorten label if very long
-                                const lab = (name2 || '').replace(/_/g,' ');
-                                t.textContent = lab.length > 18 ? (lab.slice(0,16) + '…') : lab;
-                                g.appendChild(t);
-                            } catch(_) {}
-                        });
-                    } catch(_) {}
-                }
-                createSvgLabels();
+                                // remove old labels group
+                                const old = svg.querySelector('#labels-group');
+                                if (old) old.remove();
+                                const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+                                g.setAttribute('id','labels-group');
+                                svg.appendChild(g);
+                                const items2 = svg.querySelectorAll('[data-name]');
+                                // wait a frame so the svg layout is ready and bboxes are accurate
+                                requestAnimationFrame(() => {
+                                    items2.forEach(el2 => {
+                                        try {
+                                            const name2 = el2.getAttribute('data-name');
+                                            const bbox = el2.getBBox();
+                                            const x = bbox.x + bbox.width/2;
+                                            const y = bbox.y + bbox.height/2;
+                                            const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+                                            t.setAttribute('x', x);
+                                            t.setAttribute('y', y);
+                                            // show labels by default (user requested names visible)
+                                            t.setAttribute('class', 'svg-label');
+                                            t.setAttribute('data-for', name2);
+                                            // shorten label if very long
+                                            const lab = (name2 || '').replace(/_/g,' ');
+                                            t.textContent = lab.length > 18 ? (lab.slice(0,16) + '…') : lab;
+                                            g.appendChild(t);
+                                        } catch(_) {}
+                                    });
+                                });
+                            } catch(_) { }
+                        }
+                        createSvgLabels();
                 // Add toggle button to show/hide labels
                 const mapWrap = document.getElementById('bogotaMapWrapper');
                 if (mapWrap) {
@@ -1905,7 +1909,21 @@ async function renderLocalityMap() {
             try {
                 // Insert SVG inline so we can attach events
                 if (mapContainer) {
-                    mapContainer.innerHTML = croquis;
+                            mapContainer.innerHTML = croquis;
+                            // Ensure the inserted SVG fills the map container and preserves aspect ratio
+                            try {
+                                const svgEl = mapContainer.querySelector('svg');
+                                if (svgEl) {
+                                    svgEl.removeAttribute('width');
+                                    svgEl.removeAttribute('height');
+                                    svgEl.setAttribute('preserveAspectRatio','xMidYMid meet');
+                                    svgEl.style.width = '100%';
+                                    svgEl.style.height = '100%';
+                                    svgEl.style.display = 'block';
+                                    // make parent container stretch to allow svg to use full height
+                                    mapContainer.style.alignItems = 'stretch';
+                                }
+                            } catch(e) { console.warn('Failed to adjust SVG sizing', e); }
                     // Remove any existing leaflet map instance if present
                     try { if (_bogotaMap) { _bogotaMap.remove(); _bogotaMap = null; } } catch(e) {}
                     // If the SVG doesn't contain per-area `data-name` attributes, prefer the GeoJSON Leaflet fallback
