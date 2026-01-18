@@ -13,14 +13,14 @@
     <path id="Suba" class="loc" data-name="Suba" data-stroke="#fff" data-stroke-width="12" aria-label="Suba" tabindex="0" d="M30 150 C70 138,120 132,190 136 C230 140,260 165,230 190 C200 215,140 230,90 240 C50 235,28 200,30 150 Z"/>
     <text x="85" y="188" class="loc-label">Suba</text>
 
-    <path id="Chapinero" class="loc" data-name="Chapinero" data-stroke="#fff" data-stroke-width="12" aria-label="Chapinero" tabindex="0" d="M320 48 C350 46,400 48,440 70 C460 96,430 110,390 118 C354 116,336 92,320 76 C318 64,318 56,320 48 Z"/>
-    <text x="350" y="82" class="loc-label">Chapinero</text>
+    <path id="Chapinero" class="loc" data-name="Chapinero" data-stroke="#fff" data-stroke-width="12" aria-label="Chapinero" tabindex="0" d="M300 42 C328 38,370 36,410 58 C428 80,422 100,404 114 C388 126,366 132,342 130 C326 124,314 112,306 98 C298 78,294 60,300 42 Z"/>
+    <text x="348" y="82" class="loc-label">Chapinero</text>
 
-    <path id="BarriosUnidos" class="loc" data-name="Barrios Unidos" data-stroke="#fff" data-stroke-width="12" aria-label="Barrios Unidos" tabindex="0" d="M240 110 C275 95,320 96,350 110 C360 130,340 150,310 162 C270 158,245 142,230 122 C232 118,236 114,240 110 Z"/>
-    <text x="270" y="135" class="loc-label">Barrios Unidos</text>
+    <path id="BarriosUnidos" class="loc" data-name="Barrios Unidos" data-stroke="#fff" data-stroke-width="12" aria-label="Barrios Unidos" tabindex="0" d="M224 104 C254 92,294 90,330 108 C350 128,346 152,322 166 C292 176,266 170,238 154 C230 138,226 124,224 104 Z"/>
+    <text x="268" y="134" class="loc-label">Barrios Unidos</text>
 
-    <path id="Teusaquillo" class="loc" data-name="Teusaquillo" data-stroke="#fff" data-stroke-width="12" aria-label="Teusaquillo" tabindex="0" d="M180 180 C210 172,250 170,290 182 C310 198,300 220,280 232 C240 238,200 230,180 210 C174 200,176 190,180 180 Z"/>
-    <text x="210" y="205" class="loc-label">Teusaquillo</text>
+    <path id="Teusaquillo" class="loc" data-name="Teusaquillo" data-stroke="#fff" data-stroke-width="12" aria-label="Teusaquillo" tabindex="0" d="M170 172 C198 166,230 164,266 176 C288 188,292 206,280 220 C252 232,218 226,188 210 C174 198,170 186,170 172 Z"/>
+    <text x="204" y="204" class="loc-label">Teusaquillo</text>
 
     <path id="Engativa" class="loc" data-name="Engativá" data-stroke="#fff" data-stroke-width="12" aria-label="Engativá" tabindex="0" d="M70 260 C110 248,170 240,240 250 C280 260,290 300,250 330 C200 360,140 350,100 330 C75 310,70 285,70 260 Z"/>
     <text x="120" y="300" class="loc-label">Engativá</text>
@@ -34,14 +34,14 @@
     <path id="PuenteAranda" class="loc" data-name="Puente Aranda" data-stroke="#fff" data-stroke-width="12" aria-label="Puente Aranda" tabindex="0" d="M340 198 C372 188,430 188,478 206 C494 216,480 238,450 250 C410 258,370 248,350 230 C344 216,342 204,340 198 Z"/>
     <text x="385" y="225" class="loc-label">Puente Aranda</text>
 
-    <path id="LosMartires" class="loc" data-name="Los Mártires" data-stroke="#fff" data-stroke-width="12" aria-label="Los Mártires" tabindex="0" d="M410 168 C440 158,500 162,526 190 C512 200,486 210,456 218 C430 212,418 192,410 170 C408 168,409 168,410 168 Z"/>
-    <text x="435" y="200" class="loc-label">Los Mártires</text>
+    <path id="LosMartires" class="loc" data-name="Los Mártires" data-stroke="#fff" data-stroke-width="12" aria-label="Los Mártires" tabindex="0" d="M408 164 C436 154,494 156,524 184 C512 196,488 206,456 214 C428 210,418 192,408 170 C406 166,407 165,408 164 Z"/>
+    <text x="434" y="198" class="loc-label">Los Mártires</text>
 
-    <path id="SantaFe" class="loc" data-name="Santa Fe" data-stroke="#fff" data-stroke-width="12" aria-label="Santa Fe" tabindex="0" d="M520 78 C555 66,600 70,632 92 C648 108,634 126,610 132 C574 140,540 126,520 110 C520 102,520 92,520 78 Z"/>
-    <text x="545" y="120" class="loc-label">Santa Fe</text>
+    <path id="SantaFe" class="loc" data-name="Santa Fe" data-stroke="#fff" data-stroke-width="12" aria-label="Santa Fe" tabindex="0" d="M510 72 C542 60,588 64,624 92 C646 118,636 132,606 136 C574 140,546 118,520 104 C508 94,504 86,510 72 Z"/>
+    <text x="540" y="108" class="loc-label">Santa Fe</text>
 
-    <path id="LaCandelaria" class="loc" data-name="La Candelaria" data-stroke="#fff" data-stroke-width="12" aria-label="La Candelaria" tabindex="0" d="M540 150 C560 144,600 150,612 168 C600 182,572 196,548 196 C532 188,540 172,540 150 Z"/>
-    <text x="555" y="190" class="loc-label">La Candelaria</text>
+    <path id="LaCandelaria" class="loc" data-name="La Candelaria" data-stroke="#fff" data-stroke-width="12" aria-label="La Candelaria" tabindex="0" d="M536 142 C558 136,594 148,608 164 C600 178,574 186,548 188 C532 182,538 168,536 142 Z"/>
+    <text x="548" y="170" class="loc-label">La Candelaria</text>
 
     <path id="LosMartires2" class="loc" data-name="Antonio Nariño" data-stroke="#fff" data-stroke-width="12" aria-label="Antonio Nariño" tabindex="0" d="M514 208 C532 200,568 204,594 228 C600 238,578 252,548 256 C520 252,516 232,514 208 Z"/>
     <text x="535" y="250" class="loc-label">Antonio Nariño</text>
