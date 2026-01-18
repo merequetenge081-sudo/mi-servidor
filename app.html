@@ -912,9 +912,61 @@
                             </div>
                             <div class="card-body">
                                                         <div id="bogotaMapWrapper" style="position:relative; display:none;">
-                                                            <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef; background:#f8fbff; display:flex; align-items:center; justify-content:center;"> 
-                                                                <!-- Leaflet map or SVG croquis will be injected here -->
-                                                            </div>
+                                                                                                                        <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef; background:#f8fbff; display:flex; align-items:center; justify-content:center;"> 
+                                                                                                                                <!-- Inline SVG croquis (fallback guaranteed) -->
+                                                                                                                                <div id="bogotaCroquisInlineWrapper" style="width:100%;height:100%;">
+                                                                                                                                        <?xml version="1.0" encoding="UTF-8"?>
+                                                                                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" id="bogotaCroquisInline" style="width:100%;height:100%;">
+                                                                                                                                            <style>
+                                                                                                                                                .loc { fill:#58b6ff; stroke:#fff; stroke-width:6; cursor:pointer; transition:fill 150ms, transform 150ms; }
+                                                                                                                                                .loc:hover { filter: brightness(0.92); }
+                                                                                                                                                .loc-label { font-family: Arial, Helvetica, sans-serif; font-size:12px; fill:#fff; pointer-events:none; }
+                                                                                                                                            </style>
+                                                                                                                                            <g id="localidades">
+                                                                                                                                                <path id="Usaquen" class="loc" data-name="Usaquén" d="M100,40 L320,40 L320,140 L100,140 Z"/>
+                                                                                                                                                <text x="180" y="90" class="loc-label">Usaquén</text>
+                                                                                                                                                <path id="Suba" class="loc" data-name="Suba" d="M20,140 L200,140 L200,260 L20,260 Z"/>
+                                                                                                                                                <text x="70" y="190" class="loc-label">Suba</text>
+                                                                                                                                                <path id="Chapinero" class="loc" data-name="Chapinero" d="M320,40 L440,40 L440,120 L320,120 Z"/>
+                                                                                                                                                <text x="350" y="80" class="loc-label">Chapinero</text>
+                                                                                                                                                <path id="BarriosUnidos" class="loc" data-name="Barrios Unidos" d="M240,100 L360,100 L360,180 L240,180 Z"/>
+                                                                                                                                                <text x="265" y="140" class="loc-label">Barrios Unidos</text>
+                                                                                                                                                <path id="Teusaquillo" class="loc" data-name="Teusaquillo" d="M180,180 L300,180 L300,240 L180,240 Z"/>
+                                                                                                                                                <text x="210" y="210" class="loc-label">Teusaquillo</text>
+                                                                                                                                                <path id="Engativa" class="loc" data-name="Engativá" d="M80,260 L260,260 L260,360 L80,360 Z"/>
+                                                                                                                                                <text x="120" y="310" class="loc-label">Engativá</text>
+                                                                                                                                                <path id="Fontibon" class="loc" data-name="Fontibón" d="M260,300 L420,300 L420,400 L260,400 Z"/>
+                                                                                                                                                <text x="300" y="350" class="loc-label">Fontibón</text>
+                                                                                                                                                <path id="Kennedy" class="loc" data-name="Kennedy" d="M420,300 L620,300 L620,420 L420,420 Z"/>
+                                                                                                                                                <text x="470" y="360" class="loc-label">Kennedy</text>
+                                                                                                                                                <path id="PuenteAranda" class="loc" data-name="Puente Aranda" d="M360,200 L480,200 L480,260 L360,260 Z"/>
+                                                                                                                                                <text x="380" y="230" class="loc-label">Puente Aranda</text>
+                                                                                                                                                <path id="LosMartires" class="loc" data-name="Los Mártires" d="M420,180 L520,180 L520,240 L420,240 Z"/>
+                                                                                                                                                <text x="435" y="210" class="loc-label">Los Mártires</text>
+                                                                                                                                                <path id="SantaFe" class="loc" data-name="Santa Fe" d="M520,80 L640,80 L640,160 L520,160 Z"/>
+                                                                                                                                                <text x="545" y="120" class="loc-label">Santa Fe</text>
+                                                                                                                                                <path id="LaCandelaria" class="loc" data-name="La Candelaria" d="M540,160 L620,160 L620,220 L540,220 Z"/>
+                                                                                                                                                <text x="555" y="190" class="loc-label">La Candelaria</text>
+                                                                                                                                                <path id="LosMartires2" class="loc" data-name="Antonio Nariño" d="M520,220 L600,220 L600,280 L520,280 Z"/>
+                                                                                                                                                <text x="535" y="250" class="loc-label">Antonio Nariño</text>
+                                                                                                                                                <path id="RafaelUribe" class="loc" data-name="Rafael Uribe Uribe" d="M600,260 L720,260 L720,340 L600,340 Z"/>
+                                                                                                                                                <text x="620" y="300" class="loc-label">Rafael Uribe</text>
+                                                                                                                                                <path id="Usme" class="loc" data-name="Usme" d="M740,60 L920,60 L920,200 L740,200 Z"/>
+                                                                                                                                                <text x="780" y="130" class="loc-label">Usme</text>
+                                                                                                                                                <path id="SanCristobal" class="loc" data-name="San Cristóbal" d="M880,20 L1000,20 L1000,120 L880,120 Z"/>
+                                                                                                                                                <text x="900" y="70" class="loc-label">San Cristóbal</text>
+                                                                                                                                                <path id="Tunjuelito" class="loc" data-name="Tunjuelito" d="M660,200 L760,200 L760,280 L660,280 Z"/>
+                                                                                                                                                <text x="675" y="240" class="loc-label">Tunjuelito</text>
+                                                                                                                                                <path id="CiudadBolivar" class="loc" data-name="Ciudad Bolívar" d="M760,260 L920,260 L920,380 L760,380 Z"/>
+                                                                                                                                                <text x="785" y="320" class="loc-label">Ciudad Bolívar</text>
+                                                                                                                                                <path id="Bosa" class="loc" data-name="Bosa" d="M420,420 L580,420 L580,480 L420,480 Z"/>
+                                                                                                                                                <text x="455" y="450" class="loc-label">Bosa</text>
+                                                                                                                                                <path id="Sumapaz" class="loc" data-name="Sumapaz" d="M920,360 L1100,360 L1100,460 L920,460 Z"/>
+                                                                                                                                                <text x="960" y="410" class="loc-label">Sumapaz</text>
+                                                                                                                                            </g>
+                                                                                                                                        </svg>
+                                                                                                                                </div>
+                                                                                                                        </div>
                                                             <div id="bogotaMapSpinner" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:20000; display:flex; align-items:center; justify-content:center;">
                                                                 <div style="text-align:center;">
                                                                     <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;"></div>
