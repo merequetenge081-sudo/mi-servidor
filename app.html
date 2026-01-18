@@ -2978,6 +2978,26 @@ async function refreshAnalysis() {
 
         try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras actualizar análisis:', e); }
 
+        // Intentar cargar y mostrar el croquis (GeoJSON) automáticamente si está disponible
+        try {
+            const mapWrap = document.getElementById('bogotaMapWrapper');
+            const chartWrap = document.getElementById('bogotaChartWrapper');
+            if (mapWrap && chartWrap) {
+                const geo = await ensureBogotaGeo();
+                if (geo) {
+                    mapWrap.style.display = 'block';
+                    chartWrap.style.display = 'none';
+                    try { renderLocalityMap(); } catch(e) { console.warn('Error renderizando mapa automáticamente:', e); }
+                } else {
+                    // Mantener fallback en chart si no hay geojson
+                    mapWrap.style.display = 'none';
+                    chartWrap.style.display = 'block';
+                }
+            }
+        } catch (err) {
+            console.warn('Error al intentar mostrar croquis de Bogotá:', err);
+        }
+
         showToast('success', 'Análisis actualizado');
     } catch (error) {
         console.error('Error al actualizar análisis:', error);
