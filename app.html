@@ -380,6 +380,10 @@
                 margin-left: 0 !important;
             }
         }
+        /* SVG map labels and tooltip styles */
+        .svg-label { font-family: Arial, Helvetica, sans-serif; font-size: 10px; fill: #333; pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: #fff; stroke-width: 2px; }
+        .svg-label.hidden { display: none; }
+        #svgMapTooltip { background: rgba(0,0,0,0.78); color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 13px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
     </style>
 </head>
 <body>
@@ -1577,13 +1581,13 @@ async function ensureBogotaGeo() {
 }
 
 function getColorForPct(pct) {
-    // Use a blue scale for % votantes: lighter = fewer votantes, darker = more
-    if (pct === 0) return '#f0f0f0';
-    if (pct < 10) return '#d8eefe';
-    if (pct < 25) return '#a6d8ff';
-    if (pct < 50) return '#58b6ff';
-    if (pct < 75) return '#1e90ff';
-    return '#0b67d1';
+    // Softer palette (teal/blue) that combines with page colors
+    if (!pct || pct === 0) return '#f6f7fb';
+    if (pct < 10) return '#dff5fb';
+    if (pct < 25) return '#bfeaf7';
+    if (pct < 50) return '#86d4ef';
+    if (pct < 75) return '#3fb0d9';
+    return '#167aab';
 }
 
 function styleFeature(feature) {
@@ -1748,6 +1752,68 @@ function onEachFeature(feature, layer) {
             });
             // After attaching handlers, color SVG areas according to stats
             try { colorSvgByStats(svg); } catch(e) { console.warn('colorSvgByStats failed', e); }
+
+            // Generate optional labels (centered text) and a small toggle button
+            try {
+                function createSvgLabels() {
+                    try {
+                        // remove old labels group
+                        const old = svg.querySelector('#labels-group');
+                        if (old) old.remove();
+                        const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+                        g.setAttribute('id','labels-group');
+                        svg.appendChild(g);
+                        const items2 = svg.querySelectorAll('[data-name]');
+                        items2.forEach(el2 => {
+                            try {
+                                const name2 = el2.getAttribute('data-name');
+                                const bbox = el2.getBBox();
+                                const x = bbox.x + bbox.width/2;
+                                const y = bbox.y + bbox.height/2;
+                                const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+                                t.setAttribute('x', x);
+                                t.setAttribute('y', y);
+                                t.setAttribute('class', 'svg-label hidden');
+                                t.setAttribute('data-for', name2);
+                                // shorten label if very long
+                                const lab = (name2 || '').replace(/_/g,' ');
+                                t.textContent = lab.length > 18 ? (lab.slice(0,16) + '…') : lab;
+                                g.appendChild(t);
+                            } catch(_) {}
+                        });
+                    } catch(_) {}
+                }
+                createSvgLabels();
+                // Add toggle button to show/hide labels
+                const mapWrap = document.getElementById('bogotaMapWrapper');
+                if (mapWrap) {
+                    let btn = document.getElementById('svgLabelsToggle');
+                    if (!btn) {
+                        btn = document.createElement('button');
+                        btn.id = 'svgLabelsToggle';
+                        btn.type = 'button';
+                        btn.className = 'btn btn-sm btn-outline-secondary';
+                        btn.style.position = 'absolute';
+                        btn.style.top = '8px';
+                        btn.style.left = '8px';
+                        btn.style.zIndex = 25000;
+                        btn.style.padding = '6px 8px';
+                        btn.innerText = 'Etiquetas';
+                        btn.onclick = (ev) => {
+                            ev.stopPropagation();
+                            const grp = svg.querySelector('#labels-group');
+                            if (!grp) return;
+                            const hidden = grp.querySelector('.svg-label.hidden');
+                            const show = !!hidden;
+                            grp.querySelectorAll('.svg-label').forEach(t => {
+                                if (show) t.classList.remove('hidden'); else t.classList.add('hidden');
+                            });
+                            btn.classList.toggle('active', show);
+                        };
+                        mapWrap.appendChild(btn);
+                    }
+                }
+            } catch(e) { console.warn('labels creation failed', e); }
         } catch (err) { console.warn('attachSvgInteractions error', err); }
     }
 
