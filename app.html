@@ -1509,14 +1509,32 @@ function getLocalidadKey(feature) {
     return '';
 }
 
+// Normalize locality names for stable matching (remove diacritics, punctuation, collapse spaces)
+function normalizeName(s) {
+    if (!s) return '';
+    let str = String(s).trim();
+    try {
+        // Preferred method: Unicode NFD + remove diacritics
+        str = str.normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    } catch (e) {
+        // Fallback: simple replacements for common accented characters
+        const map = { 'Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U','á':'a','é':'e','í':'i','ó':'o','ú':'u','Ñ':'N','ñ':'n','Ü':'U','ü':'u' };
+        str = str.split('').map(ch => map[ch] || ch).join('');
+    }
+    // remove punctuation, keep letters/numbers/spaces and dashes
+    str = str.replace(/[\u2000-\u206F\u2E00-\u2E7F\'"\(\)\[\]\{\},.:;\/\\<>\?@#\$%\^&\*\+=~`|]/g, '');
+    str = str.replace(/[_]+/g, ' ');
+    str = str.replace(/\s+/g, ' ').toLowerCase().trim();
+    return str;
+}
+
 function computeLocalidadStats() {
     // registrations array is global
     const counts = {};
-    // Normalizer: strip diacritics and lowercase for stable matching
-    const norm = s => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+    // Normalizer: use normalizeName helper
     registrations.forEach(r => {
         const raw = (r.localidad || '').trim() || 'Sin Localidad';
-        const k = norm(raw) || 'sin localidad';
+        const k = normalizeName(raw) || 'sin localidad';
         if (!counts[k]) counts[k] = { raw, count: 0, voters: 0 };
         counts[k].count += 1;
         // Determine if this registration marks a votante
@@ -1671,7 +1689,7 @@ function onEachFeature(feature, layer) {
                     el.__origFill = el.getAttribute('fill') || el.style.fill;
                     el.style.filter = 'brightness(0.9)';
                     const { stats } = computeLocalidadStats();
-                    const key = String(name || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+                    const key = normalizeName(name || '');
                     const s = stats[key] || { voterPct: 0, voters:0, count:0 };
                     tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
                     tip.style.display = 'block';
@@ -1687,7 +1705,7 @@ function onEachFeature(feature, layer) {
                 el.addEventListener('click', (ev) => {
                     ev.stopPropagation();
                     const { stats } = computeLocalidadStats();
-                    const key = String(name || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+                    const key = normalizeName(name || '');
                     const s = stats[key] || { voterPct: 0, voters:0, count:0 };
                     // Toggle filter: if same localidad clicked twice -> clear
                     if (currentLocalidadFilter === key) {
@@ -1763,10 +1781,10 @@ function onEachFeature(feature, layer) {
                                 const g = document.createElementNS('http://www.w3.org/2000/svg','g');
                                 g.setAttribute('id','labels-group');
                                 svg.appendChild(g);
-                                const items2 = svg.querySelectorAll('[data-name]');
+                                const items = svg.querySelectorAll('[data-name]');
                                 // wait a frame so the svg layout is ready and bboxes are accurate
                                 requestAnimationFrame(() => {
-                                    items2.forEach(el2 => {
+                                    const key = normalizeName(name || '');
                                         try {
                                             const name2 = el2.getAttribute('data-name');
                                             const bbox = el2.getBBox();
@@ -1829,7 +1847,7 @@ function onEachFeature(feature, layer) {
             const items = svg.querySelectorAll('[data-name]');
             items.forEach(el => {
                 const name = el.getAttribute('data-name');
-                const key = String(name || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+                const key = normalizeName(name || '');
                 const s = stats[key] || { voterPct: 0 };
                 const color = getColorForPct(s.voterPct);
                 try {
@@ -3545,9 +3563,9 @@ function applyFilters() {
     }
 
     // Filtrar por localidad (si está activo)
-    if (currentLocalidadFilter) {
+        if (currentLocalidadFilter) {
         filtered = filtered.filter(r => {
-            const loc = String(r.localidad || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+            const loc = normalizeName(r.localidad || '');
             return loc === currentLocalidadFilter;
         });
     }
@@ -3571,7 +3589,7 @@ function applyFilters() {
         titleText = `Búsqueda: "${currentSearchTerm}"`;
     } else if (currentLocalidadFilter) {
         // Try to find an example registration to get the pretty localidad name
-        const example = allRegistrationsData.find(r => String(r.localidad || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim() === currentLocalidadFilter);
+        const example = allRegistrationsData.find(r => normalizeName(r.localidad || '') === currentLocalidadFilter);
         const pretty = example ? (r => r.localidad)(example) : currentLocalidadFilter.split(/[-_]/).map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
         titleText = `Localidad: ${pretty}`;
     }
