@@ -1689,7 +1689,8 @@ function onEachFeature(feature, layer) {
     // ================= SVG croquis interactions =================
     function attachSvgInteractions() {
         try {
-            const svg = document.getElementById('bogotaCroquis');
+            // Support multiple possible svg ids (external file or inline)
+            const svg = document.getElementById('bogotaCroquis') || document.getElementById('bogotaCroquisInline') || document.querySelector('#bogotaMap svg');
             if (!svg) return;
             // Tooltip element
             let tip = document.getElementById('svgMapTooltip');
@@ -1737,7 +1738,25 @@ function onEachFeature(feature, layer) {
                     showToast('info', `${name}: ${s.count} registros — ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
                 });
             });
+            // After attaching handlers, color SVG areas according to stats
+            try { colorSvgByStats(svg); } catch(e) { console.warn('colorSvgByStats failed', e); }
         } catch (err) { console.warn('attachSvgInteractions error', err); }
+    }
+
+    function colorSvgByStats(svgEl) {
+        try {
+            const svg = svgEl || (document.getElementById('bogotaCroquis') || document.getElementById('bogotaCroquisInline') || document.querySelector('#bogotaMap svg'));
+            if (!svg) return;
+            const { stats } = computeLocalidadStats();
+            const items = svg.querySelectorAll('[data-name]');
+            items.forEach(el => {
+                const name = el.getAttribute('data-name');
+                const key = String(name || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+                const s = stats[key] || { voterPct: 0 };
+                const color = getColorForPct(s.voterPct);
+                try { el.style.fill = color; el.setAttribute('fill', color); } catch(e) {}
+            });
+        } catch (err) { console.warn('colorSvgByStats error', err); }
     }
 
 function toggleMapFallback() {
