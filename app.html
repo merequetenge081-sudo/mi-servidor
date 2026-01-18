@@ -912,7 +912,9 @@
                             </div>
                             <div class="card-body">
                                                         <div id="bogotaMapWrapper" style="position:relative; display:none;">
-                                                            <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef;"></div>
+                                                            <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef; background:#f8fbff; display:flex; align-items:center; justify-content:center;"> 
+                                                                <!-- Leaflet map or SVG croquis will be injected here -->
+                                                            </div>
                                                             <div id="bogotaMapSpinner" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:20000; display:flex; align-items:center; justify-content:center;">
                                                                 <div style="text-align:center;">
                                                                     <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;"></div>
@@ -1632,6 +1634,60 @@ function onEachFeature(feature, layer) {
     });
 }
 
+    // ================= SVG croquis interactions =================
+    function attachSvgInteractions() {
+        try {
+            const svg = document.getElementById('bogotaCroquis');
+            if (!svg) return;
+            // Tooltip element
+            let tip = document.getElementById('svgMapTooltip');
+            if (!tip) {
+                tip = document.createElement('div');
+                tip.id = 'svgMapTooltip';
+                tip.style.position = 'absolute';
+                tip.style.pointerEvents = 'none';
+                tip.style.padding = '6px 8px';
+                tip.style.background = 'rgba(0,0,0,0.75)';
+                tip.style.color = 'white';
+                tip.style.borderRadius = '4px';
+                tip.style.fontSize = '12px';
+                tip.style.display = 'none';
+                tip.style.zIndex = 30000;
+                document.body.appendChild(tip);
+            }
+
+            const items = svg.querySelectorAll('[data-name]');
+            items.forEach(el => {
+                const name = el.getAttribute('data-name');
+                el.addEventListener('mouseover', (ev) => {
+                    el.__origFill = el.getAttribute('fill') || el.style.fill;
+                    el.style.filter = 'brightness(0.9)';
+                    const { stats } = computeLocalidadStats();
+                    const key = String(name || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+                    const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                    tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
+                    tip.style.display = 'block';
+                });
+                el.addEventListener('mousemove', (ev) => {
+                    tip.style.left = (ev.pageX + 12) + 'px';
+                    tip.style.top = (ev.pageY + 12) + 'px';
+                });
+                el.addEventListener('mouseout', (ev) => {
+                    el.style.filter = '';
+                    tip.style.display = 'none';
+                });
+                el.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    const { stats } = computeLocalidadStats();
+                    const key = String(name || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+                    const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                    // Show popup using existing showToast for simplicity, and also open popup area
+                    showToast('info', `${name}: ${s.count} registros — ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
+                });
+            });
+        } catch (err) { console.warn('attachSvgInteractions error', err); }
+    }
+
 function toggleMapFallback() {
     const mapWrap = document.getElementById('bogotaMapWrapper');
     const chartWrap = document.getElementById('bogotaChartWrapper');
@@ -1643,6 +1699,16 @@ function toggleMapFallback() {
     } else {
         mapWrap.style.display = 'none';
         chartWrap.style.display = 'block';
+    }
+
+    // Try to load SVG croquis if present
+    async function ensureBogotaCroquis() {
+        try {
+            const r = await fetch('/bogota_croquis.svg');
+            if (!r.ok) return null;
+            const txt = await r.text();
+            return txt;
+        } catch(e) { return null; }
     }
 }
 
@@ -1659,6 +1725,23 @@ async function renderLocalityMap() {
         const mapWrap = document.getElementById('bogotaMapWrapper');
         if (mapWrap) mapWrap.style.display = 'block';
 
+        // If an SVG croquis exists, prefer it — otherwise render Leaflet geoJSON
+        const croquis = await ensureBogotaCroquis();
+        const mapContainer = document.getElementById('bogotaMap');
+        if (croquis) {
+            try {
+                // Insert SVG inline so we can attach events
+                if (mapContainer) {
+                    mapContainer.innerHTML = croquis;
+                    // Remove any existing leaflet map instance if present
+                    try { if (_bogotaMap) { _bogotaMap.remove(); _bogotaMap = null; } } catch(e) {}
+                    attachSvgInteractions();
+                }
+            } catch (e) { console.warn('Error inserting croquis SVG', e); }
+            return;
+        }
+
+        // Fallback: render leaflet geoJSON choropleth
         if (!_bogotaMap) {
             _bogotaMap = L.map('bogotaMap', { scrollWheelZoom: false }).setView([4.6486, -74.0826], 10);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
