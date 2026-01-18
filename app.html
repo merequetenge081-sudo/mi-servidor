@@ -906,13 +906,12 @@
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Mapa - Registros por Localidad (Bogotá)</h5>
                                 <div>
-                                    <input id="geojsonUrlInput" class="form-control form-control-sm d-inline-block" style="width:320px;" placeholder="URL GeoJSON (opcional)" />
-                                    <button class="btn btn-sm btn-primary ms-2" onclick="loadBogotaMapFromInput()">Cargar mapa</button>
-                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="renderLocalityMap()">Refrescar datos</button>
+                                    <span class="badge bg-info text-dark">Vista simplificada: gráfico por localidad</span>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="toggleMapFallback()">Mostrar mapa</button>
                                 </div>
                             </div>
                             <div class="card-body">
-                                                        <div id="bogotaMapWrapper" style="position:relative;">
+                                                        <div id="bogotaMapWrapper" style="position:relative; display:none;">
                                                             <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef;"></div>
                                                             <div id="bogotaMapSpinner" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:20000; display:flex; align-items:center; justify-content:center;">
                                                                 <div style="text-align:center;">
@@ -923,7 +922,7 @@
                                                             </div>
                                     <div id="bogotaMapLegend" style="margin-top:10px;"></div>
                                     <!-- Fallback simplificado: gráfico de barras con % por localidad -->
-                                    <div id="bogotaChartWrapper" style="margin-top:12px;">
+                                    <div id="bogotaChartWrapper" style="margin-top:12px; display:block;">
                                         <canvas id="localidadesChart" style="width:100%; height:240px;"></canvas>
                                     </div>
                             </div>
@@ -1589,6 +1588,20 @@ function onEachFeature(feature, layer) {
     const { stats, total } = computeLocalidadStats();
     const s = stats[norm(nameRaw)] || { count: 0, pct: 0 };
     layer.bindPopup(`<strong>${name}</strong><br/>Registros: ${s.count || 0}<br/>Porcentaje: ${s.pct ? s.pct.toFixed(2) : '0.00'}%`);
+}
+
+function toggleMapFallback() {
+    const mapWrap = document.getElementById('bogotaMapWrapper');
+    const chartWrap = document.getElementById('bogotaChartWrapper');
+    if (!mapWrap || !chartWrap) return;
+    if (mapWrap.style.display === 'none' || mapWrap.style.display === '') {
+        mapWrap.style.display = 'block';
+        chartWrap.style.display = 'none';
+        try { renderLocalityMap(); } catch(e) { console.warn('No se pudo renderizar el mapa:', e); }
+    } else {
+        mapWrap.style.display = 'none';
+        chartWrap.style.display = 'block';
+    }
 }
 
 async function renderLocalityMap() {
