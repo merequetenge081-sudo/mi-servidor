@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    { "type": "Feature", "properties": { "NOMBRE": "Usaquén", "name": "Usaquén" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.12,4.82],[-74.07,4.82],[-74.07,4.74],[-74.12,4.74],[-74.12,4.82]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Chapinero", "name": "Chapinero" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.07,4.82],[-74.02,4.82],[-74.02,4.74],[-74.07,4.74],[-74.07,4.82]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Santa Fe", "name": "Santa Fe" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.02,4.82],[-73.97,4.82],[-73.97,4.74],[-74.02,4.74],[-74.02,4.82]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "San Cristóbal", "name": "San Cristóbal" }, "geometry": { "type": "Polygon", "coordinates": [[[-73.97,4.82],[-73.92,4.82],[-73.92,4.74],[-73.97,4.74],[-73.97,4.82]]] } },
+
+    { "type": "Feature", "properties": { "NOMBRE": "Usme", "name": "Usme" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.12,4.74],[-74.07,4.74],[-74.07,4.66],[-74.12,4.66],[-74.12,4.74]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Tunjuelito", "name": "Tunjuelito" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.07,4.74],[-74.02,4.74],[-74.02,4.66],[-74.07,4.66],[-74.07,4.74]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Bosa", "name": "Bosa" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.02,4.74],[-73.97,4.74],[-73.97,4.66],[-74.02,4.66],[-74.02,4.74]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Kennedy", "name": "Kennedy" }, "geometry": { "type": "Polygon", "coordinates": [[[-73.97,4.74],[-73.92,4.74],[-73.92,4.66],[-73.97,4.66],[-73.97,4.74]]] } },
+
+    { "type": "Feature", "properties": { "NOMBRE": "Fontibón", "name": "Fontibón" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.12,4.66],[-74.07,4.66],[-74.07,4.58],[-74.12,4.58],[-74.12,4.66]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Engativá", "name": "Engativá" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.07,4.66],[-74.02,4.66],[-74.02,4.58],[-74.07,4.58],[-74.07,4.66]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Suba", "name": "Suba" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.02,4.66],[-73.97,4.66],[-73.97,4.58],[-74.02,4.58],[-74.02,4.66]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Barrios Unidos", "name": "Barrios Unidos" }, "geometry": { "type": "Polygon", "coordinates": [[[-73.97,4.66],[-73.92,4.66],[-73.92,4.58],[-73.97,4.58],[-73.97,4.66]]] } },
+
+    { "type": "Feature", "properties": { "NOMBRE": "Teusaquillo", "name": "Teusaquillo" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.12,4.58],[-74.07,4.58],[-74.07,4.50],[-74.12,4.50],[-74.12,4.58]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Los Mártires", "name": "Los Mártires" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.07,4.58],[-74.02,4.58],[-74.02,4.50],[-74.07,4.50],[-74.07,4.58]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Antonio Nariño", "name": "Antonio Nariño" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.02,4.58],[-73.97,4.58],[-73.97,4.50],[-74.02,4.50],[-74.02,4.58]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Puente Aranda", "name": "Puente Aranda" }, "geometry": { "type": "Polygon", "coordinates": [[[-73.97,4.58],[-73.92,4.58],[-73.92,4.50],[-73.97,4.50],[-73.97,4.58]]] } },
+
+    { "type": "Feature", "properties": { "NOMBRE": "La Candelaria", "name": "La Candelaria" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.12,4.50],[-74.07,4.50],[-74.07,4.42],[-74.12,4.42],[-74.12,4.50]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Rafael Uribe Uribe", "name": "Rafael Uribe Uribe" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.07,4.50],[-74.02,4.50],[-74.02,4.42],[-74.07,4.42],[-74.07,4.50]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Ciudad Bolívar", "name": "Ciudad Bolívar" }, "geometry": { "type": "Polygon", "coordinates": [[[-74.02,4.50],[-73.97,4.50],[-73.97,4.42],[-74.02,4.42],[-74.02,4.50]]] } },
+    { "type": "Feature", "properties": { "NOMBRE": "Sumapaz", "name": "Sumapaz" }, "geometry": { "type": "Polygon", "coordinates": [[[-73.97,4.50],[-73.92,4.50],[-73.92,4.42],[-73.97,4.42],[-73.97,4.50]]] } }
+  ]
+}
