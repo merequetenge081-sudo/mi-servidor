@@ -920,8 +920,12 @@
                                                                     <div class="mt-2">Cargando mapa...</div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                <div id="bogotaMapLegend" style="margin-top:10px;"></div>
+                                                            </div>
+                                    <div id="bogotaMapLegend" style="margin-top:10px;"></div>
+                                    <!-- Fallback simplificado: gráfico de barras con % por localidad -->
+                                    <div id="bogotaChartWrapper" style="margin-top:12px;">
+                                        <canvas id="localidadesChart" style="width:100%; height:240px;"></canvas>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -1634,6 +1638,9 @@ async function renderLocalityMap() {
     topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} — ${t.count} (${t.pct.toFixed(2)}%)</li>`));
     topHtml.push('</ol></div>');
     legendEl.innerHTML += topHtml.join('');
+
+    // También actualizar el gráfico simplificado (fallback)
+    try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart simplificado:', e); }
 }
 
 // ===================== 🔹 Mobile sidebar toggle helpers =====================
@@ -2984,6 +2991,68 @@ function renderDailyChart(dailyData) {
         console.error('Error renderDailyChart:', err);
     }
 }
+
+// Gráfico simplificado: porcentaje por localidad (fallback si no hay GeoJSON)
+let localidadesChart = null;
+function renderLocalidadesChart() {
+    try {
+        const { stats, total } = computeLocalidadStats();
+        const entries = Object.keys(stats).map(k => ({ key: k, label: stats[k].label || k, pct: stats[k].pct || 0, count: stats[k].count || 0 })).sort((a,b)=>b.count-a.count);
+        const labels = entries.map(e => e.label);
+        const data = entries.map(e => Number(e.pct.toFixed(2)));
+        const ctxEl = document.getElementById('localidadesChart');
+        if (!ctxEl) return;
+        const ctx = ctxEl.getContext('2d');
+
+        const bgColors = entries.map(e => getColorForPct(e.pct));
+
+        if (localidadesChart) {
+            localidadesChart.data.labels = labels;
+            localidadesChart.data.datasets[0].data = data;
+            localidadesChart.data.datasets[0].backgroundColor = bgColors;
+            localidadesChart.update();
+            return;
+        }
+
+        localidadesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: '% Registros',
+                    data,
+                    backgroundColor: bgColors,
+                    borderColor: bgColors.map(c => c),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const idx = context.dataIndex;
+                                const e = entries[idx];
+                                return `${e.pct.toFixed(2)}% — ${e.count} registros`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+                    y: { ticks: { autoSkip: false } }
+                }
+            }
+        });
+    } catch (err) {
+        console.error('Error renderLocalidadesChart:', err);
+    }
+}
+
 
 function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registrations') {
     const today = new Date().setHours(0,0,0,0);
