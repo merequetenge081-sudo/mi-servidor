@@ -921,6 +921,12 @@
                                                             </div>
                                                             </div>
                                     <div id="bogotaMapLegend" style="margin-top:10px;"></div>
+                                    <!-- Input para cargar GeoJSON desde URL -->
+                                    <div class="input-group mt-2 mb-2">
+                                        <input id="geojsonUrlInput" class="form-control form-control-sm" placeholder="Pega aquí la URL del GeoJSON (opcional)" />
+                                        <button class="btn btn-sm btn-outline-primary" type="button" onclick="loadBogotaMapFromInput()">Cargar GeoJSON</button>
+                                    </div>
+                                    <div class="small text-muted mb-2">Si colocas un archivo llamado <code>bogota_localidades.geojson</code> en la raíz del servidor, se cargará automáticamente.</div>
                                     <!-- Fallback simplificado: gráfico de barras con % por localidad -->
                                     <div id="bogotaChartWrapper" style="margin-top:12px; display:block;">
                                         <canvas id="localidadesChart" style="width:100%; height:240px;"></canvas>
@@ -1587,7 +1593,32 @@ function onEachFeature(feature, layer) {
     const name = nameRaw || 'Sin nombre';
     const { stats, total } = computeLocalidadStats();
     const s = stats[norm(nameRaw)] || { count: 0, pct: 0 };
+    // Bind popup for click
     layer.bindPopup(`<strong>${name}</strong><br/>Registros: ${s.count || 0}<br/>Porcentaje: ${s.pct ? s.pct.toFixed(2) : '0.00'}%`);
+
+    // Bind tooltip for hover (shows percentage) and add highlight on hover
+    layer.bindTooltip(`${name}: ${s.pct ? s.pct.toFixed(2) : '0.00'}%`, { direction: 'auto', sticky: true });
+
+    layer.on({
+        mouseover: function(e) {
+            const tgt = e.target;
+            try {
+                tgt.setStyle({ weight: 2.5, color: '#222', fillOpacity: 1 });
+            } catch (err) {}
+            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                try { tgt.bringToFront(); } catch(e) {}
+            }
+            // Open tooltip at mouse position
+            try { this.openTooltip(e.latlng); } catch(e) {}
+        },
+        mouseout: function(e) {
+            try { _bogotaLayer.resetStyle(e.target); } catch(err) {}
+            try { this.closeTooltip(); } catch(e) {}
+        },
+        click: function(e) {
+            try { this.openPopup(); } catch(e) {}
+        }
+    });
 }
 
 function toggleMapFallback() {
