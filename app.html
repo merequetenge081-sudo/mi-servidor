@@ -58,6 +58,30 @@
         #analysisSection .border-warning {
             border-top: 3px solid var(--warning) !important;
         }
+        /* Bogotá map & SVG label styles */
+        #bogotaMap {
+            border-radius: 8px;
+            box-shadow: 0 6px 18px rgba(17,20,33,0.06);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        #bogotaMap:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(17,20,33,0.10); }
+        .svg-label {
+            font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial;
+            font-size: 12px;
+            fill: #ffffff;
+            stroke: rgba(0,0,0,0.45);
+            stroke-width: 0.8px;
+            paint-order: stroke;
+            pointer-events: none;
+            font-weight: 600;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+        }
+        .svg-label.hidden { display: none; }
+        .loc-selected { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
+        #svgLabelsToggle {
+            box-shadow: 0 4px 12px rgba(2,6,23,0.06);
+            backdrop-filter: blur(4px);
+        }
         
         #analysisSection .table th {
             border-top: none;
@@ -916,7 +940,7 @@
                             </div>
                             <div class="card-body">
                                                         <div id="bogotaMapWrapper" style="position:relative; display:none;">
-                                                                                                                        <div id="bogotaMap" style="width:100%; height:480px; border:1px solid #e9ecef; background:#f8fbff; display:flex; align-items:center; justify-content:center;"> 
+                                                                                                                        <div id="bogotaMap" style="width:100%; height:560px; border:1px solid #e9ecef; background:linear-gradient(180deg,#f8fbff 0%, #f1f8ff 100%); display:flex; align-items:center; justify-content:center;"> 
                                                                                                                                 <!-- Inline SVG croquis (fallback guaranteed). Removed inline content so external bogota_croquis.svg is used dynamically. -->
                                                                                                                                 <div id="bogotaCroquisInlineWrapper" style="width:100%;height:100%;">
                                                                                                                                     <!-- El contenido SVG se carga dinámicamente desde /bogota_croquis.svg -->
