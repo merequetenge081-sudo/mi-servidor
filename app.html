@@ -1636,55 +1636,75 @@ function toggleMapFallback() {
 }
 
 async function renderLocalityMap() {
-    const geo = await ensureBogotaGeo();
-    if (!geo) return;
-    // compute stats to prepare legend
-    const { stats, total } = computeLocalidadStats();
+    const spinner = document.getElementById('bogotaMapSpinner');
+    try {
+        if (spinner) spinner.style.display = 'flex';
+        const geo = await ensureBogotaGeo();
+        if (!geo) return;
+        // compute stats to prepare legend
+        const { stats, total } = computeLocalidadStats();
 
-    if (!_bogotaMap) {
-        _bogotaMap = L.map('bogotaMap', { scrollWheelZoom: false }).setView([4.6486, -74.0826], 10);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+        // Ensure the container is visible so Leaflet can initialize properly
+        const mapWrap = document.getElementById('bogotaMapWrapper');
+        if (mapWrap) mapWrap.style.display = 'block';
+
+        if (!_bogotaMap) {
+            _bogotaMap = L.map('bogotaMap', { scrollWheelZoom: false }).setView([4.6486, -74.0826], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(_bogotaMap);
+        }
+
+        if (_bogotaLayer) {
+            try { _bogotaMap.removeLayer(_bogotaLayer); } catch(e) { console.warn('Error removing previous layer', e); }
+            _bogotaLayer = null;
+        }
+
+        _bogotaLayer = L.geoJSON(geo, {
+            style: styleFeature,
+            onEachFeature: onEachFeature
         }).addTo(_bogotaMap);
+
+        // give browser a moment, then invalidate size and fit bounds
+        try {
+            setTimeout(() => {
+                try { _bogotaMap.invalidateSize(); } catch(e) {}
+                try { _bogotaMap.fitBounds(_bogotaLayer.getBounds(), { padding: [20,20] }); } catch(e) { console.warn('fitBounds failed', e); }
+            }, 80);
+        } catch(e) { console.warn('Error forcing map resize', e); }
+
+        // Legend
+        const legendEl = document.getElementById('bogotaMapLegend');
+        if (legendEl) {
+            legendEl.innerHTML = '';
+            const legendHtml = [
+                '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#f0f0f0;border:1px solid #ccc"></span> 0%</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#d4f7d9"></span> <5%</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#a8e6a3"></span> 5-10%</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ffe98a"></span> 10-20%</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ffb86b"></span> 20-40%</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ff6b6b"></span> >40%</div>',
+                '</div>'
+            ].join(' ');
+            legendEl.innerHTML = legendHtml;
+
+            // Also list top localidades
+            const topList = Object.keys(stats).map(k => ({ k, ...stats[k] })).sort((a,b)=>b.count-a.count).slice(0,10);
+            const topHtml = ['<div class="mt-3"><strong>Top localidades</strong><ol style="padding-left:18px;">'];
+            topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} — ${t.count} (${t.pct.toFixed(2)}%)</li>`));
+            topHtml.push('</ol></div>');
+            legendEl.innerHTML += topHtml.join('');
+        }
+
+        // También actualizar el gráfico simplificado (fallback)
+        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart simplificado:', e); }
+    } catch (err) {
+        console.error('Error en renderLocalityMap:', err);
+        throw err;
+    } finally {
+        if (spinner) spinner.style.display = 'none';
     }
-
-    if (_bogotaLayer) {
-        _bogotaMap.removeLayer(_bogotaLayer);
-        _bogotaLayer = null;
-    }
-
-    _bogotaLayer = L.geoJSON(geo, {
-        style: styleFeature,
-        onEachFeature: onEachFeature
-    }).addTo(_bogotaMap);
-
-    // fit bounds
-    try { _bogotaMap.fitBounds(_bogotaLayer.getBounds(), { padding: [20,20] }); } catch(e) {}
-
-    // Legend
-    const legendEl = document.getElementById('bogotaMapLegend');
-    legendEl.innerHTML = '';
-    const legendHtml = [
-        '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">',
-        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#f0f0f0;border:1px solid #ccc"></span> 0%</div>',
-        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#d4f7d9"></span> <5%</div>',
-        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#a8e6a3"></span> 5-10%</div>',
-        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ffe98a"></span> 10-20%</div>',
-        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ffb86b"></span> 20-40%</div>',
-        '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ff6b6b"></span> >40%</div>',
-        '</div>'
-    ].join(' ');
-    legendEl.innerHTML = legendHtml;
-
-    // Also list top localidades
-    const topList = Object.keys(stats).map(k => ({ k, ...stats[k] })).sort((a,b)=>b.count-a.count).slice(0,10);
-    const topHtml = ['<div class="mt-3"><strong>Top localidades</strong><ol style="padding-left:18px;">'];
-    topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} — ${t.count} (${t.pct.toFixed(2)}%)</li>`));
-    topHtml.push('</ol></div>');
-    legendEl.innerHTML += topHtml.join('');
-
-    // También actualizar el gráfico simplificado (fallback)
-    try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart simplificado:', e); }
 }
 
 // ===================== 🔹 Mobile sidebar toggle helpers =====================
