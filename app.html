@@ -1959,6 +1959,7 @@ async function loadRegistrations() {
     if (!res.ok) throw new Error('Error cargando registros');
     registrations = await res.json();
     updateRegistrationsTable();
+        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras cargar registros:', e); }
     return registrations;
   } catch (error) {
     console.error('Error en loadRegistrations:', error);
@@ -2943,6 +2944,8 @@ async function refreshAnalysis() {
         } catch (err) {
             console.warn('No se pudo obtener series diarias:', err);
         }
+
+        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras actualizar análisis:', e); }
 
         showToast('success', 'Análisis actualizado');
     } catch (error) {
