@@ -1508,14 +1508,25 @@ function computeLocalidadStats() {
     registrations.forEach(r => {
         const raw = (r.localidad || '').trim() || 'Sin Localidad';
         const k = norm(raw) || 'sin localidad';
-        if (!counts[k]) counts[k] = { raw, count: 0 };
+        if (!counts[k]) counts[k] = { raw, count: 0, voters: 0 };
         counts[k].count += 1;
+        // Determine if this registration marks a votante
+        const val = r.registeredToVote;
+        const isVoter = (val === true || String(val).toLowerCase() === 'true');
+        if (isVoter) counts[k].voters += 1;
     });
     const total = registrations.length || 0;
     const stats = {};
     for (const k of Object.keys(counts)) {
         const c = counts[k].count;
-        stats[k] = { count: c, pct: total ? (c / total) * 100 : 0, label: counts[k].raw };
+        const v = counts[k].voters || 0;
+        stats[k] = {
+            count: c,
+            voters: v,
+            pct: total ? (c / total) * 100 : 0,
+            voterPct: c ? (v / c) * 100 : 0,
+            label: counts[k].raw
+        };
     }
     return { stats, total };
 }
@@ -1561,13 +1572,13 @@ async function ensureBogotaGeo() {
 }
 
 function getColorForPct(pct) {
-    // Green (low) -> Yellow -> Red (high)
+    // Use a blue scale for % votantes: lighter = fewer votantes, darker = more
     if (pct === 0) return '#f0f0f0';
-    if (pct < 5) return '#d4f7d9';
-    if (pct < 10) return '#a8e6a3';
-    if (pct < 20) return '#ffe98a';
-    if (pct < 40) return '#ffb86b';
-    return '#ff6b6b';
+    if (pct < 10) return '#d8eefe';
+    if (pct < 25) return '#a6d8ff';
+    if (pct < 50) return '#58b6ff';
+    if (pct < 75) return '#1e90ff';
+    return '#0b67d1';
 }
 
 function styleFeature(feature) {
@@ -1576,14 +1587,14 @@ function styleFeature(feature) {
     const norm = s => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
     const key = norm(rawKey);
     const { stats } = computeLocalidadStats();
-    const s = stats[key] || { pct: 0 };
+    const s = stats[key] || { pct: 0, voterPct: 0 };
     return {
-        weight: 1,
+        weight: 1.5,
         opacity: 1,
-        color: '#444',
-        dashArray: '0',
-        fillOpacity: 0.85,
-        fillColor: getColorForPct(s.pct)
+        color: '#ffffff',
+        dashArray: '2',
+        fillOpacity: 0.95,
+        fillColor: getColorForPct(s.voterPct)
     };
 }
 
@@ -1592,12 +1603,12 @@ function onEachFeature(feature, layer) {
     const norm = s => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
     const name = nameRaw || 'Sin nombre';
     const { stats, total } = computeLocalidadStats();
-    const s = stats[norm(nameRaw)] || { count: 0, pct: 0 };
-    // Bind popup for click
-    layer.bindPopup(`<strong>${name}</strong><br/>Registros: ${s.count || 0}<br/>Porcentaje: ${s.pct ? s.pct.toFixed(2) : '0.00'}%`);
+    const s = stats[norm(nameRaw)] || { count: 0, pct: 0, voters: 0, voterPct: 0 };
+    // Bind popup for click: show registros y % votantes (dentro de la localidad)
+    layer.bindPopup(`<strong>${name}</strong><br/>Registros: ${s.count || 0}<br/>Votantes: ${s.voters || 0}<br/>% Votantes: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%`);
 
-    // Bind tooltip for hover (shows percentage) and add highlight on hover
-    layer.bindTooltip(`${name}: ${s.pct ? s.pct.toFixed(2) : '0.00'}%`, { direction: 'auto', sticky: true });
+    // Bind tooltip for hover (shows % votantes) and add highlight on hover
+    layer.bindTooltip(`${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`, { direction: 'auto', sticky: true });
 
     layer.on({
         mouseover: function(e) {
@@ -1680,19 +1691,19 @@ async function renderLocalityMap() {
             const legendHtml = [
                 '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">',
                 '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#f0f0f0;border:1px solid #ccc"></span> 0%</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#d4f7d9"></span> <5%</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#a8e6a3"></span> 5-10%</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ffe98a"></span> 10-20%</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ffb86b"></span> 20-40%</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#ff6b6b"></span> >40%</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#d8eefe"></span> <10% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#a6d8ff"></span> 10-25% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#58b6ff"></span> 25-50% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#1e90ff"></span> 50-75% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#0b67d1"></span> >75% votantes</div>',
                 '</div>'
             ].join(' ');
             legendEl.innerHTML = legendHtml;
 
-            // Also list top localidades
+            // Also list top localidades by registros, show voter % as extra info
             const topList = Object.keys(stats).map(k => ({ k, ...stats[k] })).sort((a,b)=>b.count-a.count).slice(0,10);
             const topHtml = ['<div class="mt-3"><strong>Top localidades</strong><ol style="padding-left:18px;">'];
-            topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} — ${t.count} (${t.pct.toFixed(2)}%)</li>`));
+            topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} — ${t.count} registros — ${t.voterPct.toFixed(2)}% votantes</li>`));
             topHtml.push('</ol></div>');
             legendEl.innerHTML += topHtml.join('');
         }
