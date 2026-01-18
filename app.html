@@ -1767,17 +1767,18 @@ function onEachFeature(feature, layer) {
                     el.setAttribute('fill', color);
                     // Highlight selected localidad
                     if (currentLocalidadFilter && currentLocalidadFilter === key) {
-                        el.style.stroke = '#222';
-                        el.style.strokeWidth = '18px';
+                        // mark selected using CSS class for consistent styling
+                        el.classList.add('loc-selected');
                         el.setAttribute('stroke', '#222');
-                        el.setAttribute('stroke-width', '18');
-                        el.style.filter = 'drop-shadow(0 6px 18px rgba(0,0,0,0.45))';
+                        el.setAttribute('stroke-width', '3');
                     } else {
-                        // reset
-                        el.style.stroke = el.getAttribute('data-stroke') || '#fff';
-                        el.style.strokeWidth = (el.getAttribute('data-stroke-width') ? (el.getAttribute('data-stroke-width') + 'px') : '12px');
-                        el.setAttribute('stroke', el.getAttribute('data-stroke') || '#fff');
-                        el.setAttribute('stroke-width', el.getAttribute('data-stroke-width') || '12');
+                        // reset to defaults (thin white border)
+                        el.classList.remove('loc-selected');
+                        const baseStroke = el.getAttribute('data-stroke') || '#fff';
+                        const baseStrokeWidth = el.getAttribute('data-stroke-width') || '1';
+                        el.setAttribute('stroke', baseStroke);
+                        el.setAttribute('stroke-width', baseStrokeWidth);
+                        // also ensure inline style fallback
                         el.style.filter = '';
                     }
                 } catch(e) {}
