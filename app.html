@@ -414,6 +414,10 @@
         #svgMapTooltip { background: rgba(0,0,0,0.78); color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 13px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
         /* Localidades list box */
         #localidadesBox { font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial; }
+        /* Transition and positioning helpers for the panel (hidden by default) */
+        #localidadesBox { transition: transform 0.18s ease, opacity 0.18s ease; }
+        #localidadesBox.hidden { display: none !important; opacity: 0; transform: translateX(-8px); }
+        #localidadesBox.visible { display: block !important; opacity: 1; transform: translateX(0); }
         .localidades-item { background: transparent; border-radius: 6px; }
         .localidades-item:hover { background: rgba(6,24,12,0.04); cursor: pointer; }
     </style>
@@ -1648,7 +1652,7 @@ function styleFeature(feature) {
     const { stats } = computeLocalidadStats();
     const s = stats[key] || { pct: 0, voterPct: 0 };
     return {
-        weight: 1.5,
+        weight: 0.8,
         opacity: 1,
         color: '#ffffff',
         dashArray: '2',
@@ -1673,7 +1677,7 @@ function onEachFeature(feature, layer) {
         mouseover: function(e) {
             const tgt = e.target;
             try {
-                tgt.setStyle({ weight: 2.5, color: '#222', fillOpacity: 1 });
+                tgt.setStyle({ weight: 1.8, color: '#222', fillOpacity: 1 });
             } catch (err) {}
             if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                 try { tgt.bringToFront(); } catch(e) {}
@@ -1821,7 +1825,7 @@ function onEachFeature(feature, layer) {
                                 const box = document.createElement('div');
                                 box.id = 'localidadesBox';
                                 box.style.position = 'absolute';
-                                box.style.right = '12px';
+                                box.style.left = '12px';
                                 box.style.top = '12px';
                                 box.style.width = '280px';
                                 box.style.maxHeight = '68%';
@@ -1831,6 +1835,8 @@ function onEachFeature(feature, layer) {
                                 box.style.boxShadow = '0 10px 30px rgba(2,6,23,0.10)';
                                 box.style.zIndex = 26000;
                                 box.style.padding = '8px';
+                                // start hidden; toggled by the hamburger button
+                                box.classList.add('hidden');
 
                                 const title = document.createElement('div');
                                 title.innerText = 'Localidades';
@@ -1891,7 +1897,7 @@ function onEachFeature(feature, layer) {
                         btn.className = 'btn btn-sm btn-outline-secondary';
                         btn.style.position = 'absolute';
                         btn.style.top = '8px';
-                        btn.style.left = '8px';
+                        btn.style.left = '56px';
                         btn.style.zIndex = 25000;
                         btn.style.padding = '6px 8px';
                         btn.innerText = 'Etiquetas';
@@ -1907,6 +1913,37 @@ function onEachFeature(feature, layer) {
                             btn.classList.toggle('active', show);
                         };
                         mapWrap.appendChild(btn);
+                    }
+                    // Add hamburger toggle for localidades panel (left side)
+                    let locBtn = document.getElementById('localidadesToggle');
+                    if (!locBtn) {
+                        locBtn = document.createElement('button');
+                        locBtn.id = 'localidadesToggle';
+                        locBtn.type = 'button';
+                        locBtn.className = 'btn btn-sm btn-outline-secondary';
+                        locBtn.style.position = 'absolute';
+                        locBtn.style.top = '8px';
+                        locBtn.style.left = '8px';
+                        locBtn.style.zIndex = 25000;
+                        locBtn.style.padding = '6px 8px';
+                        locBtn.innerHTML = '<i class="bi bi-list"></i>';
+                        locBtn.title = 'Mostrar/ocultar localidades';
+                        locBtn.onclick = (ev) => {
+                            ev.stopPropagation();
+                            const box = document.getElementById('localidadesBox');
+                            if (!box) return;
+                            const isHidden = box.classList.contains('hidden');
+                            if (isHidden) {
+                                box.classList.remove('hidden');
+                                box.classList.add('visible');
+                                // ensure badge updates when opening
+                                try { colorSvgByStats(); } catch(e){}
+                            } else {
+                                box.classList.remove('visible');
+                                box.classList.add('hidden');
+                            }
+                        };
+                        mapWrap.appendChild(locBtn);
                     }
                 }
             } catch(e) { console.warn('labels creation failed', e); }
@@ -1932,12 +1969,12 @@ function onEachFeature(feature, layer) {
                         // mark selected using CSS class for consistent styling
                         el.classList.add('loc-selected');
                         el.setAttribute('stroke', '#222');
-                        el.setAttribute('stroke-width', '3');
+                        el.setAttribute('stroke-width', '2');
                     } else {
-                        // reset to defaults (thin white border)
+                        // reset to defaults (thinner white border)
                         el.classList.remove('loc-selected');
                         const baseStroke = el.getAttribute('data-stroke') || '#fff';
-                        const baseStrokeWidth = el.getAttribute('data-stroke-width') || '1';
+                        const baseStrokeWidth = el.getAttribute('data-stroke-width') || '0.8';
                         el.setAttribute('stroke', baseStroke);
                         el.setAttribute('stroke-width', baseStrokeWidth);
                         // also ensure inline style fallback
