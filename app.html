@@ -1781,27 +1781,35 @@ function onEachFeature(feature, layer) {
                                 const g = document.createElementNS('http://www.w3.org/2000/svg','g');
                                 g.setAttribute('id','labels-group');
                                 svg.appendChild(g);
-                                const items = svg.querySelectorAll('[data-name]');
+                                const items = Array.from(svg.querySelectorAll('[data-name]'));
                                 // wait a frame so the svg layout is ready and bboxes are accurate
                                 requestAnimationFrame(() => {
-                                    const key = normalizeName(name || '');
-                                        try {
-                                            const name2 = el2.getAttribute('data-name');
-                                            const bbox = el2.getBBox();
-                                            const x = bbox.x + bbox.width/2;
-                                            const y = bbox.y + bbox.height/2;
-                                            const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-                                            t.setAttribute('x', x);
-                                            t.setAttribute('y', y);
-                                            // show labels by default (user requested names visible)
-                                            t.setAttribute('class', 'svg-label');
-                                            t.setAttribute('data-for', name2);
-                                            // shorten label if very long
-                                            const lab = (name2 || '').replace(/_/g,' ');
-                                            t.textContent = lab.length > 18 ? (lab.slice(0,16) + '…') : lab;
-                                            g.appendChild(t);
-                                        } catch(_) {}
-                                    });
+                                    try {
+                                        const areaThreshold = 400; // skip very small polygons
+                                        items.forEach(el2 => {
+                                            try {
+                                                const name2 = el2.getAttribute('data-name');
+                                                if (!name2) return;
+                                                const bbox = el2.getBBox();
+                                                const area = Math.abs(bbox.width * bbox.height);
+                                                if (area < areaThreshold) return;
+                                                const x = bbox.x + bbox.width/2;
+                                                const y = bbox.y + bbox.height/2;
+                                                const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+                                                t.setAttribute('x', x);
+                                                t.setAttribute('y', y);
+                                                // show labels by default (user requested names visible)
+                                                t.setAttribute('class', 'svg-label');
+                                                t.setAttribute('data-for', name2);
+                                                t.setAttribute('text-anchor', 'middle');
+                                                t.setAttribute('dominant-baseline', 'middle');
+                                                // shorten label if very long
+                                                const lab = (name2 || '').replace(/_/g,' ');
+                                                t.textContent = lab.length > 18 ? (lab.slice(0,16) + '…') : lab;
+                                                g.appendChild(t);
+                                            } catch(_) { /* ignore element-specific errors */ }
+                                        });
+                                    } catch(_) { /* silence errors during label generation */ }
                                 });
                             } catch(_) { }
                         }
