@@ -1969,6 +1969,35 @@ function onEachFeature(feature, layer) {
 
                                 box.appendChild(list);
                                 mapWrap.appendChild(box);
+                                // Also create in-map labels: center text over each [data-name]
+                                try {
+                                    const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                                    labelsGroup.setAttribute('id', 'labels-group');
+                                    // small transform to ensure labels render above fills
+                                    svg.appendChild(labelsGroup);
+                                    const shapes = Array.from(svg.querySelectorAll('[data-name]'));
+                                    shapes.forEach(s => {
+                                        try {
+                                            // ensure shape receives pointer events
+                                            try { s.style.pointerEvents = 'all'; s.setAttribute('pointer-events','all'); } catch(e) {}
+                                            const name = s.getAttribute('data-name') || '';
+                                            // compute bbox and centroid
+                                            let bx;
+                                            try { bx = s.getBBox(); } catch(e) { bx = null; }
+                                            const cx = bx ? (bx.x + bx.width/2) : 0;
+                                            const cy = bx ? (bx.y + bx.height/2) : 0;
+                                            const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                                            t.setAttribute('x', cx);
+                                            t.setAttribute('y', cy);
+                                            t.setAttribute('text-anchor', 'middle');
+                                            t.setAttribute('dominant-baseline', 'middle');
+                                            t.setAttribute('class', 'svg-label');
+                                            t.setAttribute('style', 'pointer-events:none; font-family: Inter, Arial; font-size:12px; fill:#123; font-weight:700;');
+                                            t.textContent = name;
+                                            labelsGroup.appendChild(t);
+                                        } catch(e) { /* ignore per-shape errors */ }
+                                    });
+                                } catch(e) { console.warn('create in-map labels failed', e); }
                             } catch (e) { console.warn('createLocalidadesBox failed', e); }
                         }
                         createSvgLabels();
