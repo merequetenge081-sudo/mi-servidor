@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" id="bogota_croquis_auto">
+<style>path{fill:#eee;stroke:#ffffff;stroke-width:1.5px;cursor:pointer;}path:hover{filter:brightness(0.9);}#legend{font-family:Arial,Helvetica,sans-serif;font-size:12px}</style>
+<path id="loc-0" data-name="Usaquén" data-name-norm="usaquen" d="M38.46 30.77 L319.23 30.77 L319.23 178.46 L38.46 178.46 L38.46 30.77 Z" />
+<path id="loc-1" data-name="Chapinero" data-name-norm="chapinero" d="M319.23 30.77 L600.00 30.77 L600.00 178.46 L319.23 178.46 L319.23 30.77 Z" />
+<path id="loc-2" data-name="Santa Fe" data-name-norm="santa fe" d="M600.00 30.77 L880.77 30.77 L880.77 178.46 L600.00 178.46 L600.00 30.77 Z" />
+<path id="loc-3" data-name="San Cristóbal" data-name-norm="san cristobal" d="M880.77 30.77 L1161.54 30.77 L1161.54 178.46 L880.77 178.46 L880.77 30.77 Z" />
+<path id="loc-4" data-name="Usme" data-name-norm="usme" d="M38.46 178.46 L319.23 178.46 L319.23 326.15 L38.46 326.15 L38.46 178.46 Z" />
+<path id="loc-5" data-name="Tunjuelito" data-name-norm="tunjuelito" d="M319.23 178.46 L600.00 178.46 L600.00 326.15 L319.23 326.15 L319.23 178.46 Z" />
+<path id="loc-6" data-name="Bosa" data-name-norm="bosa" d="M600.00 178.46 L880.77 178.46 L880.77 326.15 L600.00 326.15 L600.00 178.46 Z" />
+<path id="loc-7" data-name="Kennedy" data-name-norm="kennedy" d="M880.77 178.46 L1161.54 178.46 L1161.54 326.15 L880.77 326.15 L880.77 178.46 Z" />
+<path id="loc-8" data-name="Fontibón" data-name-norm="fontibon" d="M38.46 326.15 L319.23 326.15 L319.23 473.85 L38.46 473.85 L38.46 326.15 Z" />
+<path id="loc-9" data-name="Engativá" data-name-norm="engativa" d="M319.23 326.15 L600.00 326.15 L600.00 473.85 L319.23 473.85 L319.23 326.15 Z" />
+<path id="loc-10" data-name="Suba" data-name-norm="suba" d="M600.00 326.15 L880.77 326.15 L880.77 473.85 L600.00 473.85 L600.00 326.15 Z" />
+<path id="loc-11" data-name="Barrios Unidos" data-name-norm="barrios unidos" d="M880.77 326.15 L1161.54 326.15 L1161.54 473.85 L880.77 473.85 L880.77 326.15 Z" />
+<path id="loc-12" data-name="Teusaquillo" data-name-norm="teusaquillo" d="M38.46 473.85 L319.23 473.85 L319.23 621.54 L38.46 621.54 L38.46 473.85 Z" />
+<path id="loc-13" data-name="Los Mártires" data-name-norm="los martires" d="M319.23 473.85 L600.00 473.85 L600.00 621.54 L319.23 621.54 L319.23 473.85 Z" />
+<path id="loc-14" data-name="Antonio Nariño" data-name-norm="antonio narino" d="M600.00 473.85 L880.77 473.85 L880.77 621.54 L600.00 621.54 L600.00 473.85 Z" />
+<path id="loc-15" data-name="Puente Aranda" data-name-norm="puente aranda" d="M880.77 473.85 L1161.54 473.85 L1161.54 621.54 L880.77 621.54 L880.77 473.85 Z" />
+<path id="loc-16" data-name="La Candelaria" data-name-norm="la candelaria" d="M38.46 621.54 L319.23 621.54 L319.23 769.23 L38.46 769.23 L38.46 621.54 Z" />
+<path id="loc-17" data-name="Rafael Uribe Uribe" data-name-norm="rafael uribe uribe" d="M319.23 621.54 L600.00 621.54 L600.00 769.23 L319.23 769.23 L319.23 621.54 Z" />
+<path id="loc-18" data-name="Ciudad Bolívar" data-name-norm="ciudad bolivar" d="M600.00 621.54 L880.77 621.54 L880.77 769.23 L600.00 769.23 L600.00 621.54 Z" />
+<path id="loc-19" data-name="Sumapaz" data-name-norm="sumapaz" d="M880.77 621.54 L1161.54 621.54 L1161.54 769.23 L880.77 769.23 L880.77 621.54 Z" />
+</svg>
