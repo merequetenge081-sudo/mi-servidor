@@ -1804,10 +1804,18 @@ function toggleMapFallback() {
 // Try to load SVG croquis if present (top-level so other functions can call it)
 async function ensureBogotaCroquis() {
     try {
-        const r = await fetch('/bogota_croquis.svg');
-        if (!r.ok) return null;
-        const txt = await r.text();
-        return txt;
+        // Prefer auto-generated SVG (from GeoJSON) if present
+        const candidates = ['/bogota_croquis_auto.svg', '/bogota_croquis.svg'];
+        for (const p of candidates) {
+            try {
+                const r = await fetch(p);
+                if (!r.ok) continue;
+                const txt = await r.text();
+                console.info('Loaded croquis from', p);
+                return txt;
+            } catch(e) { continue; }
+        }
+        return null;
     } catch(e) { return null; }
 }
 async function renderLocalityMap() {
