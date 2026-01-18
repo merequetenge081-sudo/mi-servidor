@@ -412,6 +412,10 @@
         .svg-label { font-family: Arial, Helvetica, sans-serif; font-size: 12px; fill: #ffffff; pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: rgba(0,0,0,0.08); stroke-width: 0.8px; dominant-baseline: central; font-weight:600; text-shadow: 0 1px 0 rgba(0,0,0,0.06);} 
         .svg-label.hidden { display: none; }
         #svgMapTooltip { background: rgba(0,0,0,0.78); color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 13px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+        /* Localidades list box */
+        #localidadesBox { font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial; }
+        .localidades-item { background: transparent; border-radius: 6px; }
+        .localidades-item:hover { background: rgba(6,24,12,0.04); cursor: pointer; }
     </style>
 </head>
 <body>
@@ -1803,61 +1807,77 @@ function onEachFeature(feature, layer) {
             try {
                         function createSvgLabels() {
                             try {
-                                // remove old labels group
+                                // remove any previous svg labels group
                                 const old = svg.querySelector('#labels-group');
                                 if (old) old.remove();
-                                const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-                                g.setAttribute('id','labels-group');
-                                svg.appendChild(g);
-                                const items = Array.from(svg.querySelectorAll('[data-name]'));
-                                // wait a frame so the svg layout is ready and bboxes are accurate
-                                requestAnimationFrame(() => {
-                                    try {
-                                        const areaThreshold = 400; // skip very small polygons
-                                        items.forEach(el2 => {
-                                            try {
-                                                const name2 = el2.getAttribute('data-name');
-                                                if (!name2) return;
-                                                const bbox = el2.getBBox();
-                                                const area = Math.abs(bbox.width * bbox.height);
-                                                if (area < areaThreshold) return;
-                                                const x = bbox.x + bbox.width/2;
-                                                const y = bbox.y + bbox.height/2;
-                                                const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-                                                t.setAttribute('x', x);
-                                                t.setAttribute('y', y);
-                                                // show labels by default (user requested names visible)
-                                                t.setAttribute('class', 'svg-label');
-                                                t.setAttribute('data-for', name2);
-                                                t.setAttribute('text-anchor', 'middle');
-                                                t.setAttribute('dominant-baseline', 'middle');
-                                                // shorten label if very long
-                                                const lab = (name2 || '').replace(/_/g,' ');
-                                                t.textContent = lab.length > 18 ? (lab.slice(0,16) + '…') : lab;
-                                                g.appendChild(t);
-                                                // create a subtle rounded rectangle behind the text for readability
-                                                requestAnimationFrame(() => {
-                                                    try {
-                                                        const tb = t.getBBox();
-                                                        const rx = 6;
-                                                        const padX = 6;
-                                                        const padY = 3;
-                                                        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-                                                        rect.setAttribute('x', (tb.x - padX).toString());
-                                                        rect.setAttribute('y', (tb.y - padY).toString());
-                                                        rect.setAttribute('width', (tb.width + padX*2).toString());
-                                                        rect.setAttribute('height', (tb.height + padY*2).toString());
-                                                        rect.setAttribute('rx', rx.toString());
-                                                        rect.setAttribute('class', 'svg-label-rect');
-                                                        // insert rect before text so it sits behind
-                                                        g.insertBefore(rect, t);
-                                                    } catch(_) {}
-                                                });
-                                            } catch(_) { /* ignore element-specific errors */ }
-                                        });
-                                    } catch(_) { /* silence errors during label generation */ }
+                                // remove previous localidades box if exists
+                                const existingBox = document.getElementById('localidadesBox');
+                                if (existingBox) existingBox.remove();
+
+                                const mapWrap = document.getElementById('bogotaMapWrapper');
+                                if (!mapWrap) return;
+
+                                // Build the localidades box (separate panel with the list)
+                                const box = document.createElement('div');
+                                box.id = 'localidadesBox';
+                                box.style.position = 'absolute';
+                                box.style.right = '12px';
+                                box.style.top = '12px';
+                                box.style.width = '280px';
+                                box.style.maxHeight = '68%';
+                                box.style.overflow = 'auto';
+                                box.style.background = 'rgba(255,255,255,0.96)';
+                                box.style.borderRadius = '10px';
+                                box.style.boxShadow = '0 10px 30px rgba(2,6,23,0.10)';
+                                box.style.zIndex = 26000;
+                                box.style.padding = '8px';
+
+                                const title = document.createElement('div');
+                                title.innerText = 'Localidades';
+                                title.style.fontWeight = '700';
+                                title.style.marginBottom = '6px';
+                                box.appendChild(title);
+
+                                const { stats, total } = computeLocalidadStats();
+                                const names = Array.from(new Set(Array.from(svg.querySelectorAll('[data-name]')).map(el => el.getAttribute('data-name')).filter(Boolean)));
+                                const rows = names.map(nm => {
+                                    const key = normalizeName(nm || '');
+                                    const st = stats[key] || { count: 0, voterPct: 0 };
+                                    return { name: nm, key, count: st.count || 0, voterPct: st.voterPct || 0 };
+                                }).sort((a,b) => b.count - a.count);
+
+                                const list = document.createElement('div');
+                                list.style.display = 'flex';
+                                list.style.flexDirection = 'column';
+                                list.style.gap = '6px';
+
+                                rows.forEach(rw => {
+                                    const item = document.createElement('button');
+                                    item.type = 'button';
+                                    item.className = 'localidades-item btn btn-sm';
+                                    item.style.display = 'flex';
+                                    item.style.justifyContent = 'space-between';
+                                    item.style.alignItems = 'center';
+                                    item.style.padding = '6px 8px';
+                                    item.style.background = 'transparent';
+                                    item.style.border = 'none';
+                                    item.style.textAlign = 'left';
+                                    item.style.width = '100%';
+                                    item.innerHTML = `<span style="flex:1; color: #123;">${rw.name}</span><small style="margin-left:8px; color:#3b6;">${rw.voterPct ? rw.voterPct.toFixed(1) + '%' : ''}</small>`;
+                                    item.onclick = (e) => {
+                                        e.stopPropagation();
+                                        currentLocalidadFilter = rw.key;
+                                        try { applyFilters(); } catch(_){}
+                                        try { colorSvgByStats(); } catch(_){}
+                                        // update badge
+                                        try { const badge = document.getElementById('localidadFilterBadge'); if (badge) { badge.style.display = 'inline-flex'; badge.querySelector('span').innerText = rw.name; } } catch(_){}
+                                    };
+                                    list.appendChild(item);
                                 });
-                            } catch(_) { }
+
+                                box.appendChild(list);
+                                mapWrap.appendChild(box);
+                            } catch (e) { console.warn('createLocalidadesBox failed', e); }
                         }
                         createSvgLabels();
                 // Add toggle button to show/hide labels
