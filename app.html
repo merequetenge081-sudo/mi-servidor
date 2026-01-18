@@ -1784,9 +1784,41 @@ function onEachFeature(feature, layer) {
             }
 
             const items = svg.querySelectorAll('[data-name]');
+            // helper: find shapes to attach events to (element itself + inner shape children)
+            function getInteractiveTargets(element) {
+                const targets = [];
+                const tag = (element.tagName || '').toLowerCase();
+                const shapeTags = ['path','polygon','rect','circle','ellipse'];
+                if (shapeTags.includes(tag)) targets.push(element);
+                if (element.querySelectorAll) {
+                    element.querySelectorAll('path,polygon,rect,circle,ellipse').forEach(n => targets.push(n));
+                }
+                // fallback to the element itself
+                if (targets.length === 0) targets.push(element);
+                return targets;
+            }
+
             items.forEach(el => {
                 const name = el.getAttribute('data-name');
-                el.addEventListener('mouseover', (ev) => {
+                try { el.setAttribute('tabindex', '0'); } catch(e){}
+                // Ensure the element itself (or its child shapes) will capture pointer events
+                getInteractiveTargets(el).forEach(t => {
+                    try {
+                        t.style.pointerEvents = 'all';
+                        t.setAttribute('pointer-events', 'all');
+                        const curFill = (t.getAttribute('fill') || '').trim().toLowerCase();
+                        if (!curFill || curFill === 'none') {
+                            // give a nearly-transparent fill so the shape captures mouse events reliably
+                            t.setAttribute('fill', '#ffffff');
+                            t.setAttribute('fill-opacity', '0.01');
+                        }
+                    } catch(e){}
+                });
+
+                // Attach events to the interactive targets (so both group and inner paths respond)
+                const targets = getInteractiveTargets(el);
+                targets.forEach(targetEl => {
+                    targetEl.addEventListener('mouseover', (ev) => {
                     // store original fill/stroke so we can restore later
                     el.__origFill = el.getAttribute('fill') || el.style.fill;
                     el.__origStroke = el.getAttribute('stroke') || '';
@@ -1805,7 +1837,95 @@ function onEachFeature(feature, layer) {
                             el.setAttribute('stroke-width', '0.5');
                         }
                     } catch(e){}
+                    });
+                    targetEl.addEventListener('mousemove', (ev) => {
+                        tip.style.left = (ev.pageX + 12) + 'px';
+                        tip.style.top = (ev.pageY + 12) + 'px';
+                    });
+                    targetEl.addEventListener('mouseout', (ev) => {
+                        try { el.style.filter = ''; } catch(e){}
+                        tip.style.display = 'none';
+                        // restore previous stroke unless it's selected
+                        try {
+                            const key = normalizeName(name || '');
+                            if (currentLocalidadFilter && currentLocalidadFilter === key) {
+                                // keep selected styling (handled elsewhere)
+                            } else {
+                                // restore on the actual shape elements
+                                getInteractiveTargets(el).forEach(sh => { try { sh.setAttribute('stroke', 'none'); sh.setAttribute('stroke-width', '0'); } catch(_){} });
+                            }
+                        } catch(e){}
+                    });
+                    targetEl.addEventListener('click', (ev) => {
+                        ev.stopPropagation();
+                        const { stats } = computeLocalidadStats();
+                        const key = normalizeName(name || '');
+                        const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                        // Toggle filter: if same localidad clicked twice -> clear
+                        if (currentLocalidadFilter === key) {
+                            currentLocalidadFilter = '';
+                            showToast('info', `Filtro eliminado: ${name}`);
+                        } else {
+                            currentLocalidadFilter = key;
+                            showToast('info', `Filtrando por ${name}: ${s.count} registros — ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
+                        }
+                        // Update badge in the map area to reflect active filter
+                        try {
+                            const mapWrap = document.getElementById('bogotaMapWrapper');
+                            if (mapWrap) {
+                                let badge = document.getElementById('localidadFilterBadge');
+                                if (!badge) {
+                                    badge = document.createElement('div');
+                                    badge.id = 'localidadFilterBadge';
+                                    badge.style.position = 'absolute';
+                                    badge.style.top = '8px';
+                                    badge.style.right = '8px';
+                                    badge.style.zIndex = 25000;
+                                    badge.style.padding = '6px 10px';
+                                    badge.style.background = 'rgba(0,0,0,0.6)';
+                                    badge.style.color = '#fff';
+                                    badge.style.borderRadius = '18px';
+                                    badge.style.fontSize = '13px';
+                                    badge.style.display = 'inline-flex';
+                                    badge.style.alignItems = 'center';
+                                    badge.style.gap = '8px';
+                                    const clr = document.createElement('button');
+                                    clr.type = 'button';
+                                    clr.className = 'btn btn-sm btn-light';
+                                    clr.style.padding = '2px 6px';
+                                    clr.style.fontSize = '12px';
+                                    clr.innerText = 'Limpiar';
+                                    clr.onclick = (e) => { e.stopPropagation(); currentLocalidadFilter = ''; applyFilters(); badge.style.display = 'none'; colorSvgByStats(); };
+                                    badge.appendChild(document.createElement('span'));
+                                    badge.appendChild(clr);
+                                    mapWrap.appendChild(badge);
+                                }
+                                const label = badge.querySelector('span');
+                                if (currentLocalidadFilter) {
+                                    label.innerText = `${name}`;
+                                    badge.style.display = 'inline-flex';
+                                } else {
+                                    badge.style.display = 'none';
+                                }
+                            }
+                        } catch (e) { console.warn('No se pudo actualizar badge de filtro', e); }
+
+                        // Apply filters to table and recolor SVG to show selection
+                        try { applyFilters(); } catch(e) { console.warn('applyFilters failed', e); }
+                        try { colorSvgByStats(); } catch(e) { console.warn('colorSvgByStats failed after click', e); }
+                    });
+                    // keyboard support: Enter or Space triggers the same action
+                    targetEl.addEventListener('keydown', (kev) => {
+                        if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
+                            kev.preventDefault();
+                            try { targetEl.click(); } catch(e) { console.warn('keyboard click failed', e); }
+                        }
+                    });
                 });
+                // end targets loop
+                // end per-item processing
+                
+            });
                 el.addEventListener('mousemove', (ev) => {
                     tip.style.left = (ev.pageX + 12) + 'px';
                     tip.style.top = (ev.pageY + 12) + 'px';
@@ -2182,8 +2302,11 @@ async function renderLocalityMap() {
                             // Try to map numbered labels (common in Wikimedia croquis) to data-name attributes
                             try {
                                 const mapped = mapWikimediaNumbersToDataNames(svgEl);
-                                if (mapped && svgEl.querySelectorAll('[data-name]').length > 0) {
-                                    console.info('Mapped', mapped, 'labels to data-name on Wikimedia croquis.');
+                                // Prefer the GeoJSON / Leaflet fallback unless the SVG mapping is complete.
+                                const mappedCount = (Number(mapped) || 0) + (svgEl.querySelectorAll ? svgEl.querySelectorAll('[data-name]').length : 0);
+                                console.info('Mapped', mappedCount, 'labels to data-name on Wikimedia croquis.');
+                                // Require a reasonable coverage (20 localidades) before using the SVG interactive mode.
+                                if (mappedCount >= 20) {
                                     attachSvgInteractions();
                                     return;
                                 }
