@@ -1797,18 +1797,19 @@ function toggleMapFallback() {
         mapWrap.style.display = 'none';
         chartWrap.style.display = 'block';
     }
-
-    // Try to load SVG croquis if present
-    async function ensureBogotaCroquis() {
-        try {
-            const r = await fetch('/bogota_croquis.svg');
-            if (!r.ok) return null;
-            const txt = await r.text();
-            return txt;
-        } catch(e) { return null; }
-    }
 }
 
+
+
+// Try to load SVG croquis if present (top-level so other functions can call it)
+async function ensureBogotaCroquis() {
+    try {
+        const r = await fetch('/bogota_croquis.svg');
+        if (!r.ok) return null;
+        const txt = await r.text();
+        return txt;
+    } catch(e) { return null; }
+}
 async function renderLocalityMap() {
     const spinner = document.getElementById('bogotaMapSpinner');
     try {
@@ -1832,7 +1833,20 @@ async function renderLocalityMap() {
                     mapContainer.innerHTML = croquis;
                     // Remove any existing leaflet map instance if present
                     try { if (_bogotaMap) { _bogotaMap.remove(); _bogotaMap = null; } } catch(e) {}
-                    attachSvgInteractions();
+                    // If the SVG doesn't contain per-area `data-name` attributes, prefer the GeoJSON Leaflet fallback
+                    try {
+                        const svgEl = mapContainer.querySelector('svg');
+                        const hasDataNames = svgEl && svgEl.querySelectorAll && svgEl.querySelectorAll('[data-name]').length > 0;
+                        if (!hasDataNames) {
+                            console.warn('SVG croquis loaded but contains no [data-name] attributes — falling back to Leaflet GeoJSON for interactive map.');
+                            // clear the inserted SVG so Leaflet can mount
+                            mapContainer.innerHTML = '';
+                            // fall through to leaflet rendering below
+                        } else {
+                            attachSvgInteractions();
+                            return;
+                        }
+                    } catch(e) { console.warn('Error evaluating SVG content', e); }
                 }
             } catch (e) { console.warn('Error inserting croquis SVG', e); }
             return;
