@@ -420,6 +420,9 @@
         #localidadesBox.visible { display: block !important; opacity: 1; transform: translateX(0); }
         .localidades-item { background: transparent; border-radius: 6px; }
         .localidades-item:hover { background: rgba(6,24,12,0.04); cursor: pointer; }
+        /* SVG area subtle styling: no aggressive borders, smooth transitions */
+        .svg-area { transition: stroke 140ms ease, stroke-width 140ms ease, filter 150ms ease; stroke: none; }
+        .svg-area.loc-selected { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.14)); }
     </style>
 </head>
 <body>
@@ -1529,6 +1532,63 @@ async function saveAdminRegistration() {
     }
 }
 
+// Try to map numbered labels in the Wikimedia croquis to data-name attributes
+function mapWikimediaNumbersToDataNames(svg) {
+    if (!svg) return 0;
+    const numMap = {
+        1: 'Usaquén', 2: 'Chapinero', 3: 'Santa Fe', 4: 'San Cristóbal', 5: 'Usme',
+        6: 'Tunjuelito', 7: 'Bosa', 8: 'Kennedy', 9: 'Fontibón', 10: 'Engativá',
+        11: 'Suba', 12: 'Barrios Unidos', 13: 'Teusaquillo', 14: 'Los Mártires',
+        15: 'Antonio Nariño', 16: 'Puente Aranda', 17: 'La Candelaria', 18: 'Rafael Uribe',
+        19: 'Ciudad Bolívar', 20: 'Sumapaz'
+    };
+    const texts = Array.from(svg.querySelectorAll('text')).filter(t => t && t.textContent && /\d+/.test(t.textContent));
+    const candidateShapes = Array.from(svg.querySelectorAll('path, polygon, rect, circle'));
+    let assigned = 0;
+    texts.forEach(t => {
+        const txt = t.textContent.trim();
+        const m = txt.match(/^(\d+)$/);
+        if (!m) return;
+        const n = Number(m[1]);
+        const name = numMap[n];
+        if (!name) return;
+        // Prefer direct grouping: same parent <g>
+        try {
+            const g = t.parentElement;
+            if (g) {
+                const shape = g.querySelector('path, polygon, rect, circle');
+                if (shape) {
+                    shape.setAttribute('data-name', name);
+                    assigned++;
+                    return;
+                }
+            }
+        } catch (e) {}
+
+        // otherwise, pick the nearest shape by bbox center
+        try {
+            const tb = t.getBBox ? t.getBBox() : null;
+            const tx = tb ? (tb.x + tb.width/2) : (parseFloat(t.getAttribute('x')) || 0);
+            const ty = tb ? (tb.y + tb.height/2) : (parseFloat(t.getAttribute('y')) || 0);
+            let best = null; let bestDist = Infinity;
+            candidateShapes.forEach(s => {
+                try {
+                    const b = s.getBBox();
+                    const cx = b.x + b.width/2;
+                    const cy = b.y + b.height/2;
+                    const d = Math.hypot(cx - tx, cy - ty);
+                    if (d < bestDist) { bestDist = d; best = s; }
+                } catch(e) {}
+            });
+            if (best && bestDist < 300) { // threshold in px, generous
+                best.setAttribute('data-name', name);
+                assigned++;
+            }
+        } catch (e) { }
+    });
+    return assigned;
+}
+
 // ===================== 🔹 Map: Bogotá localidades choropleth =====================
 let _bogotaMap = null;
 let _bogotaLayer = null;
@@ -1635,13 +1695,18 @@ async function ensureBogotaGeo() {
 }
 
 function getColorForPct(pct) {
-    // Green-focused palette to match the map background
-    if (!pct || pct === 0) return '#f0f7ef';
+    // Green-focused palette with finer gradation for better visual discrimination
+    if (!pct || pct === 0) return '#fbfdf9';
+    if (pct < 2) return '#f7fdef';
+    if (pct < 5) return '#eefaf0';
     if (pct < 10) return '#e6f6dd';
+    if (pct < 15) return '#d8f0c8';
     if (pct < 25) return '#c9e9b8';
+    if (pct < 35) return '#b1df93';
     if (pct < 50) return '#9cd784';
-    if (pct < 75) return '#67c24a';
-    return '#2f9e1d';
+    if (pct < 65) return '#67c24a';
+    if (pct < 85) return '#2f9e1d';
+    return '#17620f';
 }
 
 function styleFeature(feature) {
@@ -1722,21 +1787,42 @@ function onEachFeature(feature, layer) {
             items.forEach(el => {
                 const name = el.getAttribute('data-name');
                 el.addEventListener('mouseover', (ev) => {
+                    // store original fill/stroke so we can restore later
                     el.__origFill = el.getAttribute('fill') || el.style.fill;
-                    el.style.filter = 'brightness(0.9)';
+                    el.__origStroke = el.getAttribute('stroke') || '';
+                    el.__origStrokeWidth = el.getAttribute('stroke-width') || '';
+                    // subtle visual feedback without making the border aggressive
+                    try { el.style.filter = 'brightness(0.98)'; } catch(e){}
                     const { stats } = computeLocalidadStats();
                     const key = normalizeName(name || '');
                     const s = stats[key] || { voterPct: 0, voters:0, count:0 };
                     tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
                     tip.style.display = 'block';
+                    // show a very subtle stroke for small-area visibility
+                    try {
+                        if (!(currentLocalidadFilter && currentLocalidadFilter === key)) {
+                            el.setAttribute('stroke', 'rgba(0,0,0,0.18)');
+                            el.setAttribute('stroke-width', '0.5');
+                        }
+                    } catch(e){}
                 });
                 el.addEventListener('mousemove', (ev) => {
                     tip.style.left = (ev.pageX + 12) + 'px';
                     tip.style.top = (ev.pageY + 12) + 'px';
                 });
                 el.addEventListener('mouseout', (ev) => {
-                    el.style.filter = '';
+                    try { el.style.filter = ''; } catch(e){}
                     tip.style.display = 'none';
+                    // restore previous stroke unless it's selected
+                    try {
+                        const key = normalizeName(name || '');
+                        if (currentLocalidadFilter && currentLocalidadFilter === key) {
+                            // keep selected styling (handled elsewhere)
+                        } else {
+                            el.setAttribute('stroke', 'none');
+                            el.setAttribute('stroke-width', '0');
+                        }
+                    } catch(e){}
                 });
                 el.addEventListener('click', (ev) => {
                     ev.stopPropagation();
@@ -1966,17 +2052,15 @@ function onEachFeature(feature, layer) {
                     el.setAttribute('fill', color);
                     // Highlight selected localidad
                     if (currentLocalidadFilter && currentLocalidadFilter === key) {
-                        // mark selected using CSS class for consistent styling
+                        // mark selected using CSS class for consistent styling (subtle)
                         el.classList.add('loc-selected');
-                        el.setAttribute('stroke', '#222');
-                        el.setAttribute('stroke-width', '0.8');
+                        el.setAttribute('stroke', '#111');
+                        el.setAttribute('stroke-width', '0.6');
                     } else {
-                        // reset to defaults (very thin white border)
+                        // remove aggressive borders: keep no stroke by default
                         el.classList.remove('loc-selected');
-                        const baseStroke = el.getAttribute('data-stroke') || '#fff';
-                        const baseStrokeWidth = el.getAttribute('data-stroke-width') || '0.3';
-                        el.setAttribute('stroke', baseStroke);
-                        el.setAttribute('stroke-width', baseStrokeWidth);
+                        el.setAttribute('stroke', 'none');
+                        el.setAttribute('stroke-width', '0');
                         // also ensure inline style fallback
                         el.style.filter = '';
                     }
@@ -2004,8 +2088,14 @@ function toggleMapFallback() {
 // Try to load SVG croquis if present (top-level so other functions can call it)
 async function ensureBogotaCroquis() {
     try {
-        // Prefer auto-generated SVG (from GeoJSON) if present
-        const candidates = ['/bogota_croquis_auto.svg', '/bogota_croquis.svg'];
+        // Prefer the Wikimedia Commons croquis (author: Milenioscuro, CC-BY-SA)
+        // Fallback to auto-generated and local croquis afterwards
+        const candidates = [
+            '/bogota_croquis_wikimedia.svg',
+            'https://upload.wikimedia.org/wikipedia/commons/a/ab/Administrative_map_of_Distrito_Capital_%28Colombia%29.svg',
+            '/bogota_croquis_auto.svg',
+            '/bogota_croquis.svg'
+        ];
         for (const p of candidates) {
             try {
                 const r = await fetch(p);
@@ -2060,6 +2150,16 @@ async function renderLocalityMap() {
                         const svgEl = mapContainer.querySelector('svg');
                         const hasDataNames = svgEl && svgEl.querySelectorAll && svgEl.querySelectorAll('[data-name]').length > 0;
                         if (!hasDataNames) {
+                            // Try to map numbered labels (common in Wikimedia croquis) to data-name attributes
+                            try {
+                                const mapped = mapWikimediaNumbersToDataNames(svgEl);
+                                if (mapped && svgEl.querySelectorAll('[data-name]').length > 0) {
+                                    console.info('Mapped', mapped, 'labels to data-name on Wikimedia croquis.');
+                                    attachSvgInteractions();
+                                    return;
+                                }
+                            } catch (me) { console.warn('Mapping numeric labels failed', me); }
+
                             console.warn('SVG croquis loaded but contains no [data-name] attributes — falling back to Leaflet GeoJSON for interactive map.');
                             // clear the inserted SVG so Leaflet can mount
                             mapContainer.innerHTML = '';
