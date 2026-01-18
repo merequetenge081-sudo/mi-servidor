@@ -1,70 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" id="bogotaCroquis" style="width:100%;height:480px;">
   <style>
-    .loc { fill:#58b6ff; stroke:#fff; stroke-width:6; cursor:pointer; transition:fill 150ms, transform 150ms; }
-    .loc:hover { filter: brightness(0.92); }
-    .loc-label { font-family: Arial, Helvetica, sans-serif; font-size:12px; fill:#fff; pointer-events:none; }
+    .loc { fill:#58b6ff; stroke:#fff; stroke-width:4; cursor:pointer; transition:fill 180ms ease, transform 180ms ease, filter 180ms ease; transform-origin:center center; }
+    .loc:hover { transform: translateY(-3px) scale(1.02); filter: brightness(0.92) drop-shadow(0 2px 6px rgba(0,0,0,0.12)); }
+    .loc-label { font-family: Arial, Helvetica, sans-serif; font-size:12px; fill:#fff; pointer-events:none; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
   </style>
   <!-- This is a simplified croquis inspired by the provided image. Each path has data-name matching localidad names used in the app -->
   <g id="localidades">
-    <path id="Usaquen" class="loc" data-name="Usaquén" d="M100,40 L320,40 L320,140 L100,140 Z"/>
+    <path id="Usaquen" class="loc" data-name="Usaquén" data-stroke="#fff" data-stroke-width="4" aria-label="Usaquén" tabindex="0" d="M100,40 L320,40 L320,140 L100,140 Z"/>
     <text x="180" y="90" class="loc-label">Usaquén</text>
 
-    <path id="Suba" class="loc" data-name="Suba" d="M20,140 L200,140 L200,260 L20,260 Z"/>
+    <path id="Suba" class="loc" data-name="Suba" data-stroke="#fff" data-stroke-width="4" aria-label="Suba" tabindex="0" d="M20,140 L200,140 L200,260 L20,260 Z"/>
     <text x="70" y="190" class="loc-label">Suba</text>
 
-    <path id="Chapinero" class="loc" data-name="Chapinero" d="M320,40 L440,40 L440,120 L320,120 Z"/>
+    <path id="Chapinero" class="loc" data-name="Chapinero" data-stroke="#fff" data-stroke-width="4" aria-label="Chapinero" tabindex="0" d="M320,40 L440,40 L440,120 L320,120 Z"/>
     <text x="350" y="80" class="loc-label">Chapinero</text>
 
-    <path id="BarriosUnidos" class="loc" data-name="Barrios Unidos" d="M240,100 L360,100 L360,180 L240,180 Z"/>
+    <path id="BarriosUnidos" class="loc" data-name="Barrios Unidos" data-stroke="#fff" data-stroke-width="4" aria-label="Barrios Unidos" tabindex="0" d="M240,100 L360,100 L360,180 L240,180 Z"/>
     <text x="265" y="140" class="loc-label">Barrios Unidos</text>
 
-    <path id="Teusaquillo" class="loc" data-name="Teusaquillo" d="M180,180 L300,180 L300,240 L180,240 Z"/>
+    <path id="Teusaquillo" class="loc" data-name="Teusaquillo" data-stroke="#fff" data-stroke-width="4" aria-label="Teusaquillo" tabindex="0" d="M180,180 L300,180 L300,240 L180,240 Z"/>
     <text x="210" y="210" class="loc-label">Teusaquillo</text>
 
-    <path id="Engativa" class="loc" data-name="Engativá" d="M80,260 L260,260 L260,360 L80,360 Z"/>
+    <path id="Engativa" class="loc" data-name="Engativá" data-stroke="#fff" data-stroke-width="4" aria-label="Engativá" tabindex="0" d="M80,260 L260,260 L260,360 L80,360 Z"/>
     <text x="120" y="310" class="loc-label">Engativá</text>
 
-    <path id="Fontibon" class="loc" data-name="Fontibón" d="M260,300 L420,300 L420,400 L260,400 Z"/>
+    <path id="Fontibon" class="loc" data-name="Fontibón" data-stroke="#fff" data-stroke-width="4" aria-label="Fontibón" tabindex="0" d="M260,300 L420,300 L420,400 L260,400 Z"/>
     <text x="300" y="350" class="loc-label">Fontibón</text>
 
-    <path id="Kennedy" class="loc" data-name="Kennedy" d="M420,300 L620,300 L620,420 L420,420 Z"/>
+    <path id="Kennedy" class="loc" data-name="Kennedy" data-stroke="#fff" data-stroke-width="4" aria-label="Kennedy" tabindex="0" d="M420,300 L620,300 L620,420 L420,420 Z"/>
     <text x="470" y="360" class="loc-label">Kennedy</text>
 
-    <path id="PuenteAranda" class="loc" data-name="Puente Aranda" d="M360,200 L480,200 L480,260 L360,260 Z"/>
+    <path id="PuenteAranda" class="loc" data-name="Puente Aranda" data-stroke="#fff" data-stroke-width="4" aria-label="Puente Aranda" tabindex="0" d="M360,200 L480,200 L480,260 L360,260 Z"/>
     <text x="380" y="230" class="loc-label">Puente Aranda</text>
 
-    <path id="LosMartires" class="loc" data-name="Los Mártires" d="M420,180 L520,180 L520,240 L420,240 Z"/>
+    <path id="LosMartires" class="loc" data-name="Los Mártires" data-stroke="#fff" data-stroke-width="4" aria-label="Los Mártires" tabindex="0" d="M420,180 L520,180 L520,240 L420,240 Z"/>
     <text x="435" y="210" class="loc-label">Los Mártires</text>
 
-    <path id="SantaFe" class="loc" data-name="Santa Fe" d="M520,80 L640,80 L640,160 L520,160 Z"/>
+    <path id="SantaFe" class="loc" data-name="Santa Fe" data-stroke="#fff" data-stroke-width="4" aria-label="Santa Fe" tabindex="0" d="M520,80 L640,80 L640,160 L520,160 Z"/>
     <text x="545" y="120" class="loc-label">Santa Fe</text>
 
-    <path id="LaCandelaria" class="loc" data-name="La Candelaria" d="M540,160 L620,160 L620,220 L540,220 Z"/>
+    <path id="LaCandelaria" class="loc" data-name="La Candelaria" data-stroke="#fff" data-stroke-width="4" aria-label="La Candelaria" tabindex="0" d="M540,160 L620,160 L620,220 L540,220 Z"/>
     <text x="555" y="190" class="loc-label">La Candelaria</text>
 
-    <path id="LosMartires2" class="loc" data-name="Antonio Nariño" d="M520,220 L600,220 L600,280 L520,280 Z"/>
+    <path id="LosMartires2" class="loc" data-name="Antonio Nariño" data-stroke="#fff" data-stroke-width="4" aria-label="Antonio Nariño" tabindex="0" d="M520,220 L600,220 L600,280 L520,280 Z"/>
     <text x="535" y="250" class="loc-label">Antonio Nariño</text>
 
-    <path id="RafaelUribe" class="loc" data-name="Rafael Uribe Uribe" d="M600,260 L720,260 L720,340 L600,340 Z"/>
+    <path id="RafaelUribe" class="loc" data-name="Rafael Uribe Uribe" data-stroke="#fff" data-stroke-width="4" aria-label="Rafael Uribe Uribe" tabindex="0" d="M600,260 L720,260 L720,340 L600,340 Z"/>
     <text x="620" y="300" class="loc-label">Rafael Uribe</text>
 
-    <path id="Usme" class="loc" data-name="Usme" d="M740,60 L920,60 L920,200 L740,200 Z"/>
+    <path id="Usme" class="loc" data-name="Usme" data-stroke="#fff" data-stroke-width="4" aria-label="Usme" tabindex="0" d="M740,60 L920,60 L920,200 L740,200 Z"/>
     <text x="780" y="130" class="loc-label">Usme</text>
 
-    <path id="SanCristobal" class="loc" data-name="San Cristóbal" d="M880,20 L1000,20 L1000,120 L880,120 Z"/>
+    <path id="SanCristobal" class="loc" data-name="San Cristóbal" data-stroke="#fff" data-stroke-width="4" aria-label="San Cristóbal" tabindex="0" d="M880,20 L1000,20 L1000,120 L880,120 Z"/>
     <text x="900" y="70" class="loc-label">San Cristóbal</text>
 
-    <path id="Tunjuelito" class="loc" data-name="Tunjuelito" d="M660,200 L760,200 L760,280 L660,280 Z"/>
+    <path id="Tunjuelito" class="loc" data-name="Tunjuelito" data-stroke="#fff" data-stroke-width="4" aria-label="Tunjuelito" tabindex="0" d="M660,200 L760,200 L760,280 L660,280 Z"/>
     <text x="675" y="240" class="loc-label">Tunjuelito</text>
 
-    <path id="CiudadBolivar" class="loc" data-name="Ciudad Bolívar" d="M760,260 L920,260 L920,380 L760,380 Z"/>
+    <path id="CiudadBolivar" class="loc" data-name="Ciudad Bolívar" data-stroke="#fff" data-stroke-width="4" aria-label="Ciudad Bolívar" tabindex="0" d="M760,260 L920,260 L920,380 L760,380 Z"/>
     <text x="785" y="320" class="loc-label">Ciudad Bolívar</text>
 
-    <path id="Bosa" class="loc" data-name="Bosa" d="M420,420 L580,420 L580,480 L420,480 Z"/>
+    <path id="Bosa" class="loc" data-name="Bosa" data-stroke="#fff" data-stroke-width="4" aria-label="Bosa" tabindex="0" d="M420,420 L580,420 L580,480 L420,480 Z"/>
     <text x="455" y="450" class="loc-label">Bosa</text>
 
-    <path id="Sumapaz" class="loc" data-name="Sumapaz" d="M920,360 L1100,360 L1100,460 L920,460 Z"/>
+    <path id="Sumapaz" class="loc" data-name="Sumapaz" data-stroke="#fff" data-stroke-width="4" aria-label="Sumapaz" tabindex="0" d="M920,360 L1100,360 L1100,460 L920,460 Z"/>
     <text x="960" y="410" class="loc-label">Sumapaz</text>
   </g>
 </svg>
