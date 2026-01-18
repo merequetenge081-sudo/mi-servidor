@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" id="bogotaCroquis" style="width:100%;height:480px;">
   <style>
-    .loc { fill:#58b6ff; stroke:#fff; stroke-width:12; stroke-linejoin:round; stroke-linecap:round; cursor:pointer; transition:fill 180ms ease, transform 180ms ease, filter 180ms ease; transform-origin:center center; }
+  .loc { fill:#58b6ff; stroke:#fff; stroke-width:14; stroke-linejoin:round; stroke-linecap:round; cursor:pointer; transition:fill 180ms ease, transform 180ms ease, filter 180ms ease; transform-origin:center center; }
     .loc:hover { transform: translateY(-3px) scale(1.02); filter: brightness(0.92) drop-shadow(0 4px 10px rgba(0,0,0,0.14)); }
     .loc-label { font-family: Arial, Helvetica, sans-serif; font-size:12px; fill:#fff; pointer-events:none; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
   </style>
   <!-- This is a simplified croquis inspired by the provided image. Each path has data-name matching localidad names used in the app -->
   <g id="localidades">
-    <path id="Usaquen" class="loc" data-name="Usaquén" data-stroke="#fff" data-stroke-width="12" aria-label="Usaquén" tabindex="0" d="M90 48 C120 40,220 38,320 42 C380 44,460 54,520 62 C540 70,520 86,500 96 C450 120,380 120,320 116 C250 110,180 90,140 76 C120 64,100 56,90 48 Z"/>
+    <path id="Usaquen" class="loc" data-name="Usaquén" data-stroke="#fff" data-stroke-width="14" aria-label="Usaquén" tabindex="0" d="M90 48 C120 40,220 38,320 42 C380 44,460 54,520 62 C540 70,520 86,500 96 C450 120,380 120,320 116 C250 110,180 90,140 76 C120 64,100 56,90 48 Z"/>
     <text x="210" y="88" class="loc-label">Usaquén</text>
 
-    <path id="Suba" class="loc" data-name="Suba" data-stroke="#fff" data-stroke-width="12" aria-label="Suba" tabindex="0" d="M30 150 C70 138,120 132,190 136 C230 140,260 165,230 190 C200 215,140 230,90 240 C50 235,28 200,30 150 Z"/>
+    <path id="Suba" class="loc" data-name="Suba" data-stroke="#fff" data-stroke-width="14" aria-label="Suba" tabindex="0" d="M30 150 C70 138,120 132,190 136 C230 140,260 165,230 190 C200 215,140 230,90 240 C50 235,28 200,30 150 Z"/>
     <text x="85" y="188" class="loc-label">Suba</text>
 
     <path id="Chapinero" class="loc" data-name="Chapinero" data-stroke="#fff" data-stroke-width="12" aria-label="Chapinero" tabindex="0" d="M300 42 C328 38,370 36,410 58 C428 80,422 100,404 114 C388 126,366 132,342 130 C326 124,314 112,306 98 C298 78,294 60,300 42 Z"/>
