@@ -67,14 +67,18 @@
         #bogotaMap:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(17,20,33,0.10); }
         .svg-label {
             font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial;
-            font-size: 12px;
+            font-size: 13px;
             fill: #ffffff;
-            stroke: rgba(0,0,0,0.45);
-            stroke-width: 0.8px;
+            stroke: rgba(0,0,0,0.55);
+            stroke-width: 1px;
             paint-order: stroke;
             pointer-events: none;
-            font-weight: 600;
-            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+            font-weight: 700;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.28));
+        }
+        .svg-label-rect {
+            fill: rgba(0,0,0,0.42);
+            stroke: rgba(255,255,255,0.04);
         }
         .svg-label.hidden { display: none; }
         .loc-selected { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
@@ -1623,13 +1627,13 @@ async function ensureBogotaGeo() {
 }
 
 function getColorForPct(pct) {
-    // Softer palette (teal/blue) that combines with page colors
-    if (!pct || pct === 0) return '#dfeef6';
-    if (pct < 10) return '#dff5fb';
-    if (pct < 25) return '#bfeaf7';
-    if (pct < 50) return '#86d4ef';
-    if (pct < 75) return '#3fb0d9';
-    return '#167aab';
+    // Green-focused palette to match the map background
+    if (!pct || pct === 0) return '#f0f7ef';
+    if (pct < 10) return '#e6f6dd';
+    if (pct < 25) return '#c9e9b8';
+    if (pct < 50) return '#9cd784';
+    if (pct < 75) return '#67c24a';
+    return '#2f9e1d';
 }
 
 function styleFeature(feature) {
@@ -1831,6 +1835,24 @@ function onEachFeature(feature, layer) {
                                                 const lab = (name2 || '').replace(/_/g,' ');
                                                 t.textContent = lab.length > 18 ? (lab.slice(0,16) + '…') : lab;
                                                 g.appendChild(t);
+                                                // create a subtle rounded rectangle behind the text for readability
+                                                requestAnimationFrame(() => {
+                                                    try {
+                                                        const tb = t.getBBox();
+                                                        const rx = 6;
+                                                        const padX = 6;
+                                                        const padY = 3;
+                                                        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+                                                        rect.setAttribute('x', (tb.x - padX).toString());
+                                                        rect.setAttribute('y', (tb.y - padY).toString());
+                                                        rect.setAttribute('width', (tb.width + padX*2).toString());
+                                                        rect.setAttribute('height', (tb.height + padY*2).toString());
+                                                        rect.setAttribute('rx', rx.toString());
+                                                        rect.setAttribute('class', 'svg-label-rect');
+                                                        // insert rect before text so it sits behind
+                                                        g.insertBefore(rect, t);
+                                                    } catch(_) {}
+                                                });
                                             } catch(_) { /* ignore element-specific errors */ }
                                         });
                                     } catch(_) { /* silence errors during label generation */ }
@@ -2027,11 +2049,11 @@ async function renderLocalityMap() {
             const legendHtml = [
                 '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">',
                 '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#f0f0f0;border:1px solid #ccc"></span> 0%</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#d8eefe"></span> <10% votantes</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#a6d8ff"></span> 10-25% votantes</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#58b6ff"></span> 25-50% votantes</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#1e90ff"></span> 50-75% votantes</div>',
-                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#0b67d1"></span> >75% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#e6f6dd"></span> <10% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#c9e9b8"></span> 10-25% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#9cd784"></span> 25-50% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#67c24a"></span> 50-75% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#2f9e1d"></span> >75% votantes</div>',
                 '</div>'
             ].join(' ');
             legendEl.innerHTML = legendHtml;
