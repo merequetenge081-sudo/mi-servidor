@@ -1,228 +1,451 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Red Social y Política</title>
-    // ================= SVG croquis interactions =================
-    function attachSvgInteractions() {
-        try {
-            // localizar el SVG (inline o insertado dinámicamente)
-            const svg = document.getElementById('bogotaCroquis') || document.getElementById('bogotaCroquisInline') || document.querySelector('#bogotaMap svg');
-            if (!svg) return;
+    <title>Red Social y Pol├¡tica</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Leaflet CSS/JS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f4a261;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        /* Estilos para la secci├│n de an├ílisis */
+        #analysisSection .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: all 0.3s ease;
+        }
+        
+        #analysisSection .card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        #analysisSection .display-4 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            line-height: 1.2;
+            color: var(--primary);
+        }
+        
+        #analysisSection .border-primary {
+            border-top: 3px solid var(--primary) !important;
+        }
+        
+        #analysisSection .border-success {
+            border-top: 3px solid var(--success) !important;
+        }
+        
+        #analysisSection .border-info {
+            border-top: 3px solid var(--info) !important;
+        }
+        
+        #analysisSection .border-warning {
+            border-top: 3px solid var(--warning) !important;
+        }
+        /* Bogot├í map & SVG label styles */
+        #bogotaMap {
+            border-radius: 8px;
+            box-shadow: 0 6px 18px rgba(17,20,33,0.06);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        #bogotaMap:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(17,20,33,0.10); }
+        .svg-label {
+            font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial;
+            font-size: 13px;
+            fill: #ffffff;
+            stroke: rgba(0,0,0,0.55);
+            stroke-width: 1px;
+            paint-order: stroke;
+            pointer-events: none;
+            font-weight: 700;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.28));
+        }
+        .svg-label-rect {
+            fill: rgba(0,0,0,0.42);
+            stroke: rgba(255,255,255,0.04);
+        }
+        .svg-label.hidden { display: none; }
+        .loc-selected { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
+        #svgLabelsToggle {
+            box-shadow: 0 4px 12px rgba(2,6,23,0.06);
+            backdrop-filter: blur(4px);
+        }
+        
+        #analysisSection .table th {
+            border-top: none;
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
 
-            // tooltip singleton
-            let tip = document.getElementById('svgMapTooltip');
-            if (!tip) {
-                tip = document.createElement('div');
-                tip.id = 'svgMapTooltip';
-                Object.assign(tip.style, {
-                    position: 'absolute',
-                    pointerEvents: 'none',
-                    padding: '6px 8px',
-                    background: 'rgba(0,0,0,0.75)',
-                    color: '#fff',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    display: 'none',
-                    zIndex: 30000
-                });
-                document.body.appendChild(tip);
+        /* Hacer la secci├│n de an├ílisis desplazable internamente */
+        #analysisSection {
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+            padding-right: 12px; /* espacio para el scrollbar */
+        }
+        
+        #analysisSection .progress {
+            height: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        .status-badge {
+            padding: 0.25em 0.6em;
+            font-size: 0.75em;
+            font-weight: 600;
+            border-radius: 0.25rem;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: auto; /* permitir scroll general */
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+        }
+        
+        .main-content {
+            padding: 2rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card.blue {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #4cc9f0, #4895ef);
+        }
+        
+        .stat-card.purple {
+            background: linear-gradient(135deg, #7209b7, #560bad);
+        }
+        
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--dark);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .badge-active {
+            background-color: #4bb543;
+        }
+        
+        .badge-inactive {
+            background-color: #ff6b6b;
+        }
+        
+        .qr-code {
+            display: inline-block;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .public-form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .public-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .leader-card {
+            transition: transform 0.2s;
+        }
+        
+        .leader-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        /* Ocultar completamente landing page en modo p├║blico */
+        .public-registration-mode #landingPage,
+        .public-registration-mode #createEventPage,
+        .public-registration-mode #viewEventsPage {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .public-registration-mode #adminPanel {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        .public-registration-mode #publicForm {
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        /* Mejoras de usabilidad t├íctil en m├│viles */
+        @media (max-width: 576px) {
+            .form-control {
+                padding: 0.75rem 0.85rem;
+                font-size: 1rem;
+                min-height: 44px;
             }
 
-            // helper: collect shape targets (group element + inner shapes)
-            function getInteractiveTargets(element) {
-                const targets = [];
-                const tag = (element.tagName || '').toLowerCase();
-                const shapeTags = ['path','polygon','rect','circle','ellipse'];
-                if (shapeTags.includes(tag)) targets.push(element);
-                if (element.querySelectorAll) {
-                    element.querySelectorAll('path,polygon,rect,circle,ellipse').forEach(n => targets.push(n));
-                }
-                if (targets.length === 0) targets.push(element);
-                return targets;
+            .form-label { font-size: 0.95rem; }
+
+            .form-section { margin-bottom: 1rem; }
+
+            .btn {
+                padding: 0.65rem 0.9rem;
+                font-size: 1rem;
+                border-radius: 10px;
             }
 
-            // ensure pointer-events for a target and give transparent fill if needed
-            function makeTargetInteractive(t) {
-                try {
-                    t.style.pointerEvents = 'all';
-                    t.setAttribute('pointer-events', 'all');
-                    const curFill = (t.getAttribute('fill') || '').trim().toLowerCase();
-                    if (!curFill || curFill === 'none') {
-                        // fill nearly transparent so small/stroke-only shapes capture events
-                        t.setAttribute('fill', '#ffffff');
-                        t.setAttribute('fill-opacity', '0.01');
-                    }
-                } catch (e) { /* no bloquear */ }
+            /* Botones principales a ancho completo para facilidad t├íctil */
+            .public-form .btn, .d-grid .btn { width: 100% !important; }
+
+            /* Inputs de formularios en admin tambi├®n m├ís altos */
+            #adminRegistrationForm .form-control { min-height: 44px; }
+        }
+        /* Mobile sidebar / top bar */
+        #mobileTopBar {
+            display: none;
+        }
+
+        @media (max-width: 767.98px) {
+            body { padding-top: 56px; }
+            #mobileTopBar { display: flex; position: fixed; top: 0; left: 0; right: 0; z-index: 11000; background: white; border-bottom: 1px solid rgba(0,0,0,0.06); align-items: center; padding: 8px 12px; }
+            #mobileTopBar .app-title { font-weight: 700; font-size: 1rem; }
+            .sidebar {
+                position: fixed; left: -320px; top: 0; height: 100vh; width: 280px; z-index: 12000; transition: left 220ms ease; box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            }
+            .sidebar.open { left: 0; }
+            .main-content { padding-top: 0; }
+            /* small overlay when sidebar open */
+            #sidebarBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.32); z-index: 11900; display: none; }
+            #sidebarBackdrop.visible { display: block; }
+        }
+        /* Responsive adjustments for mobile devices */
+        /* Make manual toasts more accessible on small screens and avoid covering content */
+        #manualToastContainer {
+            /* default set by JS; these CSS rules ensure better mobile placement */
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none; /* allow clicks to pass through gaps */
+        }
+
+        .manual-toast-item {
+            pointer-events: auto;
+        }
+
+        @media (max-width: 576px) {
+            /* On small devices place toasts near the bottom and widen them */
+            #manualToastContainer {
+                left: 12px !important;
+                right: 12px !important;
+                top: auto !important;
+                bottom: 12px !important;
+                align-items: stretch;
+                z-index: 40000;
             }
 
-            const items = Array.from(svg.querySelectorAll('[data-name]'));
-            items.forEach(el => {
-                const name = el.getAttribute('data-name') || '';
-                try { el.setAttribute('tabindex', '0'); } catch(e) {}
+            .manual-toast-item {
+                min-width: 0 !important;
+                max-width: none !important;
+                width: 100% !important;
+                border-radius: 10px !important;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.14) !important;
+                padding: 10px 12px !important;
+            }
 
-                const targets = getInteractiveTargets(el);
-                targets.forEach(makeTargetInteractive);
+            .manual-toast-item .bi {
+                font-size: 18px !important;
+            }
 
-                // handlers using closure over `el` and `name`
-                function showTipFor(ev) {
-                    try {
-                        const { stats } = computeLocalidadStats();
-                        const key = normalizeName(name || '');
-                        const s = stats[key] || { voterPct: 0, voters: 0, count: 0 };
-                        tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
-                        tip.style.display = 'block';
-                        tip.style.left = (ev.pageX + 12) + 'px';
-                        tip.style.top = (ev.pageY + 12) + 'px';
-                        // subtle highlight
-                        targets.forEach(sh => { try { sh.setAttribute('stroke', 'rgba(0,0,0,0.12)'); sh.setAttribute('stroke-width', '0.4'); } catch(_){} });
-                    } catch (e) { console.warn('showTipFor error', e); }
-                }
-                function moveTip(ev) {
-                    tip.style.left = (ev.pageX + 12) + 'px';
-                    tip.style.top = (ev.pageY + 12) + 'px';
-                }
-                function hideTip() {
-                    try { tip.style.display = 'none'; } catch(e){}
-                    // restore subtle default (no stroke)
-                    targets.forEach(sh => { try { sh.setAttribute('stroke', 'none'); sh.setAttribute('stroke-width', '0'); } catch(_){} });
-                }
-                function clickHandler(ev) {
-                    ev.stopPropagation();
-                    try {
-                        const { stats } = computeLocalidadStats();
-                        const key = normalizeName(name || '');
-                        const s = stats[key] || { voterPct: 0, voters: 0, count: 0 };
-                        if (currentLocalidadFilter === key) {
-                            currentLocalidadFilter = '';
-                            showToast('info', `Filtro eliminado: ${name}`);
-                        } else {
-                            currentLocalidadFilter = key;
-                            showToast('info', `Filtrando por ${name}: ${s.count} registros — ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
-                        }
-                        // badge UI
-                        try {
-                            const mapWrap = document.getElementById('bogotaMapWrapper');
-                            if (mapWrap) {
-                                let badge = document.getElementById('localidadFilterBadge');
-                                if (!badge) {
-                                    badge = document.createElement('div');
-                                    badge.id = 'localidadFilterBadge';
-                                    Object.assign(badge.style, { position:'absolute', top:'8px', right:'8px', zIndex:25000,
-                                        padding:'6px 10px', background:'rgba(0,0,0,0.6)', color:'#fff', borderRadius:'18px', fontSize:'13px', display:'inline-flex', alignItems:'center', gap:'8px'});
-                                    const clr = document.createElement('button');
-                                    clr.type = 'button';
-                                    clr.className = 'btn btn-sm btn-light';
-                                    clr.style.padding = '2px 6px';
-                                    clr.style.fontSize = '12px';
-                                    clr.innerText = 'Limpiar';
-                                    clr.onclick = (e) => { e.stopPropagation(); currentLocalidadFilter = ''; applyFilters(); badge.style.display = 'none'; colorSvgByStats(); };
-                                    badge.appendChild(document.createElement('span'));
-                                    badge.appendChild(clr);
-                                    mapWrap.appendChild(badge);
-                                }
-                                const label = badge.querySelector('span');
-                                if (currentLocalidadFilter) {
-                                    label.innerText = `${name}`;
-                                    badge.style.display = 'inline-flex';
-                                } else {
-                                    badge.style.display = 'none';
-                                }
-                            }
-                        } catch(e) { console.warn('badge error', e); }
+            /* Success screen: reduce padding and stack buttons */
+            #registrationSuccessScreen {
+                padding: 1rem !important;
+            }
 
-                        applyFilters();
-                        colorSvgByStats();
-                    } catch (e) { console.warn('clickHandler error', e); }
-                }
+            #registrationSuccessScreen > div {
+                padding: 1rem !important;
+            }
 
-                // attach events to targets (covers group and inner shapes)
-                targets.forEach(t => {
-                    t.addEventListener('mouseover', showTipFor);
-                    t.addEventListener('mousemove', moveTip);
-                    t.addEventListener('mouseout', hideTip);
-                    t.addEventListener('click', clickHandler);
-                    t.addEventListener('keydown', (kev) => {
-                        if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
-                            kev.preventDefault();
-                            clickHandler({ stopPropagation: ()=>{}, preventDefault: ()=>{} });
-                        }
-                    });
-                });
+            #registrationSuccessScreen .btn {
+                width: 100% !important;
+                margin-bottom: 0.5rem !important;
+            }
 
-                // accessibility: group focus/click
-                try {
-                    el.addEventListener('focus', (ev) => showTipFor(ev || { pageX: window.innerWidth/2, pageY: window.innerHeight/2 }));
-                    el.addEventListener('blur', hideTip);
-                    el.addEventListener('click', clickHandler);
-                } catch(e) {}
-            });
-
-            // colorizar áreas según stats
-            try { colorSvgByStats(svg); } catch(e) { console.warn('colorSvgByStats failed', e); }
-
-            // crear etiquetas en mapa y panel izquierdo si no existen (silencioso a errores)
-            try {
-                const mapWrap = document.getElementById('bogotaMapWrapper');
-                if (mapWrap) {
-                    // crear lista de localidades en panel si no existe
-                    if (!document.getElementById('localidadesBox')) {
-                        const box = document.createElement('div');
-                        box.id = 'localidadesBox';
-                        Object.assign(box.style, { position:'absolute', left:'12px', top:'12px', width:'260px', maxHeight:'68%', overflow:'auto',
-                            background:'rgba(255,255,255,0.96)', borderRadius:'10px', boxShadow:'0 10px 30px rgba(2,6,23,0.08)', zIndex:26000, padding:'8px', display:'none' });
-                        const title = document.createElement('div'); title.innerText = 'Localidades'; title.style.fontWeight = '700'; title.style.marginBottom = '6px';
-                        box.appendChild(title);
-                        mapWrap.appendChild(box);
-                    }
-                }
-                // labels in-map
-                const labelsGroupId = 'labels-group';
-                let labelsGroup = svg.querySelector('#' + labelsGroupId);
-                if (labelsGroup) labelsGroup.remove();
-                labelsGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-                labelsGroup.setAttribute('id', labelsGroupId);
-                svg.appendChild(labelsGroup);
-                const shapes = Array.from(svg.querySelectorAll('[data-name]'));
-                shapes.forEach(s => {
-                    try {
-                        s.style.pointerEvents = 'all'; s.setAttribute('pointer-events','all');
-                        const name = s.getAttribute('data-name') || '';
-                        let bx = null;
-                        try { bx = s.getBBox(); } catch(e) { bx = null; }
-                        const cx = bx ? (bx.x + bx.width/2) : 0;
-                        const cy = bx ? (bx.y + bx.height/2) : 0;
-                        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-                        t.setAttribute('x', cx); t.setAttribute('y', cy);
-                        t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
-                        t.setAttribute('class','svg-label'); t.setAttribute('style','pointer-events:none; font-family:Inter, Arial; font-size:11px; fill:#123; font-weight:700;');
-                        t.textContent = name;
-                        labelsGroup.appendChild(t);
-                    } catch(e) {}
-                });
-            } catch(e) { console.warn('labels creation failed', e); }
-
-        } catch (err) { console.warn('attachSvgInteractions error', err); }
-    }
+            #registrationSuccessScreen .btn + .btn {
+                margin-left: 0 !important;
+            }
+        }
+        /* SVG map labels and tooltip styles */
+        .svg-label { font-family: Arial, Helvetica, sans-serif; font-size: 12px; fill: #ffffff; pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: rgba(0,0,0,0.08); stroke-width: 0.8px; dominant-baseline: central; font-weight:600; text-shadow: 0 1px 0 rgba(0,0,0,0.06);} 
+        .svg-label.hidden { display: none; }
+        #svgMapTooltip { background: rgba(0,0,0,0.78); color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 13px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+        /* Localidades list box */
+        #localidadesBox { font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial; }
+        /* Transition and positioning helpers for the panel (hidden by default) */
+        #localidadesBox { transition: transform 0.18s ease, opacity 0.18s ease; }
+        #localidadesBox.hidden { display: none !important; opacity: 0; transform: translateX(-8px); }
+        #localidadesBox.visible { display: block !important; opacity: 1; transform: translateX(0); }
+        .localidades-item { background: transparent; border-radius: 6px; }
+        .localidades-item:hover { background: rgba(6,24,12,0.04); cursor: pointer; }
+        /* SVG area subtle styling: no aggressive borders, smooth transitions */
+        .svg-area { transition: stroke 140ms ease, stroke-width 140ms ease, filter 150ms ease; stroke: none; }
+        .svg-area.loc-selected { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.14)); }
+    </style>
+</head>
+<body>
+    <!-- Barra superior m├│vil: bot├│n hamburguesa para mostrar el sidebar en pantallas peque├▒as -->
+    <div id="mobileTopBar" class="d-md-none">
         <button id="sidebarToggle" class="btn btn-outline-secondary me-2" style="padding:6px 8px;"><i class="bi bi-list"></i></button>
-        <div class="app-title">Red Social y Política</div>
+        <div class="app-title">Red Social y Pol├¡tica</div>
     </div>
 
-    <!-- Backdrop para el sidebar en móvil (se gestiona por JS) -->
+    <!-- Backdrop para el sidebar en m├│vil (se gestiona por JS) -->
     <div id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
     <!-- Landing Page (Crear/Ver Eventos) -->
     <div id="landingPage" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); overflow-y: auto; -webkit-overflow-scrolling: touch; z-index: 9000;">
         <div style="width: 100%; max-width: 900px; text-align: center; padding: 2rem;">
             <h1 style="font-size: 3.5rem; font-weight: 700; color: white; margin-bottom: 1rem;">
-                <i class="bi bi-calendar-event" style="margin-right: 0.5rem;"></i>Red Social y Política
+                <i class="bi bi-calendar-event" style="margin-right: 0.5rem;"></i>Red Social y Pol├¡tica
             </h1>
             <p style="font-size: 1.25rem; color: rgba(255,255,255,0.9); margin-bottom: 3rem; font-weight: 300;">
-                Gestiona tus eventos y líderes
+                Gestiona tus eventos y l├¡deres
             </p>
             
             <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
-                <!-- Botón Crear Evento -->
+                <!-- Bot├│n Crear Evento -->
                 <div style="flex: 1; min-width: 280px; max-width: 350px;">
                     <div style="background: rgba(255,255,255,0.95); border-radius: 16px; padding: 2.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transition: all 0.3s ease; cursor: pointer;" 
                          onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 30px 80px rgba(0,0,0,0.4)';" 
@@ -234,7 +457,7 @@
                             Crear Evento
                         </h3>
                         <p style="color: #7f8c8d; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.5;">
-                            Crea un nuevo evento para organizar líderes y registros
+                            Crea un nuevo evento para organizar l├¡deres y registros
                         </p>
                         <button onclick="goToCreateEvent()" style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s ease;"
                                 onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 30px rgba(67, 97, 238, 0.4)';"
@@ -244,7 +467,7 @@
                     </div>
                 </div>
 
-                <!-- Botón Ver Eventos -->
+                <!-- Bot├│n Ver Eventos -->
                 <div style="flex: 1; min-width: 280px; max-width: 350px;">
                     <div style="background: rgba(255,255,255,0.95); border-radius: 16px; padding: 2.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transition: all 0.3s ease; cursor: pointer;" 
                          onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 30px 80px rgba(0,0,0,0.4)';" 
@@ -256,7 +479,7 @@
                             Ver Eventos
                         </h3>
                         <p style="color: #7f8c8d; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.5;">
-                            Accede a eventos existentes para gestionar tu información
+                            Accede a eventos existentes para gestionar tu informaci├│n
                         </p>
                         <button onclick="goToViewEvents()" style="background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s ease;"
                                 onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 30px rgba(76, 201, 240, 0.4)';"
@@ -271,12 +494,12 @@
         <!-- Footer -->
         <div style="position: relative; left: 0; right: 0; background: rgba(0,0,0,0.12); color: rgba(255,255,255,0.9); padding: 1rem 0.75rem; text-align: center; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 1.2rem;">
             <p style="margin: 0; font-weight: 500;">
-                Desarrollado por <strong>Jonnathan Peña</strong> 
-                <span style="margin: 0 0.5rem;">•</span> 
+                Desarrollado por <strong>Jonnathan Pe├▒a</strong> 
+                <span style="margin: 0 0.5rem;">ÔÇó</span> 
                 <a href="mailto:jonnathanpena1@gmail.com" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.2s;">jonnathanpena1@gmail.com</a>
             </p>
             <p style="margin: 0.5rem 0 0 0; font-size: 0.8rem; opacity: 0.8;">
-                © 2025 Red Social y Política. Todos los derechos reservados.
+                ┬® 2025 Red Social y Pol├¡tica. Todos los derechos reservados.
             </p>
         </div>
     </div>
@@ -305,8 +528,8 @@
                                     <input type="date" class="form-control" id="createEventDateInput" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="createEventDescriptionInput" class="form-label">Descripción (Opcional)</label>
-                                    <textarea class="form-control" id="createEventDescriptionInput" rows="3" placeholder="Descripción del evento..."></textarea>
+                                    <label for="createEventDescriptionInput" class="form-label">Descripci├│n (Opcional)</label>
+                                    <textarea class="form-control" id="createEventDescriptionInput" rows="3" placeholder="Descripci├│n del evento..."></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-lg w-100" onclick="saveEventFromPage(event)">
                                     <i class="bi bi-plus-circle"></i> Crear Evento
@@ -330,7 +553,7 @@
         </div>
         <div class="container-fluid mt-5 pb-5">
             <div id="eventsListContainer" class="row g-4">
-                <!-- Lista de eventos se cargará dinámicamente -->
+                <!-- Lista de eventos se cargar├í aqu├¡ din├ímicamente -->
             </div>
         </div>
     </div>
@@ -341,7 +564,7 @@
         <div class="sidebar col-md-3 col-lg-2 p-0">
             <div class="p-4 d-flex flex-column h-100">
                 <div>
-                    <h4 class="text-white mb-4"><i class="bi bi-people-fill"></i> Red Social y Política</h4>
+                    <h4 class="text-white mb-4"><i class="bi bi-people-fill"></i> Red Social y Pol├¡tica</h4>
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link active" href="#" onclick="showSection('dashboard')">
@@ -350,7 +573,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showSection('leaders')">
-                                <i class="bi bi-person-badge"></i> Gestión de Líderes
+                                <i class="bi bi-person-badge"></i> Gesti├│n de L├¡deres
                             </a>
                         </li>
                         <li class="nav-item">
@@ -365,12 +588,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showSection('analysis')">
-                                <i class="bi bi-graph-up"></i> Análisis de Datos
+                                <i class="bi bi-graph-up"></i> An├ílisis de Datos
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showPublicForm()">
-                                <i class="bi bi-link-45deg"></i> Ver Formulario Público
+                                <i class="bi bi-link-45deg"></i> Ver Formulario P├║blico
                             </a>
                         </li>
                     </ul>
@@ -385,6 +608,7 @@
                     </button>
                 </div>
             </div>
+        </div>
         
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10 main-content">
@@ -404,7 +628,7 @@
 
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
-                            <i class="bi bi-plus-circle"></i> Nuevo Líder
+                            <i class="bi bi-plus-circle"></i> Nuevo L├¡der
                         </button>
                     </div>
                 </div>
@@ -421,7 +645,7 @@
                                 <span id="activeLeadersCount">0</span>
                                 <span id="totalLeaders" style="display:none">0</span>
                             </div>
-                            <div>Líderes Activos</div>
+                            <div>L├¡deres Activos</div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -460,12 +684,12 @@
                                             <tr>
                                                 <th>Fecha</th>
                                                 <th>Persona</th>
-                                                <th>Líder</th>
-                                                <th>Acción</th>
+                                                <th>L├¡der</th>
+                                                <th>Acci├│n</th>
                                             </tr>
                                         </thead>
                                         <tbody id="recentActivity">
-                                            <!-- Los datos se cargará dinámicamente -->
+                                            <!-- Los datos se cargar├ín din├ímicamente -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -488,10 +712,10 @@
             <!-- Leaders Section -->
             <div id="leadersSection" style="display: none;">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
-                    <h1 class="h3">Gestión de Líderes</h1>
+                    <h1 class="h3">Gesti├│n de L├¡deres</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
-                            <i class="bi bi-plus-circle"></i> Nuevo Líder
+                            <i class="bi bi-plus-circle"></i> Nuevo L├¡der
                         </button>
                     </div>
                 </div>
@@ -499,7 +723,7 @@
                 <!-- Leaders List -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="bi bi-list-ul"></i> Lista de Líderes
+                        <i class="bi bi-list-ul"></i> Lista de L├¡deres
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -514,7 +738,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="leadersTableBody">
-                                    <!-- Los datos se cargará dinámicamente -->
+                                    <!-- Los datos se cargar├ín din├ímicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -545,18 +769,18 @@
                                     <tr>
                                         <th>Fecha</th>
                                         <th>Nombre</th>
-                                        <th>Cédula</th>
-                                        <th>Líder</th>
+                                        <th>C├®dula</th>
+                                        <th>L├¡der</th>
                                         <th>Localidad</th>
-                                        <th>¿Votante?</th>
-                                        <th>Puesto Votación</th>
-                                        <th>Estado</th>
-                                        <th>Confirmado Por</th>
-                                        <th>Acción</th>
+                                        <th>┬┐Votante?</th>
+                                        <th>Puesto Votaci├│n</th>
+                                        <th>N┬║ Mesa</th>
+                                        <th>Confirmado</th>
+                                        <th>Acci├│n</th>
                                     </tr>
                                 </thead>
                                 <tbody id="registrationsTableBody">
-                                    <!-- Los datos se cargará dinámicamente -->
+                                    <!-- Los datos se cargar├ín din├ímicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -567,7 +791,7 @@
             <!-- Analysis Section -->
             <div id="analysisSection" style="display: none;">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
-                    <h1 class="h3">Análisis de Datos</h1>
+                    <h1 class="h3">An├ílisis de Datos</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="refreshAnalysis()">
@@ -577,10 +801,6 @@
                                 <i class="bi bi-search"></i> Detectar Duplicados
                             </button>
                         </div>
-                        <!-- Botón para exportar registros del líder seleccionado -->
-                        <button type="button" class="btn btn-sm btn-outline-success ms-2" onclick="exportCurrentLeaderRegs()" title="Exportar registros del líder seleccionado">
-                            <i class="bi bi-download"></i> Exportar registros del líder
-                        </button>
                     </div>
                 </div>
 
@@ -589,9 +809,9 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Filtrar por Líder:</label>
+                                <label class="form-label fw-bold">Filtrar por L├¡der:</label>
                                 <select class="form-select" id="filterLeaderSelect" onchange="filterByLeader()">
-                                    <option value="">-- Todos los Líderes --</option>
+                                    <option value="">-- Todos los L├¡deres --</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -599,7 +819,7 @@
                                 <input type="text" class="form-control" id="searchUserName" placeholder="Buscar nombre..." onkeyup="filterBySearchTerm()">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Estado de Confirmación:</label>
+                                <label class="form-label fw-bold">Estado de Confirmaci├│n:</label>
                                 <select class="form-select" id="filterConfirmedSelect" onchange="filterByConfirmed()">
                                     <option value="">-- Todos --</option>
                                     <option value="confirmed">Confirmados</option>
@@ -615,7 +835,7 @@
                     <div class="col-md-3">
                         <div class="card h-100 border-primary">
                             <div class="card-body">
-                                <h5 class="card-title">Total Líderes</h5>
+                                <h5 class="card-title">Total L├¡deres</h5>
                                 <p class="display-4" id="totalLeaders">-</p>
                                 <p class="text-muted" id="activeLeaders">- activos</p>
                             </div>
@@ -642,7 +862,7 @@
                     <div class="col-md-3">
                         <div class="card h-100 border-warning">
                             <div class="card-body">
-                                <h5 class="card-title">Última Actividad</h5>
+                                <h5 class="card-title">├Ültima Actividad</h5>
                                 <p class="h5" id="lastActivity">-</p>
                                 <p class="text-muted" id="lastActivityTime">-</p>
                             </div>
@@ -650,18 +870,18 @@
                     </div>
                 </div>
 
-                <!-- Sub-sección: Gráficos (tamaño compacto) -->
+                <!-- Sub-secci├│n: Gr├íficos (tama├▒o compacto) -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <strong>Gráficos</strong>
-                        <small class="text-muted ms-2">Resúmenes visuales (tamaño compacto)</small>
+                        <strong>Gr├íficos</strong>
+                        <small class="text-muted ms-2">Res├║menes visuales (tama├▒o compacto)</small>
                     </div>
                     <div class="card-body">
                         <div class="row gy-3">
                             <div class="col-md-6">
                                 <div class="card shadow-sm">
                                     <div class="card-body p-3">
-                                        <h6 class="card-title mb-2">Registros por Día</h6>
+                                        <h6 class="card-title mb-2">Registros por D├¡a</h6>
                                         <canvas id="analysisDailyChart" style="width:100%; height:140px; max-height:180px;"></canvas>
                                     </div>
                                 </div>
@@ -669,7 +889,7 @@
                             <div class="col-md-6">
                                 <div class="card shadow-sm">
                                     <div class="card-body p-3">
-                                        <h6 class="card-title mb-2">Top Líderes</h6>
+                                        <h6 class="card-title mb-2">Top L├¡deres</h6>
                                         <div id="topLeadersSmall" style="max-height:160px; overflow-y:auto;"></div>
                                     </div>
                                 </div>
@@ -687,7 +907,7 @@
                                     <button class="btn btn-link p-0 me-2" id="toggleLeadersBtn" onclick="toggleLeadersPerformance()" title="Minimizar/Expandir">
                                         <i class="bi bi-chevron-down"></i>
                                     </button>
-                                    <h5 class="mb-0 d-inline"><i class="bi bi-graph-up"></i> Desempeño de Líderes</h5>
+                                    <h5 class="mb-0 d-inline"><i class="bi bi-graph-up"></i> Desempe├▒o de L├¡deres</h5>
                                 </div>
                                 <div class="btn-group btn-group-sm" id="leadersToolbar">
                                     <button class="btn btn-outline-secondary" onclick="sortLeadersList('registrations')">
@@ -703,17 +923,17 @@
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
-                                                <th>Líder</th>
-                                                <th>Área</th>
+                                                <th>L├¡der</th>
+                                                <th>├ürea</th>
                                                 <th>Registros</th>
                                                 <th>Confirmados</th>
-                                                <th>% Confirmación</th>
-                                                <th>Último Registro</th>
+                                                <th>% Confirmaci├│n</th>
+                                                <th>├Ültimo Registro</th>
                                                 <th>Estado</th>
                                             </tr>
                                         </thead>
                                         <tbody id="leaderAnalysisList">
-                                            <!-- Se llenará dinámicamente -->
+                                            <!-- Se llenar├í din├ímicamente -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -722,14 +942,14 @@
                     </div>
                 </div>
 
-                <!-- Mapa de Bogotá por localidades -->
+                <!-- Mapa de Bogot├í por localidades -->
                 <div class="row">
                     <div class="col-md-12 mb-4">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Mapa - Registros por Localidad (Bogotá)</h5>
+                                <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Mapa - Registros por Localidad (Bogot├í)</h5>
                                 <div>
-                                    <span class="badge bg-info text-dark">Vista simplificada: gráfico por localidad</span>
+                                    <span class="badge bg-info text-dark">Vista simplificada: gr├ífico por localidad</span>
                                     <button class="btn btn-sm btn-outline-secondary ms-2" onclick="toggleMapFallback()">Mostrar mapa</button>
                                 </div>
                             </div>
@@ -738,7 +958,7 @@
                                                                                                                         <div id="bogotaMap" style="width:100%; height:560px; border:1px solid #dfefe0; background:linear-gradient(180deg,#e8f6ea 0%, #cfead0 100%); display:flex; align-items:center; justify-content:center;"> 
                                                                                                                                 <!-- Inline SVG croquis (fallback guaranteed). Removed inline content so external bogota_croquis.svg is used dynamically. -->
                                                                                                                                 <div id="bogotaCroquisInlineWrapper" style="width:100%;height:100%;">
-                                                                                                                                    <!-- El contenido SVG se carga dinámicamente desde /bogota_croquis.svg -->
+                                                                                                                                    <!-- El contenido SVG se carga din├ímicamente desde /bogota_croquis.svg -->
                                                                                                                                 </div>
                                                                                                                         </div>
                                                             <div id="bogotaMapSpinner" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:20000; display:flex; align-items:center; justify-content:center;">
@@ -751,11 +971,11 @@
                                     <div id="bogotaMapLegend" style="margin-top:10px;"></div>
                                     <!-- Input para cargar GeoJSON desde URL -->
                                     <div class="input-group mt-2 mb-2">
-                                        <input id="geojsonUrlInput" class="form-control form-control-sm" placeholder="Pega aquí la URL del GeoJSON (opcional)" />
+                                        <input id="geojsonUrlInput" class="form-control form-control-sm" placeholder="Pega aqu├¡ la URL del GeoJSON (opcional)" />
                                         <button class="btn btn-sm btn-outline-primary" type="button" onclick="loadBogotaMapFromInput()">Cargar GeoJSON</button>
                                     </div>
-                                    <div class="small text-muted mb-2">Si colocas un archivo llamado <code>bogota_localidades.geojson</code> en la raíz del servidor, se cargará automáticamente.</div>
-                                    <!-- Fallback simplificado: gráfico de barras con % por localidad -->
+                                    <div class="small text-muted mb-2">Si colocas un archivo llamado <code>bogota_localidades.geojson</code> en la ra├¡z del servidor, se cargar├í autom├íticamente.</div>
+                                    <!-- Fallback simplificado: gr├ífico de barras con % por localidad -->
                                     <div id="bogotaChartWrapper" style="margin-top:12px; display:block;">
                                         <canvas id="localidadesChart" style="width:100%; height:240px;"></canvas>
                                     </div>
@@ -764,36 +984,44 @@
                     </div>
                 </div>
 
-                <!-- Registros del Líder Seleccionado -->
+                <!-- Registros del L├¡der Seleccionado -->
                 <div class="row">
                     <div class="col-md-12 mb-4">
                         <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">
-                                    <i class="bi bi-people-fill"></i> 
-                                    <span id="selectedLeaderTitle">Todos los Registros</span>
-                                </h5>
-                                <div class="badge bg-info" id="registroCount">0 registros</div>
+                            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <h5 class="mb-0" style="display: inline-block;">
+                                        <i class="bi bi-people-fill"></i> 
+                                        <span id="selectedLeaderTitle">Todos los Registros</span>
+                                    </h5>
+                                    <div class="badge bg-info" id="registroCount" style="margin-left: 8px;">0 registros</div>
+                                </div>
+                                <div>
+                                    <button id="exportFilteredBtn" class="btn btn-sm btn-success" onclick="exportFilteredRegistrations()" title="Exportar registros del l├¡der seleccionado">
+                                        <i class="bi bi-download"></i> Exportar
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
                                     <table class="table table-hover table-sm">
                                         <thead>
                                             <tr>
+                                                <th style="width: 4%; text-align: center;">#</th>
                                                 <th>Fecha</th>
                                                 <th>Nombre</th>
-                                                <th>Cédula</th>
-                                                <th>Teléfono</th>
+                                                <th>C├®dula</th>
+                                                <th>Tel├®fono</th>
                                                 <th>Localidad</th>
-                                                <th>¿Votante?</th>
-                                                <th>Puesto Votación</th>
+                                                <th>┬┐Votante?</th>
+                                                <th>Puesto Votaci├│n</th>
                                                 <th>Estado</th>
                                                 <th>Confirmado Por</th>
-                                                <th>Acciones</th>
+                                                <th style="width: 8%;">Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody id="filteredRegistrationsList">
-                                            <!-- Se llenará dinámicamente -->
+                                            <!-- Se llenar├í din├ímicamente -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -814,10 +1042,10 @@
                         <div class="card leader-card">
                             <div class="card-body text-center p-4">
                                 <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
-                                <h4 class="my-3">Exportar Líderes</h4>
-                                <p class="text-muted">Descarga un archivo Excel con todos los líderes y su información.</p>
+                                <h4 class="my-3">Exportar L├¡deres</h4>
+                                <p class="text-muted">Descarga un archivo Excel con todos los l├¡deres y su informaci├│n.</p>
                                 <button class="btn btn-primary" onclick="exportToExcel('leaders')">
-                                    <i class="bi bi-download"></i> Exportar Líderes
+                                    <i class="bi bi-download"></i> Exportar L├¡deres
                                 </button>
                             </div>
                         </div>
@@ -849,7 +1077,7 @@
                     </div>
                     <div class="modal-body">
                         <div id="eventsList" class="mb-3">
-                            <!-- Lista de eventos se carga dinámicamente -->
+                            <!-- Lista de eventos se carga din├ímicamente -->
                         </div>
 
                         <hr />
@@ -864,7 +1092,7 @@
                                 <input type="date" class="form-control" id="eventDate" />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Descripción</label>
+                                <label class="form-label">Descripci├│n</label>
                                 <textarea class="form-control" id="eventDescription"></textarea>
                             </div>
                         </form>
@@ -882,7 +1110,7 @@
         <div class="public-header">
             <div class="container-fluid">
                     <h1 class="display-4">Elecciones 2026</h1>
-                    <p class="lead">Regístrate para Elecciones 2026</p>
+                    <p class="lead">Reg├¡strate para Elecciones 2026</p>
                 </div>
             </div>
         
@@ -890,7 +1118,7 @@
             <div class="public-form">
                 <form id="registrationForm">
                     <div class="form-section">
-                        <div class="form-section-title">Información Personal</div>
+                        <div class="form-section-title">Informaci├│n Personal</div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="firstName" class="form-label">Nombre</label>
@@ -902,7 +1130,7 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="cedula" class="form-label">Cédula</label>
+                            <label for="cedula" class="form-label">C├®dula</label>
                             <input type="text" class="form-control" id="cedula" name="cedula">
                         </div>
                         <div class="mb-3">
@@ -911,36 +1139,36 @@
                             <div class="form-text">No es necesario</div>
                         </div>
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Teléfono</label>
+                            <label for="phone" class="form-label">Tel├®fono</label>
                             <input type="tel" class="form-control" id="phone" name="phone" required>
                         </div>
                     </div>
                     
                     <div class="form-section">
-                        <div class="form-section-title">Información Adicional</div>
+                        <div class="form-section-title">Informaci├│n Adicional</div>
                         <div class="mb-3">
                             <label for="localidadSelect" class="form-label">Localidad</label>
                             <select id="localidadSelect" name="localidad" class="form-select" onchange="toggleLocalidadOther(this.value)" required>
                                 <option value="">-- Seleccione Localidad --</option>
-                                <option>Usaquén</option>
+                                <option>Usaqu├®n</option>
                                 <option>Chapinero</option>
                                 <option>Santa Fe</option>
-                                <option>San Cristóbal</option>
+                                <option>San Crist├│bal</option>
                                 <option>Usme</option>
                                 <option>Tunjuelito</option>
                                 <option>Bosa</option>
                                 <option>Kennedy</option>
-                                <option>Fontibón</option>
-                                <option>Engativá</option>
+                                <option>Fontib├│n</option>
+                                <option>Engativ├í</option>
                                 <option>Suba</option>
                                 <option>Barrios Unidos</option>
                                 <option>Teusaquillo</option>
-                                <option>Los Mártires</option>
-                                <option>Antonio Nariño</option>
+                                <option>Los M├írtires</option>
+                                <option>Antonio Nari├▒o</option>
                                 <option>Puente Aranda</option>
                                 <option>La Candelaria</option>
                                 <option>Rafael Uribe Uribe</option>
-                                <option>Ciudad Bolívar</option>
+                                <option>Ciudad Bol├¡var</option>
                                 <option>Sumapaz</option>
                                 <option value="Otra">Otra</option>
                             </select>
@@ -948,11 +1176,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">¿Tienes inscrita la cédula para votar?</label>
+                            <label class="form-label">┬┐Tienes inscrita la c├®dula para votar?</label>
                             <div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="registeredToVote" id="registeredYes" value="true" onchange="toggleVotingPlace(true)">
-                                    <label class="form-check-label" for="registeredYes">Sí</label>
+                                    <label class="form-check-label" for="registeredYes">S├¡</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="registeredToVote" id="registeredNo" value="false" onchange="toggleVotingPlace(false)" checked>
@@ -962,20 +1190,20 @@
                         </div>
 
                         <div class="mb-3" id="votingPlaceGroup" style="display:none;">
-                            <label for="votingPlace" class="form-label">Puesto de Votación</label>
-                            <input type="text" class="form-control" id="votingPlace" name="votingPlace" placeholder="Nombre del puesto de votación">
+                            <label for="votingPlace" class="form-label">Puesto de Votaci├│n</label>
+                            <input type="text" class="form-control" id="votingPlace" name="votingPlace" placeholder="Nombre del puesto de votaci├│n">
                             <div class="mt-2">
-                                <label for="votingTable" class="form-label">Número de mesa</label>
-                                <input type="text" class="form-control" id="votingTable" name="votingTable" placeholder="Número de mesa (ej. 023)">
+                                <label for="votingTable" class="form-label">N├║mero de mesa</label>
+                                <input type="text" class="form-control" id="votingTable" name="votingTable" placeholder="N├║mero de mesa (ej. 023)">
                             </div>
-                            <div class="form-text">No estás seguro? <a href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank" rel="noopener noreferrer">¿Dónde voto?</a></div>
+                            <div class="form-text">No est├ís seguro? <a href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank" rel="noopener noreferrer">┬┐D├│nde voto?</a></div>
                         </div>
                     </div>
                     
                     <div class="form-check mb-4">
                         <input class="form-check-input" type="checkbox" id="whatsappConsent" checked>
                         <label class="form-check-label" for="whatsappConsent">
-                            Deseo recibir confirmación por WhatsApp
+                            Deseo recibir confirmaci├│n por WhatsApp
                         </label>
                     </div>
                     
@@ -985,14 +1213,14 @@
                         </button>
                     </div>
                 </form>
-                <!-- Pantalla de éxito: se muestra después de guardar -->
+                <!-- Pantalla de ├®xito: se muestra despu├®s de guardar -->
                 <div id="registrationSuccessScreen" style="display:none; text-align:center; padding:2rem;">
                     <div style="padding:2rem;">
-                        <h2 class="text-success">¡Registro exitoso!</h2>
+                        <h2 class="text-success">┬íRegistro exitoso!</h2>
                         <p class="lead">Gracias por registrarte. Hemos recibido tus datos correctamente.</p>
-                        <p>Si necesitas volver a la página de administración, usa el botón abajo.</p>
+                        <p>Si necesitas volver a la p├ígina de administraci├│n, usa el bot├│n abajo.</p>
                         <div style="margin-top:1.5rem;">
-                            <button class="btn btn-outline-primary" onclick="showAdminPanel()">Volver al Panel de Administración</button>
+                            <button class="btn btn-outline-primary" onclick="showAdminPanel()">Volver al Panel de Administraci├│n</button>
                             <button class="btn btn-secondary ms-2" onclick="resetPublicForm()">Registrar otra persona</button>
                         </div>
                     </div>
@@ -1001,7 +1229,7 @@
             
             <div class="text-center mt-4">
                 <button class="btn btn-outline-secondary" onclick="showAdminPanel()">
-                    <i class="bi bi-arrow-left"></i> Volver al Panel de Administración
+                    <i class="bi bi-arrow-left"></i> Volver al Panel de Administraci├│n
                 </button>
             </div>
         </div>
@@ -1012,7 +1240,7 @@
         <div class="modal-dialog modal-fullscreen-sm-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="leaderModalLabel">Nuevo Líder</h5>
+                    <h5 class="modal-title" id="leaderModalLabel">Nuevo L├¡der</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1027,24 +1255,24 @@
                             <input type="email" class="form-control" id="leaderEmail" required>
                         </div>
                         <div class="mb-3">
-                            <label for="leaderPhone" class="form-label">Teléfono</label>
+                            <label for="leaderPhone" class="form-label">Tel├®fono</label>
                             <input type="tel" class="form-control" id="leaderPhone" required>
                         </div>
                         <div class="mb-3">
-                            <label for="leaderArea" class="form-label">Área/Zona</label>
+                            <label for="leaderArea" class="form-label">├ürea/Zona</label>
                             <input type="text" class="form-control" id="leaderArea">
                         </div>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="leaderActive" checked>
                             <label class="form-check-label" for="leaderActive">
-                                Líder Activo
+                                L├¡der Activo
                             </label>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveLeader()">Guardar Líder</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLeader()">Guardar L├¡der</button>
                 </div>
             </div>
         </div>
@@ -1078,6 +1306,7 @@
       </div>
       <div class="modal-body">
         <form id="adminRegistrationForm">
+          <input type="hidden" id="editingRegistrationId" value="">
           <div class="mb-3">
             <label class="form-label">Nombre</label>
             <input type="text" class="form-control" id="adminFirstName" required>
@@ -1087,7 +1316,7 @@
             <input type="text" class="form-control" id="adminLastName" required>
           </div>
           <div class="mb-3">
-            <label class="form-label">Cédula</label>
+            <label class="form-label">C├®dula</label>
             <input type="text" class="form-control" id="adminCedula" required>
           </div>
           <div class="mb-3">
@@ -1095,47 +1324,47 @@
             <input type="email" class="form-control" id="adminEmail" required>
           </div>
           <div class="mb-3">
-            <label class="form-label">Teléfono</label>
+            <label class="form-label">Tel├®fono</label>
             <input type="tel" class="form-control" id="adminPhone" required>
           </div>
           <div class="mb-3">
-            <label class="form-label">Líder</label>
+            <label class="form-label">L├¡der</label>
             <select class="form-select" id="adminLeaderSelect"></select>
           </div>
                     <div class="mb-3">
                         <label class="form-label">Localidad</label>
                         <select id="adminLocalidadSelect" name="adminLocalidad" class="form-select" onchange="toggleAdminLocalidadOther(this.value)">
                             <option value="">-- Seleccione Localidad --</option>
-                            <option>Usaquén</option>
+                            <option>Usaqu├®n</option>
                             <option>Chapinero</option>
                             <option>Santa Fe</option>
-                            <option>San Cristóbal</option>
+                            <option>San Crist├│bal</option>
                             <option>Usme</option>
                             <option>Tunjuelito</option>
                             <option>Bosa</option>
                             <option>Kennedy</option>
-                            <option>Fontibón</option>
-                            <option>Engativá</option>
+                            <option>Fontib├│n</option>
+                            <option>Engativ├í</option>
                             <option>Suba</option>
                             <option>Barrios Unidos</option>
                             <option>Teusaquillo</option>
-                            <option>Los Mártires</option>
-                            <option>Antonio Nariño</option>
+                            <option>Los M├írtires</option>
+                            <option>Antonio Nari├▒o</option>
                             <option>Puente Aranda</option>
                             <option>La Candelaria</option>
                             <option>Rafael Uribe Uribe</option>
-                            <option>Ciudad Bolívar</option>
+                            <option>Ciudad Bol├¡var</option>
                             <option>Sumapaz</option>
                             <option value="Otra">Otra</option>
                         </select>
                         <input type="text" id="adminLocalidadOtra" name="adminLocalidadOtra" class="form-control mt-2" placeholder="Especifique otra localidad" style="display:none;" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">¿Tiene inscrita la cédula para votar?</label>
+                        <label class="form-label">┬┐Tiene inscrita la c├®dula para votar?</label>
                         <div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="adminRegisteredToVote" id="adminRegisteredYes" value="true" onchange="toggleAdminVotingPlace(true)">
-                                                <label class="form-check-label" for="adminRegisteredYes">Sí</label>
+                                                <label class="form-check-label" for="adminRegisteredYes">S├¡</label>
                                             </div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="adminRegisteredToVote" id="adminRegisteredNo" value="false" checked onchange="toggleAdminVotingPlace(false)">
@@ -1144,13 +1373,13 @@
                         </div>
                     </div>
                     <div class="mb-3" id="adminVotingPlaceGroup" style="display:none;">
-                        <label class="form-label">Puesto de Votación</label>
-                        <input type="text" class="form-control" id="adminVotingPlace" name="adminVotingPlace" placeholder="Nombre del puesto de votación">
+                        <label class="form-label">Puesto de Votaci├│n</label>
+                        <input type="text" class="form-control" id="adminVotingPlace" name="adminVotingPlace" placeholder="Nombre del puesto de votaci├│n">
                         <div class="mt-2">
-                            <label for="adminVotingTable" class="form-label">Número de mesa</label>
-                            <input type="text" class="form-control" id="adminVotingTable" name="adminVotingTable" placeholder="Número de mesa (ej. 023)">
+                            <label for="adminVotingTable" class="form-label">N├║mero de mesa</label>
+                            <input type="text" class="form-control" id="adminVotingTable" name="adminVotingTable" placeholder="N├║mero de mesa (ej. 023)">
                         </div>
-                        <div class="form-text">Buscar: <a href="https://www.google.com/search?q=dónde+voto" target="_blank">¿Dónde voto?</a></div>
+                        <div class="form-text">Buscar: <a href="https://www.google.com/search?q=d├│nde+voto" target="_blank">┬┐D├│nde voto?</a></div>
                     </div>
         </form>
       </div>
@@ -1171,9 +1400,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <p class="text-muted">Se muestran grupos de posibles duplicados (misma cédula o mismo email+teléfono).</p>
+                            <p class="text-muted">Se muestran grupos de posibles duplicados (misma c├®dula o mismo email+tel├®fono).</p>
                             <div id="duplicatesResults">
-                                <!-- llenado dinámico -->
+                                <!-- llenado din├ímico -->
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -1190,7 +1419,7 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Librería qrcodejs necesaria para generar QR simples -->
+    <!-- Librer├¡a qrcodejs necesaria para generar QR simples -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- El bloque <script> duplicado ha sido eliminado. -->
 <script>
@@ -1211,6 +1440,7 @@ async function saveAdminRegistration() {
     const cedula = document.getElementById("adminCedula")?.value || '';
     const email = document.getElementById("adminEmail")?.value || '';
     const phone = document.getElementById("adminPhone")?.value || '';
+    const editingId = document.getElementById('editingRegistrationId')?.value || '';
 
     if (!name || !leaderId) {
         showToast('danger', 'Por favor completa todos los campos antes de guardar.');
@@ -1240,50 +1470,56 @@ async function saveAdminRegistration() {
         if (adminLocalidad) reg.localidad = adminLocalidad;
         reg.registeredToVote = adminRegisteredToVote;
         if (adminRegisteredToVote && !adminVotingPlace) {
-            showToast('danger', 'Si indicó que está inscrito para votar, por favor indique el puesto de votación.');
+            showToast('danger', 'Si indic├│ que est├í inscrito para votar, por favor indique el puesto de votaci├│n.');
             return;
         }
         if (adminVotingPlace) reg.votingPlace = adminVotingPlace;
         if (adminVotingTable) reg.votingTable = adminVotingTable;
 
     try {
-        // Verificar duplicados por cédula antes de enviar
-        if (reg.cedula) {
+        // Si no estamos editando, verificar duplicados
+        if (!editingId && reg.cedula) {
             try {
                 const q = `/api/registrations?cedula=${encodeURIComponent(reg.cedula)}${activeEventId ? '&eventId=' + activeEventId : ''}`;
                 const check = await fetch(q);
                 if (check.ok) {
                     const existing = await check.json();
                     if (existing.length > 0) {
-                        showToast('danger', 'usuario ya registrado');
+                        showToast('danger', 'Usuario ya registrado');
                         return;
                     }
                 }
             } catch (e) {
-                console.warn('No se pudo verificar duplicados por cédula:', e);
+                console.warn('No se pudo verificar duplicados por c├®dula:', e);
             }
         }
 
-        const response = await fetch("/api/registrations", {
-            method: "POST",
+        // Determinar si es creaci├│n o edici├│n
+        const isEditing = editingId && editingId.trim() !== '';
+        const url = isEditing ? `/api/registrations/${editingId}` : "/api/registrations";
+        const method = isEditing ? "PUT" : "POST";
+
+        const response = await fetch(url, {
+            method: method,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(reg)
         });
 
         if (response.ok) {
             const newReg = await response.json();
-            console.log('Registro guardado:', newReg);
+            console.log(isEditing ? 'Registro actualizado:' : 'Registro guardado:', newReg);
 
-            showToast('success', 'Registro guardado');
+            showToast('success', isEditing ? 'Registro actualizado correctamente' : 'Registro guardado correctamente');
 
             // Limpiar formulario
             document.getElementById("adminRegistrationForm").reset();
+            document.getElementById('editingRegistrationId').value = '';
             document.getElementById("adminFirstName").value = "";
             document.getElementById("adminLastName").value = "";
             document.getElementById("adminCedula").value = "";
             document.getElementById("adminEmail").value = "";
             document.getElementById("adminPhone").value = "";
-            // ocultar puesto de votación si estaba visible
+            // ocultar puesto de votaci├│n si estaba visible
             const adminVotingGroup = document.getElementById('adminVotingPlaceGroup');
             if (adminVotingGroup) adminVotingGroup.style.display = 'none';
             // reset radios
@@ -1291,6 +1527,9 @@ async function saveAdminRegistration() {
             const adminNo = document.getElementById('adminRegisteredNo');
             if (adminYes) adminYes.checked = false;
             if (adminNo) adminNo.checked = true;
+            
+            // Cambiar título del modal de vuelta al original
+            document.getElementById('adminRegistrationLabel').textContent = 'Registrar Persona';
 
             // Cerrar modal
             const modalElement = document.getElementById("adminRegistrationModal");
@@ -1304,11 +1543,11 @@ async function saveAdminRegistration() {
 
         } else {
             const errorData = await response.json().catch(() => ({}));
-            showToast('danger', `❌ Error al guardar el registro: ${errorData.error || 'desconocido'}`);
+            showToast('danger', `Error al guardar el registro: ${errorData.error || 'desconocido'}`);
         }
     } catch (err) {
         console.error('Error guardando registro admin:', err);
-        showToast('danger', '❌ Hubo un error al guardar el registro.');
+        showToast('danger', 'Hubo un error al guardar el registro.');
     }
 }
 
@@ -1316,11 +1555,11 @@ async function saveAdminRegistration() {
 function mapWikimediaNumbersToDataNames(svg) {
     if (!svg) return 0;
     const numMap = {
-        1: 'Usaquén', 2: 'Chapinero', 3: 'Santa Fe', 4: 'San Cristóbal', 5: 'Usme',
-        6: 'Tunjuelito', 7: 'Bosa', 8: 'Kennedy', 9: 'Fontibón', 10: 'Engativá',
-        11: 'Suba', 12: 'Barrios Unidos', 13: 'Teusaquillo', 14: 'Los Mártires',
-        15: 'Antonio Nariño', 16: 'Puente Aranda', 17: 'La Candelaria', 18: 'Rafael Uribe',
-        19: 'Ciudad Bolívar', 20: 'Sumapaz'
+        1: 'Usaqu├®n', 2: 'Chapinero', 3: 'Santa Fe', 4: 'San Crist├│bal', 5: 'Usme',
+        6: 'Tunjuelito', 7: 'Bosa', 8: 'Kennedy', 9: 'Fontib├│n', 10: 'Engativ├í',
+        11: 'Suba', 12: 'Barrios Unidos', 13: 'Teusaquillo', 14: 'Los M├írtires',
+        15: 'Antonio Nari├▒o', 16: 'Puente Aranda', 17: 'La Candelaria', 18: 'Rafael Uribe',
+        19: 'Ciudad Bol├¡var', 20: 'Sumapaz'
     };
     const texts = Array.from(svg.querySelectorAll('text')).filter(t => t && t.textContent && /\d+/.test(t.textContent));
     const candidateShapes = Array.from(svg.querySelectorAll('path, polygon, rect, circle'));
@@ -1369,7 +1608,7 @@ function mapWikimediaNumbersToDataNames(svg) {
     return assigned;
 }
 
-// ===================== 🔹 Map: Bogotá localidades choropleth =====================
+// ===================== ­ƒö╣ Map: Bogot├í localidades choropleth =====================
 let _bogotaMap = null;
 let _bogotaLayer = null;
 let _bogotaGeo = null;
@@ -1394,7 +1633,7 @@ function normalizeName(s) {
         str = str.normalize('NFD').replace(/\p{Diacritic}/gu, '');
     } catch (e) {
         // Fallback: simple replacements for common accented characters
-        const map = { 'Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U','á':'a','é':'e','í':'i','ó':'o','ú':'u','Ñ':'N','ñ':'n','Ü':'U','ü':'u' };
+        const map = { '├ü':'A','├ë':'E','├ì':'I','├ô':'O','├Ü':'U','├í':'a','├®':'e','├¡':'i','├│':'o','├║':'u','├æ':'N','├▒':'n','├£':'U','├╝':'u' };
         str = str.split('').map(ch => map[ch] || ch).join('');
     }
     // remove punctuation, keep letters/numbers/spaces and dashes
@@ -1470,7 +1709,7 @@ async function ensureBogotaGeo() {
         if (r2.ok) { _bogotaGeo = await r2.json(); return _bogotaGeo; }
     } catch(e) {}
     // Otherwise ask user to paste URL
-    showToast('info', 'No se encontró GeoJSON local. Pega una URL en el campo de arriba.');
+    showToast('info', 'No se encontr├│ GeoJSON local. Pega una URL en el campo de arriba.');
     return null;
 }
 
@@ -1543,30 +1782,28 @@ function onEachFeature(feature, layer) {
     // ================= SVG croquis interactions =================
     function attachSvgInteractions() {
         try {
-            // localizar el SVG (inline o insertado dinámicamente)
+            // Support multiple possible svg ids (external file or inline)
             const svg = document.getElementById('bogotaCroquis') || document.getElementById('bogotaCroquisInline') || document.querySelector('#bogotaMap svg');
             if (!svg) return;
-
-            // tooltip singleton
+            // Tooltip element
             let tip = document.getElementById('svgMapTooltip');
             if (!tip) {
                 tip = document.createElement('div');
                 tip.id = 'svgMapTooltip';
-                Object.assign(tip.style, {
-                    position: 'absolute',
-                    pointerEvents: 'none',
-                    padding: '6px 8px',
-                    background: 'rgba(0,0,0,0.75)',
-                    color: '#fff',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    display: 'none',
-                    zIndex: 30000
-                });
+                tip.style.position = 'absolute';
+                tip.style.pointerEvents = 'none';
+                tip.style.padding = '6px 8px';
+                tip.style.background = 'rgba(0,0,0,0.75)';
+                tip.style.color = 'white';
+                tip.style.borderRadius = '4px';
+                tip.style.fontSize = '12px';
+                tip.style.display = 'none';
+                tip.style.zIndex = 30000;
                 document.body.appendChild(tip);
             }
 
-            // helper: collect shape targets (group element + inner shapes)
+            const items = svg.querySelectorAll('[data-name]');
+            // helper: find shapes to attach events to (element itself + inner shape children)
             function getInteractiveTargets(element) {
                 const targets = [];
                 const tag = (element.tagName || '').toLowerCase();
@@ -1575,69 +1812,83 @@ function onEachFeature(feature, layer) {
                 if (element.querySelectorAll) {
                     element.querySelectorAll('path,polygon,rect,circle,ellipse').forEach(n => targets.push(n));
                 }
+                // fallback to the element itself
                 if (targets.length === 0) targets.push(element);
                 return targets;
             }
 
-            // ensure pointer-events for a target and give transparent fill if needed
-            function makeTargetInteractive(t) {
-                try {
-                    t.style.pointerEvents = 'all';
-                    t.setAttribute('pointer-events', 'all');
-                    const curFill = (t.getAttribute('fill') || '').trim().toLowerCase();
-                    if (!curFill || curFill === 'none') {
-                        // fill nearly transparent so small/stroke-only shapes capture events
-                        t.setAttribute('fill', '#ffffff');
-                        t.setAttribute('fill-opacity', '0.01');
-                    }
-                } catch (e) { /* no bloquear */ }
-            }
-
-            const items = Array.from(svg.querySelectorAll('[data-name]'));
             items.forEach(el => {
-                const name = el.getAttribute('data-name') || '';
-                try { el.setAttribute('tabindex', '0'); } catch(e) {}
-
-                const targets = getInteractiveTargets(el);
-                targets.forEach(makeTargetInteractive);
-
-                // handlers using closure over `el` and `name`
-                function showTipFor(ev) {
+                const name = el.getAttribute('data-name');
+                try { el.setAttribute('tabindex', '0'); } catch(e){}
+                // Ensure the element itself (or its child shapes) will capture pointer events
+                getInteractiveTargets(el).forEach(t => {
                     try {
-                        const { stats } = computeLocalidadStats();
-                        const key = normalizeName(name || '');
-                        const s = stats[key] || { voterPct: 0, voters: 0, count: 0 };
-                        tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
-                        tip.style.display = 'block';
+                        t.style.pointerEvents = 'all';
+                        t.setAttribute('pointer-events', 'all');
+                        const curFill = (t.getAttribute('fill') || '').trim().toLowerCase();
+                        if (!curFill || curFill === 'none') {
+                            // give a nearly-transparent fill so the shape captures mouse events reliably
+                            t.setAttribute('fill', '#ffffff');
+                            t.setAttribute('fill-opacity', '0.01');
+                        }
+                    } catch(e){}
+                });
+
+                // Attach events to the interactive targets (so both group and inner paths respond)
+                const targets = getInteractiveTargets(el);
+                targets.forEach(targetEl => {
+                    targetEl.addEventListener('mouseover', (ev) => {
+                    // store original fill/stroke so we can restore later
+                    el.__origFill = el.getAttribute('fill') || el.style.fill;
+                    el.__origStroke = el.getAttribute('stroke') || '';
+                    el.__origStrokeWidth = el.getAttribute('stroke-width') || '';
+                    // subtle visual feedback without making the border aggressive
+                    try { el.style.filter = 'brightness(0.98)'; } catch(e){}
+                    const { stats } = computeLocalidadStats();
+                    const key = normalizeName(name || '');
+                    const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                    tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
+                    tip.style.display = 'block';
+                    // show a very subtle stroke for small-area visibility
+                    try {
+                        if (!(currentLocalidadFilter && currentLocalidadFilter === key)) {
+                            el.setAttribute('stroke', 'rgba(0,0,0,0.18)');
+                            el.setAttribute('stroke-width', '0.5');
+                        }
+                    } catch(e){}
+                    });
+                    targetEl.addEventListener('mousemove', (ev) => {
                         tip.style.left = (ev.pageX + 12) + 'px';
                         tip.style.top = (ev.pageY + 12) + 'px';
-                        // subtle highlight
-                        targets.forEach(sh => { try { sh.setAttribute('stroke', 'rgba(0,0,0,0.12)'); sh.setAttribute('stroke-width', '0.4'); } catch(_){} });
-                    } catch (e) { console.warn('showTipFor error', e); }
-                }
-                function moveTip(ev) {
-                    tip.style.left = (ev.pageX + 12) + 'px';
-                    tip.style.top = (ev.pageY + 12) + 'px';
-                }
-                function hideTip() {
-                    try { tip.style.display = 'none'; } catch(e){}
-                    // restore subtle default (no stroke)
-                    targets.forEach(sh => { try { sh.setAttribute('stroke', 'none'); sh.setAttribute('stroke-width', '0'); } catch(_){} });
-                }
-                function clickHandler(ev) {
-                    ev.stopPropagation();
-                    try {
+                    });
+                    targetEl.addEventListener('mouseout', (ev) => {
+                        try { el.style.filter = ''; } catch(e){}
+                        tip.style.display = 'none';
+                        // restore previous stroke unless it's selected
+                        try {
+                            const key = normalizeName(name || '');
+                            if (currentLocalidadFilter && currentLocalidadFilter === key) {
+                                // keep selected styling (handled elsewhere)
+                            } else {
+                                // restore on the actual shape elements
+                                getInteractiveTargets(el).forEach(sh => { try { sh.setAttribute('stroke', 'none'); sh.setAttribute('stroke-width', '0'); } catch(_){} });
+                            }
+                        } catch(e){}
+                    });
+                    targetEl.addEventListener('click', (ev) => {
+                        ev.stopPropagation();
                         const { stats } = computeLocalidadStats();
                         const key = normalizeName(name || '');
-                        const s = stats[key] || { voterPct: 0, voters: 0, count: 0 };
+                        const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                        // Toggle filter: if same localidad clicked twice -> clear
                         if (currentLocalidadFilter === key) {
                             currentLocalidadFilter = '';
                             showToast('info', `Filtro eliminado: ${name}`);
                         } else {
                             currentLocalidadFilter = key;
-                            showToast('info', `Filtrando por ${name}: ${s.count} registros — ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
+                            showToast('info', `Filtrando por ${name}: ${s.count} registros ÔÇö ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
                         }
-                        // badge UI
+                        // Update badge in the map area to reflect active filter
                         try {
                             const mapWrap = document.getElementById('bogotaMapWrapper');
                             if (mapWrap) {
@@ -1645,8 +1896,18 @@ function onEachFeature(feature, layer) {
                                 if (!badge) {
                                     badge = document.createElement('div');
                                     badge.id = 'localidadFilterBadge';
-                                    Object.assign(badge.style, { position:'absolute', top:'8px', right:'8px', zIndex:25000,
-                                        padding:'6px 10px', background:'rgba(0,0,0,0.6)', color:'#fff', borderRadius:'18px', fontSize:'13px', display:'inline-flex', alignItems:'center', gap:'8px'});
+                                    badge.style.position = 'absolute';
+                                    badge.style.top = '8px';
+                                    badge.style.right = '8px';
+                                    badge.style.zIndex = 25000;
+                                    badge.style.padding = '6px 10px';
+                                    badge.style.background = 'rgba(0,0,0,0.6)';
+                                    badge.style.color = '#fff';
+                                    badge.style.borderRadius = '18px';
+                                    badge.style.fontSize = '13px';
+                                    badge.style.display = 'inline-flex';
+                                    badge.style.alignItems = 'center';
+                                    badge.style.gap = '8px';
                                     const clr = document.createElement('button');
                                     clr.type = 'button';
                                     clr.className = 'btn btn-sm btn-light';
@@ -1666,79 +1927,280 @@ function onEachFeature(feature, layer) {
                                     badge.style.display = 'none';
                                 }
                             }
-                        } catch(e) { console.warn('badge error', e); }
+                        } catch (e) { console.warn('No se pudo actualizar badge de filtro', e); }
 
-                        applyFilters();
-                        colorSvgByStats();
-                    } catch (e) { console.warn('clickHandler error', e); }
-                }
-
-                // attach events to targets (covers group and inner shapes)
-                targets.forEach(t => {
-                    t.addEventListener('mouseover', showTipFor);
-                    t.addEventListener('mousemove', moveTip);
-                    t.addEventListener('mouseout', hideTip);
-                    t.addEventListener('click', clickHandler);
-                    t.addEventListener('keydown', (kev) => {
+                        // Apply filters to table and recolor SVG to show selection
+                        try { applyFilters(); } catch(e) { console.warn('applyFilters failed', e); }
+                        try { colorSvgByStats(); } catch(e) { console.warn('colorSvgByStats failed after click', e); }
+                    });
+                    // keyboard support: Enter or Space triggers the same action
+                    targetEl.addEventListener('keydown', (kev) => {
                         if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
                             kev.preventDefault();
-                            clickHandler({ stopPropagation: ()=>{}, preventDefault: ()=>{} });
+                            try { targetEl.click(); } catch(e) { console.warn('keyboard click failed', e); }
                         }
                     });
                 });
-
-                // accessibility: group focus/click
-                try {
-                    el.addEventListener('focus', (ev) => showTipFor(ev || { pageX: window.innerWidth/2, pageY: window.innerHeight/2 }));
-                    el.addEventListener('blur', hideTip);
-                    el.addEventListener('click', clickHandler);
-                } catch(e) {}
+                // end targets loop
+                // end per-item processing
+                
             });
+                el.addEventListener('mousemove', (ev) => {
+                    tip.style.left = (ev.pageX + 12) + 'px';
+                    tip.style.top = (ev.pageY + 12) + 'px';
+                });
+                el.addEventListener('mouseout', (ev) => {
+                    try { el.style.filter = ''; } catch(e){}
+                    tip.style.display = 'none';
+                    // restore previous stroke unless it's selected
+                    try {
+                        const key = normalizeName(name || '');
+                        if (currentLocalidadFilter && currentLocalidadFilter === key) {
+                            // keep selected styling (handled elsewhere)
+                        } else {
+                            el.setAttribute('stroke', 'none');
+                            el.setAttribute('stroke-width', '0');
+                        }
+                    } catch(e){}
+                });
+                el.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    const { stats } = computeLocalidadStats();
+                    const key = normalizeName(name || '');
+                    const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                    // Toggle filter: if same localidad clicked twice -> clear
+                    if (currentLocalidadFilter === key) {
+                        currentLocalidadFilter = '';
+                        showToast('info', `Filtro eliminado: ${name}`);
+                    } else {
+                        currentLocalidadFilter = key;
+                        showToast('info', `Filtrando por ${name}: ${s.count} registros ÔÇö ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
+                    }
+                    // Update badge in the map area to reflect active filter
+                    try {
+                        const mapWrap = document.getElementById('bogotaMapWrapper');
+                        if (mapWrap) {
+                            let badge = document.getElementById('localidadFilterBadge');
+                            if (!badge) {
+                                badge = document.createElement('div');
+                                badge.id = 'localidadFilterBadge';
+                                badge.style.position = 'absolute';
+                                badge.style.top = '8px';
+                                badge.style.right = '8px';
+                                badge.style.zIndex = 25000;
+                                badge.style.padding = '6px 10px';
+                                badge.style.background = 'rgba(0,0,0,0.6)';
+                                badge.style.color = '#fff';
+                                badge.style.borderRadius = '18px';
+                                badge.style.fontSize = '13px';
+                                badge.style.display = 'inline-flex';
+                                badge.style.alignItems = 'center';
+                                badge.style.gap = '8px';
+                                const clr = document.createElement('button');
+                                clr.type = 'button';
+                                clr.className = 'btn btn-sm btn-light';
+                                clr.style.padding = '2px 6px';
+                                clr.style.fontSize = '12px';
+                                clr.innerText = 'Limpiar';
+                                clr.onclick = (e) => { e.stopPropagation(); currentLocalidadFilter = ''; applyFilters(); badge.style.display = 'none'; colorSvgByStats(); };
+                                badge.appendChild(document.createElement('span'));
+                                badge.appendChild(clr);
+                                mapWrap.appendChild(badge);
+                            }
+                            const label = badge.querySelector('span');
+                            if (currentLocalidadFilter) {
+                                label.innerText = `${name}`;
+                                badge.style.display = 'inline-flex';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                    } catch (e) { console.warn('No se pudo actualizar badge de filtro', e); }
 
-            // colorizar áreas según stats
+                    // Apply filters to table and recolor SVG to show selection
+                    try { applyFilters(); } catch(e) { console.warn('applyFilters failed', e); }
+                    try { colorSvgByStats(); } catch(e) { console.warn('colorSvgByStats failed after click', e); }
+                });
+                // keyboard support: Enter or Space triggers the same action
+                el.addEventListener('keydown', (kev) => {
+                    if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
+                        kev.preventDefault();
+                        try { el.click(); } catch(e) { console.warn('keyboard click failed', e); }
+                    }
+                });
+            });
+            // After attaching handlers, color SVG areas according to stats
             try { colorSvgByStats(svg); } catch(e) { console.warn('colorSvgByStats failed', e); }
 
-            // crear etiquetas en mapa y panel izquierdo si no existen (silencioso a errores)
+            // Generate optional labels (centered text) and a small toggle button
             try {
+                        function createSvgLabels() {
+                            try {
+                                // remove any previous svg labels group
+                                const old = svg.querySelector('#labels-group');
+                                if (old) old.remove();
+                                // remove previous localidades box if exists
+                                const existingBox = document.getElementById('localidadesBox');
+                                if (existingBox) existingBox.remove();
+
+                                const mapWrap = document.getElementById('bogotaMapWrapper');
+                                if (!mapWrap) return;
+
+                                // Build the localidades box (separate panel with the list)
+                                const box = document.createElement('div');
+                                box.id = 'localidadesBox';
+                                box.style.position = 'absolute';
+                                box.style.left = '12px';
+                                box.style.top = '12px';
+                                box.style.width = '280px';
+                                box.style.maxHeight = '68%';
+                                box.style.overflow = 'auto';
+                                box.style.background = 'rgba(255,255,255,0.96)';
+                                box.style.borderRadius = '10px';
+                                box.style.boxShadow = '0 10px 30px rgba(2,6,23,0.10)';
+                                box.style.zIndex = 26000;
+                                box.style.padding = '8px';
+                                // start hidden; toggled by the hamburger button
+                                box.classList.add('hidden');
+
+                                const title = document.createElement('div');
+                                title.innerText = 'Localidades';
+                                title.style.fontWeight = '700';
+                                title.style.marginBottom = '6px';
+                                box.appendChild(title);
+
+                                const { stats, total } = computeLocalidadStats();
+                                const names = Array.from(new Set(Array.from(svg.querySelectorAll('[data-name]')).map(el => el.getAttribute('data-name')).filter(Boolean)));
+                                const rows = names.map(nm => {
+                                    const key = normalizeName(nm || '');
+                                    const st = stats[key] || { count: 0, voterPct: 0 };
+                                    return { name: nm, key, count: st.count || 0, voterPct: st.voterPct || 0 };
+                                }).sort((a,b) => b.count - a.count);
+
+                                const list = document.createElement('div');
+                                list.style.display = 'flex';
+                                list.style.flexDirection = 'column';
+                                list.style.gap = '6px';
+
+                                rows.forEach(rw => {
+                                    const item = document.createElement('button');
+                                    item.type = 'button';
+                                    item.className = 'localidades-item btn btn-sm';
+                                    item.style.display = 'flex';
+                                    item.style.justifyContent = 'space-between';
+                                    item.style.alignItems = 'center';
+                                    item.style.padding = '6px 8px';
+                                    item.style.background = 'transparent';
+                                    item.style.border = 'none';
+                                    item.style.textAlign = 'left';
+                                    item.style.width = '100%';
+                                    item.innerHTML = `<span style="flex:1; color: #123;">${rw.name}</span><small style="margin-left:8px; color:#3b6;">${rw.voterPct ? rw.voterPct.toFixed(1) + '%' : ''}</small>`;
+                                    item.onclick = (e) => {
+                                        e.stopPropagation();
+                                        currentLocalidadFilter = rw.key;
+                                        try { applyFilters(); } catch(_){}
+                                        try { colorSvgByStats(); } catch(_){}
+                                        // update badge
+                                        try { const badge = document.getElementById('localidadFilterBadge'); if (badge) { badge.style.display = 'inline-flex'; badge.querySelector('span').innerText = rw.name; } } catch(_){}
+                                    };
+                                    list.appendChild(item);
+                                });
+
+                                box.appendChild(list);
+                                mapWrap.appendChild(box);
+                                // Also create in-map labels: center text over each [data-name]
+                                try {
+                                    const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                                    labelsGroup.setAttribute('id', 'labels-group');
+                                    // small transform to ensure labels render above fills
+                                    svg.appendChild(labelsGroup);
+                                    const shapes = Array.from(svg.querySelectorAll('[data-name]'));
+                                    shapes.forEach(s => {
+                                        try {
+                                            // ensure shape receives pointer events
+                                            try { s.style.pointerEvents = 'all'; s.setAttribute('pointer-events','all'); } catch(e) {}
+                                            const name = s.getAttribute('data-name') || '';
+                                            // compute bbox and centroid
+                                            let bx;
+                                            try { bx = s.getBBox(); } catch(e) { bx = null; }
+                                            const cx = bx ? (bx.x + bx.width/2) : 0;
+                                            const cy = bx ? (bx.y + bx.height/2) : 0;
+                                            const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                                            t.setAttribute('x', cx);
+                                            t.setAttribute('y', cy);
+                                            t.setAttribute('text-anchor', 'middle');
+                                            t.setAttribute('dominant-baseline', 'middle');
+                                            t.setAttribute('class', 'svg-label');
+                                            t.setAttribute('style', 'pointer-events:none; font-family: Inter, Arial; font-size:12px; fill:#123; font-weight:700;');
+                                            t.textContent = name;
+                                            labelsGroup.appendChild(t);
+                                        } catch(e) { /* ignore per-shape errors */ }
+                                    });
+                                } catch(e) { console.warn('create in-map labels failed', e); }
+                            } catch (e) { console.warn('createLocalidadesBox failed', e); }
+                        }
+                        createSvgLabels();
+                // Add toggle button to show/hide labels
                 const mapWrap = document.getElementById('bogotaMapWrapper');
                 if (mapWrap) {
-                    // crear lista de localidades en panel si no existe
-                    if (!document.getElementById('localidadesBox')) {
-                        const box = document.createElement('div');
-                        box.id = 'localidadesBox';
-                        Object.assign(box.style, { position:'absolute', left:'12px', top:'12px', width:'260px', maxHeight:'68%', overflow:'auto',
-                            background:'rgba(255,255,255,0.96)', borderRadius:'10px', boxShadow:'0 10px 30px rgba(2,6,23,0.08)', zIndex:26000, padding:'8px', display:'none' });
-                        const title = document.createElement('div'); title.innerText = 'Localidades'; title.style.fontWeight = '700'; title.style.marginBottom = '6px';
-                        box.appendChild(title);
-                        mapWrap.appendChild(box);
+                    let btn = document.getElementById('svgLabelsToggle');
+                    if (!btn) {
+                        btn = document.createElement('button');
+                        btn.id = 'svgLabelsToggle';
+                        btn.type = 'button';
+                        btn.className = 'btn btn-sm btn-outline-secondary';
+                        btn.style.position = 'absolute';
+                        btn.style.top = '8px';
+                        btn.style.left = '56px';
+                        btn.style.zIndex = 25000;
+                        btn.style.padding = '6px 8px';
+                        btn.innerText = 'Etiquetas';
+                        btn.onclick = (ev) => {
+                            ev.stopPropagation();
+                            const grp = svg.querySelector('#labels-group');
+                            if (!grp) return;
+                            const hidden = grp.querySelector('.svg-label.hidden');
+                            const show = !!hidden;
+                            grp.querySelectorAll('.svg-label').forEach(t => {
+                                if (show) t.classList.remove('hidden'); else t.classList.add('hidden');
+                            });
+                            btn.classList.toggle('active', show);
+                        };
+                        mapWrap.appendChild(btn);
+                    }
+                    // Add hamburger toggle for localidades panel (left side)
+                    let locBtn = document.getElementById('localidadesToggle');
+                    if (!locBtn) {
+                        locBtn = document.createElement('button');
+                        locBtn.id = 'localidadesToggle';
+                        locBtn.type = 'button';
+                        locBtn.className = 'btn btn-sm btn-outline-secondary';
+                        locBtn.style.position = 'absolute';
+                        locBtn.style.top = '8px';
+                        locBtn.style.left = '8px';
+                        locBtn.style.zIndex = 25000;
+                        locBtn.style.padding = '6px 8px';
+                        locBtn.innerHTML = '<i class="bi bi-list"></i>';
+                        locBtn.title = 'Mostrar/ocultar localidades';
+                        locBtn.onclick = (ev) => {
+                            ev.stopPropagation();
+                            const box = document.getElementById('localidadesBox');
+                            if (!box) return;
+                            const isHidden = box.classList.contains('hidden');
+                            if (isHidden) {
+                                box.classList.remove('hidden');
+                                box.classList.add('visible');
+                                // ensure badge updates when opening
+                                try { colorSvgByStats(); } catch(e){}
+                            } else {
+                                box.classList.remove('visible');
+                                box.classList.add('hidden');
+                            }
+                        };
+                        mapWrap.appendChild(locBtn);
                     }
                 }
-                // labels in-map
-                const labelsGroupId = 'labels-group';
-                let labelsGroup = svg.querySelector('#' + labelsGroupId);
-                if (labelsGroup) labelsGroup.remove();
-                labelsGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
-                labelsGroup.setAttribute('id', labelsGroupId);
-                svg.appendChild(labelsGroup);
-                const shapes = Array.from(svg.querySelectorAll('[data-name]'));
-                shapes.forEach(s => {
-                    try {
-                        s.style.pointerEvents = 'all'; s.setAttribute('pointer-events','all');
-                        const name = s.getAttribute('data-name') || '';
-                        let bx = null;
-                        try { bx = s.getBBox(); } catch(e) { bx = null; }
-                        const cx = bx ? (bx.x + bx.width/2) : 0;
-                        const cy = bx ? (bx.y + bx.height/2) : 0;
-                        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-                        t.setAttribute('x', cx); t.setAttribute('y', cy);
-                        t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
-                        t.setAttribute('class','svg-label'); t.setAttribute('style','pointer-events:none; font-family:Inter, Arial; font-size:11px; fill:#123; font-weight:700;');
-                        t.textContent = name;
-                        labelsGroup.appendChild(t);
-                    } catch(e) {}
-                });
             } catch(e) { console.warn('labels creation failed', e); }
-
         } catch (err) { console.warn('attachSvgInteractions error', err); }
     }
 
@@ -1827,7 +2289,7 @@ async function renderLocalityMap() {
         const mapWrap = document.getElementById('bogotaMapWrapper');
         if (mapWrap) mapWrap.style.display = 'block';
 
-        // If an SVG croquis exists, prefer it — otherwise render Leaflet geoJSON
+        // If an SVG croquis exists, prefer it ÔÇö otherwise render Leaflet geoJSON
         const croquis = await ensureBogotaCroquis();
         const mapContainer = document.getElementById('bogotaMap');
         if (croquis) {
@@ -1869,7 +2331,7 @@ async function renderLocalityMap() {
                                 }
                             } catch (me) { console.warn('Mapping numeric labels failed', me); }
 
-                            console.warn('SVG croquis loaded but contains no [data-name] attributes — falling back to Leaflet GeoJSON for interactive map.');
+                            console.warn('SVG croquis loaded but contains no [data-name] attributes ÔÇö falling back to Leaflet GeoJSON for interactive map.');
                             // clear the inserted SVG so Leaflet can mount
                             mapContainer.innerHTML = '';
                             // fall through to leaflet rendering below
@@ -1927,12 +2389,12 @@ async function renderLocalityMap() {
             // Also list top localidades by registros, show voter % as extra info
             const topList = Object.keys(stats).map(k => ({ k, ...stats[k] })).sort((a,b)=>b.count-a.count).slice(0,10);
             const topHtml = ['<div class="mt-3"><strong>Top localidades</strong><ol style="padding-left:18px;">'];
-            topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} — ${t.count} registros — ${t.voterPct.toFixed(2)}% votantes</li>`));
+            topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} ÔÇö ${t.count} registros ÔÇö ${t.voterPct.toFixed(2)}% votantes</li>`));
             topHtml.push('</ol></div>');
             legendEl.innerHTML += topHtml.join('');
         }
 
-        // También actualizar el gráfico simplificado (fallback)
+        // Tambi├®n actualizar el gr├ífico simplificado (fallback)
         try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart simplificado:', e); }
     } catch (err) {
         console.error('Error en renderLocalityMap:', err);
@@ -1942,7 +2404,7 @@ async function renderLocalityMap() {
     }
 }
 
-// ===================== 🔹 Mobile sidebar toggle helpers =====================
+// ===================== ­ƒö╣ Mobile sidebar toggle helpers =====================
 function openMobileSidebar() {
     const sb = document.querySelector('.sidebar');
     const backdrop = document.getElementById('sidebarBackdrop');
@@ -1970,12 +2432,12 @@ window.addEventListener('resize', function () {
     }
 });
 
-// Ajusta la altura de la sección de Análisis para que su scroll interno coincida con la ventana
+// Ajusta la altura de la secci├│n de An├ílisis para que su scroll interno coincida con la ventana
 function adjustAnalysisSectionHeight() {
     try {
         const el = document.getElementById('analysisSection');
         if (!el || el.style.display === 'none') return;
-        // calcular espacio disponible desde la posición superior del elemento hasta el fondo de la ventana
+        // calcular espacio disponible desde la posici├│n superior del elemento hasta el fondo de la ventana
         const rect = el.getBoundingClientRect();
         const topOffset = Math.max(0, rect.top);
         const paddingBottom = 20; // espacio para evitar que quede justo en el borde
@@ -1993,46 +2455,98 @@ window.addEventListener('resize', function () {
 });
 
 async function deleteRegistration(id) {
-  if (!confirm("¿Eliminar este registro?")) return;
+  if (!confirm("┬┐Eliminar este registro?")) return;
   try {
     const response = await fetch(`/api/registrations/${id}`, { method: "DELETE" });
         if (response.ok) {
-            console.log(`✅ Registro ${id} eliminado`);
-            showToast('success', '✅ Registro eliminado');
+            console.log(`Ô£à Registro ${id} eliminado`);
+            showToast('success', 'Ô£à Registro eliminado');
       
-      // Recargar datos del servidor para asegurar sincronización
+      // Recargar datos del servidor para asegurar sincronizaci├│n
       await loadRegistrations();
       await loadLeaders();
       
-      // Actualizar tabla de líderes inmediatamente
+      // Actualizar tabla de l├¡deres inmediatamente
       updateLeadersTable();
       
       // Actualizar tabla de registros
       updateRegistrationsTable();
       
-      // Actualizar dashboard si está visible
+      // Actualizar dashboard si est├í visible
       if (document.getElementById('dashboardSection').style.display !== 'none') {
         await updateDashboard();
       }
       
-      showToast('success', '✅ Registro eliminado correctamente');
+      showToast('success', 'Ô£à Registro eliminado correctamente');
         } else {
-            showToast('danger', '❌ Error al eliminar el registro');
+            showToast('danger', 'ÔØî Error al eliminar el registro');
     }
   } catch (err) {
     console.error('Error al eliminar registro:', err);
-        showToast('danger', '❌ Error al eliminar el registro');
+        showToast('danger', 'ÔØî Error al eliminar el registro');
   }
 }
 
 function editRegistration(id) {
-    showToast('info', '✏️ Función de edición pendiente — aquí puedes abrir un modal con los datos.');
+    try {
+        // Buscar el registro en los datos cargados
+        const reg = allRegistrationsData.find(r => r._id === id);
+        if (!reg) {
+            // Si no está en allRegistrationsData, buscarlo en registrations global
+            const reg2 = registrations.find(r => r._id === id);
+            if (!reg2) {
+                showToast('danger', 'Registro no encontrado');
+                return;
+            }
+            fillEditRegistrationForm(reg2);
+        } else {
+            fillEditRegistrationForm(reg);
+        }
+        
+        // Guardar el ID para usar en el guardado
+        document.getElementById('editingRegistrationId').value = id;
+        
+        // Cambiar título del modal
+        document.getElementById('adminRegistrationLabel').textContent = 'Editar Registro';
+        
+        // Abrir modal
+        new bootstrap.Modal(document.getElementById('adminRegistrationModal')).show();
+    } catch (err) {
+        console.error('Error editRegistration:', err);
+        showToast('danger', 'Error al abrir formulario de edición');
+    }
 }
 
-// 🔹 Define primero la función updateDashboard (solicitud del usuario)
+function fillEditRegistrationForm(reg) {
+    try {
+        document.getElementById('adminFirstName').value = reg.firstName || '';
+        document.getElementById('adminLastName').value = reg.lastName || '';
+        document.getElementById('adminCedula').value = reg.cedula || '';
+        document.getElementById('adminEmail').value = reg.email || '';
+        document.getElementById('adminPhone').value = reg.phone || '';
+        document.getElementById('adminLeaderSelect').value = reg.leaderId || '';
+        document.getElementById('adminLocalidadSelect').value = reg.localidad || '';
+        
+        // Cargar estado de votante
+        if (reg.registeredToVote) {
+            document.getElementById('adminRegisteredYes').checked = true;
+            toggleAdminVotingPlace(true);
+        } else {
+            document.getElementById('adminRegisteredNo').checked = true;
+            toggleAdminVotingPlace(false);
+        }
+        
+        document.getElementById('adminVotingPlace').value = reg.votingPlace || '';
+        document.getElementById('adminVotingTable').value = reg.votingTable || '';
+    } catch (err) {
+        console.error('Error llenando formulario:', err);
+    }
+}
+
+// ­ƒö╣ Define primero la funci├│n updateDashboard (solicitud del usuario)
 async function updateDashboard() {
     try {
-        // Obtener líderes y registros
+        // Obtener l├¡deres y registros
         const leadersUrl = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
         const regsUrl = `${API_BASE}/registrations${activeEventId ? '?eventId=' + activeEventId : ''}`;
         const [leadersRes, regsRes] = await Promise.all([
@@ -2084,7 +2598,7 @@ async function updateDashboard() {
     }
 }
 
-// ===================== 🔹 Events management =====================
+// ===================== ­ƒö╣ Events management =====================
 async function loadEvents() {
     try {
         const res = await fetch(`${API_BASE}/events`);
@@ -2145,7 +2659,7 @@ async function saveEvent() {
 
 async function selectEvent(eventId) {
     try {
-        // cargar evento para mostrar nombre y persistir selección
+        // cargar evento para mostrar nombre y persistir selecci├│n
         const res = await fetch(`${API_BASE}/events`);
         const events = await res.json();
         const ev = events.find(e => String(e._id) === String(eventId));
@@ -2153,7 +2667,7 @@ async function selectEvent(eventId) {
         activeEventId = ev._id;
         activeEvent = ev;
         localStorage.setItem('activeEventId', activeEventId);
-        // cerrar modal si está abierto
+        // cerrar modal si est├í abierto
         const modalEl = document.getElementById('eventModal');
         const modal = bootstrap.Modal.getInstance(modalEl);
         if (modal) modal.hide();
@@ -2186,33 +2700,33 @@ function editEvent(id) {
 }
 
 
-// ===================== 🔹 Cargar datos del backend =====================
+// ===================== ­ƒö╣ Cargar datos del backend =====================
 async function loadLeaders() {
   try {
         const url = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
         const res = await fetch(url);
-    if (!res.ok) throw new Error('Error cargando líderes');
+    if (!res.ok) throw new Error('Error cargando l├¡deres');
     leaders = await res.json();
     updateLeadersTable();
     return leaders;
   } catch (error) {
     console.error('Error en loadLeaders:', error);
-    showToast('danger', 'Error cargando líderes');
+    showToast('danger', 'Error cargando l├¡deres');
     throw error;
   }
 }
 
-// ===================== 🔹 Auto-refresh en tiempo real =====================
+// ===================== ­ƒö╣ Auto-refresh en tiempo real =====================
 async function checkForNewRegistrations() {
     try {
         const regsRes = await fetch(`${API_BASE}/registrations`);
         const registrations = await regsRes.json();
         const currentCount = registrations.length;
         
-        // Si hay nuevos registros, actualizar automáticamente
+        // Si hay nuevos registros, actualizar autom├íticamente
         if (currentCount > lastRegistrationCount) {
             lastRegistrationCount = currentCount;
-            console.log(`✅ Nuevo(s) registro(s) detectado(s). Total: ${currentCount}`);
+            console.log(`Ô£à Nuevo(s) registro(s) detectado(s). Total: ${currentCount}`);
             
             // Actualizar todos los datos
             await loadLeaders();
@@ -2231,8 +2745,8 @@ async function checkForNewRegistrations() {
                 await refreshAnalysis();
             }
             
-            // Mostrar notificación
-            showToast('success', `✅ Nuevo registro detectado! Total: ${currentCount}`);
+            // Mostrar notificaci├│n
+            showToast('success', `Ô£à Nuevo registro detectado! Total: ${currentCount}`);
         }
     } catch (error) {
         console.error('Error en checkForNewRegistrations:', error);
@@ -2249,14 +2763,14 @@ function startAutoRefresh() {
         checkForNewRegistrations();
     }, 5000);
     
-    console.log('🔄 Auto-refresh iniciado (cada 5 segundos)');
+    console.log('­ƒöä Auto-refresh iniciado (cada 5 segundos)');
 }
 
 function stopAutoRefresh() {
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
         autoRefreshInterval = null;
-        console.log('⏹️ Auto-refresh detenido');
+        console.log('ÔÅ╣´©Å Auto-refresh detenido');
     }
 }
 
@@ -2276,11 +2790,11 @@ async function loadRegistrations() {
   }
 }
 
-// ===================== 🔹 Actualizar tablas =====================
+// ===================== ­ƒö╣ Actualizar tablas =====================
 function updateLeadersTable() {
   const tbody = document.getElementById('leadersTableBody');
   tbody.innerHTML = leaders.map((leader, i) => {
-    // Recalcular el contador de registros desde el array registrations para mayor precisión
+    // Recalcular el contador de registros desde el array registrations para mayor precisi├│n
     // Comparar como strings para evitar problemas de tipo
     const leaderId = String(leader._id);
     const leaderRegsCount = registrations.filter(r => String(r.leaderId) === leaderId).length;
@@ -2316,13 +2830,13 @@ function updateRegistrationsTable() {
     const tbody = document.getElementById('registrationsTableBody');
     tbody.innerHTML = registrations.map(reg => {
         const nombre = reg.name || ((reg.firstName || '') + ' ' + (reg.lastName || '')).trim() || 'Sin nombre';
-        const lider = (leaders.find(l => l._id === reg.leaderId)?.name) || reg.leaderName || 'Sin líder';
+        const lider = (leaders.find(l => l._id === reg.leaderId)?.name) || reg.leaderName || 'Sin l├¡der';
         const fecha = reg.date ? new Date(reg.date).toLocaleDateString() : 'Sin fecha';
         const confirmed = reg.confirmed ? true : false;
         const confirmedBy = reg.confirmedBy ? reg.confirmedBy : '';
         const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
         const localidad = reg.localidad || '-';
-        const votante = reg.registeredToVote ? 'Sí' : 'No';
+        const votante = reg.registeredToVote ? 'S├¡' : 'No';
         const votingPlace = reg.votingPlace || '-';
         const votingTable = reg.votingTable || '-';
 
@@ -2339,7 +2853,7 @@ function updateRegistrationsTable() {
                 <td>
                     ${confirmed ? `
                         <div>
-                            <span class="badge bg-success">Asistió ✅</span>
+                            <span class="badge bg-success">Asisti├│ Ô£à</span>
                             <br><small>${confirmedBy} - ${confirmedAt}</small>
                         </div>
                     ` : `
@@ -2349,21 +2863,21 @@ function updateRegistrationsTable() {
                     `}
                 </td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar Notificación">
+                  <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar Notificaci├│n">
                     <i class="bi bi-envelope-check"></i>
                   </button>
                   <button class="btn btn-sm btn-outline-success" onclick="confirmRegistration('${reg._id}')" title="Confirmar Asistencia">
                     <i class="bi bi-check2-circle"></i>
                   </button>
-                  <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">✏️</button>
-                  <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">🗑️</button>
+                  <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">Ô£Å´©Å</button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">­ƒùæ´©Å</button>
                 </td>
             </tr>
         `;
     }).join('');
 }
 
-// ===================== 🔹 Funciones de la interfaz =====================
+// ===================== ­ƒö╣ Funciones de la interfaz =====================
 function showSection(section) {
   const sections = ['dashboard', 'leaders', 'registrations', 'exports', 'analysis'];
   sections.forEach(s => {
@@ -2373,7 +2887,7 @@ function showSection(section) {
     }
   });
   
-  // Si es la sección de análisis, actualizar datos
+  // Si es la secci├│n de an├ílisis, actualizar datos
     if (section === 'analysis') {
         try {
             // refreshAnalysis is async; after it completes adjust the section height
@@ -2406,7 +2920,7 @@ function showAdminPanel() {
 function openAdminRegistration() {
   // Limpiar formulario
   document.getElementById('adminRegistrationForm').reset();
-  // Cargar líderes para el selector
+  // Cargar l├¡deres para el selector
   const leaderSelect = document.getElementById('adminLeaderSelect');
   leaderSelect.innerHTML = leaders.map(leader => `
     <option value="${leader._id}">${leader.name}</option>
@@ -2415,7 +2929,7 @@ function openAdminRegistration() {
   new bootstrap.Modal(document.getElementById('adminRegistrationModal')).show();
 }
 
-// ===================== 🔹 Funciones de registro y exportación =====================
+// ===================== ­ƒö╣ Funciones de registro y exportaci├│n =====================
 async function saveLeader() {
   const id = document.getElementById('leaderId').value;
   const name = document.getElementById('leaderName').value;
@@ -2437,7 +2951,7 @@ async function saveLeader() {
     active
   };
   
-  // Asociar el líder al evento actual si existe
+  // Asociar el l├¡der al evento actual si existe
   if (activeEventId) {
     leaderData.eventId = activeEventId;
   }
@@ -2453,11 +2967,11 @@ async function saveLeader() {
     
     if (res.ok) {
       const newLeader = await res.json();
-      console.log('✅ Líder guardado:', newLeader);
+      console.log('Ô£à L├¡der guardado:', newLeader);
       
-      showToast('success', 'Líder guardado con éxito');
+      showToast('success', 'L├¡der guardado con ├®xito');
       
-      // Recargar líderes desde el backend
+      // Recargar l├¡deres desde el backend
       await loadLeaders();
       
       // Actualizar dashboard
@@ -2474,22 +2988,26 @@ async function saveLeader() {
       document.getElementById('leaderForm').reset();
       document.getElementById('leaderId').value = '';
       
-    } catch (err) {
-        console.error('Error saveLeader:', err);
-        showToast('danger', 'Error de conexión al guardar el líder');
+    } else {
+      const errorData = await res.json();
+      showToast('danger', `Error al guardar el l├¡der: ${errorData.error}`);
     }
+  } catch (err) {
+    console.error('Error saveLeader:', err);
+    showToast('danger', 'Error de conexi├│n al guardar el l├¡der');
+  }
 }
 
 async function deleteLeader(id) {
-  if (!confirm("¿Eliminar este líder?")) return;
+  if (!confirm("┬┐Eliminar este l├¡der?")) return;
 
   const res = await fetch(`${API_BASE}/leaders/${id}`, { method: "DELETE" });
   if (res.ok) {
     leaders = leaders.filter(l => l._id !== id);
     updateLeadersTable();
-    showToast('success', 'Líder eliminado correctamente');
+    showToast('success', 'L├¡der eliminado correctamente');
   } else {
-    showToast('danger', 'Error al eliminar líder');
+    showToast('danger', 'Error al eliminar l├¡der');
   }
 }
 
@@ -2518,15 +3036,15 @@ async function exportToExcel(type) {
   }
 }
 
-// ===================== 🔹 Funciones de formulario público =====================
+// ===================== ­ƒö╣ Funciones de formulario p├║blico =====================
 document.getElementById('registrationForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
-    // Obtener token del líder: preferir localStorage, si no existe usar la querystring
+    // Obtener token del l├¡der: preferir localStorage, si no existe usar la querystring
     let leaderToken = null;
     try {
         leaderToken = localStorage.getItem('publicLeaderToken');
-    } catch (e) { /* ignorar si localStorage no está disponible */ }
+    } catch (e) { /* ignorar si localStorage no est├í disponible */ }
 
     if (!leaderToken) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -2544,25 +3062,25 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
 
-    // Si seleccionó 'Otra' en localidad, obtener el texto especificado
+    // Si seleccion├│ 'Otra' en localidad, obtener el texto especificado
     if (data.localidad === 'Otra') {
         data.localidad = document.getElementById('localidadOtra')?.value || '';
     }
 
-    // Asegurar que el leaderId se asigne. Si no está disponible, enviar token para que el servidor lo resuelva
+    // Asegurar que el leaderId se asigne. Si no est├í disponible, enviar token para que el servidor lo resuelva
     data.leaderId = leaderId;
     if (!data.leaderId && leaderToken) data.leaderToken = leaderToken;
 
-    // Si no hay líder, no continuar
+    // Si no hay l├¡der, no continuar
     if (!data.leaderId && !data.leaderToken) {
-        showToast('danger', 'No se encontró un líder asociado para este registro.');
+        showToast('danger', 'No se encontr├│ un l├¡der asociado para este registro.');
         return;
     }
 
-    // Mostrar pantalla de éxito inmediatamente (optimista)
+    // Mostrar pantalla de ├®xito inmediatamente (optimista)
     showRegistrationSuccess();
 
-    // Verificación: evitar re-registro por cédula (si existe, revertir la vista)
+    // Verificaci├│n: evitar re-registro por c├®dula (si existe, revertir la vista)
     try {
         const cedula = data.cedula || '';
         if (cedula) {
@@ -2578,10 +3096,10 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
             }
         }
     } catch (err) {
-        console.warn('No se pudo verificar cédula, continuando:', err);
+        console.warn('No se pudo verificar c├®dula, continuando:', err);
     }
 
-    // Enviar petición al servidor en background
+    // Enviar petici├│n al servidor en background
     try {
         const res = await fetch(`${API_BASE}/registrations`, {
             method: 'POST',
@@ -2590,16 +3108,16 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
         });
 
         if (res.ok) {
-            // petición exitosa: actualizar datos en background
+            // petici├│n exitosa: actualizar datos en background
             (async () => { try { await loadRegistrations(); await updateDashboard(); } catch (e) { console.warn(e); } })();
         } else {
             const err = await res.json().catch(() => ({}));
-            resetPublicForm();
             showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
+            resetPublicForm();
         }
     } catch (err) {
         console.error('Error enviando registro:', err);
-        showToast('danger', 'Error de conexión al enviar el registro');
+        showToast('danger', 'Error de conexi├│n al enviar el registro');
         resetPublicForm();
     }
 });
@@ -2609,14 +3127,14 @@ function showRegistrationSuccess() {
     const success = document.getElementById('registrationSuccessScreen');
     const publicForm = document.getElementById('publicForm');
 
-    // Asegurar que el contenedor público esté visible
+    // Asegurar que el contenedor p├║blico est├® visible
     if (publicForm) {
         publicForm.style.display = 'block';
         publicForm.style.visibility = 'visible';
         publicForm.style.pointerEvents = 'auto';
     }
 
-    // Ocultar el formulario y mostrar la pantalla de éxito inmediatamente
+    // Ocultar el formulario y mostrar la pantalla de ├®xito inmediatamente
     if (form) form.style.display = 'none';
     if (success) {
         success.style.display = 'block';
@@ -2633,7 +3151,7 @@ function showRegistrationSuccess() {
         } catch (e) {}
     }
 
-    // En modo público asegurarnos de ocultar admin
+    // En modo p├║blico asegurarnos de ocultar admin
     const adminPanel = document.getElementById('adminPanel');
     if (adminPanel) adminPanel.style.display = 'none';
 }
@@ -2652,7 +3170,7 @@ function resetPublicForm() {
     if (first) first.focus();
 }
 
-// ===================== 🔹 Funciones de QR y enlace =====================
+// ===================== ­ƒö╣ Funciones de QR y enlace =====================
 function showQRCode(leader) {
     // Acepta tanto el objeto leader como su _id
     if (typeof leader === 'string' || typeof leader === 'number') {
@@ -2660,13 +3178,13 @@ function showQRCode(leader) {
     }
 
     if (!leader) {
-        showToast('danger', 'No se encontró el líder');
+        showToast('danger', 'No se encontr├│ el l├¡der');
         return;
     }
 
     const qrContainer = document.getElementById('qrContainer');
     if (!qrContainer) {
-        console.error('No se encontró #qrContainer en el DOM');
+        console.error('No se encontr├│ #qrContainer en el DOM');
         return;
     }
     qrContainer.innerHTML = ''; // limpiar el contenedor
@@ -2703,7 +3221,7 @@ function copyLeaderRegistrationLink() {
         return;
     }
     linkInput.select();
-    linkInput.setSelectionRange(0, 99999); // Para dispositivos móviles
+    linkInput.setSelectionRange(0, 99999); // Para dispositivos m├│viles
     document.execCommand("copy");
     showToast('success', 'Enlace copiado al portapapeles');
 }
@@ -2715,13 +3233,13 @@ function copyLeaderLink() {
         return;
     }
     leaderLink.select();
-    leaderLink.setSelectionRange(0, 99999); // Para dispositivos móviles
+    leaderLink.setSelectionRange(0, 99999); // Para dispositivos m├│viles
 
     document.execCommand("copy");
     showToast('success', 'Enlace copiado al portapapeles');
 }
 
-// ===================== 🔹 Registro público (registerPerson) =====================
+// ===================== ­ƒö╣ Registro p├║blico (registerPerson) =====================
 async function registerPerson() {
     try {
         // intento de obtener leaderId de URL o variable global
@@ -2734,7 +3252,7 @@ async function registerPerson() {
         const cedula = document.getElementById('cedula')?.value || '';
         const email = document.getElementById('email')?.value || '';
         const phone = document.getElementById('phone')?.value || '';
-        // Localidad: puede ser select con opción 'Otra'
+        // Localidad: puede ser select con opci├│n 'Otra'
         const localidadSelect = document.getElementById('localidadSelect');
         let localidad = '';
         if (localidadSelect) {
@@ -2752,37 +3270,37 @@ async function registerPerson() {
         const votingTable = document.getElementById('votingTable') ? document.getElementById('votingTable').value : '';
 
         if (!leaderId && !leaderToken) {
-            showToast('danger', 'No se encontró un líder asociado para este registro.');
+            showToast('danger', 'No se encontr├│ un l├¡der asociado para este registro.');
             return;
         }
 
-        // Validación: si declaró que está inscrito para votar, debe indicar puesto de votación
+        // Validaci├│n: si declar├│ que est├í inscrito para votar, debe indicar puesto de votaci├│n
         if (registeredToVote && !votingPlace) {
-            showToast('danger', 'Si indicó que está inscrito para votar, por favor indique el puesto de votación.');
+            showToast('danger', 'Si indic├│ que est├í inscrito para votar, por favor indique el puesto de votaci├│n.');
             return;
         }
 
-        // Optimistic UX: mostrar éxito inmediatamente y realizar verificación + POST en background.
+        // Optimistic UX: mostrar ├®xito inmediatamente y realizar verificaci├│n + POST en background.
         showToast('success', 'Registro guardado');
         showRegistrationSuccess();
         try { document.getElementById('registrationForm').reset(); } catch (e) {}
 
         // Ejecutar validaciones y el POST en background. Si falla algo, revertimos la UI.
         (async () => {
-            // Validación: verificar duplicados por teléfono
+            // Validaci├│n: verificar duplicados por tel├®fono
             try {
                 const checkRes = await fetch(`/api/registrations?phone=${encodeURIComponent(phone)}`);
                 if (checkRes.ok) {
                     const existingRegs = await checkRes.json();
                     if (existingRegs.length > 0) {
                         resetPublicForm();
-                        showToast('danger', '❌ Este número de teléfono ya está registrado en el sistema. No se permiten registros duplicados.');
+                        showToast('danger', 'ÔØî Este n├║mero de tel├®fono ya est├í registrado en el sistema. No se permiten registros duplicados.');
                         return;
                     }
                 }
             } catch (checkErr) {
                 console.error('Error verificando duplicados (continuando):', checkErr);
-                // Continuar con el registro si falla la verificación
+                // Continuar con el registro si falla la verificaci├│n
             }
 
             // Enviar al backend
@@ -2799,28 +3317,28 @@ async function registerPerson() {
                 } else {
                     const errorData = await res.json().catch(() => ({}));
                     resetPublicForm();
-                    showToast('danger', `❌ Error al registrar: ${errorData.error || 'Error desconocido'}`);
+                    showToast('danger', `ÔØî Error al registrar: ${errorData.error || 'Error desconocido'}`);
                 }
             } catch (postErr) {
                 console.error('Error en POST registerPerson:', postErr);
                 resetPublicForm();
-                showToast('danger', '❌ Error al registrar la persona (problema de red).');
+                showToast('danger', 'ÔØî Error al registrar la persona (problema de red).');
             }
         })();
 
     } catch (err) {
         console.error('Error registerPerson:', err);
         resetPublicForm();
-        showToast('danger', '❌ Error al procesar el registro');
+        showToast('danger', 'ÔØî Error al procesar el registro');
     }
 }
 
-// ===================== 🔹 Funciones de notificaciones =====================
+// ===================== ­ƒö╣ Funciones de notificaciones =====================
 // Tracker para evitar mostrar toasts duplicados en ventana corta
 const _recentToasts = new Map(); // message -> timestamp
 
 function showToast(type, message) {
-    // registro rápido para depuración
+    // registro r├ípido para depuraci├│n
     try { console.log('[showToast]', type, message); } catch (e) { /* no bloquear */ }
 
     const now = Date.now();
@@ -2839,7 +3357,7 @@ function showToast(type, message) {
     // We use only the manual toast for visibility and consistent styling.
     // (Bootstrap toasts were removed to avoid legacy styles appearing.)
 
-    // Además, crear un toast manual (fallback garantizado) para asegurar visibilidad
+    // Adem├ís, crear un toast manual (fallback garantizado) para asegurar visibilidad
     try {
         let manualContainer = document.getElementById('manualToastContainer');
         if (!manualContainer) {
@@ -2905,7 +3423,7 @@ function showToast(type, message) {
         const title = document.createElement('div');
         title.style.fontWeight = '700';
         title.style.fontSize = '14px';
-        title.textContent = (type === 'success') ? '¡Listo!' : (type === 'warning' ? 'Aviso' : (type === 'info' ? 'Info' : 'Atención'));
+        title.textContent = (type === 'success') ? '┬íListo!' : (type === 'warning' ? 'Aviso' : (type === 'info' ? 'Info' : 'Atenci├│n'));
         const text = document.createElement('div');
         text.style.fontSize = '13px';
         text.textContent = message;
@@ -2917,7 +3435,7 @@ function showToast(type, message) {
 
         // close button
         const closeBtn = document.createElement('button');
-        closeBtn.textContent = '×';
+        closeBtn.textContent = '├ù';
         closeBtn.style.marginLeft = '12px';
         closeBtn.style.background = 'transparent';
         closeBtn.style.border = 'none';
@@ -2936,12 +3454,12 @@ function showToast(type, message) {
         manual.appendChild(contentLine);
         manualContainer.insertBefore(manual, manualContainer.firstChild);
 
-        // Forzar reflow para activar transición
+        // Forzar reflow para activar transici├│n
         void manual.offsetWidth;
         manual.style.opacity = '1';
         manual.style.transform = 'translateY(0)';
 
-        // Auto eliminar después de 5s
+        // Auto eliminar despu├®s de 5s
         setTimeout(() => {
             manual.style.opacity = '0';
             manual.style.transform = 'translateY(-8px)';
@@ -2952,21 +3470,21 @@ function showToast(type, message) {
     }
 }
 
-// Mostrar / ocultar el campo de puesto de votación en el formulario público
+// Mostrar / ocultar el campo de puesto de votaci├│n en el formulario p├║blico
 function toggleVotingPlace(show) {
     const group = document.getElementById('votingPlaceGroup');
     if (!group) return;
     group.style.display = show ? 'block' : 'none';
 }
 
-// Mostrar / ocultar el campo de puesto de votación en el modal admin
+// Mostrar / ocultar el campo de puesto de votaci├│n en el modal admin
 function toggleAdminVotingPlace(show) {
     const group = document.getElementById('adminVotingPlaceGroup');
     if (!group) return;
     group.style.display = show ? 'block' : 'none';
 }
 
-// Mostrar/ocultar campo 'Otra' para localidad (público)
+// Mostrar/ocultar campo 'Otra' para localidad (p├║blico)
 function toggleLocalidadOther(value) {
     const other = document.getElementById('localidadOtra');
     if (!other) return;
@@ -2982,20 +3500,20 @@ function toggleAdminLocalidadOther(value) {
 
 async function sendWhatsApp(phone, name) {
     if (!phone) {
-        showToast("danger", "Este registro no tiene número de teléfono.");
+        showToast("danger", "Este registro no tiene n├║mero de tel├®fono.");
         return;
     }
     const cleaned = String(phone).replace(/[^0-9+]/g, '');
-    const message = encodeURIComponent(`Hola ${name || ''}! ✅ Gracias por registrarte con nosotros.`);
+    const message = encodeURIComponent(`Hola ${name || ''}! Ô£à Gracias por registrarte con nosotros.`);
     
     try {
-        // Enviar mensaje a través del bot de WhatsApp
+        // Enviar mensaje a trav├®s del bot de WhatsApp
         const res = await fetch('http://localhost:4000/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 number: cleaned,
-                message: `Hola ${name || ''}! ✅ Gracias por registrarte con nosotros.`
+                message: `Hola ${name || ''}! Ô£à Gracias por registrarte con nosotros.`
             })
         });
 
@@ -3011,7 +3529,7 @@ async function sendWhatsApp(phone, name) {
     } catch (err) {
         console.error('Error al enviar WhatsApp:', err);
         showToast('danger', 'Error al conectar con el bot de WhatsApp');
-        // Si falla el bot, usar el método de respaldo de abrir WhatsApp web
+        // Si falla el bot, usar el m├®todo de respaldo de abrir WhatsApp web
         window.open(`https://wa.me/${cleaned}?text=${message}`, "_blank");
     }
 }
@@ -3019,47 +3537,47 @@ async function sendWhatsApp(phone, name) {
 // Enviar notificaciones manualmente para un registro
 async function sendNotification(registrationId) {
     try {
-        console.log('🔄 Enviando notificación para registro:', registrationId);
+        console.log('­ƒöä Enviando notificaci├│n para registro:', registrationId);
         
         const response = await fetch(`/api/send-notification/${registrationId}`, {
             method: 'POST'
         });
         
         const result = await response.json();
-        console.log('📨 Respuesta del servidor:', result);
+        console.log('­ƒô¿ Respuesta del servidor:', result);
         
         if (result.success) {
             showToast('success', 'Notificaciones enviadas correctamente');
             if (result.results?.email?.success) {
-                console.log('✅ Email enviado exitosamente');
+                console.log('Ô£à Email enviado exitosamente');
             } else if (result.results?.email?.error) {
-                console.log('❌ Error en email:', result.results.email.error);
+                console.log('ÔØî Error en email:', result.results.email.error);
             }
         } else {
             showToast('danger', 'Error enviando notificaciones: ' + (result.error || 'Error desconocido'));
         }
     } catch (error) {
-        console.error('💥 Error de conexión:', error);
-        showToast('danger', 'Error de conexión al servidor');
+        console.error('­ƒÆÑ Error de conexi├│n:', error);
+        showToast('danger', 'Error de conexi├│n al servidor');
     }
 }
 
 // Variable global para controlar el modo
 let isPublicRegistrationMode = false;
 
-// Detectar si es una vista pública del formulario
+// Detectar si es una vista p├║blica del formulario
 window.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const leaderToken = urlParams.get("leader");
 
   if (leaderToken) {
     isPublicRegistrationMode = true;
-    console.log('🎯 Modo registro público activado para líder:', leaderToken);
+    console.log('­ƒÄ» Modo registro p├║blico activado para l├¡der:', leaderToken);
 
-    // Agregar clase al body para aplicar estilos CSS de modo público
+    // Agregar clase al body para aplicar estilos CSS de modo p├║blico
     document.body.classList.add('public-registration-mode');
 
-        // Guardar token público para que el submit lo use como fallback
+        // Guardar token p├║blico para que el submit lo use como fallback
         try {
             localStorage.setItem('publicLeaderToken', leaderToken);
         } catch (e) {
@@ -3086,7 +3604,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       publicForm.style.pointerEvents = "auto";
     }
 
-    // Ocultar cualquier elemento de navegación admin
+    // Ocultar cualquier elemento de navegaci├│n admin
     document.querySelectorAll('.sidebar, [onclick="showAdminPanel()"], [onclick*="goToCreateEvent"], [onclick*="goToViewEvents"]').forEach(el => {
       el.style.display = 'none';
       el.style.visibility = 'hidden';
@@ -3104,21 +3622,21 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   } else {
     isPublicRegistrationMode = false;
-    console.log('🏠 Modo landing page normal');
+    console.log('­ƒÅá Modo landing page normal');
     document.body.classList.remove('public-registration-mode');
     // Mostrar landing page solo en modo normal
     document.getElementById("landingPage").style.display = "flex";
 
-    // Realizar migración automática al cargar la página
+    // Realizar migraci├│n autom├ítica al cargar la p├ígina
     try {
-      console.log('🔄 Iniciando migración automática de datos...');
+      console.log('­ƒöä Iniciando migraci├│n autom├ítica de datos...');
       const migrateRes = await fetch('/api/migrate', { method: 'POST' });
       const migrateData = await migrateRes.json();
 
       if (migrateData.success) {
-        console.log(`✅ Migración completada: ${migrateData.migratedLeaders} líderes, ${migrateData.migratedRegistrations} registros`);
+        console.log(`Ô£à Migraci├│n completada: ${migrateData.migratedLeaders} l├¡deres, ${migrateData.migratedRegistrations} registros`);
 
-        // Recargar datos después de migrar
+        // Recargar datos despu├®s de migrar
         setTimeout(() => {
           if (activeEventId) {
             loadLeaders();
@@ -3128,15 +3646,15 @@ window.addEventListener("DOMContentLoaded", async () => {
         }, 500);
       }
     } catch (err) {
-      console.error('❌ Error en migración:', err);
+      console.error('ÔØî Error en migraci├│n:', err);
     }
   }
 
-  // Inicializar página después de configurar el modo
+  // Inicializar p├ígina despu├®s de configurar el modo
   await initializePage();
 });
 
-// ===================== 🔹 Funciones de Análisis de Datos =====================
+// ===================== ­ƒö╣ Funciones de An├ílisis de Datos =====================
 // Variables globales para filtrado
 let allRegistrationsData = [];
 let allLeadersData = [];
@@ -3149,7 +3667,7 @@ let autoRefreshInterval = null;
 let lastRegistrationCount = 0;
 let analysisDailyChart = null;
 
-// Detección de duplicados
+// Detecci├│n de duplicados
 async function detectDuplicates() {
     try {
         const res = await fetch(`${API_BASE}/duplicates${activeEventId ? '?eventId=' + activeEventId : ''}`);
@@ -3163,23 +3681,23 @@ async function detectDuplicates() {
         } else {
             let html = '';
             if (data.byCedula && data.byCedula.length) {
-                html += '<h6>Por Cédula</h6>';
+                html += '<h6>Por C├®dula</h6>';
                 data.byCedula.forEach(group => {
                     html += `<div class="mb-3 p-2 border rounded">
-                        <strong>Cédula: ${group.key}</strong> — ${group.count} registros
+                        <strong>C├®dula: ${group.key}</strong> ÔÇö ${group.count} registros
                         <ul class="mb-0 mt-2">
-                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} — ${i.email || ''} — ${i.phone || ''} <small class="text-muted">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
+                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} ÔÇö ${i.email || ''} ÔÇö ${i.phone || ''} <small class=\"text-muted\">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
                         </ul>
                     </div>`;
                 });
             }
             if (data.byContact && data.byContact.length) {
-                html += '<h6>Por Email + Teléfono</h6>';
+                html += '<h6>Por Email + Tel├®fono</h6>';
                 data.byContact.forEach(group => {
                     html += `<div class="mb-3 p-2 border rounded">
-                        <strong>Contacto: ${group.key}</strong> — ${group.count} registros
+                        <strong>Contacto: ${group.key}</strong> ÔÇö ${group.count} registros
                         <ul class="mb-0 mt-2">
-                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} — ${i.email || ''} — ${i.phone || ''} <small class="text-muted">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
+                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} ÔÇö ${i.email || ''} ÔÇö ${i.phone || ''} <small class=\"text-muted\">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
                         </ul>
                     </div>`;
                 });
@@ -3206,12 +3724,12 @@ async function refreshAnalysis() {
         allLeadersData = leadersData;
         allRegistrationsData = registrationsData;
         
-        // Llenar selector de líderes
+        // Llenar selector de l├¡deres
         const leaderSelect = document.getElementById('filterLeaderSelect');
-        leaderSelect.innerHTML = '<option value="">-- Todos los Líderes --</option>' + 
+        leaderSelect.innerHTML = '<option value="">-- Todos los L├¡deres --</option>' + 
             leadersData.map(l => `<option value="${l._id}">${l.name} (${leadersData.filter(ld => ld._id === l._id).length ? leadersData.filter(ld => ld._id === l._id).reduce((acc, li) => acc + (registrationsData.filter(r => r.leaderId === li._id).length), 0) : 0} registros)</option>`).join('');
 
-        // Estadísticas generales
+        // Estad├¡sticas generales
         const totalLeaders = leadersData.length;
         const activeLeaders = leadersData.filter(l => l.active).length;
         const totalRegistrations = registrationsData.length;
@@ -3223,7 +3741,7 @@ async function refreshAnalysis() {
             new Date(r.date).setHours(0,0,0,0) === today
         ).length;
 
-        // Última actividad
+        // ├Ültima actividad
         const lastReg = registrationsData.sort((a,b) => new Date(b.date) - new Date(a.date))[0];
         const lastActivity = lastReg ? `${lastReg.firstName || ''} ${lastReg.lastName || ''}`.trim() : '-';
         const lastActivityTime = lastReg ? new Date(lastReg.date).toLocaleString('es-CO') : '-';
@@ -3238,7 +3756,7 @@ async function refreshAnalysis() {
         document.getElementById('lastActivity').textContent = lastActivity;
         document.getElementById('lastActivityTime').textContent = lastActivityTime;
 
-        // Actualizar tabla de líderes
+        // Actualizar tabla de l├¡deres
         updateLeaderAnalysisList(leadersData, registrationsData);
         
         // Aplicar filtros iniciales
@@ -3255,9 +3773,9 @@ async function refreshAnalysis() {
             console.warn('No se pudo obtener series diarias:', err);
         }
 
-        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras actualizar análisis:', e); }
+        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras actualizar an├ílisis:', e); }
 
-        // Intentar cargar y mostrar el croquis (GeoJSON) automáticamente si está disponible
+        // Intentar cargar y mostrar el croquis (GeoJSON) autom├íticamente si est├í disponible
         try {
             const mapWrap = document.getElementById('bogotaMapWrapper');
             const chartWrap = document.getElementById('bogotaChartWrapper');
@@ -3266,7 +3784,7 @@ async function refreshAnalysis() {
                 if (geo) {
                     mapWrap.style.display = 'block';
                     chartWrap.style.display = 'none';
-                    try { renderLocalityMap(); } catch(e) { console.warn('Error renderizando mapa automáticamente:', e); }
+                    try { renderLocalityMap(); } catch(e) { console.warn('Error renderizando mapa autom├íticamente:', e); }
                 } else {
                     // Mantener fallback en chart si no hay geojson
                     mapWrap.style.display = 'none';
@@ -3274,13 +3792,13 @@ async function refreshAnalysis() {
                 }
             }
         } catch (err) {
-            console.warn('Error al intentar mostrar croquis de Bogotá:', err);
+            console.warn('Error al intentar mostrar croquis de Bogot├í:', err);
         }
 
-        showToast('success', 'Análisis actualizado');
+        showToast('success', 'An├ílisis actualizado');
     } catch (error) {
-        console.error('Error al actualizar análisis:', error);
-        showToast('danger', 'Error al actualizar análisis');
+        console.error('Error al actualizar an├ílisis:', error);
+        showToast('danger', 'Error al actualizar an├ílisis');
     }
 }
 
@@ -3338,7 +3856,7 @@ function renderDailyChart(dailyData) {
     }
 }
 
-// Gráfico simplificado: porcentaje por localidad (fallback si no hay GeoJSON)
+// Gr├ífico simplificado: porcentaje por localidad (fallback si no hay GeoJSON)
 let localidadesChart = null;
 function renderLocalidadesChart() {
     try {
@@ -3383,7 +3901,7 @@ function renderLocalidadesChart() {
                             label: function(context) {
                                 const idx = context.dataIndex;
                                 const e = entries[idx];
-                                return `${e.pct.toFixed(2)}% — ${e.count} registros`;
+                                return `${e.pct.toFixed(2)}% ÔÇö ${e.count} registros`;
                             }
                         }
                     }
@@ -3458,7 +3976,7 @@ function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registration
             </td>
             <td>
                 <span class="status-badge ${leader.active ? 'status-active' : 'status-inactive'}">
-                    ${leader.active ? 'Activo ✅' : 'Inactivo ❌'}
+                    ${leader.active ? 'Activo Ô£à' : 'Inactivo ÔØî'}
                 </span>
             </td>
         </tr>
@@ -3492,12 +4010,12 @@ function filterByConfirmed() {
 function applyFilters() {
     let filtered = [...allRegistrationsData];
 
-    // Filtrar por líder
+    // Filtrar por l├¡der
     if (currentFilterLeaderId) {
         filtered = filtered.filter(r => r.leaderId === currentFilterLeaderId);
     }
 
-    // Filtrar por búsqueda de nombre
+    // Filtrar por b├║squeda de nombre
     if (currentSearchTerm) {
         filtered = filtered.filter(r => {
             const fullName = `${r.firstName || ''} ${r.lastName || ''}`.toLowerCase();
@@ -3505,7 +4023,7 @@ function applyFilters() {
         });
     }
 
-    // Filtrar por localidad (si está activo)
+    // Filtrar por localidad (si est├í activo)
         if (currentLocalidadFilter) {
         filtered = filtered.filter(r => {
             const loc = normalizeName(r.localidad || '');
@@ -3513,7 +4031,7 @@ function applyFilters() {
         });
     }
 
-    // Filtrar por confirmación
+    // Filtrar por confirmaci├│n
     if (currentConfirmedFilter === 'confirmed') {
         filtered = filtered.filter(r => r.confirmed);
     } else if (currentConfirmedFilter === 'unconfirmed') {
@@ -3523,13 +4041,13 @@ function applyFilters() {
     // Ordenar por fecha descendente
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Actualizar título
+    // Actualizar t├¡tulo
     let titleText = 'Todos los Registros';
     if (currentFilterLeaderId) {
         const leader = allLeadersData.find(l => l._id === currentFilterLeaderId);
-        titleText = `Registros de ${leader?.name || 'Líder'}`;
+        titleText = `Registros de ${leader?.name || 'L├¡der'}`;
     } else if (currentSearchTerm) {
-        titleText = `Búsqueda: "${currentSearchTerm}"`;
+        titleText = `B├║squeda: "${currentSearchTerm}"`;
     } else if (currentLocalidadFilter) {
         // Try to find an example registration to get the pretty localidad name
         const example = allRegistrationsData.find(r => normalizeName(r.localidad || '') === currentLocalidadFilter);
@@ -3549,7 +4067,7 @@ function updateFilteredRegistrationsList(registrations) {
     if (registrations.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="10" class="text-center text-muted py-4">
+                <td colspan="11" class="text-center text-muted py-4">
                     <i class="bi bi-inbox" style="font-size: 2rem;"></i>
                     <p>No hay registros que coincidan con los filtros</p>
                 </td>
@@ -3558,36 +4076,59 @@ function updateFilteredRegistrationsList(registrations) {
         return;
     }
 
-    tbody.innerHTML = registrations.map(reg => {
+    tbody.innerHTML = registrations.map((reg, index) => {
         const confirmed = reg.confirmed ? true : false;
         const confirmedBy = reg.confirmedBy || '';
         const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
         const fullName = `${reg.firstName || ''} ${reg.lastName || ''}`.trim();
         const localidad = reg.localidad || '-';
-        const votante = reg.registeredToVote ? 'Sí' : 'No';
+        const votante = reg.registeredToVote ? 'S├¡' : 'No';
         const votingPlace = reg.votingPlace || '-';
-        const votingTable = reg.votingTable || '-';
+
         return `
             <tr>
-                <td>${new Date(reg.date).toLocaleString("es-CO")}</td>
-                <td><strong>${fullName}</strong></td>
-                <td><code>${reg.cedula || 'N/A'}</code></td>
+                <td style="text-align: center;"><strong>${index + 1}</strong></td>
+                <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
+                <td>
+                    <strong>${fullName}</strong>
+                </td>
+                <td>
+                    <code>${reg.cedula || 'N/A'}</code>
+                </td>
                 <td>${reg.phone || 'N/A'}</td>
                 <td>${localidad}</td>
                 <td>${votante}</td>
                 <td>${votingPlace}</td>
-                <td>${confirmed ? `<span class="badge bg-success">Asistió ✅</span>` : `<span class="badge bg-secondary">No confirmado</span>`}</td>
-                <td><small class="text-muted">${confirmedAt || '-'}</small></td>
                 <td>
-                    <button class="btn btn-sm btn-outline-primary" onclick="editRegistration('${reg._id}')"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')"><i class="bi bi-trash"></i></button>
+                    ${confirmed ? `
+                        <span class="badge bg-success">Asisti├│ ✅</span>
+                    ` : `
+                        <span class="badge bg-secondary">No confirmado</span>
+                    `}
+                </td>
+                <td>
+                    ${confirmedBy ? `
+                        <small class="text-success">${confirmedBy}</small>
+                        <br>
+                        <small class="text-muted">${confirmedAt}</small>
+                    ` : `
+                        <small class="text-muted">-</small>
+                    `}
+                </td>
+                <td style="text-align: center; white-space: nowrap;">
+                    <button class="btn btn-sm btn-outline-primary" onclick="editRegistration('${reg._id}')" title="Editar registro">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')" title="Eliminar registro">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             </tr>
         `;
     }).join('');
 }
 
-// Función para mostrar detalles de un líder específico
+// Funci├│n para mostrar detalles de un l├¡der espec├¡fico
 function showLeaderDetails(leaderId) {
     selectLeaderFilter(leaderId);
     const leader = allLeadersData.find(l => l._id === leaderId);
@@ -3595,7 +4136,7 @@ function showLeaderDetails(leaderId) {
     showToast('success', `Mostrando registros de ${leader.name}`);
 }
 
-// Función para exportar datos de un líder específico
+// Funci├│n para exportar datos de un l├¡der espec├¡fico
 async function exportLeaderData(leaderId) {
     const leader = allLeadersData.find(l => l._id === leaderId);
     const leaderRegs = allRegistrationsData.filter(r => r.leaderId === leaderId);
@@ -3605,10 +4146,10 @@ async function exportLeaderData(leaderId) {
         const worksheet = XLSX.utils.json_to_sheet(leaderRegs.map(reg => ({
             'Fecha': new Date(reg.date).toLocaleString('es-CO'),
             'Nombre': `${reg.firstName} ${reg.lastName}`,
-            'Cédula': reg.cedula || '',
-            'Teléfono': reg.phone || '',
+            'C├®dula': reg.cedula || '',
+            'Tel├®fono': reg.phone || '',
             'Email': reg.email || '',
-            'Confirmado': reg.confirmed ? 'Sí' : 'No',
+            'Confirmado': reg.confirmed ? 'S├¡' : 'No',
             'Confirmado Por': reg.confirmedBy || '',
             'Confirmado En': reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''
         })));
@@ -3625,6 +4166,79 @@ async function exportLeaderData(leaderId) {
     } catch (error) {
         console.error('Error exportando datos:', error);
         showToast('danger', 'Error al exportar datos');
+    }
+}
+
+// Exportar registros filtrados mostrados en la tabla
+async function exportFilteredRegistrations() {
+    try {
+        // Obtener los registros que est├ín siendo mostrados (filtrados)
+        const tbody = document.getElementById('filteredRegistrationsList');
+        if (!tbody || tbody.querySelectorAll('tr').length === 0) {
+            showToast('warning', 'No hay registros para exportar');
+            return;
+        }
+
+        // Recopilar datos de las filas mostradas
+        const filteredRegs = [];
+        const rows = tbody.querySelectorAll('tr');
+        
+        for (const row of rows) {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 0) continue; // Saltar filas sin datos
+            
+            // Los ├óndices corresponden a: #, Fecha, Nombre, C├®dula, Tel├®fono, Localidad, ┬┐Votante?, Puesto, Estado, Confirmado Por, Acciones
+            const fullName = cells[2]?.textContent.trim() || '';
+            const fecha = cells[1]?.textContent.trim() || '';
+            const cedula = cells[3]?.textContent.trim() || '';
+            const telefono = cells[4]?.textContent.trim() || '';
+            const localidad = cells[5]?.textContent.trim() || '';
+            const votante = cells[6]?.textContent.trim() || '';
+            const puesto = cells[7]?.textContent.trim() || '';
+            const estado = cells[8]?.textContent.includes('✅') ? 'Asisti├│' : 'No confirmado';
+            const confirmedPor = cells[9]?.textContent.trim() || '-';
+            
+            filteredRegs.push({
+                'Fecha': fecha || '-',
+                'Nombre': fullName,
+                'C├®dula': cedula !== 'N/A' ? cedula : '',
+                'Tel├®fono': telefono !== 'N/A' ? telefono : '',
+                'Localidad': localidad,
+                '┬┐Votante?': votante,
+                'Puesto de Votaci├│n': puesto !== '-' ? puesto : '',
+                'Asistencia': estado,
+                'Confirmado Por': confirmedPor
+            });
+        }
+
+        if (filteredRegs.length === 0) {
+            showToast('warning', 'No hay registros v├ílidos para exportar');
+            return;
+        }
+
+        // Crear worksheet
+        const worksheet = XLSX.utils.json_to_sheet(filteredRegs);
+        
+        // Ajustar ancho de columnas
+        const columnWidths = [15, 20, 20, 15, 15, 18, 15, 22, 18, 20];
+        worksheet['!cols'] = columnWidths.map(w => ({ wch: w }));
+        
+        // Crear workbook
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros Filtrados');
+        
+        // Generar nombre del archivo
+        const titulo = document.getElementById('selectedLeaderTitle')?.textContent || 'Registros';
+        const fecha = new Date().toISOString().slice(0, 10);
+        const filename = `${titulo.replace(/[^a-z0-9]/gi, '_')}_${fecha}.xlsx`;
+        
+        // Descargar archivo
+        XLSX.writeFile(workbook, filename);
+        
+        showToast('success', `Se export├▓ ${filteredRegs.length} registros correctamente`);
+    } catch (error) {
+        console.error('Error exportando registros filtrados:', error);
+        showToast('danger', 'Error al exportar registros');
     }
 }
 
@@ -3651,9 +4265,9 @@ function toggleLeadersPerformance() {
     }
 }
 
-// ===================== 🔹 Landing Page Functions =====================
+// ===================== ­ƒö╣ Landing Page Functions =====================
 function changeEvent() {
-    // No hacer nada si estamos en modo de registro público
+    // No hacer nada si estamos en modo de registro p├║blico
     if (isPublicRegistrationMode) return;
 
     // Limpiar active event y volver a landing
@@ -3683,13 +4297,13 @@ async function refreshEventData() {
 }
 
 function goToCreateEvent() {
-    // No hacer nada si estamos en modo de registro público
+    // No hacer nada si estamos en modo de registro p├║blico
     if (isPublicRegistrationMode) {
-        console.log('🚫 goToCreateEvent() bloqueado - modo registro público');
+        console.log('­ƒÜ½ goToCreateEvent() bloqueado - modo registro p├║blico');
         return;
     }
 
-    // Mostrar página de crear evento
+    // Mostrar p├ígina de crear evento
     document.getElementById('landingPage').style.display = 'none';
     document.getElementById('viewEventsPage').style.display = 'none';
     document.getElementById('createEventPage').style.display = 'block';
@@ -3723,7 +4337,7 @@ async function saveEventFromPage(event) {
             const newEvent = await response.json();
             showToast('success', `Evento "${name}" creado exitosamente`);
             
-            // Cargar el nuevo evento automáticamente
+            // Cargar el nuevo evento autom├íticamente
             setTimeout(() => {
                 selectEventFromLanding(newEvent._id);
             }, 500);
@@ -3737,9 +4351,9 @@ async function saveEventFromPage(event) {
 }
 
 function goToViewEvents() {
-    // No hacer nada si estamos en modo de registro público
+    // No hacer nada si estamos en modo de registro p├║blico
     if (isPublicRegistrationMode) {
-        console.log('🚫 goToViewEvents() bloqueado - modo registro público');
+        console.log('­ƒÜ½ goToViewEvents() bloqueado - modo registro p├║blico');
         return;
     }
 
@@ -3753,9 +4367,9 @@ function goToViewEvents() {
 }
 
 function backToLanding() {
-    // No hacer nada si estamos en modo de registro público
+    // No hacer nada si estamos en modo de registro p├║blico
     if (isPublicRegistrationMode) {
-        console.log('🚫 backToLanding() bloqueado - modo registro público');
+        console.log('­ƒÜ½ backToLanding() bloqueado - modo registro p├║blico');
         return;
     }
 
@@ -3804,8 +4418,12 @@ async function loadEventsForSelection() {
                         </p>
                         ${event.description ? `<p class="card-text">${event.description}</p>` : ''}
                         <div class="d-flex gap-2 mt-3">
-                            <button class="btn btn-sm btn-primary flex-grow-1" onclick="selectEventFromLanding('${event._id}')">Entrar</button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEventFromLanding('${event._id}')">Eliminar</button>
+                            <button class="btn btn-sm btn-primary flex-grow-1" onclick="selectEventFromLanding('${event._id}'); event.stopPropagation();">
+                                <i class="bi bi-box-arrow-in-right"></i> Entrar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEventFromLanding('${event._id}'); event.stopPropagation();" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -3819,7 +4437,7 @@ async function loadEventsForSelection() {
 }
 
 async function selectEventFromLanding(eventId) {
-    // No hacer nada si estamos en modo de registro público
+    // No hacer nada si estamos en modo de registro p├║blico
     if (isPublicRegistrationMode) return;
 
     try {
@@ -3851,7 +4469,7 @@ async function selectEventFromLanding(eventId) {
 }
 
 async function deleteEventFromLanding(eventId) {
-    if (!confirm('¿Estás seguro de que deseas eliminar este evento? Se perderán todos los datos asociados.')) {
+    if (!confirm('┬┐Est├ís seguro de que deseas eliminar este evento? Se perder├ín todos los datos asociados.')) {
         return;
     }
     
@@ -3872,11 +4490,11 @@ async function deleteEventFromLanding(eventId) {
     }
 }
 
-// Función para inicializar la página
+// Funci├│n para inicializar la p├ígina
 async function initializePage() {
-    // No inicializar si estamos en modo de registro público
+    // No inicializar si estamos en modo de registro p├║blico
     if (isPublicRegistrationMode) {
-        console.log('🚫 initializePage() bloqueado - modo registro público activo');
+        console.log('­ƒÜ½ initializePage() bloqueado - modo registro p├║blico activo');
         return;
     }
 
@@ -3904,14 +4522,14 @@ async function initializePage() {
             
             showSection('dashboard');
         } else {
-            // Mostrar página de inicio (landing page)
+            // Mostrar p├ígina de inicio (landing page)
             document.getElementById('landingPage').style.display = 'flex';
             document.getElementById('viewEventsPage').style.display = 'none';
             document.getElementById('createEventPage').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'none';
         }
     } catch (error) {
-        console.error('Error inicializando la página:', error);
+        console.error('Error inicializando la p├ígina:', error);
         showToast('danger', 'Error cargando los datos iniciales');
     }
 }
@@ -3919,10 +4537,10 @@ async function initializePage() {
 // Cargar datos iniciales - MOVIDO DENTRO DE DOMContentLoaded
 // initializePage();
 
-// Iniciar auto-refresh automático
+// Iniciar auto-refresh autom├ítico
 startAutoRefresh();
 
-// ===================== 🔹 Click handlers para tarjetas =====================
+// ===================== ­ƒö╣ Click handlers para tarjetas =====================
 (function(){
     var activeCard = document.getElementById('activeLeadersCard');
     if (activeCard) activeCard.addEventListener('click', function() {
@@ -3935,12 +4553,12 @@ startAutoRefresh();
     });
 })();
 
-// Función para editar líder
+// Funci├│n para editar l├¡der
 async function editLeader(id) {
   const leader = leaders.find(l => l._id === id);
   if (!leader) return;
 
-  const nuevoNombre = prompt("Editar nombre del líder:", leader.name);
+  const nuevoNombre = prompt("Editar nombre del l├¡der:", leader.name);
   if (!nuevoNombre) return;
 
   const res = await fetch(`${API_BASE}/leaders`, {
@@ -3952,14 +4570,14 @@ async function editLeader(id) {
   const updated = await res.json();
   leaders = leaders.map(l => (l._id === updated._id ? updated : l));
   updateLeadersTable();
-  showToast('success', 'Líder actualizado correctamente');
+  showToast('success', 'L├¡der actualizado correctamente');
 }
 
 async function sendQRToLeader(leaderId) {
     try {
         const leader = leaders.find(l => l._id === leaderId);
         if (!leader) {
-            showToast('danger', 'No se encontró el líder');
+            showToast('danger', 'No se encontr├│ el l├¡der');
             return;
         }
 
@@ -3992,7 +4610,7 @@ async function confirmRegistration(regId) {
             return;
         }
 
-        // Pedir quién confirma
+        // Pedir qui├®n confirma
         const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
         if (!confirmer) return;
 
@@ -4058,7 +4676,7 @@ async function toggleConfirm(regId, value) {
         showToast('success', value ? 'Confirmado' : 'Desconfirmado');
     } catch (err) {
         console.error('Error toggling confirm:', err);
-        showToast('danger', 'Error actualizando confirmación');
+        showToast('danger', 'Error actualizando confirmaci├│n');
     }
 }
 </script>
