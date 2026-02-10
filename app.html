@@ -1429,6 +1429,75 @@ let registrations = [];
 let activeEventId = localStorage.getItem('activeEventId') || '';
 let activeEvent = null;
 
+// ===================== FUNCIONES DE LA INTERFAZ (UI) =====================
+// These functions must be defined early to be available for onclick handlers
+function showSection(section) {
+  const sections = ['dashboard', 'leaders', 'registrations', 'exports', 'analysis'];
+  sections.forEach(s => {
+    const el = document.getElementById(s + 'Section');
+    if (el) {
+      el.style.display = s === section ? 'block' : 'none';
+    }
+  });
+  
+  // Update analysis section if needed
+  if (section === 'analysis') {
+    try {
+      if (typeof refreshAnalysis === 'function') {
+        refreshAnalysis().then(() => { 
+          try { adjustAnalysisSectionHeight(); } catch(e){}
+        }).catch(() => { 
+          try { adjustAnalysisSectionHeight(); } catch(e){}
+        });
+      }
+    } catch(e) {
+      try { adjustAnalysisSectionHeight(); } catch(err){}
+    }
+  }
+  
+  // Update sidebar active state
+  const links = document.querySelectorAll('.sidebar .nav-link');
+  links.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('onclick')?.includes(section)) {
+      link.classList.add('active');
+    }
+  });
+}
+
+function showPublicForm() {
+  const adminPanel = document.getElementById('adminPanel');
+  const publicForm = document.getElementById('publicForm');
+  if (adminPanel) adminPanel.style.display = 'none';
+  if (publicForm) publicForm.style.display = 'block';
+}
+
+function showAdminPanel() {
+  const publicForm = document.getElementById('publicForm');
+  const adminPanel = document.getElementById('adminPanel');
+  if (publicForm) publicForm.style.display = 'none';
+  if (adminPanel) adminPanel.style.display = 'flex';
+}
+
+function openAdminRegistration() {
+  const form = document.getElementById('adminRegistrationForm');
+  if (form) form.reset();
+  
+  const leaderSelect = document.getElementById('adminLeaderSelect');
+  if (leaderSelect && leaders && leaders.length > 0) {
+    leaderSelect.innerHTML = leaders.map(leader => `
+      <option value="${leader._id}">${leader.name}</option>
+    `).join('');
+  }
+  
+  try {
+    const modal = new bootstrap.Modal(document.getElementById('adminRegistrationModal'));
+    modal.show();
+  } catch(e) {
+    console.warn('Could not open admin registration modal:', e);
+  }
+}
+
 // registerPerson is defined later in the file (single implementation). Removed duplicate to avoid conflicts.
 
 // Guardar registro desde el modal del admin
@@ -1943,8 +2012,6 @@ function onEachFeature(feature, layer) {
                 });
                 // end targets loop
                 // end per-item processing
-                
-            });
                 el.addEventListener('mousemove', (ev) => {
                     tip.style.left = (ev.pageX + 12) + 'px';
                     tip.style.top = (ev.pageY + 12) + 'px';
@@ -2875,58 +2942,6 @@ function updateRegistrationsTable() {
             </tr>
         `;
     }).join('');
-}
-
-// ===================== ­ƒö╣ Funciones de la interfaz =====================
-function showSection(section) {
-  const sections = ['dashboard', 'leaders', 'registrations', 'exports', 'analysis'];
-  sections.forEach(s => {
-    const el = document.getElementById(s + 'Section');
-    if (el) {
-      el.style.display = s === section ? 'block' : 'none';
-    }
-  });
-  
-  // Si es la secci├│n de an├ílisis, actualizar datos
-    if (section === 'analysis') {
-        try {
-            // refreshAnalysis is async; after it completes adjust the section height
-            refreshAnalysis().then(() => { try { adjustAnalysisSectionHeight(); } catch(e){} }).catch(() => { try { adjustAnalysisSectionHeight(); } catch(e){} });
-        } catch(e) {
-            try { adjustAnalysisSectionHeight(); } catch(err){}
-        }
-    }
-  
-  // Actualizar el estado de los botones de la barra lateral
-  const links = document.querySelectorAll('.sidebar .nav-link');
-  links.forEach(link => {
-    link.classList.remove('active');
-    if (link.getAttribute('onclick')?.includes(section)) {
-      link.classList.add('active');
-    }
-  });
-}
-
-function showPublicForm() {
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('publicForm').style.display = 'block';
-}
-
-function showAdminPanel() {
-  document.getElementById('publicForm').style.display = 'none';
-  document.getElementById('adminPanel').style.display = 'flex';
-}
-
-function openAdminRegistration() {
-  // Limpiar formulario
-  document.getElementById('adminRegistrationForm').reset();
-  // Cargar l├¡deres para el selector
-  const leaderSelect = document.getElementById('adminLeaderSelect');
-  leaderSelect.innerHTML = leaders.map(leader => `
-    <option value="${leader._id}">${leader.name}</option>
-  `).join('');
-  // Mostrar modal
-  new bootstrap.Modal(document.getElementById('adminRegistrationModal')).show();
 }
 
 // ===================== ­ƒö╣ Funciones de registro y exportaci├│n =====================
