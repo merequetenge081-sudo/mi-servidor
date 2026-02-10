@@ -3708,24 +3708,16 @@ async function refreshAnalysis() {
 
         try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras actualizar análisis:', e); }
 
-        // Intentar cargar y mostrar el croquis (GeoJSON) automáticamente si está disponible
+        // Mostrar gráfico de barras (nunca mostrar mapa)
         try {
             const mapWrap = document.getElementById('bogotaMapWrapper');
             const chartWrap = document.getElementById('bogotaChartWrapper');
             if (mapWrap && chartWrap) {
-                const geo = await ensureBogotaGeo();
-                if (geo) {
-                    mapWrap.style.display = 'block';
-                    chartWrap.style.display = 'none';
-                    try { renderLocalityMap(); } catch(e) { console.warn('Error renderizando mapa automáticamente:', e); }
-                } else {
-                    // Mantener fallback en chart si no hay geojson
-                    mapWrap.style.display = 'none';
-                    chartWrap.style.display = 'block';
-                }
+                mapWrap.style.display = 'none';
+                chartWrap.style.display = 'block';
             }
         } catch (err) {
-            console.warn('Error al intentar mostrar croquis de Bogotá:', err);
+            console.warn('Error al configurar vista de gráfico:', err);
         }
 
         showToast('success', 'Análisis actualizado');
@@ -4000,7 +3992,7 @@ function updateFilteredRegistrationsList(registrations) {
     if (registrations.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center text-muted py-4">
+                <td colspan="10" class="text-center text-muted py-4">
                     <i class="bi bi-inbox" style="font-size: 2rem;"></i>
                     <p>No hay registros que coincidan con los filtros</p>
                 </td>
@@ -4059,6 +4051,14 @@ function updateFilteredRegistrationsList(registrations) {
                         </button>
                     `}
                 </td>
+                <td style="text-align: center; white-space: nowrap;">
+                    <button class="btn btn-sm btn-outline-primary" onclick="editRegistration('${reg._id}')" title="Editar registro">
+                        <i class="bi bi-pencil"></i> Editar
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')" title="Eliminar registro">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
             </tr>
         `;
     }).join('');
@@ -4070,39 +4070,6 @@ function showLeaderDetails(leaderId) {
     const leader = allLeadersData.find(l => l._id === leaderId);
     if (!leader) return;
     showToast('success', `Mostrando registros de ${leader.name}`);
-}
-
-// Función para exportar datos de un líder específico
-async function exportLeaderData(leaderId) {
-    const leader = allLeadersData.find(l => l._id === leaderId);
-    const leaderRegs = allRegistrationsData.filter(r => r.leaderId === leaderId);
-    
-    try {
-        // Preparar datos para Excel
-        const worksheet = XLSX.utils.json_to_sheet(leaderRegs.map(reg => ({
-            'Fecha': new Date(reg.date).toLocaleString('es-CO'),
-            'Nombre': `${reg.firstName} ${reg.lastName}`,
-            'Cédula': reg.cedula || '',
-            'Teléfono': reg.phone || '',
-            'Email': reg.email || '',
-            'Confirmado': reg.confirmed ? 'Sí' : 'No',
-            'Confirmado Por': reg.confirmedBy || '',
-            'Confirmado En': reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''
-        })));
-        
-        // Crear libro de Excel
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros');
-        
-        // Guardar archivo
-        const filename = `registros_${leader.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`;
-        XLSX.writeFile(workbook, filename);
-        
-        showToast('success', 'Datos exportados correctamente');
-    } catch (error) {
-        console.error('Error exportando datos:', error);
-        showToast('danger', 'Error al exportar datos');
-    }
 }
 
 function sortLeadersList(criteria) {
@@ -4616,12 +4583,17 @@ async function exportFilteredRegistrations() {
     }
 }
 
-// Función para exportar datos de un líder específico
+// Función para exportar datos de un líder específico (solo con número de mesa)
 async function exportLeaderData(leaderId) {
     const leader = allLeadersData.find(l => l._id === leaderId);
-    const leaderRegs = allRegistrationsData.filter(r => r.leaderId === leaderId);
+    const leaderRegs = allRegistrationsData.filter(r => r.leaderId === leaderId && r.votingTable);
     
     try {
+        if (leaderRegs.length === 0) {
+            showToast('warning', 'No hay registros con número de mesa para exportar');
+            return;
+        }
+
         // Preparar datos para Excel
         const worksheet = XLSX.utils.json_to_sheet(leaderRegs.map(reg => ({
             'Fecha': new Date(reg.date).toLocaleString('es-CO'),
@@ -4629,6 +4601,8 @@ async function exportLeaderData(leaderId) {
             'Cédula': reg.cedula || '',
             'Teléfono': reg.phone || '',
             'Email': reg.email || '',
+            'Puesto de Votación': reg.votingPlace || '',
+            'Número de Mesa': reg.votingTable || '',
             'Confirmado': reg.confirmed ? 'Sí' : 'No',
             'Confirmado Por': reg.confirmedBy || '',
             'Confirmado En': reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''
@@ -4642,7 +4616,7 @@ async function exportLeaderData(leaderId) {
         const filename = `registros_${leader.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`;
         XLSX.writeFile(workbook, filename);
         
-        showToast('success', 'Datos exportados correctamente');
+        showToast('success', `Datos exportados correctamente (${leaderRegs.length} registros)`);
     } catch (error) {
         console.error('Error exportando datos:', error);
         showToast('danger', 'Error al exportar datos');
