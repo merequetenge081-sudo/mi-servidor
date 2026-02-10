@@ -1,0 +1,3271 @@
+const API_BASE = `${window.location.origin}/api`;
+let leaders = [];
+let registrations = [];
+let activeEventId = localStorage.getItem('activeEventId') || '';
+let activeEvent = null;
+
+// ===================== FUNCIONES DE LA INTERFAZ (UI) =====================
+// These functions must be defined early to be available for onclick handlers
+function showSection(section) {
+  const sections = ['dashboard', 'leaders', 'registrations', 'exports', 'analysis'];
+  sections.forEach(s => {
+    const el = document.getElementById(s + 'Section');
+    if (el) {
+      el.style.display = s === section ? 'block' : 'none';
+    }
+  });
+  
+  // Update analysis section if needed
+  if (section === 'analysis') {
+    try {
+      if (typeof refreshAnalysis === 'function') {
+        refreshAnalysis().then(() => { 
+          try { adjustAnalysisSectionHeight(); } catch(e){}
+        }).catch(() => { 
+          try { adjustAnalysisSectionHeight(); } catch(e){}
+        });
+      }
+    } catch(e) {
+      try { adjustAnalysisSectionHeight(); } catch(err){}
+    }
+  }
+  
+  // Update sidebar active state
+  const links = document.querySelectorAll('.sidebar .nav-link');
+  links.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('onclick')?.includes(section)) {
+      link.classList.add('active');
+    }
+  });
+}
+
+function showPublicForm() {
+  const adminPanel = document.getElementById('adminPanel');
+  const publicForm = document.getElementById('publicForm');
+  if (adminPanel) adminPanel.style.display = 'none';
+  if (publicForm) publicForm.style.display = 'block';
+}
+
+function showAdminPanel() {
+  const publicForm = document.getElementById('publicForm');
+  const adminPanel = document.getElementById('adminPanel');
+  if (publicForm) publicForm.style.display = 'none';
+  if (adminPanel) adminPanel.style.display = 'flex';
+}
+
+function openAdminRegistration() {
+  const form = document.getElementById('adminRegistrationForm');
+  if (form) form.reset();
+  
+  const leaderSelect = document.getElementById('adminLeaderSelect');
+  if (leaderSelect && leaders && leaders.length > 0) {
+    leaderSelect.innerHTML = leaders.map(leader => `
+      <option value="${leader._id}">${leader.name}</option>
+    `).join('');
+  }
+  
+  try {
+    const modal = new bootstrap.Modal(document.getElementById('adminRegistrationModal'));
+    modal.show();
+  } catch(e) {
+    console.warn('Could not open admin registration modal:', e);
+  }
+}
+
+// registerPerson is defined later in the file (single implementation). Removed duplicate to avoid conflicts.
+
+// Guardar registro desde el modal del admin
+async function saveAdminRegistration() {
+    const first = document.getElementById("adminFirstName")?.value.trim() || '';
+    const last = document.getElementById("adminLastName")?.value.trim() || '';
+    const name = (first + ' ' + last).trim();
+    const leaderId = document.getElementById("adminLeaderSelect")?.value;
+    const cedula = document.getElementById("adminCedula")?.value || '';
+    const email = document.getElementById("adminEmail")?.value || '';
+    const phone = document.getElementById("adminPhone")?.value || '';
+    const editingId = document.getElementById('editingRegistrationId')?.value || '';
+
+    if (!name || !leaderId) {
+        showToast('danger', 'Por favor completa todos los campos antes de guardar.');
+        return;
+    }
+
+    const reg = { 
+      firstName: first,
+      lastName: last,
+      cedula,
+      email,
+      phone,
+      leaderId,
+      eventId: activeEventId // Asociar al evento actual
+    };
+        // campos electorales desde el modal admin
+        const adminLocalidadSelect = document.getElementById('adminLocalidadSelect');
+        let adminLocalidad = '';
+        if (adminLocalidadSelect) {
+            adminLocalidad = adminLocalidadSelect.value === 'Otra' ? (document.getElementById('adminLocalidadOtra')?.value || '') : (adminLocalidadSelect.value || '');
+        }
+        const adminRegRadio = document.querySelector('input[name="adminRegisteredToVote"]:checked');
+        const adminRegisteredToVote = adminRegRadio ? (adminRegRadio.value === 'true') : false;
+        const adminVotingPlace = document.getElementById('adminVotingPlace')?.value || '';
+        const adminVotingTable = document.getElementById('adminVotingTable')?.value || '';
+
+        if (adminLocalidad) reg.localidad = adminLocalidad;
+        reg.registeredToVote = adminRegisteredToVote;
+        if (adminRegisteredToVote && !adminVotingPlace) {
+            showToast('danger', 'Si indic├│ que est├í inscrito para votar, por favor indique el puesto de votaci├│n.');
+            return;
+        }
+        if (adminVotingPlace) reg.votingPlace = adminVotingPlace;
+        if (adminVotingTable) reg.votingTable = adminVotingTable;
+
+    try {
+        // Si no estamos editando, verificar duplicados
+        if (!editingId && reg.cedula) {
+            try {
+                const q = `/api/registrations?cedula=${encodeURIComponent(reg.cedula)}${activeEventId ? '&eventId=' + activeEventId : ''}`;
+                const check = await fetch(q);
+                if (check.ok) {
+                    const existing = await check.json();
+                    if (existing.length > 0) {
+                        showToast('danger', 'Usuario ya registrado');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('No se pudo verificar duplicados por c├®dula:', e);
+            }
+        }
+
+        // Determinar si es creaci├│n o edici├│n
+        const isEditing = editingId && editingId.trim() !== '';
+        const url = isEditing ? `/api/registrations/${editingId}` : "/api/registrations";
+        const method = isEditing ? "PUT" : "POST";
+
+        const response = await fetch(url, {
+            method: method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reg)
+        });
+
+        if (response.ok) {
+            const newReg = await response.json();
+            console.log(isEditing ? 'Registro actualizado:' : 'Registro guardado:', newReg);
+
+            showToast('success', isEditing ? 'Registro actualizado correctamente' : 'Registro guardado correctamente');
+
+            // Limpiar formulario
+            document.getElementById("adminRegistrationForm").reset();
+            document.getElementById('editingRegistrationId').value = '';
+            document.getElementById("adminFirstName").value = "";
+            document.getElementById("adminLastName").value = "";
+            document.getElementById("adminCedula").value = "";
+            document.getElementById("adminEmail").value = "";
+            document.getElementById("adminPhone").value = "";
+            // ocultar puesto de votaci├│n si estaba visible
+            const adminVotingGroup = document.getElementById('adminVotingPlaceGroup');
+            if (adminVotingGroup) adminVotingGroup.style.display = 'none';
+            // reset radios
+            const adminYes = document.getElementById('adminRegisteredYes');
+            const adminNo = document.getElementById('adminRegisteredNo');
+            if (adminYes) adminYes.checked = false;
+            if (adminNo) adminNo.checked = true;
+            
+            // Cambiar título del modal de vuelta al original
+            document.getElementById('adminRegistrationLabel').textContent = 'Registrar Persona';
+
+            // Cerrar modal
+            const modalElement = document.getElementById("adminRegistrationModal");
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) modal.hide();
+
+            // Recargar datos
+            await loadLeaders();
+            await loadRegistrations();
+            await updateDashboard();
+
+        } else {
+            const errorData = await response.json().catch(() => ({}));
+            showToast('danger', `Error al guardar el registro: ${errorData.error || 'desconocido'}`);
+        }
+    } catch (err) {
+        console.error('Error guardando registro admin:', err);
+        showToast('danger', 'Hubo un error al guardar el registro.');
+    }
+}
+
+// Try to map numbered labels in the Wikimedia croquis to data-name attributes
+function mapWikimediaNumbersToDataNames(svg) {
+    if (!svg) return 0;
+    const numMap = {
+        1: 'Usaqu├®n', 2: 'Chapinero', 3: 'Santa Fe', 4: 'San Crist├│bal', 5: 'Usme',
+        6: 'Tunjuelito', 7: 'Bosa', 8: 'Kennedy', 9: 'Fontib├│n', 10: 'Engativ├í',
+        11: 'Suba', 12: 'Barrios Unidos', 13: 'Teusaquillo', 14: 'Los M├írtires',
+        15: 'Antonio Nari├▒o', 16: 'Puente Aranda', 17: 'La Candelaria', 18: 'Rafael Uribe',
+        19: 'Ciudad Bol├¡var', 20: 'Sumapaz'
+    };
+    const texts = Array.from(svg.querySelectorAll('text')).filter(t => t && t.textContent && /\d+/.test(t.textContent));
+    const candidateShapes = Array.from(svg.querySelectorAll('path, polygon, rect, circle'));
+    let assigned = 0;
+    texts.forEach(t => {
+        const txt = t.textContent.trim();
+        const m = txt.match(/^(\d+)$/);
+        if (!m) return;
+        const n = Number(m[1]);
+        const name = numMap[n];
+        if (!name) return;
+        // Prefer direct grouping: same parent <g>
+        try {
+            const g = t.parentElement;
+            if (g) {
+                const shape = g.querySelector('path, polygon, rect, circle');
+                if (shape) {
+                    shape.setAttribute('data-name', name);
+                    assigned++;
+                    return;
+                }
+            }
+        } catch (e) {}
+
+        // otherwise, pick the nearest shape by bbox center
+        try {
+            const tb = t.getBBox ? t.getBBox() : null;
+            const tx = tb ? (tb.x + tb.width/2) : (parseFloat(t.getAttribute('x')) || 0);
+            const ty = tb ? (tb.y + tb.height/2) : (parseFloat(t.getAttribute('y')) || 0);
+            let best = null; let bestDist = Infinity;
+            candidateShapes.forEach(s => {
+                try {
+                    const b = s.getBBox();
+                    const cx = b.x + b.width/2;
+                    const cy = b.y + b.height/2;
+                    const d = Math.hypot(cx - tx, cy - ty);
+                    if (d < bestDist) { bestDist = d; best = s; }
+                } catch(e) {}
+            });
+            if (best && bestDist < 300) { // threshold in px, generous
+                best.setAttribute('data-name', name);
+                assigned++;
+            }
+        } catch (e) { }
+    });
+    return assigned;
+}
+
+// ===================== ­ƒö╣ Map: Bogot├í localidades choropleth =====================
+let _bogotaMap = null;
+let _bogotaLayer = null;
+let _bogotaGeo = null;
+
+function getLocalidadKey(feature) {
+    // Try common property names that might contain the locality name
+    if (!feature || !feature.properties) return '';
+    const props = feature.properties;
+    const keys = ['NOMBRE','nombre','NAME','name','NOM_LOC','NOM_POBL','LOCALIDAD','localidad','LOCAL','NOM_LOCALI','NOMLOCAL','DPTO','MUNICIPIO','NOM_MUN'];
+    for (const k of keys) {
+        if (props[k] && String(props[k]).trim()) return String(props[k]).trim();
+    }
+    return '';
+}
+
+// Normalize locality names for stable matching (remove diacritics, punctuation, collapse spaces)
+function normalizeName(s) {
+    if (!s) return '';
+    let str = String(s).trim();
+    try {
+        // Preferred method: Unicode NFD + remove diacritics
+        str = str.normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    } catch (e) {
+        // Fallback: simple replacements for common accented characters
+        const map = { '├ü':'A','├ë':'E','├ì':'I','├ô':'O','├Ü':'U','├í':'a','├®':'e','├¡':'i','├│':'o','├║':'u','├æ':'N','├▒':'n','├£':'U','├╝':'u' };
+        str = str.split('').map(ch => map[ch] || ch).join('');
+    }
+    // remove punctuation, keep letters/numbers/spaces and dashes
+    str = str.replace(/[\u2000-\u206F\u2E00-\u2E7F\'"\(\)\[\]\{\},.:;\/\\<>\?@#\$%\^&\*\+=~`|]/g, '');
+    str = str.replace(/[_]+/g, ' ');
+    str = str.replace(/\s+/g, ' ').toLowerCase().trim();
+    return str;
+}
+
+function computeLocalidadStats() {
+    // registrations array is global
+    const counts = {};
+    // Normalizer: use normalizeName helper
+    registrations.forEach(r => {
+        const raw = (r.localidad || '').trim() || 'Sin Localidad';
+        const k = normalizeName(raw) || 'sin localidad';
+        if (!counts[k]) counts[k] = { raw, count: 0, voters: 0 };
+        counts[k].count += 1;
+        // Determine if this registration marks a votante
+        const val = r.registeredToVote;
+        const isVoter = (val === true || String(val).toLowerCase() === 'true');
+        if (isVoter) counts[k].voters += 1;
+    });
+    const total = registrations.length || 0;
+    const stats = {};
+    for (const k of Object.keys(counts)) {
+        const c = counts[k].count;
+        const v = counts[k].voters || 0;
+        stats[k] = {
+            count: c,
+            voters: v,
+            pct: total ? (c / total) * 100 : 0,
+            voterPct: c ? (v / c) * 100 : 0,
+            label: counts[k].raw
+        };
+    }
+    return { stats, total };
+}
+
+async function loadBogotaMapFromInput() {
+    const url = document.getElementById('geojsonUrlInput').value.trim();
+    if (!url) {
+        showToast('warning', 'Pega la URL del GeoJSON o coloca el archivo en `public/bogota_localidades.geojson`');
+        return;
+    }
+    try {
+        document.getElementById('bogotaMapSpinner').style.display = 'flex';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('No se pudo descargar GeoJSON');
+        _bogotaGeo = await res.json();
+        renderLocalityMap();
+        showToast('success', 'GeoJSON cargado');
+    } catch (err) {
+        console.error('Error cargando GeoJSON:', err);
+        showToast('danger', 'Error cargando GeoJSON: ' + err.message);
+    }
+    finally {
+        try { document.getElementById('bogotaMapSpinner').style.display = 'none'; } catch(e){}
+    }
+}
+
+async function ensureBogotaGeo() {
+    if (_bogotaGeo) return _bogotaGeo;
+    // Try local path first
+    const localPath = '/bogota_localidades.geojson';
+    const altLocal = '/MANZANA.geojson';
+    try {
+        const r = await fetch(localPath);
+        if (r.ok) { _bogotaGeo = await r.json(); return _bogotaGeo; }
+    } catch(e) {}
+    try {
+        const r2 = await fetch(altLocal);
+        if (r2.ok) { _bogotaGeo = await r2.json(); return _bogotaGeo; }
+    } catch(e) {}
+    // Otherwise ask user to paste URL
+    showToast('info', 'No se encontr├│ GeoJSON local. Pega una URL en el campo de arriba.');
+    return null;
+}
+
+function getColorForPct(pct) {
+    // Green-focused palette with finer gradation for better visual discrimination
+    if (!pct || pct === 0) return '#fbfdf9';
+    if (pct < 2) return '#f7fdef';
+    if (pct < 5) return '#eefaf0';
+    if (pct < 10) return '#e6f6dd';
+    if (pct < 15) return '#d8f0c8';
+    if (pct < 25) return '#c9e9b8';
+    if (pct < 35) return '#b1df93';
+    if (pct < 50) return '#9cd784';
+    if (pct < 65) return '#67c24a';
+    if (pct < 85) return '#2f9e1d';
+    return '#17620f';
+}
+
+function styleFeature(feature) {
+    // Determine the locality key from feature; normalize for match
+    const rawKey = getLocalidadKey(feature) || '';
+    const norm = s => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+    const key = norm(rawKey);
+    const { stats } = computeLocalidadStats();
+    const s = stats[key] || { pct: 0, voterPct: 0 };
+    return {
+        weight: 0.3,
+        opacity: 1,
+        color: '#ffffff',
+        dashArray: '2',
+        fillOpacity: 0.95,
+        fillColor: getColorForPct(s.voterPct)
+    };
+}
+
+function onEachFeature(feature, layer) {
+    const nameRaw = getLocalidadKey(feature) || '';
+    const norm = s => String(s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+    const name = nameRaw || 'Sin nombre';
+    const { stats, total } = computeLocalidadStats();
+    const s = stats[norm(nameRaw)] || { count: 0, pct: 0, voters: 0, voterPct: 0 };
+    // Bind popup for click: show registros y % votantes (dentro de la localidad)
+    layer.bindPopup(`<strong>${name}</strong><br/>Registros: ${s.count || 0}<br/>Votantes: ${s.voters || 0}<br/>% Votantes: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%`);
+
+    // Bind tooltip for hover (shows % votantes) and add highlight on hover
+    layer.bindTooltip(`${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`, { direction: 'auto', sticky: true });
+
+    layer.on({
+        mouseover: function(e) {
+            const tgt = e.target;
+            try {
+                tgt.setStyle({ weight: 0.9, color: '#222', fillOpacity: 1 });
+            } catch (err) {}
+            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                try { tgt.bringToFront(); } catch(e) {}
+            }
+            // Open tooltip at mouse position
+            try { this.openTooltip(e.latlng); } catch(e) {}
+        },
+        mouseout: function(e) {
+            try { _bogotaLayer.resetStyle(e.target); } catch(err) {}
+            try { this.closeTooltip(); } catch(e) {}
+        },
+        click: function(e) {
+            try { this.openPopup(); } catch(e) {}
+        }
+    });
+}
+
+    // ================= SVG croquis interactions =================
+    function attachSvgInteractions() {
+        try {
+            // Support multiple possible svg ids (external file or inline)
+            const svg = document.getElementById('bogotaCroquis') || document.getElementById('bogotaCroquisInline') || document.querySelector('#bogotaMap svg');
+            if (!svg) return;
+            // Tooltip element
+            let tip = document.getElementById('svgMapTooltip');
+            if (!tip) {
+                tip = document.createElement('div');
+                tip.id = 'svgMapTooltip';
+                tip.style.position = 'absolute';
+                tip.style.pointerEvents = 'none';
+                tip.style.padding = '6px 8px';
+                tip.style.background = 'rgba(0,0,0,0.75)';
+                tip.style.color = 'white';
+                tip.style.borderRadius = '4px';
+                tip.style.fontSize = '12px';
+                tip.style.display = 'none';
+                tip.style.zIndex = 30000;
+                document.body.appendChild(tip);
+            }
+
+            const items = svg.querySelectorAll('[data-name]');
+            // helper: find shapes to attach events to (element itself + inner shape children)
+            function getInteractiveTargets(element) {
+                const targets = [];
+                const tag = (element.tagName || '').toLowerCase();
+                const shapeTags = ['path','polygon','rect','circle','ellipse'];
+                if (shapeTags.includes(tag)) targets.push(element);
+                if (element.querySelectorAll) {
+                    element.querySelectorAll('path,polygon,rect,circle,ellipse').forEach(n => targets.push(n));
+                }
+                // fallback to the element itself
+                if (targets.length === 0) targets.push(element);
+                return targets;
+            }
+
+            items.forEach(el => {
+                const name = el.getAttribute('data-name');
+                try { el.setAttribute('tabindex', '0'); } catch(e){}
+                // Ensure the element itself (or its child shapes) will capture pointer events
+                getInteractiveTargets(el).forEach(t => {
+                    try {
+                        t.style.pointerEvents = 'all';
+                        t.setAttribute('pointer-events', 'all');
+                        const curFill = (t.getAttribute('fill') || '').trim().toLowerCase();
+                        if (!curFill || curFill === 'none') {
+                            // give a nearly-transparent fill so the shape captures mouse events reliably
+                            t.setAttribute('fill', '#ffffff');
+                            t.setAttribute('fill-opacity', '0.01');
+                        }
+                    } catch(e){}
+                });
+
+                // Attach events to the interactive targets (so both group and inner paths respond)
+                const targets = getInteractiveTargets(el);
+                targets.forEach(targetEl => {
+                    targetEl.addEventListener('mouseover', (ev) => {
+                    // store original fill/stroke so we can restore later
+                    el.__origFill = el.getAttribute('fill') || el.style.fill;
+                    el.__origStroke = el.getAttribute('stroke') || '';
+                    el.__origStrokeWidth = el.getAttribute('stroke-width') || '';
+                    // subtle visual feedback without making the border aggressive
+                    try { el.style.filter = 'brightness(0.98)'; } catch(e){}
+                    const { stats } = computeLocalidadStats();
+                    const key = normalizeName(name || '');
+                    const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                    tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
+                    tip.style.display = 'block';
+                    // show a very subtle stroke for small-area visibility
+                    try {
+                        if (!(currentLocalidadFilter && currentLocalidadFilter === key)) {
+                            el.setAttribute('stroke', 'rgba(0,0,0,0.18)');
+                            el.setAttribute('stroke-width', '0.5');
+                        }
+                    } catch(e){}
+                    });
+                    targetEl.addEventListener('mousemove', (ev) => {
+                        tip.style.left = (ev.pageX + 12) + 'px';
+                        tip.style.top = (ev.pageY + 12) + 'px';
+                    });
+                    targetEl.addEventListener('mouseout', (ev) => {
+                        try { el.style.filter = ''; } catch(e){}
+                        tip.style.display = 'none';
+                        // restore previous stroke unless it's selected
+                        try {
+                            const key = normalizeName(name || '');
+                            if (currentLocalidadFilter && currentLocalidadFilter === key) {
+                                // keep selected styling (handled elsewhere)
+                            } else {
+                                // restore on the actual shape elements
+                                getInteractiveTargets(el).forEach(sh => { try { sh.setAttribute('stroke', 'none'); sh.setAttribute('stroke-width', '0'); } catch(_){} });
+                            }
+                        } catch(e){}
+                    });
+                    targetEl.addEventListener('click', (ev) => {
+                        ev.stopPropagation();
+                        const { stats } = computeLocalidadStats();
+                        const key = normalizeName(name || '');
+                        const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                        // Toggle filter: if same localidad clicked twice -> clear
+                        if (currentLocalidadFilter === key) {
+                            currentLocalidadFilter = '';
+                            showToast('info', `Filtro eliminado: ${name}`);
+                        } else {
+                            currentLocalidadFilter = key;
+                            showToast('info', `Filtrando por ${name}: ${s.count} registros ÔÇö ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
+                        }
+                        // Update badge in the map area to reflect active filter
+                        try {
+                            const mapWrap = document.getElementById('bogotaMapWrapper');
+                            if (mapWrap) {
+                                let badge = document.getElementById('localidadFilterBadge');
+                                if (!badge) {
+                                    badge = document.createElement('div');
+                                    badge.id = 'localidadFilterBadge';
+                                    badge.style.position = 'absolute';
+                                    badge.style.top = '8px';
+                                    badge.style.right = '8px';
+                                    badge.style.zIndex = 25000;
+                                    badge.style.padding = '6px 10px';
+                                    badge.style.background = 'rgba(0,0,0,0.6)';
+                                    badge.style.color = '#fff';
+                                    badge.style.borderRadius = '18px';
+                                    badge.style.fontSize = '13px';
+                                    badge.style.display = 'inline-flex';
+                                    badge.style.alignItems = 'center';
+                                    badge.style.gap = '8px';
+                                    const clr = document.createElement('button');
+                                    clr.type = 'button';
+                                    clr.className = 'btn btn-sm btn-light';
+                                    clr.style.padding = '2px 6px';
+                                    clr.style.fontSize = '12px';
+                                    clr.innerText = 'Limpiar';
+                                    clr.onclick = (e) => { e.stopPropagation(); currentLocalidadFilter = ''; applyFilters(); badge.style.display = 'none'; colorSvgByStats(); };
+                                    badge.appendChild(document.createElement('span'));
+                                    badge.appendChild(clr);
+                                    mapWrap.appendChild(badge);
+                                }
+                                const label = badge.querySelector('span');
+                                if (currentLocalidadFilter) {
+                                    label.innerText = `${name}`;
+                                    badge.style.display = 'inline-flex';
+                                } else {
+                                    badge.style.display = 'none';
+                                }
+                            }
+                        } catch (e) { console.warn('No se pudo actualizar badge de filtro', e); }
+
+                        // Apply filters to table and recolor SVG to show selection
+                        try { applyFilters(); } catch(e) { console.warn('applyFilters failed', e); }
+                        try { colorSvgByStats(); } catch(e) { console.warn('colorSvgByStats failed after click', e); }
+                    });
+                    // keyboard support: Enter or Space triggers the same action
+                    targetEl.addEventListener('keydown', (kev) => {
+                        if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
+                            kev.preventDefault();
+                            try { targetEl.click(); } catch(e) { console.warn('keyboard click failed', e); }
+                        }
+                    });
+                });
+                // end targets loop
+                // end per-item processing
+                el.addEventListener('mousemove', (ev) => {
+                    tip.style.left = (ev.pageX + 12) + 'px';
+                    tip.style.top = (ev.pageY + 12) + 'px';
+                });
+                el.addEventListener('mouseout', (ev) => {
+                    try { el.style.filter = ''; } catch(e){}
+                    tip.style.display = 'none';
+                    // restore previous stroke unless it's selected
+                    try {
+                        const key = normalizeName(name || '');
+                        if (currentLocalidadFilter && currentLocalidadFilter === key) {
+                            // keep selected styling (handled elsewhere)
+                        } else {
+                            el.setAttribute('stroke', 'none');
+                            el.setAttribute('stroke-width', '0');
+                        }
+                    } catch(e){}
+                });
+                el.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    const { stats } = computeLocalidadStats();
+                    const key = normalizeName(name || '');
+                    const s = stats[key] || { voterPct: 0, voters:0, count:0 };
+                    // Toggle filter: if same localidad clicked twice -> clear
+                    if (currentLocalidadFilter === key) {
+                        currentLocalidadFilter = '';
+                        showToast('info', `Filtro eliminado: ${name}`);
+                    } else {
+                        currentLocalidadFilter = key;
+                        showToast('info', `Filtrando por ${name}: ${s.count} registros ÔÇö ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
+                    }
+                    // Update badge in the map area to reflect active filter
+                    try {
+                        const mapWrap = document.getElementById('bogotaMapWrapper');
+                        if (mapWrap) {
+                            let badge = document.getElementById('localidadFilterBadge');
+                            if (!badge) {
+                                badge = document.createElement('div');
+                                badge.id = 'localidadFilterBadge';
+                                badge.style.position = 'absolute';
+                                badge.style.top = '8px';
+                                badge.style.right = '8px';
+                                badge.style.zIndex = 25000;
+                                badge.style.padding = '6px 10px';
+                                badge.style.background = 'rgba(0,0,0,0.6)';
+                                badge.style.color = '#fff';
+                                badge.style.borderRadius = '18px';
+                                badge.style.fontSize = '13px';
+                                badge.style.display = 'inline-flex';
+                                badge.style.alignItems = 'center';
+                                badge.style.gap = '8px';
+                                const clr = document.createElement('button');
+                                clr.type = 'button';
+                                clr.className = 'btn btn-sm btn-light';
+                                clr.style.padding = '2px 6px';
+                                clr.style.fontSize = '12px';
+                                clr.innerText = 'Limpiar';
+                                clr.onclick = (e) => { e.stopPropagation(); currentLocalidadFilter = ''; applyFilters(); badge.style.display = 'none'; colorSvgByStats(); };
+                                badge.appendChild(document.createElement('span'));
+                                badge.appendChild(clr);
+                                mapWrap.appendChild(badge);
+                            }
+                            const label = badge.querySelector('span');
+                            if (currentLocalidadFilter) {
+                                label.innerText = `${name}`;
+                                badge.style.display = 'inline-flex';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                    } catch (e) { console.warn('No se pudo actualizar badge de filtro', e); }
+
+                    // Apply filters to table and recolor SVG to show selection
+                    try { applyFilters(); } catch(e) { console.warn('applyFilters failed', e); }
+                    try { colorSvgByStats(); } catch(e) { console.warn('colorSvgByStats failed after click', e); }
+                });
+                // keyboard support: Enter or Space triggers the same action
+                el.addEventListener('keydown', (kev) => {
+                    if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
+                        kev.preventDefault();
+                        try { el.click(); } catch(e) { console.warn('keyboard click failed', e); }
+                    }
+                });
+            });
+            // After attaching handlers, color SVG areas according to stats
+            try { colorSvgByStats(svg); } catch(e) { console.warn('colorSvgByStats failed', e); }
+
+            // Generate optional labels (centered text) and a small toggle button
+            try {
+                        function createSvgLabels() {
+                            try {
+                                // remove any previous svg labels group
+                                const old = svg.querySelector('#labels-group');
+                                if (old) old.remove();
+                                // remove previous localidades box if exists
+                                const existingBox = document.getElementById('localidadesBox');
+                                if (existingBox) existingBox.remove();
+
+                                const mapWrap = document.getElementById('bogotaMapWrapper');
+                                if (!mapWrap) return;
+
+                                // Build the localidades box (separate panel with the list)
+                                const box = document.createElement('div');
+                                box.id = 'localidadesBox';
+                                box.style.position = 'absolute';
+                                box.style.left = '12px';
+                                box.style.top = '12px';
+                                box.style.width = '280px';
+                                box.style.maxHeight = '68%';
+                                box.style.overflow = 'auto';
+                                box.style.background = 'rgba(255,255,255,0.96)';
+                                box.style.borderRadius = '10px';
+                                box.style.boxShadow = '0 10px 30px rgba(2,6,23,0.10)';
+                                box.style.zIndex = 26000;
+                                box.style.padding = '8px';
+                                // start hidden; toggled by the hamburger button
+                                box.classList.add('hidden');
+
+                                const title = document.createElement('div');
+                                title.innerText = 'Localidades';
+                                title.style.fontWeight = '700';
+                                title.style.marginBottom = '6px';
+                                box.appendChild(title);
+
+                                const { stats, total } = computeLocalidadStats();
+                                const names = Array.from(new Set(Array.from(svg.querySelectorAll('[data-name]')).map(el => el.getAttribute('data-name')).filter(Boolean)));
+                                const rows = names.map(nm => {
+                                    const key = normalizeName(nm || '');
+                                    const st = stats[key] || { count: 0, voterPct: 0 };
+                                    return { name: nm, key, count: st.count || 0, voterPct: st.voterPct || 0 };
+                                }).sort((a,b) => b.count - a.count);
+
+                                const list = document.createElement('div');
+                                list.style.display = 'flex';
+                                list.style.flexDirection = 'column';
+                                list.style.gap = '6px';
+
+                                rows.forEach(rw => {
+                                    const item = document.createElement('button');
+                                    item.type = 'button';
+                                    item.className = 'localidades-item btn btn-sm';
+                                    item.style.display = 'flex';
+                                    item.style.justifyContent = 'space-between';
+                                    item.style.alignItems = 'center';
+                                    item.style.padding = '6px 8px';
+                                    item.style.background = 'transparent';
+                                    item.style.border = 'none';
+                                    item.style.textAlign = 'left';
+                                    item.style.width = '100%';
+                                    item.innerHTML = `<span style="flex:1; color: #123;">${rw.name}</span><small style="margin-left:8px; color:#3b6;">${rw.voterPct ? rw.voterPct.toFixed(1) + '%' : ''}</small>`;
+                                    item.onclick = (e) => {
+                                        e.stopPropagation();
+                                        currentLocalidadFilter = rw.key;
+                                        try { applyFilters(); } catch(_){}
+                                        try { colorSvgByStats(); } catch(_){}
+                                        // update badge
+                                        try { const badge = document.getElementById('localidadFilterBadge'); if (badge) { badge.style.display = 'inline-flex'; badge.querySelector('span').innerText = rw.name; } } catch(_){}
+                                    };
+                                    list.appendChild(item);
+                                });
+
+                                box.appendChild(list);
+                                mapWrap.appendChild(box);
+                                // Also create in-map labels: center text over each [data-name]
+                                try {
+                                    const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                                    labelsGroup.setAttribute('id', 'labels-group');
+                                    // small transform to ensure labels render above fills
+                                    svg.appendChild(labelsGroup);
+                                    const shapes = Array.from(svg.querySelectorAll('[data-name]'));
+                                    shapes.forEach(s => {
+                                        try {
+                                            // ensure shape receives pointer events
+                                            try { s.style.pointerEvents = 'all'; s.setAttribute('pointer-events','all'); } catch(e) {}
+                                            const name = s.getAttribute('data-name') || '';
+                                            // compute bbox and centroid
+                                            let bx;
+                                            try { bx = s.getBBox(); } catch(e) { bx = null; }
+                                            const cx = bx ? (bx.x + bx.width/2) : 0;
+                                            const cy = bx ? (bx.y + bx.height/2) : 0;
+                                            const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                                            t.setAttribute('x', cx);
+                                            t.setAttribute('y', cy);
+                                            t.setAttribute('text-anchor', 'middle');
+                                            t.setAttribute('dominant-baseline', 'middle');
+                                            t.setAttribute('class', 'svg-label');
+                                            t.setAttribute('style', 'pointer-events:none; font-family: Inter, Arial; font-size:12px; fill:#123; font-weight:700;');
+                                            t.textContent = name;
+                                            labelsGroup.appendChild(t);
+                                        } catch(e) { /* ignore per-shape errors */ }
+                                    });
+                                } catch(e) { console.warn('create in-map labels failed', e); }
+                            } catch (e) { console.warn('createLocalidadesBox failed', e); }
+                        }
+                        createSvgLabels();
+                // Add toggle button to show/hide labels
+                const mapWrap = document.getElementById('bogotaMapWrapper');
+                if (mapWrap) {
+                    let btn = document.getElementById('svgLabelsToggle');
+                    if (!btn) {
+                        btn = document.createElement('button');
+                        btn.id = 'svgLabelsToggle';
+                        btn.type = 'button';
+                        btn.className = 'btn btn-sm btn-outline-secondary';
+                        btn.style.position = 'absolute';
+                        btn.style.top = '8px';
+                        btn.style.left = '56px';
+                        btn.style.zIndex = 25000;
+                        btn.style.padding = '6px 8px';
+                        btn.innerText = 'Etiquetas';
+                        btn.onclick = (ev) => {
+                            ev.stopPropagation();
+                            const grp = svg.querySelector('#labels-group');
+                            if (!grp) return;
+                            const hidden = grp.querySelector('.svg-label.hidden');
+                            const show = !!hidden;
+                            grp.querySelectorAll('.svg-label').forEach(t => {
+                                if (show) t.classList.remove('hidden'); else t.classList.add('hidden');
+                            });
+                            btn.classList.toggle('active', show);
+                        };
+                        mapWrap.appendChild(btn);
+                    }
+                    // Add hamburger toggle for localidades panel (left side)
+                    let locBtn = document.getElementById('localidadesToggle');
+                    if (!locBtn) {
+                        locBtn = document.createElement('button');
+                        locBtn.id = 'localidadesToggle';
+                        locBtn.type = 'button';
+                        locBtn.className = 'btn btn-sm btn-outline-secondary';
+                        locBtn.style.position = 'absolute';
+                        locBtn.style.top = '8px';
+                        locBtn.style.left = '8px';
+                        locBtn.style.zIndex = 25000;
+                        locBtn.style.padding = '6px 8px';
+                        locBtn.innerHTML = '<i class="bi bi-list"></i>';
+                        locBtn.title = 'Mostrar/ocultar localidades';
+                        locBtn.onclick = (ev) => {
+                            ev.stopPropagation();
+                            const box = document.getElementById('localidadesBox');
+                            if (!box) return;
+                            const isHidden = box.classList.contains('hidden');
+                            if (isHidden) {
+                                box.classList.remove('hidden');
+                                box.classList.add('visible');
+                                // ensure badge updates when opening
+                                try { colorSvgByStats(); } catch(e){}
+                            } else {
+                                box.classList.remove('visible');
+                                box.classList.add('hidden');
+                            }
+                        };
+                        mapWrap.appendChild(locBtn);
+                    }
+                }
+            } catch(e) { console.warn('labels creation failed', e); }
+        } catch (err) { console.warn('attachSvgInteractions error', err); }
+    }
+
+    function colorSvgByStats(svgEl) {
+        try {
+            const svg = svgEl || (document.getElementById('bogotaCroquis') || document.getElementById('bogotaCroquisInline') || document.querySelector('#bogotaMap svg'));
+            if (!svg) return;
+            const { stats } = computeLocalidadStats();
+            const items = svg.querySelectorAll('[data-name]');
+            items.forEach(el => {
+                const name = el.getAttribute('data-name');
+                const key = normalizeName(name || '');
+                const s = stats[key] || { voterPct: 0 };
+                const color = getColorForPct(s.voterPct);
+                try {
+                    el.style.fill = color;
+                    el.setAttribute('fill', color);
+                    // Highlight selected localidad
+                    if (currentLocalidadFilter && currentLocalidadFilter === key) {
+                        // mark selected using CSS class for consistent styling (subtle)
+                        el.classList.add('loc-selected');
+                        el.setAttribute('stroke', '#111');
+                        el.setAttribute('stroke-width', '0.6');
+                    } else {
+                        // remove aggressive borders: keep no stroke by default
+                        el.classList.remove('loc-selected');
+                        el.setAttribute('stroke', 'none');
+                        el.setAttribute('stroke-width', '0');
+                        // also ensure inline style fallback
+                        el.style.filter = '';
+                    }
+                } catch(e) {}
+            });
+        } catch (err) { console.warn('colorSvgByStats error', err); }
+    }
+
+function toggleMapFallback() {
+    const mapWrap = document.getElementById('bogotaMapWrapper');
+    const chartWrap = document.getElementById('bogotaChartWrapper');
+    if (!mapWrap || !chartWrap) return;
+    if (mapWrap.style.display === 'none' || mapWrap.style.display === '') {
+        mapWrap.style.display = 'block';
+        chartWrap.style.display = 'none';
+        try { renderLocalityMap(); } catch(e) { console.warn('No se pudo renderizar el mapa:', e); }
+    } else {
+        mapWrap.style.display = 'none';
+        chartWrap.style.display = 'block';
+    }
+}
+
+
+
+// Try to load SVG croquis if present (top-level so other functions can call it)
+async function ensureBogotaCroquis() {
+    try {
+        // Prefer the Wikimedia Commons croquis (author: Milenioscuro, CC-BY-SA)
+        // Fallback to auto-generated and local croquis afterwards
+        const candidates = [
+            '/bogota_croquis_wikimedia.svg',
+            'https://upload.wikimedia.org/wikipedia/commons/a/ab/Administrative_map_of_Distrito_Capital_%28Colombia%29.svg',
+            '/bogota_croquis_auto.svg',
+            '/bogota_croquis.svg'
+        ];
+        for (const p of candidates) {
+            try {
+                const r = await fetch(p);
+                if (!r.ok) continue;
+                const txt = await r.text();
+                console.info('Loaded croquis from', p);
+                return txt;
+            } catch(e) { continue; }
+        }
+        return null;
+    } catch(e) { return null; }
+}
+async function renderLocalityMap() {
+    const spinner = document.getElementById('bogotaMapSpinner');
+    try {
+        if (spinner) spinner.style.display = 'flex';
+        const geo = await ensureBogotaGeo();
+        if (!geo) return;
+        // compute stats to prepare legend
+        const { stats, total } = computeLocalidadStats();
+
+        // Ensure the container is visible so Leaflet can initialize properly
+        const mapWrap = document.getElementById('bogotaMapWrapper');
+        if (mapWrap) mapWrap.style.display = 'block';
+
+        // If an SVG croquis exists, prefer it ÔÇö otherwise render Leaflet geoJSON
+        const croquis = await ensureBogotaCroquis();
+        const mapContainer = document.getElementById('bogotaMap');
+        if (croquis) {
+            try {
+                // Insert SVG inline so we can attach events
+                if (mapContainer) {
+                            mapContainer.innerHTML = croquis;
+                            // Ensure the inserted SVG fills the map container and preserves aspect ratio
+                            try {
+                                const svgEl = mapContainer.querySelector('svg');
+                                if (svgEl) {
+                                    svgEl.removeAttribute('width');
+                                    svgEl.removeAttribute('height');
+                                    svgEl.setAttribute('preserveAspectRatio','xMidYMid meet');
+                                    svgEl.style.width = '100%';
+                                    svgEl.style.height = '100%';
+                                    svgEl.style.display = 'block';
+                                    // make parent container stretch to allow svg to use full height
+                                    mapContainer.style.alignItems = 'stretch';
+                                }
+                            } catch(e) { console.warn('Failed to adjust SVG sizing', e); }
+                    // Remove any existing leaflet map instance if present
+                    try { if (_bogotaMap) { _bogotaMap.remove(); _bogotaMap = null; } } catch(e) {}
+                    // If the SVG doesn't contain per-area `data-name` attributes, prefer the GeoJSON Leaflet fallback
+                    try {
+                        const svgEl = mapContainer.querySelector('svg');
+                        const hasDataNames = svgEl && svgEl.querySelectorAll && svgEl.querySelectorAll('[data-name]').length > 0;
+                        if (!hasDataNames) {
+                            // Try to map numbered labels (common in Wikimedia croquis) to data-name attributes
+                            try {
+                                const mapped = mapWikimediaNumbersToDataNames(svgEl);
+                                // Prefer the GeoJSON / Leaflet fallback unless the SVG mapping is complete.
+                                const mappedCount = (Number(mapped) || 0) + (svgEl.querySelectorAll ? svgEl.querySelectorAll('[data-name]').length : 0);
+                                console.info('Mapped', mappedCount, 'labels to data-name on Wikimedia croquis.');
+                                // Require a reasonable coverage (20 localidades) before using the SVG interactive mode.
+                                if (mappedCount >= 20) {
+                                    attachSvgInteractions();
+                                    return;
+                                }
+                            } catch (me) { console.warn('Mapping numeric labels failed', me); }
+
+                            console.warn('SVG croquis loaded but contains no [data-name] attributes ÔÇö falling back to Leaflet GeoJSON for interactive map.');
+                            // clear the inserted SVG so Leaflet can mount
+                            mapContainer.innerHTML = '';
+                            // fall through to leaflet rendering below
+                        } else {
+                            attachSvgInteractions();
+                            return;
+                        }
+                    } catch(e) { console.warn('Error evaluating SVG content', e); }
+                }
+            } catch (e) { console.warn('Error inserting croquis SVG', e); }
+        }
+
+        // Fallback: render leaflet geoJSON choropleth
+        if (!_bogotaMap) {
+            _bogotaMap = L.map('bogotaMap', { scrollWheelZoom: false }).setView([4.6486, -74.0826], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(_bogotaMap);
+        }
+
+        if (_bogotaLayer) {
+            try { _bogotaMap.removeLayer(_bogotaLayer); } catch(e) { console.warn('Error removing previous layer', e); }
+            _bogotaLayer = null;
+        }
+
+        _bogotaLayer = L.geoJSON(geo, {
+            style: styleFeature,
+            onEachFeature: onEachFeature
+        }).addTo(_bogotaMap);
+
+        // give browser a moment, then invalidate size and fit bounds
+        try {
+            setTimeout(() => {
+                try { _bogotaMap.invalidateSize(); } catch(e) {}
+                try { _bogotaMap.fitBounds(_bogotaLayer.getBounds(), { padding: [20,20] }); } catch(e) { console.warn('fitBounds failed', e); }
+            }, 80);
+        } catch(e) { console.warn('Error forcing map resize', e); }
+
+        // Legend
+        const legendEl = document.getElementById('bogotaMapLegend');
+        if (legendEl) {
+            legendEl.innerHTML = '';
+            const legendHtml = [
+                '<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#f0f0f0;border:1px solid #ccc"></span> 0%</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#e6f6dd"></span> <10% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#c9e9b8"></span> 10-25% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#9cd784"></span> 25-50% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#67c24a"></span> 50-75% votantes</div>',
+                '<div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block;width:18px;height:12px;background:#2f9e1d"></span> >75% votantes</div>',
+                '</div>'
+            ].join(' ');
+            legendEl.innerHTML = legendHtml;
+
+            // Also list top localidades by registros, show voter % as extra info
+            const topList = Object.keys(stats).map(k => ({ k, ...stats[k] })).sort((a,b)=>b.count-a.count).slice(0,10);
+            const topHtml = ['<div class="mt-3"><strong>Top localidades</strong><ol style="padding-left:18px;">'];
+            topList.forEach(t=> topHtml.push(`<li>${t.label || t.k} ÔÇö ${t.count} registros ÔÇö ${t.voterPct.toFixed(2)}% votantes</li>`));
+            topHtml.push('</ol></div>');
+            legendEl.innerHTML += topHtml.join('');
+        }
+
+        // Tambi├®n actualizar el gr├ífico simplificado (fallback)
+        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart simplificado:', e); }
+    } catch (err) {
+        console.error('Error en renderLocalityMap:', err);
+        throw err;
+    } finally {
+        if (spinner) spinner.style.display = 'none';
+    }
+}
+
+// ===================== ­ƒö╣ Mobile sidebar toggle helpers =====================
+function openMobileSidebar() {
+    const sb = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sb) sb.classList.add('open');
+    if (backdrop) backdrop.classList.add('visible');
+}
+
+function closeMobileSidebar() {
+    const sb = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sb) sb.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('visible');
+}
+
+document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'sidebarToggle') {
+        openMobileSidebar();
+    }
+});
+
+// Cerrar sidebar si se redimensiona a ancho de escritorio
+window.addEventListener('resize', function () {
+    if (window.innerWidth > 768) {
+        closeMobileSidebar();
+    }
+});
+
+// Ajusta la altura de la secci├│n de An├ílisis para que su scroll interno coincida con la ventana
+function adjustAnalysisSectionHeight() {
+    try {
+        const el = document.getElementById('analysisSection');
+        if (!el || el.style.display === 'none') return;
+        // calcular espacio disponible desde la posici├│n superior del elemento hasta el fondo de la ventana
+        const rect = el.getBoundingClientRect();
+        const topOffset = Math.max(0, rect.top);
+        const paddingBottom = 20; // espacio para evitar que quede justo en el borde
+        const avail = Math.max(120, window.innerHeight - topOffset - paddingBottom);
+        el.style.maxHeight = avail + 'px';
+        el.style.overflowY = 'auto';
+    } catch (e) {
+        console.warn('adjustAnalysisSectionHeight failed', e);
+    }
+}
+
+// Reajustar al redimensionar
+window.addEventListener('resize', function () {
+    try { adjustAnalysisSectionHeight(); } catch(e) {}
+});
+
+async function deleteRegistration(id) {
+  if (!confirm("┬┐Eliminar este registro?")) return;
+  try {
+    const response = await fetch(`/api/registrations/${id}`, { method: "DELETE" });
+        if (response.ok) {
+            console.log(`Ô£à Registro ${id} eliminado`);
+            showToast('success', 'Ô£à Registro eliminado');
+      
+      // Recargar datos del servidor para asegurar sincronizaci├│n
+      await loadRegistrations();
+      await loadLeaders();
+      
+      // Actualizar tabla de l├¡deres inmediatamente
+      updateLeadersTable();
+      
+      // Actualizar tabla de registros
+      updateRegistrationsTable();
+      
+      // Actualizar dashboard si est├í visible
+      if (document.getElementById('dashboardSection').style.display !== 'none') {
+        await updateDashboard();
+      }
+      
+      showToast('success', 'Ô£à Registro eliminado correctamente');
+        } else {
+            showToast('danger', 'ÔØî Error al eliminar el registro');
+    }
+  } catch (err) {
+    console.error('Error al eliminar registro:', err);
+        showToast('danger', 'ÔØî Error al eliminar el registro');
+  }
+}
+
+function editRegistration(id) {
+    try {
+        // Buscar el registro en los datos cargados
+        const reg = allRegistrationsData.find(r => r._id === id);
+        if (!reg) {
+            // Si no está en allRegistrationsData, buscarlo en registrations global
+            const reg2 = registrations.find(r => r._id === id);
+            if (!reg2) {
+                showToast('danger', 'Registro no encontrado');
+                return;
+            }
+            fillEditRegistrationForm(reg2);
+        } else {
+            fillEditRegistrationForm(reg);
+        }
+        
+        // Guardar el ID para usar en el guardado
+        document.getElementById('editingRegistrationId').value = id;
+        
+        // Cambiar título del modal
+        document.getElementById('adminRegistrationLabel').textContent = 'Editar Registro';
+        
+        // Abrir modal
+        new bootstrap.Modal(document.getElementById('adminRegistrationModal')).show();
+    } catch (err) {
+        console.error('Error editRegistration:', err);
+        showToast('danger', 'Error al abrir formulario de edición');
+    }
+}
+
+function fillEditRegistrationForm(reg) {
+    try {
+        document.getElementById('adminFirstName').value = reg.firstName || '';
+        document.getElementById('adminLastName').value = reg.lastName || '';
+        document.getElementById('adminCedula').value = reg.cedula || '';
+        document.getElementById('adminEmail').value = reg.email || '';
+        document.getElementById('adminPhone').value = reg.phone || '';
+        document.getElementById('adminLeaderSelect').value = reg.leaderId || '';
+        document.getElementById('adminLocalidadSelect').value = reg.localidad || '';
+        
+        // Cargar estado de votante
+        if (reg.registeredToVote) {
+            document.getElementById('adminRegisteredYes').checked = true;
+            toggleAdminVotingPlace(true);
+        } else {
+            document.getElementById('adminRegisteredNo').checked = true;
+            toggleAdminVotingPlace(false);
+        }
+        
+        document.getElementById('adminVotingPlace').value = reg.votingPlace || '';
+        document.getElementById('adminVotingTable').value = reg.votingTable || '';
+    } catch (err) {
+        console.error('Error llenando formulario:', err);
+    }
+}
+
+// ­ƒö╣ Define primero la funci├│n updateDashboard (solicitud del usuario)
+async function updateDashboard() {
+    try {
+        // Obtener l├¡deres y registros
+        const leadersUrl = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
+        const regsUrl = `${API_BASE}/registrations${activeEventId ? '?eventId=' + activeEventId : ''}`;
+        const [leadersRes, regsRes] = await Promise.all([
+            fetch(leadersUrl),
+            fetch(regsUrl),
+        ]);
+        const leadersData = await leadersRes.json();
+        const regs = await regsRes.json();
+
+        // Calcular datos
+        const activeLeaders = (leadersData.filter(l => l.active).length) || leadersData.length;
+        const totalRegs = regs.length;
+
+        // Actualizar la UI (elementos nuevos)
+        const activeEl = document.getElementById('activeLeadersCount');
+        if (activeEl) activeEl.innerText = activeLeaders;
+        const regsEl = document.getElementById('registrationsCount');
+        if (regsEl) regsEl.innerText = totalRegs;
+        const msgsEl = document.getElementById('messagesCount');
+        if (msgsEl) msgsEl.innerText = 0; // placeholder
+        // Mostrar nombre/fecha del evento activo en el dashboard
+        try {
+            const evtNameEl = document.getElementById('activeEventNameText');
+            const evtDateEl = document.getElementById('activeEventDate');
+            if (activeEvent && activeEvent.name) {
+                if (evtNameEl) evtNameEl.textContent = activeEvent.name;
+                if (evtDateEl) evtDateEl.textContent = activeEvent.date ? new Date(activeEvent.date).toLocaleDateString() : '';
+            } else if (activeEventId) {
+                // intentar obtener evento por id
+                const evRes = await fetch(`${API_BASE}/events`);
+                if (evRes.ok) {
+                    const evs = await evRes.json();
+                    const ev = evs.find(e => String(e._id) === String(activeEventId));
+                    if (ev) {
+                        activeEvent = ev;
+                        if (evtNameEl) evtNameEl.textContent = ev.name;
+                        if (evtDateEl) evtDateEl.textContent = ev.date ? new Date(ev.date).toLocaleDateString() : '';
+                    }
+                }
+            } else {
+                if (evtNameEl) evtNameEl.textContent = 'Sin evento seleccionado';
+                if (evtDateEl) evtDateEl.textContent = '';
+            }
+        } catch (e) {
+            console.warn('No se pudo actualizar visual del evento:', e);
+        }
+    } catch (err) {
+        console.error('Error actualizando dashboard:', err);
+    }
+}
+
+// ===================== ­ƒö╣ Events management =====================
+async function loadEvents() {
+    try {
+        const res = await fetch(`${API_BASE}/events`);
+        if (!res.ok) throw new Error('Error cargando eventos');
+        const events = await res.json();
+        const container = document.getElementById('eventsList');
+        if (container) {
+            if (events.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay eventos. Crea uno nuevo abajo.</p>';
+            } else {
+                container.innerHTML = events.map(ev => `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>${ev.name}</strong>
+                            <div><small class="text-muted">${ev.date ? new Date(ev.date).toLocaleDateString() : ''} - ${ev.description || ''}</small></div>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="selectEvent('${ev._id}')">Seleccionar</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="editEvent('${ev._id}')">Editar</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        return events;
+    } catch (err) {
+        console.error('Error loadEvents:', err);
+        showToast('danger', 'Error cargando eventos');
+        return [];
+    }
+}
+
+async function saveEvent() {
+    const name = document.getElementById('eventName').value.trim();
+    const date = document.getElementById('eventDate').value || null;
+    const description = document.getElementById('eventDescription').value || '';
+    if (!name) return showToast('danger', 'El nombre del evento es obligatorio');
+
+    try {
+        const res = await fetch(`${API_BASE}/events`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, date, description })
+        });
+        if (!res.ok) throw new Error('Error creando evento');
+        const ev = await res.json();
+        // seleccionar evento creado
+        selectEvent(ev._id);
+        // cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
+        if (modal) modal.hide();
+        showToast('success', 'Evento creado y seleccionado');
+    } catch (err) {
+        console.error('Error saveEvent:', err);
+        showToast('danger', 'Error creando evento');
+    }
+}
+
+async function selectEvent(eventId) {
+    try {
+        // cargar evento para mostrar nombre y persistir selecci├│n
+        const res = await fetch(`${API_BASE}/events`);
+        const events = await res.json();
+        const ev = events.find(e => String(e._id) === String(eventId));
+        if (!ev) return showToast('danger', 'Evento no encontrado');
+        activeEventId = ev._id;
+        activeEvent = ev;
+        localStorage.setItem('activeEventId', activeEventId);
+        // cerrar modal si est├í abierto
+        const modalEl = document.getElementById('eventModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+
+        // refrescar datos con el evento seleccionado
+        await loadLeaders();
+        await loadRegistrations();
+        await updateDashboard();
+        showToast('success', `Evento seleccionado: ${ev.name}`);
+        showSection('dashboard');
+    } catch (err) {
+        console.error('Error selectEvent:', err);
+        showToast('danger', 'Error seleccionando evento');
+    }
+}
+
+function openEventModal() {
+    loadEvents();
+    const modal = new bootstrap.Modal(document.getElementById('eventModal'));
+    modal.show();
+}
+
+function editEvent(id) {
+    // placeholder: simple prompt edit
+    const name = prompt('Nuevo nombre del evento:');
+    if (!name) return;
+    fetch(`${API_BASE}/events/${id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name })
+    }).then(() => loadEvents());
+}
+
+
+// ===================== ­ƒö╣ Cargar datos del backend =====================
+async function loadLeaders() {
+  try {
+        const url = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
+        const res = await fetch(url);
+    if (!res.ok) throw new Error('Error cargando l├¡deres');
+    leaders = await res.json();
+    updateLeadersTable();
+    return leaders;
+  } catch (error) {
+    console.error('Error en loadLeaders:', error);
+    showToast('danger', 'Error cargando l├¡deres');
+    throw error;
+  }
+}
+
+// ===================== ­ƒö╣ Auto-refresh en tiempo real =====================
+async function checkForNewRegistrations() {
+    try {
+        const regsRes = await fetch(`${API_BASE}/registrations`);
+        const registrations = await regsRes.json();
+        const currentCount = registrations.length;
+        
+        // Si hay nuevos registros, actualizar autom├íticamente
+        if (currentCount > lastRegistrationCount) {
+            lastRegistrationCount = currentCount;
+            console.log(`Ô£à Nuevo(s) registro(s) detectado(s). Total: ${currentCount}`);
+            
+            // Actualizar todos los datos
+            await loadLeaders();
+            await loadRegistrations();
+            
+            // Actualizar las tablas visibles
+            if (document.getElementById('dashboardSection').style.display !== 'none') {
+                await updateDashboard();
+            }
+            
+            if (document.getElementById('registrationsSection').style.display !== 'none') {
+                updateRegistrationsTable();
+            }
+            
+            if (document.getElementById('analysisSection').style.display !== 'none') {
+                await refreshAnalysis();
+            }
+            
+            // Mostrar notificaci├│n
+            showToast('success', `Ô£à Nuevo registro detectado! Total: ${currentCount}`);
+        }
+    } catch (error) {
+        console.error('Error en checkForNewRegistrations:', error);
+    }
+}
+
+function startAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+    
+    // Verificar cada 5 segundos si hay nuevos registros
+    autoRefreshInterval = setInterval(() => {
+        checkForNewRegistrations();
+    }, 5000);
+    
+    console.log('­ƒöä Auto-refresh iniciado (cada 5 segundos)');
+}
+
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+        console.log('ÔÅ╣´©Å Auto-refresh detenido');
+    }
+}
+
+async function loadRegistrations() {
+  try {
+        const url = `${API_BASE}/registrations${activeEventId ? '?eventId=' + activeEventId : ''}`;
+        const res = await fetch(url);
+    if (!res.ok) throw new Error('Error cargando registros');
+    registrations = await res.json();
+    updateRegistrationsTable();
+        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras cargar registros:', e); }
+    return registrations;
+  } catch (error) {
+    console.error('Error en loadRegistrations:', error);
+    showToast('danger', 'Error cargando registros');
+    throw error;
+  }
+}
+
+// ===================== ­ƒö╣ Actualizar tablas =====================
+function updateLeadersTable() {
+  const tbody = document.getElementById('leadersTableBody');
+  tbody.innerHTML = leaders.map((leader, i) => {
+    // Recalcular el contador de registros desde el array registrations para mayor precisi├│n
+    // Comparar como strings para evitar problemas de tipo
+    const leaderId = String(leader._id);
+    const leaderRegsCount = registrations.filter(r => String(r.leaderId) === leaderId).length;
+    const registrationsDisplay = leaderRegsCount;
+    
+    console.log(`[updateLeadersTable] ${leader.name}: leaderId=${leaderId}, count=${leaderRegsCount}`);
+    
+    return `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${leader.name}</td>
+      <td>${leader.token}</td>
+      <td>${registrationsDisplay}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary" onclick="showQRCode('${leader._id}')" title="Ver QR">
+          <i class="bi bi-qr-code"></i>
+        </button>
+        <button class="btn btn-sm btn-success" onclick="sendQRToLeader('${leader._id}')" title="Enviar QR">
+          <i class="bi bi-send"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-warning" onclick="editLeader('${leader._id}')">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteLeader('${leader._id}')">
+          <i class="bi bi-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `}).join('');
+}
+
+function updateRegistrationsTable() {
+    const tbody = document.getElementById('registrationsTableBody');
+    tbody.innerHTML = registrations.map(reg => {
+        const nombre = reg.name || ((reg.firstName || '') + ' ' + (reg.lastName || '')).trim() || 'Sin nombre';
+        const lider = (leaders.find(l => l._id === reg.leaderId)?.name) || reg.leaderName || 'Sin l├¡der';
+        const fecha = reg.date ? new Date(reg.date).toLocaleDateString() : 'Sin fecha';
+        const confirmed = reg.confirmed ? true : false;
+        const confirmedBy = reg.confirmedBy ? reg.confirmedBy : '';
+        const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
+        const localidad = reg.localidad || '-';
+        const votante = reg.registeredToVote ? 'S├¡' : 'No';
+        const votingPlace = reg.votingPlace || '-';
+        const votingTable = reg.votingTable || '-';
+
+        return `
+            <tr>
+                <td>${new Date(reg.date).toLocaleDateString("es-CO")}</td>
+                <td>${nombre}</td>
+                <td>${reg.cedula || '-'}</td>
+                <td>${lider}</td>
+                <td>${localidad}</td>
+                <td>${votante}</td>
+                <td>${votingPlace}</td>
+                <td>${votingTable}</td>
+                <td>
+                    ${confirmed ? `
+                        <div>
+                            <span class="badge bg-success">Asisti├│ Ô£à</span>
+                            <br><small>${confirmedBy} - ${confirmedAt}</small>
+                        </div>
+                    ` : `
+                        <div>
+                            <span class="badge bg-secondary">No confirmado</span>
+                        </div>
+                    `}
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar Notificaci├│n">
+                    <i class="bi bi-envelope-check"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-success" onclick="confirmRegistration('${reg._id}')" title="Confirmar Asistencia">
+                    <i class="bi bi-check2-circle"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">Ô£Å´©Å</button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">­ƒùæ´©Å</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ===================== ­ƒö╣ Funciones de registro y exportaci├│n =====================
+async function saveLeader() {
+  const id = document.getElementById('leaderId').value;
+  const name = document.getElementById('leaderName').value;
+  const email = document.getElementById('leaderEmail').value;
+  const phone = document.getElementById('leaderPhone').value;
+  const area = document.getElementById('leaderArea').value;
+  const active = document.getElementById('leaderActive').checked;
+  
+  if (!name || !email || !phone) {
+    showToast('danger', 'Por favor complete todos los campos obligatorios');
+    return;
+  }
+  
+  const leaderData = {
+    name,
+    email,
+    phone,
+    area,
+    active
+  };
+  
+  // Asociar el l├¡der al evento actual si existe
+  if (activeEventId) {
+    leaderData.eventId = activeEventId;
+  }
+  
+  try {
+    const res = await fetch(`${API_BASE}/leaders${id ? '/' + id : ''}`, {
+      method: id ? 'PUT' : 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(leaderData)
+    });
+    
+    if (res.ok) {
+      const newLeader = await res.json();
+      console.log('Ô£à L├¡der guardado:', newLeader);
+      
+      showToast('success', 'L├¡der guardado con ├®xito');
+      
+      // Recargar l├¡deres desde el backend
+      await loadLeaders();
+      
+      // Actualizar dashboard
+      await updateDashboard();
+      
+      // Cerrar modal
+      const modalElement = document.getElementById('leaderModal');
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
+      
+      // Limpiar formulario
+      document.getElementById('leaderForm').reset();
+      document.getElementById('leaderId').value = '';
+      
+    } else {
+      const errorData = await res.json();
+      showToast('danger', `Error al guardar el l├¡der: ${errorData.error}`);
+    }
+  } catch (err) {
+    console.error('Error saveLeader:', err);
+    showToast('danger', 'Error de conexi├│n al guardar el l├¡der');
+  }
+}
+
+async function deleteLeader(id) {
+  if (!confirm("┬┐Eliminar este l├¡der?")) return;
+
+  const res = await fetch(`${API_BASE}/leaders/${id}`, { method: "DELETE" });
+  if (res.ok) {
+    leaders = leaders.filter(l => l._id !== id);
+    updateLeadersTable();
+    showToast('success', 'L├¡der eliminado correctamente');
+  } else {
+    showToast('danger', 'Error al eliminar l├¡der');
+  }
+}
+
+async function exportToExcel(type) {
+    const url = `${API_BASE}/export/${type}${activeEventId ? '?eventId=' + activeEventId : ''}`;
+    const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  if (res.ok) {
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `export_${type}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    showToast('success', `Datos exportados a Excel (${type})`);
+  } else {
+    showToast('danger', 'Error al exportar datos');
+  }
+}
+
+// ===================== ­ƒö╣ Funciones de formulario p├║blico =====================
+document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+    // Obtener token del l├¡der: preferir localStorage, si no existe usar la querystring
+    let leaderToken = null;
+    try {
+        leaderToken = localStorage.getItem('publicLeaderToken');
+    } catch (e) { /* ignorar si localStorage no est├í disponible */ }
+
+    if (!leaderToken) {
+        const urlParams = new URLSearchParams(window.location.search);
+        leaderToken = urlParams.get('leader') || null;
+        if (leaderToken) {
+            try { localStorage.setItem('publicLeaderToken', leaderToken); } catch (e) { /* ignore */ }
+        }
+    }
+
+    const resLeader = await fetch("/api/leaders");
+    const leaders = await resLeader.json();
+    const leader = leaderToken ? leaders.find(l => l.token === leaderToken) : null;
+    const leaderId = leader ? leader._id : null;
+  
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    // Si seleccion├│ 'Otra' en localidad, obtener el texto especificado
+    if (data.localidad === 'Otra') {
+        data.localidad = document.getElementById('localidadOtra')?.value || '';
+    }
+
+    // Asegurar que el leaderId se asigne. Si no est├í disponible, enviar token para que el servidor lo resuelva
+    data.leaderId = leaderId;
+    if (!data.leaderId && leaderToken) data.leaderToken = leaderToken;
+
+    // Si no hay l├¡der, no continuar
+    if (!data.leaderId && !data.leaderToken) {
+        showToast('danger', 'No se encontr├│ un l├¡der asociado para este registro.');
+        return;
+    }
+
+    // Mostrar pantalla de ├®xito inmediatamente (optimista)
+    showRegistrationSuccess();
+
+    // Verificaci├│n: evitar re-registro por c├®dula (si existe, revertir la vista)
+    try {
+        const cedula = data.cedula || '';
+        if (cedula) {
+            const checkUrl = `/api/registrations?cedula=${encodeURIComponent(cedula)}${activeEventId ? '&eventId=' + activeEventId : ''}`;
+            const checkRes = await fetch(checkUrl);
+            if (checkRes.ok) {
+                const existing = await checkRes.json();
+                if (existing.length > 0) {
+                    showToast('danger', 'usuario ya registrado');
+                    resetPublicForm();
+                    return;
+                }
+            }
+        }
+    } catch (err) {
+        console.warn('No se pudo verificar c├®dula, continuando:', err);
+    }
+
+    // Enviar petici├│n al servidor en background
+    try {
+        const res = await fetch(`${API_BASE}/registrations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            // petici├│n exitosa: actualizar datos en background
+            (async () => { try { await loadRegistrations(); await updateDashboard(); } catch (e) { console.warn(e); } })();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
+            resetPublicForm();
+        }
+    } catch (err) {
+        console.error('Error enviando registro:', err);
+        showToast('danger', 'Error de conexi├│n al enviar el registro');
+        resetPublicForm();
+    }
+});
+
+function showRegistrationSuccess() {
+    const form = document.getElementById('registrationForm');
+    const success = document.getElementById('registrationSuccessScreen');
+    const publicForm = document.getElementById('publicForm');
+
+    // Asegurar que el contenedor p├║blico est├® visible
+    if (publicForm) {
+        publicForm.style.display = 'block';
+        publicForm.style.visibility = 'visible';
+        publicForm.style.pointerEvents = 'auto';
+    }
+
+    // Ocultar el formulario y mostrar la pantalla de ├®xito inmediatamente
+    if (form) form.style.display = 'none';
+    if (success) {
+        success.style.display = 'block';
+        success.style.zIndex = '31000';
+        success.style.opacity = '0';
+        success.style.transition = 'opacity 180ms ease, transform 180ms ease';
+        success.style.transform = 'translateY(6px)';
+        // force reflow
+        void success.offsetWidth;
+        success.style.opacity = '1';
+        success.style.transform = 'translateY(0)';
+        try {
+            success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (e) {}
+    }
+
+    // En modo p├║blico asegurarnos de ocultar admin
+    const adminPanel = document.getElementById('adminPanel');
+    if (adminPanel) adminPanel.style.display = 'none';
+}
+
+function resetPublicForm() {
+    // Mostrar de nuevo el formulario y resetear campos
+    const form = document.getElementById('registrationForm');
+    const success = document.getElementById('registrationSuccessScreen');
+    if (form) {
+        form.reset();
+        form.style.display = 'block';
+    }
+    if (success) success.style.display = 'none';
+    // enfocar primer campo
+    const first = document.getElementById('firstName');
+    if (first) first.focus();
+}
+
+// ===================== ­ƒö╣ Funciones de QR y enlace =====================
+function showQRCode(leader) {
+    // Acepta tanto el objeto leader como su _id
+    if (typeof leader === 'string' || typeof leader === 'number') {
+        leader = leaders.find(l => l._id === String(leader));
+    }
+
+    if (!leader) {
+        showToast('danger', 'No se encontr├│ el l├¡der');
+        return;
+    }
+
+    const qrContainer = document.getElementById('qrContainer');
+    if (!qrContainer) {
+        console.error('No se encontr├│ #qrContainer en el DOM');
+        return;
+    }
+    qrContainer.innerHTML = ''; // limpiar el contenedor
+
+    // Generar QR con qrcodejs
+    new QRCode(qrContainer, {
+        text: `${window.location.origin}/?leader=${leader.token}`,
+        width: 200,
+        height: 200,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    var titleEl = document.getElementById('qrModalTitle');
+    if (titleEl) titleEl.innerText = `QR de ${leader.name}`;
+
+    // Rellenar el link del registro en el input
+    const registrationLink = `${window.location.origin}/?leader=${leader.token}`;
+    const linkInput = document.getElementById('leaderRegistrationLink');
+    if (linkInput) {
+        linkInput.value = registrationLink;
+    }
+
+    // Mostrar modal simple
+    document.getElementById('qrModal').style.display = 'block';
+}
+
+// Copiar link de registro desde el modal del QR
+function copyLeaderRegistrationLink() {
+    const linkInput = document.getElementById('leaderRegistrationLink');
+    if (!linkInput || !linkInput.value) {
+        showToast('danger', 'No hay enlace para copiar');
+        return;
+    }
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // Para dispositivos m├│viles
+    document.execCommand("copy");
+    showToast('success', 'Enlace copiado al portapapeles');
+}
+
+function copyLeaderLink() {
+    const leaderLink = document.getElementById('leaderLink');
+    if (!leaderLink) {
+        showToast('danger', 'No hay enlace para copiar');
+        return;
+    }
+    leaderLink.select();
+    leaderLink.setSelectionRange(0, 99999); // Para dispositivos m├│viles
+
+    document.execCommand("copy");
+    showToast('success', 'Enlace copiado al portapapeles');
+}
+
+// ===================== ­ƒö╣ Registro p├║blico (registerPerson) =====================
+async function registerPerson() {
+    try {
+        // intento de obtener leaderId de URL o variable global
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLeaderToken = urlParams.get('leader');
+        const leaderId = window.currentLeaderId || null;
+        const leaderToken = urlLeaderToken || null;
+        const firstName = document.getElementById('firstName')?.value || '';
+        const lastName = document.getElementById('lastName')?.value || '';
+        const cedula = document.getElementById('cedula')?.value || '';
+        const email = document.getElementById('email')?.value || '';
+        const phone = document.getElementById('phone')?.value || '';
+        // Localidad: puede ser select con opci├│n 'Otra'
+        const localidadSelect = document.getElementById('localidadSelect');
+        let localidad = '';
+        if (localidadSelect) {
+            if (localidadSelect.value === 'Otra') {
+                localidad = document.getElementById('localidadOtra')?.value || '';
+            } else {
+                localidad = localidadSelect.value || '';
+            }
+        } else {
+            localidad = document.getElementById('localidad') ? document.getElementById('localidad').value : '';
+        }
+        const regRadio = document.querySelector('input[name="registeredToVote"]:checked');
+        const registeredToVote = regRadio ? (regRadio.value === 'true') : false;
+        const votingPlace = document.getElementById('votingPlace') ? document.getElementById('votingPlace').value : '';
+        const votingTable = document.getElementById('votingTable') ? document.getElementById('votingTable').value : '';
+
+        if (!leaderId && !leaderToken) {
+            showToast('danger', 'No se encontr├│ un l├¡der asociado para este registro.');
+            return;
+        }
+
+        // Validaci├│n: si declar├│ que est├í inscrito para votar, debe indicar puesto de votaci├│n
+        if (registeredToVote && !votingPlace) {
+            showToast('danger', 'Si indic├│ que est├í inscrito para votar, por favor indique el puesto de votaci├│n.');
+            return;
+        }
+
+        // Optimistic UX: mostrar ├®xito inmediatamente y realizar verificaci├│n + POST en background.
+        showToast('success', 'Registro guardado');
+        showRegistrationSuccess();
+        try { document.getElementById('registrationForm').reset(); } catch (e) {}
+
+        // Ejecutar validaciones y el POST en background. Si falla algo, revertimos la UI.
+        (async () => {
+            // Validaci├│n: verificar duplicados por tel├®fono
+            try {
+                const checkRes = await fetch(`/api/registrations?phone=${encodeURIComponent(phone)}`);
+                if (checkRes.ok) {
+                    const existingRegs = await checkRes.json();
+                    if (existingRegs.length > 0) {
+                        resetPublicForm();
+                        showToast('danger', 'ÔØî Este n├║mero de tel├®fono ya est├í registrado en el sistema. No se permiten registros duplicados.');
+                        return;
+                    }
+                }
+            } catch (checkErr) {
+                console.error('Error verificando duplicados (continuando):', checkErr);
+                // Continuar con el registro si falla la verificaci├│n
+            }
+
+            // Enviar al backend
+            try {
+                const res = await fetch('/api/registrations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ leaderId, leaderToken, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace, votingTable })
+                });
+
+                if (res.ok) {
+                    try { await updateDashboard(); } catch (e) { console.warn(e); }
+                    // Nothing else to do; success already shown optimistically.
+                } else {
+                    const errorData = await res.json().catch(() => ({}));
+                    resetPublicForm();
+                    showToast('danger', `ÔØî Error al registrar: ${errorData.error || 'Error desconocido'}`);
+                }
+            } catch (postErr) {
+                console.error('Error en POST registerPerson:', postErr);
+                resetPublicForm();
+                showToast('danger', 'ÔØî Error al registrar la persona (problema de red).');
+            }
+        })();
+
+    } catch (err) {
+        console.error('Error registerPerson:', err);
+        resetPublicForm();
+        showToast('danger', 'ÔØî Error al procesar el registro');
+    }
+}
+
+// ===================== ­ƒö╣ Funciones de notificaciones =====================
+// Tracker para evitar mostrar toasts duplicados en ventana corta
+const _recentToasts = new Map(); // message -> timestamp
+
+function showToast(type, message) {
+    // registro r├ípido para depuraci├│n
+    try { console.log('[showToast]', type, message); } catch (e) { /* no bloquear */ }
+
+    const now = Date.now();
+    const last = _recentToasts.get(message) || 0;
+    // Si el mismo mensaje fue mostrado hace menos de 3.5s, ignorar duplicado
+    if (now - last < 3500) {
+        console.log('[showToast] duplicate suppressed:', message);
+        return;
+    }
+    _recentToasts.set(message, now);
+    // Limpiar entradas antiguas (cada llamada)
+    for (const [msg, ts] of _recentToasts) {
+        if (now - ts > 10000) _recentToasts.delete(msg);
+    }
+
+    // We use only the manual toast for visibility and consistent styling.
+    // (Bootstrap toasts were removed to avoid legacy styles appearing.)
+
+    // Adem├ís, crear un toast manual (fallback garantizado) para asegurar visibilidad
+    try {
+        let manualContainer = document.getElementById('manualToastContainer');
+        if (!manualContainer) {
+            manualContainer = document.createElement('div');
+            manualContainer.id = 'manualToastContainer';
+            manualContainer.style.position = 'fixed';
+            manualContainer.style.top = '20px';
+            manualContainer.style.right = '20px';
+            manualContainer.style.zIndex = '30000';
+            manualContainer.style.display = 'flex';
+            manualContainer.style.flexDirection = 'column';
+            manualContainer.style.gap = '8px';
+            document.body.appendChild(manualContainer);
+        }
+
+        // Evitar duplicados manuales: si hay un item con mismo texto, actualizar su timer
+        for (const child of Array.from(manualContainer.children)) {
+            if (child.dataset && child.dataset.msg === message) {
+                // reset timer by removing and recreating visual effect
+                child.style.opacity = '1';
+                child.style.transform = 'translateY(0)';
+                // move to top
+                manualContainer.insertBefore(child, manualContainer.firstChild);
+                return;
+            }
+        }
+
+        const manual = document.createElement('div');
+        manual.className = 'manual-toast-item';
+        manual.dataset.msg = message;
+        manual.style.minWidth = '240px';
+        manual.style.maxWidth = '420px';
+        // Color mapping for toast types
+        let bgStart = '#ff6b6b', bgEnd = '#dc3545';
+        if (type === 'success') { bgStart = '#2dd4bf'; bgEnd = '#198754'; }
+        else if (type === 'warning') { bgStart = '#f6c84c'; bgEnd = '#f59e0b'; }
+        else if (type === 'info') { bgStart = '#38bdf8'; bgEnd = '#0ea5e9'; }
+        manual.style.background = 'linear-gradient(90deg,' + bgStart + ', ' + bgEnd + ')';
+        manual.style.color = 'white';
+        manual.style.padding = '12px 14px';
+        manual.style.borderRadius = '12px';
+        manual.style.boxShadow = '0 10px 30px rgba(0,0,0,0.12)';
+        manual.style.opacity = '0';
+        manual.style.transform = 'translateY(-8px)';
+        manual.style.transition = 'opacity 240ms cubic-bezier(.2,.9,.3,1), transform 240ms cubic-bezier(.2,.9,.3,1)';
+
+        // contenido con icono y texto
+        const inner = document.createElement('div');
+        inner.style.display = 'flex';
+        inner.style.alignItems = 'center';
+        inner.style.gap = '10px';
+
+        const icon = document.createElement('i');
+        let iconClass = 'bi-exclamation-triangle-fill';
+        if (type === 'success') iconClass = 'bi-check-square-fill';
+        else if (type === 'warning') iconClass = 'bi-exclamation-diamond-fill';
+        else if (type === 'info') iconClass = 'bi-info-circle-fill';
+        icon.className = 'bi ' + iconClass;
+        icon.style.fontSize = '20px';
+        icon.style.opacity = '0.95';
+
+        const textWrap = document.createElement('div');
+        const title = document.createElement('div');
+        title.style.fontWeight = '700';
+        title.style.fontSize = '14px';
+        title.textContent = (type === 'success') ? '┬íListo!' : (type === 'warning' ? 'Aviso' : (type === 'info' ? 'Info' : 'Atenci├│n'));
+        const text = document.createElement('div');
+        text.style.fontSize = '13px';
+        text.textContent = message;
+
+        textWrap.appendChild(title);
+        textWrap.appendChild(text);
+        inner.appendChild(icon);
+        inner.appendChild(textWrap);
+
+        // close button
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '├ù';
+        closeBtn.style.marginLeft = '12px';
+        closeBtn.style.background = 'transparent';
+        closeBtn.style.border = 'none';
+        closeBtn.style.color = 'white';
+        closeBtn.style.fontSize = '18px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.onclick = () => { try { manual.remove(); } catch (e) {} };
+
+        const contentLine = document.createElement('div');
+        contentLine.style.display = 'flex';
+        contentLine.style.alignItems = 'center';
+        contentLine.style.justifyContent = 'space-between';
+        contentLine.appendChild(inner);
+        contentLine.appendChild(closeBtn);
+
+        manual.appendChild(contentLine);
+        manualContainer.insertBefore(manual, manualContainer.firstChild);
+
+        // Forzar reflow para activar transici├│n
+        void manual.offsetWidth;
+        manual.style.opacity = '1';
+        manual.style.transform = 'translateY(0)';
+
+        // Auto eliminar despu├®s de 5s
+        setTimeout(() => {
+            manual.style.opacity = '0';
+            manual.style.transform = 'translateY(-8px)';
+            setTimeout(() => { try { manual.remove(); } catch (e) {} }, 260);
+        }, 5000);
+    } catch (e) {
+        console.warn('manual toast error', e);
+    }
+}
+
+// Mostrar / ocultar el campo de puesto de votaci├│n en el formulario p├║blico
+function toggleVotingPlace(show) {
+    const group = document.getElementById('votingPlaceGroup');
+    if (!group) return;
+    group.style.display = show ? 'block' : 'none';
+}
+
+// Mostrar / ocultar el campo de puesto de votaci├│n en el modal admin
+function toggleAdminVotingPlace(show) {
+    const group = document.getElementById('adminVotingPlaceGroup');
+    if (!group) return;
+    group.style.display = show ? 'block' : 'none';
+}
+
+// Mostrar/ocultar campo 'Otra' para localidad (p├║blico)
+function toggleLocalidadOther(value) {
+    const other = document.getElementById('localidadOtra');
+    if (!other) return;
+    other.style.display = (value === 'Otra') ? 'block' : 'none';
+}
+
+// Mostrar/ocultar campo 'Otra' para localidad (admin)
+function toggleAdminLocalidadOther(value) {
+    const other = document.getElementById('adminLocalidadOtra');
+    if (!other) return;
+    other.style.display = (value === 'Otra') ? 'block' : 'none';
+}
+
+async function sendWhatsApp(phone, name) {
+    if (!phone) {
+        showToast("danger", "Este registro no tiene n├║mero de tel├®fono.");
+        return;
+    }
+    const cleaned = String(phone).replace(/[^0-9+]/g, '');
+    const message = encodeURIComponent(`Hola ${name || ''}! Ô£à Gracias por registrarte con nosotros.`);
+    
+    try {
+        // Enviar mensaje a trav├®s del bot de WhatsApp
+        const res = await fetch('http://localhost:4000/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                number: cleaned,
+                message: `Hola ${name || ''}! Ô£à Gracias por registrarte con nosotros.`
+            })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            showToast('success', 'Mensaje de WhatsApp enviado correctamente');
+            // Actualizar contador de mensajes
+            const msgCount = document.getElementById('messagesCount');
+            if (msgCount) msgCount.innerText = (parseInt(msgCount.innerText) || 0) + 1;
+        } else {
+            showToast('danger', 'Error al enviar mensaje de WhatsApp');
+        }
+    } catch (err) {
+        console.error('Error al enviar WhatsApp:', err);
+        showToast('danger', 'Error al conectar con el bot de WhatsApp');
+        // Si falla el bot, usar el m├®todo de respaldo de abrir WhatsApp web
+        window.open(`https://wa.me/${cleaned}?text=${message}`, "_blank");
+    }
+}
+
+// Enviar notificaciones manualmente para un registro
+async function sendNotification(registrationId) {
+    try {
+        console.log('­ƒöä Enviando notificaci├│n para registro:', registrationId);
+        
+        const response = await fetch(`/api/send-notification/${registrationId}`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        console.log('­ƒô¿ Respuesta del servidor:', result);
+        
+        if (result.success) {
+            showToast('success', 'Notificaciones enviadas correctamente');
+            if (result.results?.email?.success) {
+                console.log('Ô£à Email enviado exitosamente');
+            } else if (result.results?.email?.error) {
+                console.log('ÔØî Error en email:', result.results.email.error);
+            }
+        } else {
+            showToast('danger', 'Error enviando notificaciones: ' + (result.error || 'Error desconocido'));
+        }
+    } catch (error) {
+        console.error('­ƒÆÑ Error de conexi├│n:', error);
+        showToast('danger', 'Error de conexi├│n al servidor');
+    }
+}
+
+// Variable global para controlar el modo
+let isPublicRegistrationMode = false;
+
+// Detectar si es una vista p├║blica del formulario
+window.addEventListener("DOMContentLoaded", async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const leaderToken = urlParams.get("leader");
+
+  if (leaderToken) {
+    isPublicRegistrationMode = true;
+    console.log('­ƒÄ» Modo registro p├║blico activado para l├¡der:', leaderToken);
+
+    // Agregar clase al body para aplicar estilos CSS de modo p├║blico
+    document.body.classList.add('public-registration-mode');
+
+        // Guardar token p├║blico para que el submit lo use como fallback
+        try {
+            localStorage.setItem('publicLeaderToken', leaderToken);
+        } catch (e) {
+            console.warn('No se pudo guardar publicLeaderToken en localStorage:', e);
+        }
+
+    // Forzar ocultar landing page y admin panel inmediatamente
+    const landingPage = document.getElementById("landingPage");
+    const adminPanel = document.getElementById("adminPanel");
+    const publicForm = document.getElementById("publicForm");
+
+    if (landingPage) {
+      landingPage.style.display = "none";
+      landingPage.style.visibility = "hidden";
+      landingPage.style.pointerEvents = "none";
+    }
+    if (adminPanel) {
+      adminPanel.style.display = "none";
+      adminPanel.style.visibility = "hidden";
+    }
+    if (publicForm) {
+      publicForm.style.display = "block";
+      publicForm.style.visibility = "visible";
+      publicForm.style.pointerEvents = "auto";
+    }
+
+    // Ocultar cualquier elemento de navegaci├│n admin
+    document.querySelectorAll('.sidebar, [onclick="showAdminPanel()"], [onclick*="goToCreateEvent"], [onclick*="goToViewEvents"]').forEach(el => {
+      el.style.display = 'none';
+      el.style.visibility = 'hidden';
+      el.style.pointerEvents = 'none';
+    });
+
+    // Auto-enfocar el primer campo del formulario
+    setTimeout(() => {
+      const firstInput = document.getElementById('firstName');
+      if (firstInput) {
+        firstInput.focus();
+        firstInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+
+  } else {
+    isPublicRegistrationMode = false;
+    console.log('­ƒÅá Modo landing page normal');
+    document.body.classList.remove('public-registration-mode');
+    // Mostrar landing page solo en modo normal
+    document.getElementById("landingPage").style.display = "flex";
+
+    // Realizar migraci├│n autom├ítica al cargar la p├ígina
+    try {
+      console.log('­ƒöä Iniciando migraci├│n autom├ítica de datos...');
+      const migrateRes = await fetch('/api/migrate', { method: 'POST' });
+      const migrateData = await migrateRes.json();
+
+      if (migrateData.success) {
+        console.log(`Ô£à Migraci├│n completada: ${migrateData.migratedLeaders} l├¡deres, ${migrateData.migratedRegistrations} registros`);
+
+        // Recargar datos despu├®s de migrar
+        setTimeout(() => {
+          if (activeEventId) {
+            loadLeaders();
+            loadRegistrations();
+            updateDashboard();
+          }
+        }, 500);
+      }
+    } catch (err) {
+      console.error('ÔØî Error en migraci├│n:', err);
+    }
+  }
+
+  // Inicializar p├ígina despu├®s de configurar el modo
+  await initializePage();
+});
+
+// ===================== ­ƒö╣ Funciones de An├ílisis de Datos =====================
+// Variables globales para filtrado
+let allRegistrationsData = [];
+let allLeadersData = [];
+let currentFilterLeaderId = '';
+let currentSearchTerm = '';
+let currentConfirmedFilter = '';
+let currentLocalidadFilter = '';
+let leadersPerformanceMinimized = false;
+let autoRefreshInterval = null;
+let lastRegistrationCount = 0;
+let analysisDailyChart = null;
+
+// Detecci├│n de duplicados
+async function detectDuplicates() {
+    try {
+        const res = await fetch(`${API_BASE}/duplicates${activeEventId ? '?eventId=' + activeEventId : ''}`);
+        if (!res.ok) throw new Error('Error al solicitar duplicados');
+        const data = await res.json();
+
+        const container = document.getElementById('duplicatesResults');
+        if (!container) return;
+        if ((!data.byCedula || data.byCedula.length === 0) && (!data.byContact || data.byContact.length === 0)) {
+            container.innerHTML = '<p class="text-muted">No se encontraron duplicados.</p>';
+        } else {
+            let html = '';
+            if (data.byCedula && data.byCedula.length) {
+                html += '<h6>Por C├®dula</h6>';
+                data.byCedula.forEach(group => {
+                    html += `<div class="mb-3 p-2 border rounded">
+                        <strong>C├®dula: ${group.key}</strong> ÔÇö ${group.count} registros
+                        <ul class="mb-0 mt-2">
+                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} ÔÇö ${i.email || ''} ÔÇö ${i.phone || ''} <small class=\"text-muted\">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
+                        </ul>
+                    </div>`;
+                });
+            }
+            if (data.byContact && data.byContact.length) {
+                html += '<h6>Por Email + Tel├®fono</h6>';
+                data.byContact.forEach(group => {
+                    html += `<div class="mb-3 p-2 border rounded">
+                        <strong>Contacto: ${group.key}</strong> ÔÇö ${group.count} registros
+                        <ul class="mb-0 mt-2">
+                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} ÔÇö ${i.email || ''} ÔÇö ${i.phone || ''} <small class=\"text-muted\">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
+                        </ul>
+                    </div>`;
+                });
+            }
+            container.innerHTML = html;
+        }
+
+        new bootstrap.Modal(document.getElementById('duplicatesModal')).show();
+    } catch (err) {
+        console.error('Error detectDuplicates:', err);
+        showToast('danger', 'Error al detectar duplicados');
+    }
+}
+
+async function refreshAnalysis() {
+    try {
+        console.log('Iniciando refreshAnalysis');
+        const [leadersData, registrationsData] = await Promise.all([
+            loadLeaders(),
+            loadRegistrations()
+        ]);
+        
+        // Guardar datos globales para filtrado
+        allLeadersData = leadersData;
+        allRegistrationsData = registrationsData;
+        
+        // Llenar selector de l├¡deres
+        const leaderSelect = document.getElementById('filterLeaderSelect');
+        leaderSelect.innerHTML = '<option value="">-- Todos los L├¡deres --</option>' + 
+            leadersData.map(l => `<option value="${l._id}">${l.name} (${leadersData.filter(ld => ld._id === l._id).length ? leadersData.filter(ld => ld._id === l._id).reduce((acc, li) => acc + (registrationsData.filter(r => r.leaderId === li._id).length), 0) : 0} registros)</option>`).join('');
+
+        // Estad├¡sticas generales
+        const totalLeaders = leadersData.length;
+        const activeLeaders = leadersData.filter(l => l.active).length;
+        const totalRegistrations = registrationsData.length;
+        const confirmedRegs = registrationsData.filter(r => r.confirmed).length;
+        const confirmationRate = totalRegistrations > 0 ? ((confirmedRegs / totalRegistrations) * 100).toFixed(1) : 0;
+        const today = new Date().setHours(0,0,0,0);
+        
+        const todayRegistrations = registrationsData.filter(r => 
+            new Date(r.date).setHours(0,0,0,0) === today
+        ).length;
+
+        // ├Ültima actividad
+        const lastReg = registrationsData.sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+        const lastActivity = lastReg ? `${lastReg.firstName || ''} ${lastReg.lastName || ''}`.trim() : '-';
+        const lastActivityTime = lastReg ? new Date(lastReg.date).toLocaleString('es-CO') : '-';
+
+        // Actualizar cards
+        document.getElementById('totalLeaders').textContent = totalLeaders;
+        document.getElementById('activeLeaders').textContent = `${activeLeaders} activos`;
+        document.getElementById('totalRegistrations').textContent = totalRegistrations;
+        document.getElementById('todayRegistrations').textContent = `${todayRegistrations} hoy`;
+        document.getElementById('confirmedCount').textContent = confirmedRegs;
+        document.getElementById('confirmationRate').textContent = `${confirmationRate}%`;
+        document.getElementById('lastActivity').textContent = lastActivity;
+        document.getElementById('lastActivityTime').textContent = lastActivityTime;
+
+        // Actualizar tabla de l├¡deres
+        updateLeaderAnalysisList(leadersData, registrationsData);
+        
+        // Aplicar filtros iniciales
+        applyFilters();
+
+        // Obtener series diarias y renderizar chart
+        try {
+            const dailyRes = await fetch(`${API_BASE}/stats/daily${activeEventId ? '?eventId=' + activeEventId : ''}`);
+            if (dailyRes.ok) {
+                const dailyData = await dailyRes.json();
+                renderDailyChart(dailyData);
+            }
+        } catch (err) {
+            console.warn('No se pudo obtener series diarias:', err);
+        }
+
+        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras actualizar an├ílisis:', e); }
+
+        // Intentar cargar y mostrar el croquis (GeoJSON) autom├íticamente si est├í disponible
+        try {
+            const mapWrap = document.getElementById('bogotaMapWrapper');
+            const chartWrap = document.getElementById('bogotaChartWrapper');
+            if (mapWrap && chartWrap) {
+                const geo = await ensureBogotaGeo();
+                if (geo) {
+                    mapWrap.style.display = 'block';
+                    chartWrap.style.display = 'none';
+                    try { renderLocalityMap(); } catch(e) { console.warn('Error renderizando mapa autom├íticamente:', e); }
+                } else {
+                    // Mantener fallback en chart si no hay geojson
+                    mapWrap.style.display = 'none';
+                    chartWrap.style.display = 'block';
+                }
+            }
+        } catch (err) {
+            console.warn('Error al intentar mostrar croquis de Bogot├í:', err);
+        }
+
+        showToast('success', 'An├ílisis actualizado');
+    } catch (error) {
+        console.error('Error al actualizar an├ílisis:', error);
+        showToast('danger', 'Error al actualizar an├ílisis');
+    }
+}
+
+function renderDailyChart(dailyData) {
+    try {
+        const labels = dailyData.map(d => d._id);
+        const totals = dailyData.map(d => d.total);
+        const confirmed = dailyData.map(d => d.confirmed);
+
+        const ctx = document.getElementById('analysisDailyChart').getContext('2d');
+        if (analysisDailyChart) {
+            analysisDailyChart.data.labels = labels;
+            analysisDailyChart.data.datasets[0].data = totals;
+            analysisDailyChart.data.datasets[1].data = confirmed;
+            analysisDailyChart.update();
+            return;
+        }
+
+        analysisDailyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Total Registros',
+                        data: totals,
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67,97,238,0.12)',
+                        fill: true,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'Confirmados',
+                        data: confirmed,
+                        borderColor: '#4cc9f0',
+                        backgroundColor: 'rgba(76,201,240,0.12)',
+                        fill: true,
+                        tension: 0.2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { display: true, title: { display: false } },
+                    y: { display: true, beginAtZero: true }
+                }
+            }
+        });
+    } catch (err) {
+        console.error('Error renderDailyChart:', err);
+    }
+}
+
+// Gr├ífico simplificado: porcentaje por localidad (fallback si no hay GeoJSON)
+let localidadesChart = null;
+function renderLocalidadesChart() {
+    try {
+        const { stats, total } = computeLocalidadStats();
+        const entries = Object.keys(stats).map(k => ({ key: k, label: stats[k].label || k, pct: stats[k].pct || 0, count: stats[k].count || 0 })).sort((a,b)=>b.count-a.count);
+        const labels = entries.map(e => e.label);
+        const data = entries.map(e => Number(e.pct.toFixed(2)));
+        const ctxEl = document.getElementById('localidadesChart');
+        if (!ctxEl) return;
+        const ctx = ctxEl.getContext('2d');
+
+        const bgColors = entries.map(e => getColorForPct(e.pct));
+
+        if (localidadesChart) {
+            localidadesChart.data.labels = labels;
+            localidadesChart.data.datasets[0].data = data;
+            localidadesChart.data.datasets[0].backgroundColor = bgColors;
+            localidadesChart.update();
+            return;
+        }
+
+        localidadesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: '% Registros',
+                    data,
+                    backgroundColor: bgColors,
+                    borderColor: bgColors.map(c => c),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const idx = context.dataIndex;
+                                const e = entries[idx];
+                                return `${e.pct.toFixed(2)}% ÔÇö ${e.count} registros`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+                    y: { ticks: { autoSkip: false } }
+                }
+            }
+        });
+    } catch (err) {
+        console.error('Error renderLocalidadesChart:', err);
+    }
+}
+
+
+function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registrations') {
+    const today = new Date().setHours(0,0,0,0);
+    const leaderStats = leaders.map(leader => {
+        const leaderRegs = registrations.filter(r => r.leaderId === leader._id);
+        const confirmedRegs = leaderRegs.filter(r => r.confirmed);
+        const lastReg = leaderRegs.length ? 
+            new Date(Math.max(...leaderRegs.map(r => new Date(r.date)))) : null;
+        
+        const confirmationRate = leaderRegs.length > 0 ? 
+            ((confirmedRegs.length / leaderRegs.length) * 100).toFixed(1) : 0;
+        
+        return {
+            ...leader,
+            registrationCount: leaderRegs.length,
+            confirmedCount: confirmedRegs.length,
+            confirmationRate: confirmationRate,
+            lastRegistration: lastReg,
+            registrations: leaderRegs
+        };
+    });
+
+    if (sortBy === 'registrations') {
+        leaderStats.sort((a, b) => b.registrationCount - a.registrationCount);
+    } else if (sortBy === 'name') {
+        leaderStats.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    const tbody = document.getElementById('leaderAnalysisList');
+    tbody.innerHTML = leaderStats.map(leader => `
+        <tr style="cursor: pointer;" onclick="selectLeaderFilter('${leader._id}')">
+            <td>
+                <strong>${leader.name}</strong>
+                <br>
+                <small class="text-muted">${leader.email}</small>
+            </td>
+            <td>
+                <span class="badge bg-secondary">${leader.area || 'Sin especificar'}</span>
+            </td>
+            <td>
+                <span class="badge bg-primary">${leader.registrationCount}</span>
+            </td>
+            <td>
+                <span class="badge bg-success">${leader.confirmedCount}</span>
+            </td>
+            <td>
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: ${leader.confirmationRate}%"
+                         title="${leader.confirmationRate}%">
+                        ${leader.confirmationRate}%
+                    </div>
+                </div>
+            </td>
+            <td>
+                <small class="text-muted">${leader.lastRegistration ? leader.lastRegistration.toLocaleString('es-CO') : 'Sin registros'}</small>
+            </td>
+            <td>
+                <span class="status-badge ${leader.active ? 'status-active' : 'status-inactive'}">
+                    ${leader.active ? 'Activo Ô£à' : 'Inactivo ÔØî'}
+                </span>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function selectLeaderFilter(leaderId) {
+    document.getElementById('filterLeaderSelect').value = leaderId;
+    filterByLeader();
+}
+
+function filterByLeader() {
+    currentFilterLeaderId = document.getElementById('filterLeaderSelect').value;
+    currentSearchTerm = '';
+    document.getElementById('searchUserName').value = '';
+    applyFilters();
+}
+
+function filterBySearchTerm() {
+    currentSearchTerm = document.getElementById('searchUserName').value.toLowerCase();
+    currentFilterLeaderId = '';
+    document.getElementById('filterLeaderSelect').value = '';
+    applyFilters();
+}
+
+function filterByConfirmed() {
+    currentConfirmedFilter = document.getElementById('filterConfirmedSelect').value;
+    applyFilters();
+}
+
+function applyFilters() {
+    let filtered = [...allRegistrationsData];
+
+    // Filtrar por l├¡der
+    if (currentFilterLeaderId) {
+        filtered = filtered.filter(r => r.leaderId === currentFilterLeaderId);
+    }
+
+    // Filtrar por b├║squeda de nombre
+    if (currentSearchTerm) {
+        filtered = filtered.filter(r => {
+            const fullName = `${r.firstName || ''} ${r.lastName || ''}`.toLowerCase();
+            return fullName.includes(currentSearchTerm);
+        });
+    }
+
+    // Filtrar por localidad (si est├í activo)
+        if (currentLocalidadFilter) {
+        filtered = filtered.filter(r => {
+            const loc = normalizeName(r.localidad || '');
+            return loc === currentLocalidadFilter;
+        });
+    }
+
+    // Filtrar por confirmaci├│n
+    if (currentConfirmedFilter === 'confirmed') {
+        filtered = filtered.filter(r => r.confirmed);
+    } else if (currentConfirmedFilter === 'unconfirmed') {
+        filtered = filtered.filter(r => !r.confirmed);
+    }
+
+    // Ordenar por fecha descendente
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Actualizar t├¡tulo
+    let titleText = 'Todos los Registros';
+    if (currentFilterLeaderId) {
+        const leader = allLeadersData.find(l => l._id === currentFilterLeaderId);
+        titleText = `Registros de ${leader?.name || 'L├¡der'}`;
+    } else if (currentSearchTerm) {
+        titleText = `B├║squeda: "${currentSearchTerm}"`;
+    } else if (currentLocalidadFilter) {
+        // Try to find an example registration to get the pretty localidad name
+        const example = allRegistrationsData.find(r => normalizeName(r.localidad || '') === currentLocalidadFilter);
+        const pretty = example ? (r => r.localidad)(example) : currentLocalidadFilter.split(/[-_]/).map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+        titleText = `Localidad: ${pretty}`;
+    }
+    document.getElementById('selectedLeaderTitle').textContent = titleText;
+    document.getElementById('registroCount').textContent = `${filtered.length} registros`;
+
+    // Actualizar tabla
+    updateFilteredRegistrationsList(filtered);
+}
+
+function updateFilteredRegistrationsList(registrations) {
+    const tbody = document.getElementById('filteredRegistrationsList');
+    
+    if (registrations.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="11" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                    <p>No hay registros que coincidan con los filtros</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = registrations.map((reg, index) => {
+        const confirmed = reg.confirmed ? true : false;
+        const confirmedBy = reg.confirmedBy || '';
+        const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
+        const fullName = `${reg.firstName || ''} ${reg.lastName || ''}`.trim();
+        const localidad = reg.localidad || '-';
+        const votante = reg.registeredToVote ? 'S├¡' : 'No';
+        const votingPlace = reg.votingPlace || '-';
+
+        return `
+            <tr>
+                <td style="text-align: center;"><strong>${index + 1}</strong></td>
+                <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
+                <td>
+                    <strong>${fullName}</strong>
+                </td>
+                <td>
+                    <code>${reg.cedula || 'N/A'}</code>
+                </td>
+                <td>${reg.phone || 'N/A'}</td>
+                <td>${localidad}</td>
+                <td>${votante}</td>
+                <td>${votingPlace}</td>
+                <td>
+                    ${confirmed ? `
+                        <span class="badge bg-success">Asisti├│ ✅</span>
+                    ` : `
+                        <span class="badge bg-secondary">No confirmado</span>
+                    `}
+                </td>
+                <td>
+                    ${confirmedBy ? `
+                        <small class="text-success">${confirmedBy}</small>
+                        <br>
+                        <small class="text-muted">${confirmedAt}</small>
+                    ` : `
+                        <small class="text-muted">-</small>
+                    `}
+                </td>
+                <td style="text-align: center; white-space: nowrap;">
+                    <button class="btn btn-sm btn-outline-primary" onclick="editRegistration('${reg._id}')" title="Editar registro">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')" title="Eliminar registro">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Funci├│n para mostrar detalles de un l├¡der espec├¡fico
+function showLeaderDetails(leaderId) {
+    selectLeaderFilter(leaderId);
+    const leader = allLeadersData.find(l => l._id === leaderId);
+    if (!leader) return;
+    showToast('success', `Mostrando registros de ${leader.name}`);
+}
+
+// Funci├│n para exportar datos de un l├¡der espec├¡fico
+async function exportLeaderData(leaderId) {
+    const leader = allLeadersData.find(l => l._id === leaderId);
+    const leaderRegs = allRegistrationsData.filter(r => r.leaderId === leaderId);
+    
+    try {
+        // Preparar datos para Excel
+        const worksheet = XLSX.utils.json_to_sheet(leaderRegs.map(reg => ({
+            'Fecha': new Date(reg.date).toLocaleString('es-CO'),
+            'Nombre': `${reg.firstName} ${reg.lastName}`,
+            'C├®dula': reg.cedula || '',
+            'Tel├®fono': reg.phone || '',
+            'Email': reg.email || '',
+            'Confirmado': reg.confirmed ? 'S├¡' : 'No',
+            'Confirmado Por': reg.confirmedBy || '',
+            'Confirmado En': reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''
+        })));
+        
+        // Crear libro de Excel
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros');
+        
+        // Guardar archivo
+        const filename = `registros_${leader.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(workbook, filename);
+        
+        showToast('success', 'Datos exportados correctamente');
+    } catch (error) {
+        console.error('Error exportando datos:', error);
+        showToast('danger', 'Error al exportar datos');
+    }
+}
+
+// Exportar registros filtrados mostrados en la tabla
+async function exportFilteredRegistrations() {
+    try {
+        // Obtener los registros que est├ín siendo mostrados (filtrados)
+        const tbody = document.getElementById('filteredRegistrationsList');
+        if (!tbody || tbody.querySelectorAll('tr').length === 0) {
+            showToast('warning', 'No hay registros para exportar');
+            return;
+        }
+
+        // Recopilar datos de las filas mostradas
+        const filteredRegs = [];
+        const rows = tbody.querySelectorAll('tr');
+        
+        for (const row of rows) {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 0) continue; // Saltar filas sin datos
+            
+            // Los ├óndices corresponden a: #, Fecha, Nombre, C├®dula, Tel├®fono, Localidad, ┬┐Votante?, Puesto, Estado, Confirmado Por, Acciones
+            const fullName = cells[2]?.textContent.trim() || '';
+            const fecha = cells[1]?.textContent.trim() || '';
+            const cedula = cells[3]?.textContent.trim() || '';
+            const telefono = cells[4]?.textContent.trim() || '';
+            const localidad = cells[5]?.textContent.trim() || '';
+            const votante = cells[6]?.textContent.trim() || '';
+            const puesto = cells[7]?.textContent.trim() || '';
+            const estado = cells[8]?.textContent.includes('✅') ? 'Asisti├│' : 'No confirmado';
+            const confirmedPor = cells[9]?.textContent.trim() || '-';
+            
+            filteredRegs.push({
+                'Fecha': fecha || '-',
+                'Nombre': fullName,
+                'C├®dula': cedula !== 'N/A' ? cedula : '',
+                'Tel├®fono': telefono !== 'N/A' ? telefono : '',
+                'Localidad': localidad,
+                '┬┐Votante?': votante,
+                'Puesto de Votaci├│n': puesto !== '-' ? puesto : '',
+                'Asistencia': estado,
+                'Confirmado Por': confirmedPor
+            });
+        }
+
+        if (filteredRegs.length === 0) {
+            showToast('warning', 'No hay registros v├ílidos para exportar');
+            return;
+        }
+
+        // Crear worksheet
+        const worksheet = XLSX.utils.json_to_sheet(filteredRegs);
+        
+        // Ajustar ancho de columnas
+        const columnWidths = [15, 20, 20, 15, 15, 18, 15, 22, 18, 20];
+        worksheet['!cols'] = columnWidths.map(w => ({ wch: w }));
+        
+        // Crear workbook
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros Filtrados');
+        
+        // Generar nombre del archivo
+        const titulo = document.getElementById('selectedLeaderTitle')?.textContent || 'Registros';
+        const fecha = new Date().toISOString().slice(0, 10);
+        const filename = `${titulo.replace(/[^a-z0-9]/gi, '_')}_${fecha}.xlsx`;
+        
+        // Descargar archivo
+        XLSX.writeFile(workbook, filename);
+        
+        showToast('success', `Se export├▓ ${filteredRegs.length} registros correctamente`);
+    } catch (error) {
+        console.error('Error exportando registros filtrados:', error);
+        showToast('danger', 'Error al exportar registros');
+    }
+}
+
+function sortLeadersList(criteria) {
+    updateLeaderAnalysisList(allLeadersData, allRegistrationsData, criteria);
+}
+
+function toggleLeadersPerformance() {
+    const body = document.getElementById('leadersPerformanceBody');
+    const btn = document.getElementById('toggleLeadersBtn');
+    
+    if (leadersPerformanceMinimized) {
+        // Expandir
+        body.style.display = 'block';
+        btn.innerHTML = '<i class="bi bi-chevron-down"></i>';
+        document.getElementById('leadersToolbar').style.display = 'flex';
+        leadersPerformanceMinimized = false;
+    } else {
+        // Minimizar
+        body.style.display = 'none';
+        btn.innerHTML = '<i class="bi bi-chevron-right"></i>';
+        document.getElementById('leadersToolbar').style.display = 'none';
+        leadersPerformanceMinimized = true;
+    }
+}
+
+// ===================== ­ƒö╣ Landing Page Functions =====================
+function changeEvent() {
+    // No hacer nada si estamos en modo de registro p├║blico
+    if (isPublicRegistrationMode) return;
+
+    // Limpiar active event y volver a landing
+    localStorage.removeItem('activeEventId');
+    activeEventId = null;
+    activeEvent = null;
+
+    document.getElementById('landingPage').style.display = 'flex';
+    document.getElementById('viewEventsPage').style.display = 'none';
+    document.getElementById('createEventPage').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+
+    showToast('info', 'Selecciona un evento para continuar');
+}
+
+async function refreshEventData() {
+    try {
+        showToast('info', 'Actualizando datos del evento...');
+        await loadLeaders();
+        await loadRegistrations();
+        await updateDashboard();
+        showToast('success', 'Datos del evento actualizados correctamente');
+    } catch (error) {
+        console.error('Error actualizando evento:', error);
+        showToast('danger', 'Error al actualizar los datos del evento');
+    }
+}
+
+function goToCreateEvent() {
+    // No hacer nada si estamos en modo de registro p├║blico
+    if (isPublicRegistrationMode) {
+        console.log('­ƒÜ½ goToCreateEvent() bloqueado - modo registro p├║blico');
+        return;
+    }
+
+    // Mostrar p├ígina de crear evento
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('viewEventsPage').style.display = 'none';
+    document.getElementById('createEventPage').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+
+    // Limpiar formulario
+    const form = document.getElementById('createEventFormPage');
+    if (form) form.reset();
+}
+
+async function saveEventFromPage(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('createEventNameInput')?.value;
+    const date = document.getElementById('createEventDateInput')?.value;
+    const description = document.getElementById('createEventDescriptionInput')?.value;
+    
+    if (!name || !date) {
+        showToast('warning', 'Por favor llena el nombre y la fecha');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/events`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, date, description })
+        });
+        
+        if (response.ok) {
+            const newEvent = await response.json();
+            showToast('success', `Evento "${name}" creado exitosamente`);
+            
+            // Cargar el nuevo evento autom├íticamente
+            setTimeout(() => {
+                selectEventFromLanding(newEvent._id);
+            }, 500);
+        } else {
+            showToast('danger', 'Error al crear el evento');
+        }
+    } catch (error) {
+        console.error('Error creando evento:', error);
+        showToast('danger', 'Error al crear el evento');
+    }
+}
+
+function goToViewEvents() {
+    // No hacer nada si estamos en modo de registro p├║blico
+    if (isPublicRegistrationMode) {
+        console.log('­ƒÜ½ goToViewEvents() bloqueado - modo registro p├║blico');
+        return;
+    }
+
+    // Cargar y mostrar lista de eventos
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('viewEventsPage').style.display = 'block';
+    document.getElementById('createEventPage').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+
+    loadEventsForSelection();
+}
+
+function backToLanding() {
+    // No hacer nada si estamos en modo de registro p├║blico
+    if (isPublicRegistrationMode) {
+        console.log('­ƒÜ½ backToLanding() bloqueado - modo registro p├║blico');
+        return;
+    }
+
+    document.getElementById('landingPage').style.display = 'flex';
+    document.getElementById('viewEventsPage').style.display = 'none';
+    document.getElementById('createEventPage').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+}
+
+async function loadEventsForSelection() {
+    try {
+        const response = await fetch(`${API_BASE}/events`);
+        const events = await response.json();
+        
+        const container = document.getElementById('eventsListContainer');
+        container.innerHTML = '';
+        
+        if (events.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <p class="text-muted">No hay eventos disponibles. Crea uno para comenzar.</p>
+                    <button class="btn btn-primary" onclick="goToCreateEvent()">
+                        <i class="bi bi-plus-circle"></i> Crear Evento
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        events.forEach(event => {
+            const eventCard = document.createElement('div');
+            eventCard.className = 'col-md-6 col-lg-4';
+            eventCard.innerHTML = `
+                <div class="card border-0 shadow-sm cursor-pointer h-100" style="cursor: pointer; transition: transform 0.2s;" 
+                     onmouseover="this.style.transform='translateY(-5px)'" 
+                     onmouseout="this.style.transform='translateY(0)'"
+                     onclick="selectEventFromLanding('${event._id}')">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-calendar-event"></i> ${event.name}
+                        </h5>
+                        <p class="card-text text-muted">
+                            <small>
+                                <i class="bi bi-calendar"></i> ${new Date(event.date).toLocaleDateString('es-CO')}
+                            </small>
+                        </p>
+                        ${event.description ? `<p class="card-text">${event.description}</p>` : ''}
+                        <div class="d-flex gap-2 mt-3">
+                            <button class="btn btn-sm btn-primary flex-grow-1" onclick="selectEventFromLanding('${event._id}'); event.stopPropagation();">
+                                <i class="bi bi-box-arrow-in-right"></i> Entrar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEventFromLanding('${event._id}'); event.stopPropagation();" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(eventCard);
+        });
+    } catch (error) {
+        console.error('Error cargando eventos:', error);
+        showToast('danger', 'Error al cargar los eventos');
+    }
+}
+
+async function selectEventFromLanding(eventId) {
+    // No hacer nada si estamos en modo de registro p├║blico
+    if (isPublicRegistrationMode) return;
+
+    try {
+        localStorage.setItem('activeEventId', eventId);
+        activeEventId = eventId;
+        
+        // Cargar evento desde servidor
+        const evRes = await fetch(`${API_BASE}/events`);
+        const events = await evRes.json();
+        activeEvent = events.find(e => String(e._id) === String(eventId)) || null;
+        
+        // Cargar datos del evento
+        await loadLeaders();
+        await loadRegistrations();
+        await updateDashboard();
+        
+        // Mostrar dashboard
+        document.getElementById('landingPage').style.display = 'none';
+        document.getElementById('viewEventsPage').style.display = 'none';
+        document.getElementById('createEventPage').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        
+        showSection('dashboard');
+        showToast('success', `Evento "${activeEvent?.name}" cargado correctamente`);
+    } catch (error) {
+        console.error('Error seleccionando evento:', error);
+        showToast('danger', 'Error al seleccionar el evento');
+    }
+}
+
+async function deleteEventFromLanding(eventId) {
+    if (!confirm('┬┐Est├ís seguro de que deseas eliminar este evento? Se perder├ín todos los datos asociados.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/events/${eventId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showToast('success', 'Evento eliminado correctamente');
+            loadEventsForSelection();
+        } else {
+            showToast('danger', 'Error al eliminar el evento');
+        }
+    } catch (error) {
+        console.error('Error eliminando evento:', error);
+        showToast('danger', 'Error al eliminar el evento');
+    }
+}
+
+// Funci├│n para inicializar la p├ígina
+async function initializePage() {
+    // No inicializar si estamos en modo de registro p├║blico
+    if (isPublicRegistrationMode) {
+        console.log('­ƒÜ½ initializePage() bloqueado - modo registro p├║blico activo');
+        return;
+    }
+
+    try {
+        // Cargar eventos y si hay un evento activo, cargar datos del mismo
+        await loadEvents();
+        if (activeEventId) {
+            // cargar evento activo desde server
+            try {
+                const evRes = await fetch(`${API_BASE}/events`);
+                const events = await evRes.json();
+                activeEvent = events.find(e => String(e._id) === String(activeEventId)) || null;
+            } catch (e) {
+                console.warn('No se pudo cargar evento activo desde server');
+            }
+            await loadLeaders();
+            await loadRegistrations();
+            await updateDashboard();
+            
+            // Mostrar dashboard
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('viewEventsPage').style.display = 'none';
+            document.getElementById('createEventPage').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            
+            showSection('dashboard');
+        } else {
+            // Mostrar p├ígina de inicio (landing page)
+            document.getElementById('landingPage').style.display = 'flex';
+            document.getElementById('viewEventsPage').style.display = 'none';
+            document.getElementById('createEventPage').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error inicializando la p├ígina:', error);
+        showToast('danger', 'Error cargando los datos iniciales');
+    }
+}
+
+// Cargar datos iniciales - MOVIDO DENTRO DE DOMContentLoaded
+// initializePage();
+
+// Iniciar auto-refresh autom├ítico
+startAutoRefresh();
+
+// ===================== ­ƒö╣ Click handlers para tarjetas =====================
+(function(){
+    var activeCard = document.getElementById('activeLeadersCard');
+    if (activeCard) activeCard.addEventListener('click', function() {
+        document.getElementById('leadersSection').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    var regsCard = document.getElementById('registrationsCard');
+    if (regsCard) regsCard.addEventListener('click', function() {
+        document.getElementById('registrationsSection').scrollIntoView({ behavior: 'smooth' });
+    });
+})();
+
+// Funci├│n para editar l├¡der
+async function editLeader(id) {
+  const leader = leaders.find(l => l._id === id);
+  if (!leader) return;
+
+  const nuevoNombre = prompt("Editar nombre del l├¡der:", leader.name);
+  if (!nuevoNombre) return;
+
+  const res = await fetch(`${API_BASE}/leaders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ _id: id, name: nuevoNombre, token: leader.token, registrations: leader.registrations })
+  });
+
+  const updated = await res.json();
+  leaders = leaders.map(l => (l._id === updated._id ? updated : l));
+  updateLeadersTable();
+  showToast('success', 'L├¡der actualizado correctamente');
+}
+
+async function sendQRToLeader(leaderId) {
+    try {
+        const leader = leaders.find(l => l._id === leaderId);
+        if (!leader) {
+            showToast('danger', 'No se encontr├│ el l├¡der');
+            return;
+        }
+
+        const response = await fetch(`/api/leaders/${leaderId}/send-qr`, {
+            method: 'POST'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            let mensaje = 'QR enviado';
+            if (result.whatsappSent) mensaje += ' por WhatsApp';
+            if (result.emailSent) mensaje += ' por email';
+            showToast('success', mensaje);
+        } else {
+            showToast('danger', result.error || 'Error al enviar QR');
+        }
+    } catch (error) {
+        console.error('Error enviando QR:', error);
+        showToast('danger', 'Error al enviar QR');
+    }
+}
+
+// Funciones para confirmar/desconfirmar asistencia
+async function confirmRegistration(regId) {
+    try {
+        const reg = allRegistrationsData.find(r => r._id === regId);
+        if (!reg) {
+            showToast('danger', 'Registro no encontrado');
+            return;
+        }
+
+        // Pedir qui├®n confirma
+        const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
+        if (!confirmer) return;
+
+        const res = await fetch(`${API_BASE}/registrations/${regId}/confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ confirmedBy: confirmer })
+        });
+
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            console.error('Confirm failed', res.status, text);
+            showToast('danger', 'Error al confirmar asistencia');
+            return;
+        }
+
+        await loadRegistrations();
+        applyFilters();
+        showToast('success', 'Asistencia confirmada');
+    } catch (err) {
+        console.error('Error confirmando registro:', err);
+        showToast('danger', 'Error al confirmar asistencia');
+    }
+}
+
+async function toggleConfirm(regId, value) {
+    try {
+        const reg = allRegistrationsData.find(r => r._id === regId);
+        if (!reg) {
+            showToast('danger', 'Registro no encontrado');
+            return;
+        }
+
+        if (value) {
+            // confirmar
+            const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
+            if (!confirmer) return;
+            
+            const res = await fetch(`${API_BASE}/registrations/${regId}/confirm`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ confirmedBy: confirmer })
+            });
+
+            if (!res.ok) {
+                showToast('danger', 'Error al confirmar asistencia');
+                return;
+            }
+        } else {
+            // desconfirmar
+            const res = await fetch(`${API_BASE}/registrations/${regId}/unconfirm`, {
+                method: 'POST'
+            });
+
+            if (!res.ok) {
+                showToast('danger', 'Error al desconfirmar asistencia');
+                return;
+            }
+        }
+
+        await loadRegistrations();
+        applyFilters();
+        showToast('success', value ? 'Confirmado' : 'Desconfirmado');
+    } catch (err) {
+        console.error('Error toggling confirm:', err);
+        showToast('danger', 'Error actualizando confirmaci├│n');
+    }
+}
