@@ -4,430 +4,207 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Red Social y Política</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- QR Code Library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <!-- Leaflet CSS/JS for maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Excel Export -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --info: #4895ef;
-            --warning: #f4a261;
-            --light: #f8f9fa;
-            --dark: #212529;
-        }
-        
-        /* Estilos para la sección de análisis */
-        #analysisSection .card {
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            transition: all 0.3s ease;
-        }
-        
-        #analysisSection .card:hover {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-        
-        #analysisSection .display-4 {
-            font-size: 2.5rem;
-            font-weight: 300;
-            line-height: 1.2;
-            color: var(--primary);
-        }
-        
-        #analysisSection .border-primary {
-            border-top: 3px solid var(--primary) !important;
-        }
-        
-        #analysisSection .border-success {
-            border-top: 3px solid var(--success) !important;
-        }
-        
-        #analysisSection .border-info {
-            border-top: 3px solid var(--info) !important;
-        }
-        
-        #analysisSection .border-warning {
-            border-top: 3px solid var(--warning) !important;
-        }
-        /* Bogotá map & SVG label styles */
-        #bogotaMap {
-            border-radius: 8px;
-            box-shadow: 0 6px 18px rgba(17,20,33,0.06);
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
-        }
-        #bogotaMap:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(17,20,33,0.10); }
-        .svg-label {
-            font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial;
-            font-size: 13px;
-            fill: #ffffff;
-            stroke: rgba(0,0,0,0.55);
-            stroke-width: 1px;
-            paint-order: stroke;
-            pointer-events: none;
-            font-weight: 700;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.28));
-        }
-        .svg-label-rect {
-            fill: rgba(0,0,0,0.42);
-            stroke: rgba(255,255,255,0.04);
-        }
-        .svg-label.hidden { display: none; }
-        .loc-selected { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
-        #svgLabelsToggle {
-            box-shadow: 0 4px 12px rgba(2,6,23,0.06);
-            backdrop-filter: blur(4px);
-        }
-        
-        #analysisSection .table th {
-            border-top: none;
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
+    // ================= SVG croquis interactions =================
+    function attachSvgInteractions() {
+        try {
+            // localizar el SVG (inline o insertado dinámicamente)
+            const svg = document.getElementById('bogotaCroquis') || document.getElementById('bogotaCroquisInline') || document.querySelector('#bogotaMap svg');
+            if (!svg) return;
 
-        /* Hacer la sección de análisis desplazable internamente */
-        #analysisSection {
-            max-height: calc(100vh - 220px);
-            overflow-y: auto;
-            padding-right: 12px; /* espacio para el scrollbar */
-        }
-        
-        #analysisSection .progress {
-            height: 4px;
-            margin-top: 0.5rem;
-        }
-        
-        .status-badge {
-            padding: 0.25em 0.6em;
-            font-size: 0.75em;
-            font-weight: 600;
-            border-radius: 0.25rem;
-        }
-        
-        .status-active {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .status-inactive {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            overflow: auto; /* permitir scroll general */
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fb;
-        }
-        
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 0.75rem 1rem;
-            margin: 0.25rem 0;
-            border-radius: 0.5rem;
-        }
-        
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar .nav-link i {
-            margin-right: 0.5rem;
-        }
-        
-        .main-content {
-            padding: 2rem;
-        }
-        
-        .card {
-            border: none;
-            border-radius: 0.75rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 1.5rem;
-        }
-        
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            font-weight: 600;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem 0.75rem 0 0 !important;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            color: white;
-            margin-bottom: 1.5rem;
-        }
-        
-        .stat-card.blue {
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
-        }
-        
-        .stat-card.green {
-            background: linear-gradient(135deg, #4cc9f0, #4895ef);
-        }
-        
-        .stat-card.purple {
-            background: linear-gradient(135deg, #7209b7, #560bad);
-        }
-        
-        .stat-card .number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0.5rem 0;
-        }
-        
-        .table th {
-            border-top: none;
-            font-weight: 600;
-            color: var(--dark);
-            background-color: rgba(67, 97, 238, 0.05);
-        }
-        
-        .badge-active {
-            background-color: #4bb543;
-        }
-        
-        .badge-inactive {
-            background-color: #ff6b6b;
-        }
-        
-        .qr-code {
-            display: inline-block;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .public-form {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .public-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
-        }
-        
-        .form-section {
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .form-section-title {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-        
-        .leader-card {
-            transition: transform 0.2s;
-        }
-        
-        .leader-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        /* Ocultar completamente landing page en modo público */
-        .public-registration-mode #landingPage,
-        .public-registration-mode #createEventPage,
-        .public-registration-mode #viewEventsPage {
-            display: none !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-        }
-
-        .public-registration-mode #adminPanel {
-            display: none !important;
-            visibility: hidden !important;
-        }
-
-        .public-registration-mode #publicForm {
-            display: block !important;
-            visibility: visible !important;
-        }
-
-        /* Mejoras de usabilidad táctil en móviles */
-        @media (max-width: 576px) {
-            .form-control {
-                padding: 0.75rem 0.85rem;
-                font-size: 1rem;
-                min-height: 44px;
+            // tooltip singleton
+            let tip = document.getElementById('svgMapTooltip');
+            if (!tip) {
+                tip = document.createElement('div');
+                tip.id = 'svgMapTooltip';
+                Object.assign(tip.style, {
+                    position: 'absolute',
+                    pointerEvents: 'none',
+                    padding: '6px 8px',
+                    background: 'rgba(0,0,0,0.75)',
+                    color: '#fff',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    display: 'none',
+                    zIndex: 30000
+                });
+                document.body.appendChild(tip);
             }
 
-            .form-label { font-size: 0.95rem; }
-
-            .form-section { margin-bottom: 1rem; }
-
-            .btn {
-                padding: 0.65rem 0.9rem;
-                font-size: 1rem;
-                border-radius: 10px;
+            // helper: collect shape targets (group element + inner shapes)
+            function getInteractiveTargets(element) {
+                const targets = [];
+                const tag = (element.tagName || '').toLowerCase();
+                const shapeTags = ['path','polygon','rect','circle','ellipse'];
+                if (shapeTags.includes(tag)) targets.push(element);
+                if (element.querySelectorAll) {
+                    element.querySelectorAll('path,polygon,rect,circle,ellipse').forEach(n => targets.push(n));
+                }
+                if (targets.length === 0) targets.push(element);
+                return targets;
             }
 
-            /* Botones principales a ancho completo para facilidad táctil */
-            .public-form .btn, .d-grid .btn { width: 100% !important; }
-
-            /* Inputs de formularios en admin también más altos */
-            #adminRegistrationForm .form-control { min-height: 44px; }
-        }
-        /* Mobile sidebar / top bar */
-        #mobileTopBar {
-            display: none;
-        }
-
-        @media (max-width: 767.98px) {
-            body { padding-top: 56px; }
-            #mobileTopBar { display: flex; position: fixed; top: 0; left: 0; right: 0; z-index: 11000; background: white; border-bottom: 1px solid rgba(0,0,0,0.06); align-items: center; padding: 8px 12px; }
-            #mobileTopBar .app-title { font-weight: 700; font-size: 1rem; }
-            .sidebar {
-                position: fixed; left: -320px; top: 0; height: 100vh; width: 280px; z-index: 12000; transition: left 220ms ease; box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-            }
-            .sidebar.open { left: 0; }
-            .main-content { padding-top: 0; }
-            /* small overlay when sidebar open */
-            #sidebarBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.32); z-index: 11900; display: none; }
-            #sidebarBackdrop.visible { display: block; }
-        }
-        /* Responsive adjustments for mobile devices */
-        /* Make manual toasts more accessible on small screens and avoid covering content */
-        #manualToastContainer {
-            /* default set by JS; these CSS rules ensure better mobile placement */
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            pointer-events: none; /* allow clicks to pass through gaps */
-        }
-
-        .manual-toast-item {
-            pointer-events: auto;
-        }
-
-        @media (max-width: 576px) {
-            /* On small devices place toasts near the bottom and widen them */
-            #manualToastContainer {
-                left: 12px !important;
-                right: 12px !important;
-                top: auto !important;
-                bottom: 12px !important;
-                align-items: stretch;
-                z-index: 40000;
+            // ensure pointer-events for a target and give transparent fill if needed
+            function makeTargetInteractive(t) {
+                try {
+                    t.style.pointerEvents = 'all';
+                    t.setAttribute('pointer-events', 'all');
+                    const curFill = (t.getAttribute('fill') || '').trim().toLowerCase();
+                    if (!curFill || curFill === 'none') {
+                        // fill nearly transparent so small/stroke-only shapes capture events
+                        t.setAttribute('fill', '#ffffff');
+                        t.setAttribute('fill-opacity', '0.01');
+                    }
+                } catch (e) { /* no bloquear */ }
             }
 
-            .manual-toast-item {
-                min-width: 0 !important;
-                max-width: none !important;
-                width: 100% !important;
-                border-radius: 10px !important;
-                box-shadow: 0 8px 24px rgba(0,0,0,0.14) !important;
-                padding: 10px 12px !important;
-            }
+            const items = Array.from(svg.querySelectorAll('[data-name]'));
+            items.forEach(el => {
+                const name = el.getAttribute('data-name') || '';
+                try { el.setAttribute('tabindex', '0'); } catch(e) {}
 
-            .manual-toast-item .bi {
-                font-size: 18px !important;
-            }
+                const targets = getInteractiveTargets(el);
+                targets.forEach(makeTargetInteractive);
 
-            /* Success screen: reduce padding and stack buttons */
-            #registrationSuccessScreen {
-                padding: 1rem !important;
-            }
+                // handlers using closure over `el` and `name`
+                function showTipFor(ev) {
+                    try {
+                        const { stats } = computeLocalidadStats();
+                        const key = normalizeName(name || '');
+                        const s = stats[key] || { voterPct: 0, voters: 0, count: 0 };
+                        tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
+                        tip.style.display = 'block';
+                        tip.style.left = (ev.pageX + 12) + 'px';
+                        tip.style.top = (ev.pageY + 12) + 'px';
+                        // subtle highlight
+                        targets.forEach(sh => { try { sh.setAttribute('stroke', 'rgba(0,0,0,0.12)'); sh.setAttribute('stroke-width', '0.4'); } catch(_){} });
+                    } catch (e) { console.warn('showTipFor error', e); }
+                }
+                function moveTip(ev) {
+                    tip.style.left = (ev.pageX + 12) + 'px';
+                    tip.style.top = (ev.pageY + 12) + 'px';
+                }
+                function hideTip() {
+                    try { tip.style.display = 'none'; } catch(e){}
+                    // restore subtle default (no stroke)
+                    targets.forEach(sh => { try { sh.setAttribute('stroke', 'none'); sh.setAttribute('stroke-width', '0'); } catch(_){} });
+                }
+                function clickHandler(ev) {
+                    ev.stopPropagation();
+                    try {
+                        const { stats } = computeLocalidadStats();
+                        const key = normalizeName(name || '');
+                        const s = stats[key] || { voterPct: 0, voters: 0, count: 0 };
+                        if (currentLocalidadFilter === key) {
+                            currentLocalidadFilter = '';
+                            showToast('info', `Filtro eliminado: ${name}`);
+                        } else {
+                            currentLocalidadFilter = key;
+                            showToast('info', `Filtrando por ${name}: ${s.count} registros — ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
+                        }
+                        // badge UI
+                        try {
+                            const mapWrap = document.getElementById('bogotaMapWrapper');
+                            if (mapWrap) {
+                                let badge = document.getElementById('localidadFilterBadge');
+                                if (!badge) {
+                                    badge = document.createElement('div');
+                                    badge.id = 'localidadFilterBadge';
+                                    Object.assign(badge.style, { position:'absolute', top:'8px', right:'8px', zIndex:25000,
+                                        padding:'6px 10px', background:'rgba(0,0,0,0.6)', color:'#fff', borderRadius:'18px', fontSize:'13px', display:'inline-flex', alignItems:'center', gap:'8px'});
+                                    const clr = document.createElement('button');
+                                    clr.type = 'button';
+                                    clr.className = 'btn btn-sm btn-light';
+                                    clr.style.padding = '2px 6px';
+                                    clr.style.fontSize = '12px';
+                                    clr.innerText = 'Limpiar';
+                                    clr.onclick = (e) => { e.stopPropagation(); currentLocalidadFilter = ''; applyFilters(); badge.style.display = 'none'; colorSvgByStats(); };
+                                    badge.appendChild(document.createElement('span'));
+                                    badge.appendChild(clr);
+                                    mapWrap.appendChild(badge);
+                                }
+                                const label = badge.querySelector('span');
+                                if (currentLocalidadFilter) {
+                                    label.innerText = `${name}`;
+                                    badge.style.display = 'inline-flex';
+                                } else {
+                                    badge.style.display = 'none';
+                                }
+                            }
+                        } catch(e) { console.warn('badge error', e); }
 
-            #registrationSuccessScreen > div {
-                padding: 1rem !important;
-            }
+                        applyFilters();
+                        colorSvgByStats();
+                    } catch (e) { console.warn('clickHandler error', e); }
+                }
 
-            #registrationSuccessScreen .btn {
-                width: 100% !important;
-                margin-bottom: 0.5rem !important;
-            }
+                // attach events to targets (covers group and inner shapes)
+                targets.forEach(t => {
+                    t.addEventListener('mouseover', showTipFor);
+                    t.addEventListener('mousemove', moveTip);
+                    t.addEventListener('mouseout', hideTip);
+                    t.addEventListener('click', clickHandler);
+                    t.addEventListener('keydown', (kev) => {
+                        if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
+                            kev.preventDefault();
+                            clickHandler({ stopPropagation: ()=>{}, preventDefault: ()=>{} });
+                        }
+                    });
+                });
 
-            #registrationSuccessScreen .btn + .btn {
-                margin-left: 0 !important;
-            }
-        }
-        /* SVG map labels and tooltip styles */
-        .svg-label { font-family: Arial, Helvetica, sans-serif; font-size: 12px; fill: #ffffff; pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: rgba(0,0,0,0.08); stroke-width: 0.8px; dominant-baseline: central; font-weight:600; text-shadow: 0 1px 0 rgba(0,0,0,0.06);} 
-        .svg-label.hidden { display: none; }
-        #svgMapTooltip { background: rgba(0,0,0,0.78); color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 13px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
-        /* Localidades list box */
-        #localidadesBox { font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial; }
-        /* Transition and positioning helpers for the panel (hidden by default) */
-        #localidadesBox { transition: transform 0.18s ease, opacity 0.18s ease; }
-        #localidadesBox.hidden { display: none !important; opacity: 0; transform: translateX(-8px); }
-        #localidadesBox.visible { display: block !important; opacity: 1; transform: translateX(0); }
-        .localidades-item { background: transparent; border-radius: 6px; }
-        .localidades-item:hover { background: rgba(6,24,12,0.04); cursor: pointer; }
-        /* SVG area subtle styling: no aggressive borders, smooth transitions */
-        .svg-area { transition: stroke 140ms ease, stroke-width 140ms ease, filter 150ms ease; stroke: none; }
-        .svg-area.loc-selected { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.14)); }
-    </style>
-</head>
-<body>
-    <!-- Barra superior móvil: botón hamburguesa para mostrar el sidebar en pantallas pequeñas -->
-    <div id="mobileTopBar" class="d-md-none">
+                // accessibility: group focus/click
+                try {
+                    el.addEventListener('focus', (ev) => showTipFor(ev || { pageX: window.innerWidth/2, pageY: window.innerHeight/2 }));
+                    el.addEventListener('blur', hideTip);
+                    el.addEventListener('click', clickHandler);
+                } catch(e) {}
+            });
+
+            // colorizar áreas según stats
+            try { colorSvgByStats(svg); } catch(e) { console.warn('colorSvgByStats failed', e); }
+
+            // crear etiquetas en mapa y panel izquierdo si no existen (silencioso a errores)
+            try {
+                const mapWrap = document.getElementById('bogotaMapWrapper');
+                if (mapWrap) {
+                    // crear lista de localidades en panel si no existe
+                    if (!document.getElementById('localidadesBox')) {
+                        const box = document.createElement('div');
+                        box.id = 'localidadesBox';
+                        Object.assign(box.style, { position:'absolute', left:'12px', top:'12px', width:'260px', maxHeight:'68%', overflow:'auto',
+                            background:'rgba(255,255,255,0.96)', borderRadius:'10px', boxShadow:'0 10px 30px rgba(2,6,23,0.08)', zIndex:26000, padding:'8px', display:'none' });
+                        const title = document.createElement('div'); title.innerText = 'Localidades'; title.style.fontWeight = '700'; title.style.marginBottom = '6px';
+                        box.appendChild(title);
+                        mapWrap.appendChild(box);
+                    }
+                }
+                // labels in-map
+                const labelsGroupId = 'labels-group';
+                let labelsGroup = svg.querySelector('#' + labelsGroupId);
+                if (labelsGroup) labelsGroup.remove();
+                labelsGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+                labelsGroup.setAttribute('id', labelsGroupId);
+                svg.appendChild(labelsGroup);
+                const shapes = Array.from(svg.querySelectorAll('[data-name]'));
+                shapes.forEach(s => {
+                    try {
+                        s.style.pointerEvents = 'all'; s.setAttribute('pointer-events','all');
+                        const name = s.getAttribute('data-name') || '';
+                        let bx = null;
+                        try { bx = s.getBBox(); } catch(e) { bx = null; }
+                        const cx = bx ? (bx.x + bx.width/2) : 0;
+                        const cy = bx ? (bx.y + bx.height/2) : 0;
+                        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+                        t.setAttribute('x', cx); t.setAttribute('y', cy);
+                        t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+                        t.setAttribute('class','svg-label'); t.setAttribute('style','pointer-events:none; font-family:Inter, Arial; font-size:11px; fill:#123; font-weight:700;');
+                        t.textContent = name;
+                        labelsGroup.appendChild(t);
+                    } catch(e) {}
+                });
+            } catch(e) { console.warn('labels creation failed', e); }
+
+        } catch (err) { console.warn('attachSvgInteractions error', err); }
+    }
         <button id="sidebarToggle" class="btn btn-outline-secondary me-2" style="padding:6px 8px;"><i class="bi bi-list"></i></button>
         <div class="app-title">Red Social y Política</div>
     </div>
@@ -553,7 +330,7 @@
         </div>
         <div class="container-fluid mt-5 pb-5">
             <div id="eventsListContainer" class="row g-4">
-                <!-- Lista de eventos se cargará aquí dinámicamente -->
+                <!-- Lista de eventos se cargará dinámicamente -->
             </div>
         </div>
     </div>
@@ -608,7 +385,6 @@
                     </button>
                 </div>
             </div>
-        </div>
         
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10 main-content">
@@ -689,7 +465,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="recentActivity">
-                                            <!-- Los datos se cargarán dinámicamente -->
+                                            <!-- Los datos se cargará dinámicamente -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -738,7 +514,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="leadersTableBody">
-                                    <!-- Los datos se cargarán dinámicamente -->
+                                    <!-- Los datos se cargará dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -774,13 +550,13 @@
                                         <th>Localidad</th>
                                         <th>¿Votante?</th>
                                         <th>Puesto Votación</th>
-                                        <th>Nº Mesa</th>
-                                        <th>Confirmado</th>
+                                        <th>Estado</th>
+                                        <th>Confirmado Por</th>
                                         <th>Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody id="registrationsTableBody">
-                                    <!-- Los datos se cargarán dinámicamente -->
+                                    <!-- Los datos se cargará dinámicamente -->
                                 </tbody>
                             </table>
                         </div>
@@ -801,6 +577,10 @@
                                 <i class="bi bi-search"></i> Detectar Duplicados
                             </button>
                         </div>
+                        <!-- Botón para exportar registros del líder seleccionado -->
+                        <button type="button" class="btn btn-sm btn-outline-success ms-2" onclick="exportCurrentLeaderRegs()" title="Exportar registros del líder seleccionado">
+                            <i class="bi bi-download"></i> Exportar registros del líder
+                        </button>
                     </div>
                 </div>
 
@@ -1763,28 +1543,30 @@ function onEachFeature(feature, layer) {
     // ================= SVG croquis interactions =================
     function attachSvgInteractions() {
         try {
-            // Support multiple possible svg ids (external file or inline)
+            // localizar el SVG (inline o insertado dinámicamente)
             const svg = document.getElementById('bogotaCroquis') || document.getElementById('bogotaCroquisInline') || document.querySelector('#bogotaMap svg');
             if (!svg) return;
-            // Tooltip element
+
+            // tooltip singleton
             let tip = document.getElementById('svgMapTooltip');
             if (!tip) {
                 tip = document.createElement('div');
                 tip.id = 'svgMapTooltip';
-                tip.style.position = 'absolute';
-                tip.style.pointerEvents = 'none';
-                tip.style.padding = '6px 8px';
-                tip.style.background = 'rgba(0,0,0,0.75)';
-                tip.style.color = 'white';
-                tip.style.borderRadius = '4px';
-                tip.style.fontSize = '12px';
-                tip.style.display = 'none';
-                tip.style.zIndex = 30000;
+                Object.assign(tip.style, {
+                    position: 'absolute',
+                    pointerEvents: 'none',
+                    padding: '6px 8px',
+                    background: 'rgba(0,0,0,0.75)',
+                    color: '#fff',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    display: 'none',
+                    zIndex: 30000
+                });
                 document.body.appendChild(tip);
             }
 
-            const items = svg.querySelectorAll('[data-name]');
-            // helper: find shapes to attach events to (element itself + inner shape children)
+            // helper: collect shape targets (group element + inner shapes)
             function getInteractiveTargets(element) {
                 const targets = [];
                 const tag = (element.tagName || '').toLowerCase();
@@ -1793,75 +1575,61 @@ function onEachFeature(feature, layer) {
                 if (element.querySelectorAll) {
                     element.querySelectorAll('path,polygon,rect,circle,ellipse').forEach(n => targets.push(n));
                 }
-                // fallback to the element itself
                 if (targets.length === 0) targets.push(element);
                 return targets;
             }
 
-            items.forEach(el => {
-                const name = el.getAttribute('data-name');
-                try { el.setAttribute('tabindex', '0'); } catch(e){}
-                // Ensure the element itself (or its child shapes) will capture pointer events
-                getInteractiveTargets(el).forEach(t => {
-                    try {
-                        t.style.pointerEvents = 'all';
-                        t.setAttribute('pointer-events', 'all');
-                        const curFill = (t.getAttribute('fill') || '').trim().toLowerCase();
-                        if (!curFill || curFill === 'none') {
-                            // give a nearly-transparent fill so the shape captures mouse events reliably
-                            t.setAttribute('fill', '#ffffff');
-                            t.setAttribute('fill-opacity', '0.01');
-                        }
-                    } catch(e){}
-                });
+            // ensure pointer-events for a target and give transparent fill if needed
+            function makeTargetInteractive(t) {
+                try {
+                    t.style.pointerEvents = 'all';
+                    t.setAttribute('pointer-events', 'all');
+                    const curFill = (t.getAttribute('fill') || '').trim().toLowerCase();
+                    if (!curFill || curFill === 'none') {
+                        // fill nearly transparent so small/stroke-only shapes capture events
+                        t.setAttribute('fill', '#ffffff');
+                        t.setAttribute('fill-opacity', '0.01');
+                    }
+                } catch (e) { /* no bloquear */ }
+            }
 
-                // Attach events to the interactive targets (so both group and inner paths respond)
+            const items = Array.from(svg.querySelectorAll('[data-name]'));
+            items.forEach(el => {
+                const name = el.getAttribute('data-name') || '';
+                try { el.setAttribute('tabindex', '0'); } catch(e) {}
+
                 const targets = getInteractiveTargets(el);
-                targets.forEach(targetEl => {
-                    targetEl.addEventListener('mouseover', (ev) => {
-                    // store original fill/stroke so we can restore later
-                    el.__origFill = el.getAttribute('fill') || el.style.fill;
-                    el.__origStroke = el.getAttribute('stroke') || '';
-                    el.__origStrokeWidth = el.getAttribute('stroke-width') || '';
-                    // subtle visual feedback without making the border aggressive
-                    try { el.style.filter = 'brightness(0.98)'; } catch(e){}
-                    const { stats } = computeLocalidadStats();
-                    const key = normalizeName(name || '');
-                    const s = stats[key] || { voterPct: 0, voters:0, count:0 };
-                    tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
-                    tip.style.display = 'block';
-                    // show a very subtle stroke for small-area visibility
+                targets.forEach(makeTargetInteractive);
+
+                // handlers using closure over `el` and `name`
+                function showTipFor(ev) {
                     try {
-                        if (!(currentLocalidadFilter && currentLocalidadFilter === key)) {
-                            el.setAttribute('stroke', 'rgba(0,0,0,0.18)');
-                            el.setAttribute('stroke-width', '0.5');
-                        }
-                    } catch(e){}
-                    });
-                    targetEl.addEventListener('mousemove', (ev) => {
-                        tip.style.left = (ev.pageX + 12) + 'px';
-                        tip.style.top = (ev.pageY + 12) + 'px';
-                    });
-                    targetEl.addEventListener('mouseout', (ev) => {
-                        try { el.style.filter = ''; } catch(e){}
-                        tip.style.display = 'none';
-                        // restore previous stroke unless it's selected
-                        try {
-                            const key = normalizeName(name || '');
-                            if (currentLocalidadFilter && currentLocalidadFilter === key) {
-                                // keep selected styling (handled elsewhere)
-                            } else {
-                                // restore on the actual shape elements
-                                getInteractiveTargets(el).forEach(sh => { try { sh.setAttribute('stroke', 'none'); sh.setAttribute('stroke-width', '0'); } catch(_){} });
-                            }
-                        } catch(e){}
-                    });
-                    targetEl.addEventListener('click', (ev) => {
-                        ev.stopPropagation();
                         const { stats } = computeLocalidadStats();
                         const key = normalizeName(name || '');
-                        const s = stats[key] || { voterPct: 0, voters:0, count:0 };
-                        // Toggle filter: if same localidad clicked twice -> clear
+                        const s = stats[key] || { voterPct: 0, voters: 0, count: 0 };
+                        tip.innerText = `${name}: ${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}% votantes`;
+                        tip.style.display = 'block';
+                        tip.style.left = (ev.pageX + 12) + 'px';
+                        tip.style.top = (ev.pageY + 12) + 'px';
+                        // subtle highlight
+                        targets.forEach(sh => { try { sh.setAttribute('stroke', 'rgba(0,0,0,0.12)'); sh.setAttribute('stroke-width', '0.4'); } catch(_){} });
+                    } catch (e) { console.warn('showTipFor error', e); }
+                }
+                function moveTip(ev) {
+                    tip.style.left = (ev.pageX + 12) + 'px';
+                    tip.style.top = (ev.pageY + 12) + 'px';
+                }
+                function hideTip() {
+                    try { tip.style.display = 'none'; } catch(e){}
+                    // restore subtle default (no stroke)
+                    targets.forEach(sh => { try { sh.setAttribute('stroke', 'none'); sh.setAttribute('stroke-width', '0'); } catch(_){} });
+                }
+                function clickHandler(ev) {
+                    ev.stopPropagation();
+                    try {
+                        const { stats } = computeLocalidadStats();
+                        const key = normalizeName(name || '');
+                        const s = stats[key] || { voterPct: 0, voters: 0, count: 0 };
                         if (currentLocalidadFilter === key) {
                             currentLocalidadFilter = '';
                             showToast('info', `Filtro eliminado: ${name}`);
@@ -1869,7 +1637,7 @@ function onEachFeature(feature, layer) {
                             currentLocalidadFilter = key;
                             showToast('info', `Filtrando por ${name}: ${s.count} registros — ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
                         }
-                        // Update badge in the map area to reflect active filter
+                        // badge UI
                         try {
                             const mapWrap = document.getElementById('bogotaMapWrapper');
                             if (mapWrap) {
@@ -1877,18 +1645,8 @@ function onEachFeature(feature, layer) {
                                 if (!badge) {
                                     badge = document.createElement('div');
                                     badge.id = 'localidadFilterBadge';
-                                    badge.style.position = 'absolute';
-                                    badge.style.top = '8px';
-                                    badge.style.right = '8px';
-                                    badge.style.zIndex = 25000;
-                                    badge.style.padding = '6px 10px';
-                                    badge.style.background = 'rgba(0,0,0,0.6)';
-                                    badge.style.color = '#fff';
-                                    badge.style.borderRadius = '18px';
-                                    badge.style.fontSize = '13px';
-                                    badge.style.display = 'inline-flex';
-                                    badge.style.alignItems = 'center';
-                                    badge.style.gap = '8px';
+                                    Object.assign(badge.style, { position:'absolute', top:'8px', right:'8px', zIndex:25000,
+                                        padding:'6px 10px', background:'rgba(0,0,0,0.6)', color:'#fff', borderRadius:'18px', fontSize:'13px', display:'inline-flex', alignItems:'center', gap:'8px'});
                                     const clr = document.createElement('button');
                                     clr.type = 'button';
                                     clr.className = 'btn btn-sm btn-light';
@@ -1908,280 +1666,79 @@ function onEachFeature(feature, layer) {
                                     badge.style.display = 'none';
                                 }
                             }
-                        } catch (e) { console.warn('No se pudo actualizar badge de filtro', e); }
+                        } catch(e) { console.warn('badge error', e); }
 
-                        // Apply filters to table and recolor SVG to show selection
-                        try { applyFilters(); } catch(e) { console.warn('applyFilters failed', e); }
-                        try { colorSvgByStats(); } catch(e) { console.warn('colorSvgByStats failed after click', e); }
-                    });
-                    // keyboard support: Enter or Space triggers the same action
-                    targetEl.addEventListener('keydown', (kev) => {
+                        applyFilters();
+                        colorSvgByStats();
+                    } catch (e) { console.warn('clickHandler error', e); }
+                }
+
+                // attach events to targets (covers group and inner shapes)
+                targets.forEach(t => {
+                    t.addEventListener('mouseover', showTipFor);
+                    t.addEventListener('mousemove', moveTip);
+                    t.addEventListener('mouseout', hideTip);
+                    t.addEventListener('click', clickHandler);
+                    t.addEventListener('keydown', (kev) => {
                         if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
                             kev.preventDefault();
-                            try { targetEl.click(); } catch(e) { console.warn('keyboard click failed', e); }
+                            clickHandler({ stopPropagation: ()=>{}, preventDefault: ()=>{} });
                         }
                     });
                 });
-                // end targets loop
-                // end per-item processing
-                
-            });
-                el.addEventListener('mousemove', (ev) => {
-                    tip.style.left = (ev.pageX + 12) + 'px';
-                    tip.style.top = (ev.pageY + 12) + 'px';
-                });
-                el.addEventListener('mouseout', (ev) => {
-                    try { el.style.filter = ''; } catch(e){}
-                    tip.style.display = 'none';
-                    // restore previous stroke unless it's selected
-                    try {
-                        const key = normalizeName(name || '');
-                        if (currentLocalidadFilter && currentLocalidadFilter === key) {
-                            // keep selected styling (handled elsewhere)
-                        } else {
-                            el.setAttribute('stroke', 'none');
-                            el.setAttribute('stroke-width', '0');
-                        }
-                    } catch(e){}
-                });
-                el.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    const { stats } = computeLocalidadStats();
-                    const key = normalizeName(name || '');
-                    const s = stats[key] || { voterPct: 0, voters:0, count:0 };
-                    // Toggle filter: if same localidad clicked twice -> clear
-                    if (currentLocalidadFilter === key) {
-                        currentLocalidadFilter = '';
-                        showToast('info', `Filtro eliminado: ${name}`);
-                    } else {
-                        currentLocalidadFilter = key;
-                        showToast('info', `Filtrando por ${name}: ${s.count} registros — ${s.voters} votantes (${s.voterPct ? s.voterPct.toFixed(2) : '0.00'}%)`);
-                    }
-                    // Update badge in the map area to reflect active filter
-                    try {
-                        const mapWrap = document.getElementById('bogotaMapWrapper');
-                        if (mapWrap) {
-                            let badge = document.getElementById('localidadFilterBadge');
-                            if (!badge) {
-                                badge = document.createElement('div');
-                                badge.id = 'localidadFilterBadge';
-                                badge.style.position = 'absolute';
-                                badge.style.top = '8px';
-                                badge.style.right = '8px';
-                                badge.style.zIndex = 25000;
-                                badge.style.padding = '6px 10px';
-                                badge.style.background = 'rgba(0,0,0,0.6)';
-                                badge.style.color = '#fff';
-                                badge.style.borderRadius = '18px';
-                                badge.style.fontSize = '13px';
-                                badge.style.display = 'inline-flex';
-                                badge.style.alignItems = 'center';
-                                badge.style.gap = '8px';
-                                const clr = document.createElement('button');
-                                clr.type = 'button';
-                                clr.className = 'btn btn-sm btn-light';
-                                clr.style.padding = '2px 6px';
-                                clr.style.fontSize = '12px';
-                                clr.innerText = 'Limpiar';
-                                clr.onclick = (e) => { e.stopPropagation(); currentLocalidadFilter = ''; applyFilters(); badge.style.display = 'none'; colorSvgByStats(); };
-                                badge.appendChild(document.createElement('span'));
-                                badge.appendChild(clr);
-                                mapWrap.appendChild(badge);
-                            }
-                            const label = badge.querySelector('span');
-                            if (currentLocalidadFilter) {
-                                label.innerText = `${name}`;
-                                badge.style.display = 'inline-flex';
-                            } else {
-                                badge.style.display = 'none';
-                            }
-                        }
-                    } catch (e) { console.warn('No se pudo actualizar badge de filtro', e); }
 
-                    // Apply filters to table and recolor SVG to show selection
-                    try { applyFilters(); } catch(e) { console.warn('applyFilters failed', e); }
-                    try { colorSvgByStats(); } catch(e) { console.warn('colorSvgByStats failed after click', e); }
-                });
-                // keyboard support: Enter or Space triggers the same action
-                el.addEventListener('keydown', (kev) => {
-                    if (kev.key === 'Enter' || kev.key === ' ' || kev.keyCode === 13 || kev.keyCode === 32) {
-                        kev.preventDefault();
-                        try { el.click(); } catch(e) { console.warn('keyboard click failed', e); }
-                    }
-                });
+                // accessibility: group focus/click
+                try {
+                    el.addEventListener('focus', (ev) => showTipFor(ev || { pageX: window.innerWidth/2, pageY: window.innerHeight/2 }));
+                    el.addEventListener('blur', hideTip);
+                    el.addEventListener('click', clickHandler);
+                } catch(e) {}
             });
-            // After attaching handlers, color SVG areas according to stats
+
+            // colorizar áreas según stats
             try { colorSvgByStats(svg); } catch(e) { console.warn('colorSvgByStats failed', e); }
 
-            // Generate optional labels (centered text) and a small toggle button
+            // crear etiquetas en mapa y panel izquierdo si no existen (silencioso a errores)
             try {
-                        function createSvgLabels() {
-                            try {
-                                // remove any previous svg labels group
-                                const old = svg.querySelector('#labels-group');
-                                if (old) old.remove();
-                                // remove previous localidades box if exists
-                                const existingBox = document.getElementById('localidadesBox');
-                                if (existingBox) existingBox.remove();
-
-                                const mapWrap = document.getElementById('bogotaMapWrapper');
-                                if (!mapWrap) return;
-
-                                // Build the localidades box (separate panel with the list)
-                                const box = document.createElement('div');
-                                box.id = 'localidadesBox';
-                                box.style.position = 'absolute';
-                                box.style.left = '12px';
-                                box.style.top = '12px';
-                                box.style.width = '280px';
-                                box.style.maxHeight = '68%';
-                                box.style.overflow = 'auto';
-                                box.style.background = 'rgba(255,255,255,0.96)';
-                                box.style.borderRadius = '10px';
-                                box.style.boxShadow = '0 10px 30px rgba(2,6,23,0.10)';
-                                box.style.zIndex = 26000;
-                                box.style.padding = '8px';
-                                // start hidden; toggled by the hamburger button
-                                box.classList.add('hidden');
-
-                                const title = document.createElement('div');
-                                title.innerText = 'Localidades';
-                                title.style.fontWeight = '700';
-                                title.style.marginBottom = '6px';
-                                box.appendChild(title);
-
-                                const { stats, total } = computeLocalidadStats();
-                                const names = Array.from(new Set(Array.from(svg.querySelectorAll('[data-name]')).map(el => el.getAttribute('data-name')).filter(Boolean)));
-                                const rows = names.map(nm => {
-                                    const key = normalizeName(nm || '');
-                                    const st = stats[key] || { count: 0, voterPct: 0 };
-                                    return { name: nm, key, count: st.count || 0, voterPct: st.voterPct || 0 };
-                                }).sort((a,b) => b.count - a.count);
-
-                                const list = document.createElement('div');
-                                list.style.display = 'flex';
-                                list.style.flexDirection = 'column';
-                                list.style.gap = '6px';
-
-                                rows.forEach(rw => {
-                                    const item = document.createElement('button');
-                                    item.type = 'button';
-                                    item.className = 'localidades-item btn btn-sm';
-                                    item.style.display = 'flex';
-                                    item.style.justifyContent = 'space-between';
-                                    item.style.alignItems = 'center';
-                                    item.style.padding = '6px 8px';
-                                    item.style.background = 'transparent';
-                                    item.style.border = 'none';
-                                    item.style.textAlign = 'left';
-                                    item.style.width = '100%';
-                                    item.innerHTML = `<span style="flex:1; color: #123;">${rw.name}</span><small style="margin-left:8px; color:#3b6;">${rw.voterPct ? rw.voterPct.toFixed(1) + '%' : ''}</small>`;
-                                    item.onclick = (e) => {
-                                        e.stopPropagation();
-                                        currentLocalidadFilter = rw.key;
-                                        try { applyFilters(); } catch(_){}
-                                        try { colorSvgByStats(); } catch(_){}
-                                        // update badge
-                                        try { const badge = document.getElementById('localidadFilterBadge'); if (badge) { badge.style.display = 'inline-flex'; badge.querySelector('span').innerText = rw.name; } } catch(_){}
-                                    };
-                                    list.appendChild(item);
-                                });
-
-                                box.appendChild(list);
-                                mapWrap.appendChild(box);
-                                // Also create in-map labels: center text over each [data-name]
-                                try {
-                                    const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                                    labelsGroup.setAttribute('id', 'labels-group');
-                                    // small transform to ensure labels render above fills
-                                    svg.appendChild(labelsGroup);
-                                    const shapes = Array.from(svg.querySelectorAll('[data-name]'));
-                                    shapes.forEach(s => {
-                                        try {
-                                            // ensure shape receives pointer events
-                                            try { s.style.pointerEvents = 'all'; s.setAttribute('pointer-events','all'); } catch(e) {}
-                                            const name = s.getAttribute('data-name') || '';
-                                            // compute bbox and centroid
-                                            let bx;
-                                            try { bx = s.getBBox(); } catch(e) { bx = null; }
-                                            const cx = bx ? (bx.x + bx.width/2) : 0;
-                                            const cy = bx ? (bx.y + bx.height/2) : 0;
-                                            const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                                            t.setAttribute('x', cx);
-                                            t.setAttribute('y', cy);
-                                            t.setAttribute('text-anchor', 'middle');
-                                            t.setAttribute('dominant-baseline', 'middle');
-                                            t.setAttribute('class', 'svg-label');
-                                            t.setAttribute('style', 'pointer-events:none; font-family: Inter, Arial; font-size:12px; fill:#123; font-weight:700;');
-                                            t.textContent = name;
-                                            labelsGroup.appendChild(t);
-                                        } catch(e) { /* ignore per-shape errors */ }
-                                    });
-                                } catch(e) { console.warn('create in-map labels failed', e); }
-                            } catch (e) { console.warn('createLocalidadesBox failed', e); }
-                        }
-                        createSvgLabels();
-                // Add toggle button to show/hide labels
                 const mapWrap = document.getElementById('bogotaMapWrapper');
                 if (mapWrap) {
-                    let btn = document.getElementById('svgLabelsToggle');
-                    if (!btn) {
-                        btn = document.createElement('button');
-                        btn.id = 'svgLabelsToggle';
-                        btn.type = 'button';
-                        btn.className = 'btn btn-sm btn-outline-secondary';
-                        btn.style.position = 'absolute';
-                        btn.style.top = '8px';
-                        btn.style.left = '56px';
-                        btn.style.zIndex = 25000;
-                        btn.style.padding = '6px 8px';
-                        btn.innerText = 'Etiquetas';
-                        btn.onclick = (ev) => {
-                            ev.stopPropagation();
-                            const grp = svg.querySelector('#labels-group');
-                            if (!grp) return;
-                            const hidden = grp.querySelector('.svg-label.hidden');
-                            const show = !!hidden;
-                            grp.querySelectorAll('.svg-label').forEach(t => {
-                                if (show) t.classList.remove('hidden'); else t.classList.add('hidden');
-                            });
-                            btn.classList.toggle('active', show);
-                        };
-                        mapWrap.appendChild(btn);
-                    }
-                    // Add hamburger toggle for localidades panel (left side)
-                    let locBtn = document.getElementById('localidadesToggle');
-                    if (!locBtn) {
-                        locBtn = document.createElement('button');
-                        locBtn.id = 'localidadesToggle';
-                        locBtn.type = 'button';
-                        locBtn.className = 'btn btn-sm btn-outline-secondary';
-                        locBtn.style.position = 'absolute';
-                        locBtn.style.top = '8px';
-                        locBtn.style.left = '8px';
-                        locBtn.style.zIndex = 25000;
-                        locBtn.style.padding = '6px 8px';
-                        locBtn.innerHTML = '<i class="bi bi-list"></i>';
-                        locBtn.title = 'Mostrar/ocultar localidades';
-                        locBtn.onclick = (ev) => {
-                            ev.stopPropagation();
-                            const box = document.getElementById('localidadesBox');
-                            if (!box) return;
-                            const isHidden = box.classList.contains('hidden');
-                            if (isHidden) {
-                                box.classList.remove('hidden');
-                                box.classList.add('visible');
-                                // ensure badge updates when opening
-                                try { colorSvgByStats(); } catch(e){}
-                            } else {
-                                box.classList.remove('visible');
-                                box.classList.add('hidden');
-                            }
-                        };
-                        mapWrap.appendChild(locBtn);
+                    // crear lista de localidades en panel si no existe
+                    if (!document.getElementById('localidadesBox')) {
+                        const box = document.createElement('div');
+                        box.id = 'localidadesBox';
+                        Object.assign(box.style, { position:'absolute', left:'12px', top:'12px', width:'260px', maxHeight:'68%', overflow:'auto',
+                            background:'rgba(255,255,255,0.96)', borderRadius:'10px', boxShadow:'0 10px 30px rgba(2,6,23,0.08)', zIndex:26000, padding:'8px', display:'none' });
+                        const title = document.createElement('div'); title.innerText = 'Localidades'; title.style.fontWeight = '700'; title.style.marginBottom = '6px';
+                        box.appendChild(title);
+                        mapWrap.appendChild(box);
                     }
                 }
+                // labels in-map
+                const labelsGroupId = 'labels-group';
+                let labelsGroup = svg.querySelector('#' + labelsGroupId);
+                if (labelsGroup) labelsGroup.remove();
+                labelsGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+                labelsGroup.setAttribute('id', labelsGroupId);
+                svg.appendChild(labelsGroup);
+                const shapes = Array.from(svg.querySelectorAll('[data-name]'));
+                shapes.forEach(s => {
+                    try {
+                        s.style.pointerEvents = 'all'; s.setAttribute('pointer-events','all');
+                        const name = s.getAttribute('data-name') || '';
+                        let bx = null;
+                        try { bx = s.getBBox(); } catch(e) { bx = null; }
+                        const cx = bx ? (bx.x + bx.width/2) : 0;
+                        const cy = bx ? (bx.y + bx.height/2) : 0;
+                        const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+                        t.setAttribute('x', cx); t.setAttribute('y', cy);
+                        t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+                        t.setAttribute('class','svg-label'); t.setAttribute('style','pointer-events:none; font-family:Inter, Arial; font-size:11px; fill:#123; font-weight:700;');
+                        t.textContent = name;
+                        labelsGroup.appendChild(t);
+                    } catch(e) {}
+                });
             } catch(e) { console.warn('labels creation failed', e); }
+
         } catch (err) { console.warn('attachSvgInteractions error', err); }
     }
 
@@ -2917,14 +2474,10 @@ async function saveLeader() {
       document.getElementById('leaderForm').reset();
       document.getElementById('leaderId').value = '';
       
-    } else {
-      const errorData = await res.json();
-      showToast('danger', `Error al guardar el líder: ${errorData.error}`);
+    } catch (err) {
+        console.error('Error saveLeader:', err);
+        showToast('danger', 'Error de conexión al guardar el líder');
     }
-  } catch (err) {
-    console.error('Error saveLeader:', err);
-    showToast('danger', 'Error de conexión al guardar el líder');
-  }
 }
 
 async function deleteLeader(id) {
@@ -3041,8 +2594,8 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
             (async () => { try { await loadRegistrations(); await updateDashboard(); } catch (e) { console.warn(e); } })();
         } else {
             const err = await res.json().catch(() => ({}));
-            showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
             resetPublicForm();
+            showToast('danger', `Error al enviar el registro: ${err.error || 'desconocido'}`);
         }
     } catch (err) {
         console.error('Error enviando registro:', err);
@@ -3615,7 +3168,7 @@ async function detectDuplicates() {
                     html += `<div class="mb-3 p-2 border rounded">
                         <strong>Cédula: ${group.key}</strong> — ${group.count} registros
                         <ul class="mb-0 mt-2">
-                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} — ${i.email || ''} — ${i.phone || ''} <small class=\"text-muted\">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
+                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} — ${i.email || ''} — ${i.phone || ''} <small class="text-muted">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
                         </ul>
                     </div>`;
                 });
@@ -3626,7 +3179,7 @@ async function detectDuplicates() {
                     html += `<div class="mb-3 p-2 border rounded">
                         <strong>Contacto: ${group.key}</strong> — ${group.count} registros
                         <ul class="mb-0 mt-2">
-                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} — ${i.email || ''} — ${i.phone || ''} <small class=\"text-muted\">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
+                            ${group.items.map(i => `<li>${i.firstName || ''} ${i.lastName || ''} — ${i.email || ''} — ${i.phone || ''} <small class="text-muted">(${new Date(i.date).toLocaleString()})</small></li>`).join('')}
                         </ul>
                     </div>`;
                 });
@@ -3996,7 +3549,7 @@ function updateFilteredRegistrationsList(registrations) {
     if (registrations.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center text-muted py-4">
+                <td colspan="10" class="text-center text-muted py-4">
                     <i class="bi bi-inbox" style="font-size: 2rem;"></i>
                     <p>No hay registros que coincidan con los filtros</p>
                 </td>
@@ -4013,46 +3566,21 @@ function updateFilteredRegistrationsList(registrations) {
         const localidad = reg.localidad || '-';
         const votante = reg.registeredToVote ? 'Sí' : 'No';
         const votingPlace = reg.votingPlace || '-';
-
+        const votingTable = reg.votingTable || '-';
         return `
             <tr>
-                <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
-                <td>
-                    <strong>${fullName}</strong>
-                </td>
-                <td>
-                    <code>${reg.cedula || 'N/A'}</code>
-                </td>
+                <td>${new Date(reg.date).toLocaleString("es-CO")}</td>
+                <td><strong>${fullName}</strong></td>
+                <td><code>${reg.cedula || 'N/A'}</code></td>
                 <td>${reg.phone || 'N/A'}</td>
                 <td>${localidad}</td>
                 <td>${votante}</td>
                 <td>${votingPlace}</td>
+                <td>${confirmed ? `<span class="badge bg-success">Asistió ✅</span>` : `<span class="badge bg-secondary">No confirmado</span>`}</td>
+                <td><small class="text-muted">${confirmedAt || '-'}</small></td>
                 <td>
-                    ${confirmed ? `
-                        <span class="badge bg-success">Asistió ✅</span>
-                    ` : `
-                        <span class="badge bg-secondary">No confirmado</span>
-                    `}
-                </td>
-                <td>
-                    ${confirmedBy ? `
-                        <small class="text-success">${confirmedBy}</small>
-                        <br>
-                        <small class="text-muted">${confirmedAt}</small>
-                    ` : `
-                        <small class="text-muted">-</small>
-                    `}
-                </td>
-                <td>
-                    ${confirmed ? `
-                        <button class="btn btn-sm btn-outline-danger" onclick="toggleConfirm('${reg._id}', false)" title="Desconfirmar">
-                            <i class="bi bi-x-circle"></i>
-                        </button>
-                    ` : `
-                        <button class="btn btn-sm btn-outline-success" onclick="confirmRegistration('${reg._id}')" title="Confirmar">
-                            <i class="bi bi-check-circle"></i>
-                        </button>
-                    `}
+                    <button class="btn btn-sm btn-outline-primary" onclick="editRegistration('${reg._id}')"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
         `;
@@ -4276,12 +3804,8 @@ async function loadEventsForSelection() {
                         </p>
                         ${event.description ? `<p class="card-text">${event.description}</p>` : ''}
                         <div class="d-flex gap-2 mt-3">
-                            <button class="btn btn-sm btn-primary flex-grow-1" onclick="selectEventFromLanding('${event._id}'); event.stopPropagation();">
-                                <i class="bi bi-box-arrow-in-right"></i> Entrar
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEventFromLanding('${event._id}'); event.stopPropagation();" title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            <button class="btn btn-sm btn-primary flex-grow-1" onclick="selectEventFromLanding('${event._id}')">Entrar</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteEventFromLanding('${event._id}')">Eliminar</button>
                         </div>
                     </div>
                 </div>
