@@ -1070,43 +1070,20 @@
                 <div class="tab-pane fade" id="content-geography" role="tabpanel">
                     <div class="card shadow-sm">
                         <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0"><i class="bi bi-geo-alt"></i> Mapa - Registros por Localidad (Bogotá)</h6>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleMapFallback()">
-                                <i class="bi bi-map"></i> Mostrar Mapa
-                            </button>
+                            <h6 class="mb-0"><i class="bi bi-geo-alt"></i> Geografía — Registros por Localidad (gráficos)</h6>
                         </div>
                         <div class="card-body">
-                            <div id="bogotaMapWrapper" style="position:relative; display:none;">
-                                <div id="bogotaMap" style="width:100%; height:560px; border:1px solid #dfefe0; background:linear-gradient(180deg,#e8f6ea 0%, #cfead0 100%); display:flex; align-items:center; justify-content:center;"> 
-                                    <div id="bogotaCroquisInlineWrapper" style="width:100%;height:100%;">
-                                        <!-- El contenido SVG se carga dinámicamente desde /bogota_croquis.svg -->
-                                    </div>
+                            <!-- Mantener solo los gráficos: barras y circular (doughnut). Mapa eliminado por solicitud. -->
+                            <div id="bogotaChartWrapper" style="margin-top:6px; display:block;">
+                                <h6 class="mb-2"><i class="bi bi-bar-chart"></i> Registros por Localidad (Barras)</h6>
+                                <div style="height:320px;">
+                                    <canvas id="localidadesChart" style="width:100%; height:100%;"></canvas>
                                 </div>
-                                <div id="bogotaMapSpinner" style="display:none; position:absolute; inset:0; background:rgba(255,255,255,0.6); z-index:20000; display:flex; align-items:center; justify-content:center;">
-                                    <div style="text-align:center;">
-                                        <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;"></div>
-                                        <div class="mt-2">Cargando mapa...</div>
-                                    </div>
+                                <hr />
+                                <h6 class="mb-2"><i class="bi bi-pie-chart"></i> Distribución por Localidad (Circular)</h6>
+                                <div style="width:280px; max-width:100%;">
+                                    <canvas id="localidadesDoughnut" style="width:100%; height:260px;"></canvas>
                                 </div>
-                            </div>
-                            <div id="bogotaMapLegend" style="margin-top:10px;"></div>
-                            
-                            <!-- Carga de GeoJSON personalizado -->
-                            <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
-                                <i class="bi bi-info-circle"></i> <strong>Tip:</strong> Carga un archivo GeoJSON personalizado para ver un mapa interactivo de localidades.
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                            <div class="input-group mb-3">
-                                <input id="geojsonUrlInput" class="form-control form-control-sm" placeholder="Pega aquí la URL del GeoJSON (opcional)" />
-                                <button class="btn btn-outline-primary btn-sm" type="button" onclick="loadBogotaMapFromInput()">
-                                    <i class="bi bi-download"></i> Cargar GeoJSON
-                                </button>
-                            </div>
-
-                            <!-- Gráfico de barras de localidades -->
-                            <div id="bogotaChartWrapper" style="margin-top:12px;">
-                                <h6 class="mb-3"><i class="bi bi-bar-chart"></i> Registros por Localidad</h6>
-                                <canvas id="localidadesChart" style="width:100%; height:300px;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -2365,17 +2342,11 @@ function onEachFeature(feature, layer) {
     }
 
 function toggleMapFallback() {
-    const mapWrap = document.getElementById('bogotaMapWrapper');
-    const chartWrap = document.getElementById('bogotaChartWrapper');
-    if (!mapWrap || !chartWrap) return;
-    if (mapWrap.style.display === 'none' || mapWrap.style.display === '') {
-        mapWrap.style.display = 'block';
-        chartWrap.style.display = 'none';
-        try { renderLocalityMap(); } catch(e) { console.warn('No se pudo renderizar el mapa:', e); }
-    } else {
-        mapWrap.style.display = 'none';
-        chartWrap.style.display = 'block';
-    }
+    // Map removed: ensure charts are visible. Keep function as noop for compatibility.
+    try {
+        const chartWrap = document.getElementById('bogotaChartWrapper');
+        if (chartWrap && chartWrap.style) chartWrap.style.display = 'block';
+    } catch(e) { console.warn('toggleMapFallback noop error', e); }
 }
 
 
@@ -2522,7 +2493,7 @@ async function renderLocalityMap() {
         }
 
         // También actualizar el gráfico simplificado (fallback)
-        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart simplificado:', e); }
+        try { renderLocalidadesChart(); renderLocalidadesDoughnut(); } catch(e) { console.warn('No se pudo renderizar charts de localidades:', e); }
     } catch (err) {
         console.error('Error en renderLocalityMap:', err);
         throw err;
@@ -2856,7 +2827,7 @@ async function loadRegistrations() {
     if (!res.ok) throw new Error('Error cargando registros');
     registrations = await res.json();
     updateRegistrationsTable();
-        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades tras cargar registros:', e); }
+        try { renderLocalidadesChart(); renderLocalidadesDoughnut(); } catch(e) { console.warn('No se pudo renderizar charts de localidades tras cargar registros:', e); }
     return registrations;
   } catch (error) {
     console.error('Error en loadRegistrations:', error);
@@ -3886,7 +3857,7 @@ async function refreshAnalysis() {
             console.warn('No se pudo renderizar chart de estado de confirmación:', e); 
         }
 
-        try { renderLocalidadesChart(); } catch(e) { console.warn('No se pudo renderizar chart de localidades:', e); }
+        try { renderLocalidadesChart(); renderLocalidadesDoughnut(); } catch(e) { console.warn('No se pudo renderizar charts de localidades:', e); }
 
         // Mostrar gráfico de barras (nunca mostrar mapa)
         try {
@@ -4244,6 +4215,45 @@ function renderLocalidadesChart() {
         });
     } catch (err) {
         console.error('Error renderLocalidadesChart:', err);
+    }
+}
+
+// Doughnut chart for localidades
+let localidadesDoughnut = null;
+function renderLocalidadesDoughnut() {
+    try {
+        const { stats } = computeLocalidadStats();
+        const entries = Object.keys(stats).map(k => ({ key: k, label: stats[k].label || k, count: stats[k].count || 0 })).sort((a,b)=>b.count-a.count);
+        const labels = entries.map(e => e.label);
+        const data = entries.map(e => e.count);
+        const ctxEl = document.getElementById('localidadesDoughnut');
+        if (!ctxEl) return;
+        const ctx = ctxEl.getContext('2d');
+
+        const bgColors = entries.map((e,i) => getColorForPct(((stats[e.key].voterPct||0))));
+
+        if (localidadesDoughnut) {
+            localidadesDoughnut.data.labels = labels;
+            localidadesDoughnut.data.datasets[0].data = data;
+            localidadesDoughnut.data.datasets[0].backgroundColor = bgColors;
+            localidadesDoughnut.update();
+            return;
+        }
+
+        localidadesDoughnut = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{ data, backgroundColor: bgColors }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+    } catch (err) {
+        console.error('Error renderLocalidadesDoughnut:', err);
     }
 }
 
