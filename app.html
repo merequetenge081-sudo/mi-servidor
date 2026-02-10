@@ -993,13 +993,19 @@
                                     <i class="bi bi-people-fill"></i> 
                                     <span id="selectedLeaderTitle">Todos los Registros</span>
                                 </h5>
-                                <div class="badge bg-info" id="registroCount">0 registros</div>
+                                <div>
+                                    <div class="badge bg-info" id="registroCount" style="margin-left: 8px;">0 registros</div>
+                                    <button id="exportFilteredBtn" class="btn btn-sm btn-success" onclick="exportFilteredRegistrations()" title="Exportar registros del líder seleccionado" style="margin-left: 8px;">
+                                        <i class="bi bi-download"></i> Exportar
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
                                     <table class="table table-hover table-sm">
                                         <thead>
                                             <tr>
+                                                <th style="width: 4%; text-align: center;">#</th>
                                                 <th>Fecha</th>
                                                 <th>Nombre</th>
                                                 <th>Cédula</th>
@@ -4003,7 +4009,7 @@ function updateFilteredRegistrationsList(registrations) {
         return;
     }
 
-    tbody.innerHTML = registrations.map(reg => {
+    tbody.innerHTML = registrations.map((reg, index) => {
         const confirmed = reg.confirmed ? true : false;
         const confirmedBy = reg.confirmedBy || '';
         const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
@@ -4014,6 +4020,7 @@ function updateFilteredRegistrationsList(registrations) {
 
         return `
             <tr>
+                <td style="text-align: center;"><strong>${index + 1}</strong></td>
                 <td>${new Date(reg.date).toLocaleString('es-CO')}</td>
                 <td>
                     <strong>${fullName}</strong>
@@ -4533,6 +4540,112 @@ async function toggleConfirm(regId, value) {
     } catch (err) {
         console.error('Error toggling confirm:', err);
         showToast('danger', 'Error actualizando confirmación');
+    }
+}
+
+// Exportar registros filtrados mostrados en la tabla
+async function exportFilteredRegistrations() {
+    try {
+        // Obtener los registros que están siendo mostrados (filtrados)
+        const tbody = document.getElementById('filteredRegistrationsList');
+        if (!tbody || tbody.querySelectorAll('tr').length === 0) {
+            showToast('warning', 'No hay registros para exportar');
+            return;
+        }
+
+        // Recopilar datos de las filas mostradas
+        const filteredRegs = [];
+        const rows = tbody.querySelectorAll('tr');
+        
+        for (const row of rows) {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 0) continue; // Saltar filas sin datos
+            
+            // Los índices corresponden a: #, Fecha, Nombre, Cédula, Teléfono, Localidad, ¿Votante?, Puesto, Estado, Confirmado Por, Acciones
+            const fullName = cells[2]?.textContent.trim() || '';
+            const fecha = cells[1]?.textContent.trim() || '';
+            const cedula = cells[3]?.textContent.trim() || '';
+            const telefono = cells[4]?.textContent.trim() || '';
+            const localidad = cells[5]?.textContent.trim() || '';
+            const votante = cells[6]?.textContent.trim() || '';
+            const puesto = cells[7]?.textContent.trim() || '';
+            const estado = cells[8]?.textContent.includes('✅') ? 'Asistió' : 'No confirmado';
+            const confirmedPor = cells[9]?.textContent.trim() || '-';
+            
+            filteredRegs.push({
+                'Fecha': fecha || '-',
+                'Nombre': fullName,
+                'Cédula': cedula !== 'N/A' ? cedula : '',
+                'Teléfono': telefono !== 'N/A' ? telefono : '',
+                'Localidad': localidad,
+                '¿Votante?': votante,
+                'Puesto de Votación': puesto !== '-' ? puesto : '',
+                'Asistencia': estado,
+                'Confirmado Por': confirmedPor
+            });
+        }
+
+        if (filteredRegs.length === 0) {
+            showToast('warning', 'No hay registros válidos para exportar');
+            return;
+        }
+
+        // Crear worksheet
+        const worksheet = XLSX.utils.json_to_sheet(filteredRegs);
+        
+        // Ajustar ancho de columnas
+        const columnWidths = [15, 20, 20, 15, 15, 18, 15, 22, 18, 20];
+        worksheet['!cols'] = columnWidths.map(w => ({ wch: w }));
+        
+        // Crear workbook
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros Filtrados');
+        
+        // Generar nombre del archivo
+        const titulo = document.getElementById('selectedLeaderTitle')?.textContent || 'Registros';
+        const fecha = new Date().toISOString().slice(0, 10);
+        const filename = `${titulo.replace(/[^a-z0-9]/gi, '_')}_${fecha}.xlsx`;
+        
+        // Descargar archivo
+        XLSX.writeFile(workbook, filename);
+        
+        showToast('success', `Se exportó ${filteredRegs.length} registros correctamente`);
+    } catch (error) {
+        console.error('Error exportando registros filtrados:', error);
+        showToast('danger', 'Error al exportar registros');
+    }
+}
+
+// Función para exportar datos de un líder específico
+async function exportLeaderData(leaderId) {
+    const leader = allLeadersData.find(l => l._id === leaderId);
+    const leaderRegs = allRegistrationsData.filter(r => r.leaderId === leaderId);
+    
+    try {
+        // Preparar datos para Excel
+        const worksheet = XLSX.utils.json_to_sheet(leaderRegs.map(reg => ({
+            'Fecha': new Date(reg.date).toLocaleString('es-CO'),
+            'Nombre': `${reg.firstName} ${reg.lastName}`,
+            'Cédula': reg.cedula || '',
+            'Teléfono': reg.phone || '',
+            'Email': reg.email || '',
+            'Confirmado': reg.confirmed ? 'Sí' : 'No',
+            'Confirmado Por': reg.confirmedBy || '',
+            'Confirmado En': reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''
+        })));
+        
+        // Crear libro de Excel
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros');
+        
+        // Guardar archivo
+        const filename = `registros_${leader.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(workbook, filename);
+        
+        showToast('success', 'Datos exportados correctamente');
+    } catch (error) {
+        console.error('Error exportando datos:', error);
+        showToast('danger', 'Error al exportar datos');
     }
 }
 </script>
