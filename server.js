@@ -8,12 +8,15 @@ import ExcelJS from "exceljs";
 import fetch from 'node-fetch';
 import dotenv from "dotenv";
 import { NotificationService } from './notifications.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 
 const mongoURL = process.env.MONGO_URL;
 mongoose.connect(mongoURL)
@@ -40,6 +43,7 @@ const LeaderSchema = new mongoose.Schema({
   token: String,
   eventId: { type: String, default: '' },
   registrations: { type: Number, default: 0 }
+  ,passwordHash: { type: String, default: '' }
 });
 const RegistrationSchema = new mongoose.Schema({
   leaderId: String,
@@ -72,13 +76,110 @@ RegistrationSchema.add({
 const Leader = mongoose.model("Leader", LeaderSchema);
 const Registration = mongoose.model("Registration", RegistrationSchema);
 
+// Usuario Admin (simple)
+const AdminSchema = new mongoose.Schema({
+  username: { type: String, unique: true },
+  passwordHash: String,
+  createdAt: { type: Date, default: () => new Date() }
+});
+const Admin = mongoose.model('Admin', AdminSchema);
+
+// 🔍 Modelo de Auditoría
+const AuditLogSchema = new mongoose.Schema({
+  action: { type: String, enum: ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'EXPORT'], required: true },
+  resourceType: { type: String }, // 'registration', 'leader', 'event', etc.
+  resourceId: String,
+  userId: String, // username (admin) o leaderId (líder)
+  userRole: { type: String, enum: ['admin', 'leader'] },
+  userName: String,
+  changes: mongoose.Schema.Types.Mixed, // {field: {old, new}}
+  timestamp: { type: Date, default: () => new Date() },
+  ipAddress: String,
+  description: String
+});
+const AuditLog = mongoose.model('AuditLog', AuditLogSchema);
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
+// --- Autenticación / autorización ---
+function generateToken(payload) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '12h' });
+}
+
+function verifyToken(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'No autorizado' });
+  const token = auth.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload; // { role, username?, leaderId }
+    return next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+}
+
+// Helper para chequear permiso cuando el recurso debe pertenecer al líder
+function requireOwnerOrAdmin(getOwnerId) {
+  return async (req, res, next) => {
+    if (!req.user) return res.status(401).json({ error: 'No autorizado' });
+    if (req.user.role === 'admin') return next();
+    if (req.user.role === 'leader') {
+      try {
+        const ownerId = await getOwnerId(req);
+        if (!ownerId) return res.status(404).json({ error: 'Recurso no encontrado' });
+        if (String(ownerId) !== String(req.user.leaderId)) return res.status(403).json({ error: 'Prohibido' });
+        return next();
+      } catch (err) {
+        return res.status(500).json({ error: err.message });
+      }
+    }
+    return res.status(403).json({ error: 'Prohibido' });
+  };
+}
+
+// � Función para registrar auditoría
+async function logAudit(req, action, resourceType, resourceId, changes = null, description = null) {
+  try {
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    let userId = null;
+    let userRole = null;
+    let userName = null;
+
+    if (req.user) {
+      userRole = req.user.role;
+      userId = req.user.username || req.user.leaderId;
+      userName = req.user.username || req.user.name || 'Unknown';
+    }
+
+    await AuditLog.create({
+      action,
+      resourceType,
+      resourceId,
+      userId,
+      userRole,
+      userName,
+      changes,
+      ipAddress,
+      description
+    });
+  } catch (err) {
+    console.error('❌ Error registrando auditoría:', err);
+    // No fallar la operación principal por error en auditoría
+  }
+}
+
 // 🔹 Ruta principal
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "app.html")));
+
+// 🔹 Ruta de login
+app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "public/login.html")));
+
+// 🔹 Ruta de auditoría
+app.get("/audit", (req, res) => res.sendFile(path.join(__dirname, "public/audit-logs.html")));
+
 
 // 🔹 ENDPOINT PARA MIGRAR DATOS DE data.json A MONGODB (DESARROLLO)
 app.post("/api/migrate", async (req, res) => {
@@ -189,7 +290,14 @@ app.post("/api/leaders", async (req, res) => {
     leader.token = leader.token || "leader" + Date.now();
     leader.active = leader.active !== false; // Asegurar que active sea booleano
     leader.registrations = 0; // Inicializar en 0
-    
+
+    // Si viene contraseña, hashearla
+    if (leader.password) {
+      const hash = await bcrypt.hash(leader.password, 10);
+      leader.passwordHash = hash;
+      delete leader.password;
+    }
+
     const newLeader = await Leader.create(leader);
     console.log('✅ Líder creado:', newLeader);
     res.json(newLeader);
@@ -284,6 +392,53 @@ app.put("/api/leaders/:id", async (req, res) => {
   res.json(updated);
 });
 
+// --- RUTAS DE AUTENTICACIÓN ---
+// Admin login
+app.post('/api/auth/admin-login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'Faltan credenciales' });
+  const admin = await Admin.findOne({ username });
+  if (!admin) {
+    await logAudit({ ip: req.ip }, 'LOGIN', 'admin', username, null, 'Failed login attempt');
+    return res.status(401).json({ error: 'Credenciales inválidas' });
+  }
+  const ok = await bcrypt.compare(password, admin.passwordHash || '');
+  if (!ok) {
+    await logAudit({ ip: req.ip, user: { role: 'admin', username } }, 'LOGIN', 'admin', username, null, 'Failed login - wrong password');
+    return res.status(401).json({ error: 'Credenciales inválidas' });
+  }
+  const token = generateToken({ role: 'admin', username: admin.username });
+  
+  // Registrar login exitoso
+  const mockReq = { ip: req.ip, user: { role: 'admin', username: admin.username } };
+  await logAudit(mockReq, 'LOGIN', 'admin', username, null, 'Successful login');
+  
+  res.json({ token });
+});
+
+// Leader login (usar id + password)
+app.post('/api/auth/leader-login', async (req, res) => {
+  const { leaderId, password } = req.body;
+  if (!leaderId || !password) return res.status(400).json({ error: 'Faltan credenciales' });
+  const leader = await Leader.findById(leaderId);
+  if (!leader) {
+    await logAudit({ ip: req.ip }, 'LOGIN', 'leader', leaderId, null, 'Failed login attempt');
+    return res.status(401).json({ error: 'Credenciales inválidas' });
+  }
+  const ok = await bcrypt.compare(password, leader.passwordHash || '');
+  if (!ok) {
+    await logAudit({ ip: req.ip, user: { role: 'leader', leaderId } }, 'LOGIN', 'leader', leaderId, null, 'Failed login - wrong password');
+    return res.status(401).json({ error: 'Credenciales inválidas' });
+  }
+  const token = generateToken({ role: 'leader', leaderId: String(leader._id), name: leader.name });
+  
+  // Registrar login exitoso
+  const mockReq = { ip: req.ip, user: { role: 'leader', leaderId: String(leader._id), name: leader.name } };
+  await logAudit(mockReq, 'LOGIN', 'leader', String(leader._id), null, 'Successful login');
+  
+  res.json({ token });
+});
+
 // 🔹 Eliminar líder
 app.delete("/api/leaders/:id", async (req, res) => {
   await Leader.findByIdAndDelete(req.params.id);
@@ -291,12 +446,18 @@ app.delete("/api/leaders/:id", async (req, res) => {
 });
 
 // 🔹 Obtener registros (opcionalmente filtrar por eventId o phone)
-app.get("/api/registrations", async (req, res) => {
+app.get("/api/registrations", verifyToken, async (req, res) => {
   const { eventId, phone, cedula } = req.query;
   const filter = {};
   if (eventId) filter.eventId = eventId;
   if (phone) filter.phone = phone;
   if (cedula) filter.cedula = cedula;
+
+  // Si es líder, restringir a sus registros
+  if (req.user.role === 'leader') {
+    filter.leaderId = String(req.user.leaderId);
+  }
+
   const regs = await Registration.find(filter);
   res.json(regs);
 });
@@ -378,10 +539,26 @@ app.post("/api/registrations", async (req, res) => {
 });
 
 // 🔹 Editar registro
-app.put("/api/registrations/:id", async (req, res) => {
+app.put("/api/registrations/:id", verifyToken, requireOwnerOrAdmin(async (req) => {
+  const reg = await Registration.findById(req.params.id);
+  return reg ? String(reg.leaderId) : null;
+}), async (req, res) => {
   try {
+    const original = await Registration.findById(req.params.id);
     const updated = await Registration.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated) return res.status(404).json({ error: "Registro no encontrado" });
+
+    // Registrar cambios en auditoría
+    const changes = {};
+    if (original) {
+      for (const key in req.body) {
+        if (original[key] !== req.body[key]) {
+          changes[key] = { old: original[key], new: req.body[key] };
+        }
+      }
+    }
+    await logAudit(req, 'UPDATE', 'registration', req.params.id, changes, `Actualizado registro de ${updated.firstName} ${updated.lastName}`);
+
     res.json(updated);
   } catch (err) {
     console.error("Error al editar registro:", err);
@@ -425,18 +602,24 @@ app.post('/api/registrations/:id/unconfirm', async (req, res) => {
 });
 
 // 🔹 Eliminar registro
-app.delete("/api/registrations/:id", async (req, res) => {
+app.delete("/api/registrations/:id", verifyToken, requireOwnerOrAdmin(async (req) => {
+  const reg = await Registration.findById(req.params.id);
+  return reg ? String(reg.leaderId) : null;
+}), async (req, res) => {
   try {
     const deleted = await Registration.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: "Registro no encontrado" });
-    
+
+    // Registrar eliminación en auditoría
+    await logAudit(req, 'DELETE', 'registration', req.params.id, { deleted: deleted.toObject() }, `Eliminado registro de ${deleted.firstName} ${deleted.lastName}`);
+
     // Recalcular contador de registros del líder asociado
     if (deleted.leaderId) {
       const leaderRegsCount = await Registration.countDocuments({ leaderId: deleted.leaderId });
       await Leader.findByIdAndUpdate(deleted.leaderId, { registrations: leaderRegsCount }, { new: true });
       console.log(`✅ Contador de registros del líder ${deleted.leaderId} actualizado a ${leaderRegsCount}`);
     }
-    
+
     res.json({ success: true });
   } catch (err) {
     console.error("Error al eliminar registro:", err);
@@ -452,7 +635,7 @@ app.get("/registro/:token", (req, res) => {
 });
 
 // Exportar a Excel (genérico: /api/export/leaders o /api/export/registrations)
-app.get("/api/export/:type", async (req, res) => {
+app.get("/api/export/:type", verifyToken, async (req, res) => {
   const { type } = req.params;
   const { eventId } = req.query;
   try {
@@ -638,6 +821,9 @@ app.get("/api/export/:type", async (req, res) => {
     sheet.views = [
       { state: 'frozen', xSplit: 0, ySplit: 3, activeCell: 'A4' }
     ];
+
+    // 🔍 Registrar exportación en auditoría
+    await logAudit(req, 'EXPORT', type, null, null, `Exportado reporte de ${type}${eventId ? ` (evento: ${eventId})` : ''}`);
 
     res.setHeader("Content-Disposition", `attachment; filename=${type}_export_${new Date().toISOString().slice(0, 10)}.xlsx`);
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -912,4 +1098,74 @@ app.get('/api/test-send-email', async (req, res) => {
     res.json({ success: false, error: error.message });
   }
 });
+
+// 🔍 --- RUTAS DE AUDITORÍA ---
+// Obtener todos los logs de auditoría (solo admin)
+app.get('/api/audit-logs', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Solo admin puede ver logs de auditoría' });
+  }
+
+  try {
+    const { action, resourceType, userId, limit = 100, skip = 0 } = req.query;
+    const filter = {};
+    if (action) filter.action = action;
+    if (resourceType) filter.resourceType = resourceType;
+    if (userId) filter.userId = userId;
+
+    const logs = await AuditLog.find(filter)
+      .sort({ timestamp: -1 })
+      .limit(parseInt(limit, 10))
+      .skip(parseInt(skip, 10));
+
+    const total = await AuditLog.countDocuments(filter);
+
+    res.json({
+      total,
+      count: logs.length,
+      skip: parseInt(skip, 10),
+      limit: parseInt(limit, 10),
+      logs
+    });
+  } catch (err) {
+    console.error('❌ Error obteniendo audit logs:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Obtener estadísticas de auditoría (solo admin)
+app.get('/api/audit-stats', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Solo admin puede ver estadísticas de auditoría' });
+  }
+
+  try {
+    const stats = await AuditLog.aggregate([
+      { $group: {
+          _id: '$action',
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    const userStats = await AuditLog.aggregate([
+      { $group: {
+          _id: { userId: '$userId', userName: '$userName', role: '$userRole' },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    res.json({
+      actionStats: stats,
+      userStats
+    });
+  } catch (err) {
+    console.error('❌ Error obteniendo audit stats:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));
