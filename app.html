@@ -1558,7 +1558,7 @@ async function apiCall(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
   
-  const response = await apiCall(`${endpoint}`, {
+  const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers
   });
