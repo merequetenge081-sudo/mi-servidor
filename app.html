@@ -1691,11 +1691,11 @@ async function saveAdminRegistration() {
 
     } else {
       const errorData = await response.json().catch(() => ({}));
-      showToast('danger', `á Error al guardar el registro: ${errorData.error || 'desconocido'}`);
+      showToast('danger', `Error al guardar el registro: ${errorData.error || 'desconocido'}`);
     }
   } catch (err) {
     console.error('Error guardando registro admin:', err);
-    showToast('danger', 'á Hubo un error al guardar el registro.');
+    showToast('danger', 'Hubo un error al guardar el registro.');
   }
 }
 
@@ -2600,7 +2600,7 @@ async function deleteRegistration(id) {
   const response = await apiCall(`/api/registrations/${id}`, { method: "DELETE" });
     if (response.ok) {
       console.log(`á Registro ${id} eliminado`);
-      showToast('success', 'á Registro eliminado');
+      showToast('success', 'Registro eliminado');
    
    // Recargar datos del servidor para asegurar sincronizacián
    await loadRegistrations();
@@ -2617,18 +2617,18 @@ async function deleteRegistration(id) {
     await updateDashboard();
    }
    
-   showToast('success', 'á Registro eliminado correctamente');
+  showToast('success', 'Registro eliminado correctamente');
     } else {
-      showToast('danger', 'á Error al eliminar el registro');
+      showToast('danger', 'Error al eliminar el registro');
   }
  } catch (err) {
   console.error('Error al eliminar registro:', err);
-    showToast('danger', 'á Error al eliminar el registro');
+    showToast('danger', 'Error al eliminar el registro');
  }
 }
 
 function editRegistration(id) {
-  showToast('info', 'áá Funcián de edicián pendiente ? aquá puedes abrir un modal con los datos.');
+  showToast('info', 'Función de edición pendiente — aquí puedes abrir un modal con los datos.');
 }
 
 // áá Define primero la funcián updateDashboard (solicitud del usuario)
