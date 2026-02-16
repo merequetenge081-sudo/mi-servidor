@@ -786,14 +786,14 @@
                                     <tr>
                                         <th>Fecha</th>
                                         <th>Nombre</th>
-                                        <th>C�dula</th>
+                                        <th>Cédula</th>
                                         <th>Líder</th>
                                         <th>Localidad</th>
-                                        <th>�Votante?</th>
-                                        <th>Puesto Votaci�n</th>
-                                        <th>N� Mesa</th>
+                                        <th>¿Votante?</th>
+                                        <th>Votación</th>
+                                        <th>N° Mesa</th>
                                         <th>Confirmado</th>
-                                        <th>Acci�n</th>
+                                        <th>Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody id="registrationsTableBody">
@@ -4562,8 +4562,7 @@ function logout() {
     activeEventId = null;
     activeEvent = null;
     
-    document.getElementById('landingPage').style.display = 'flex';
-    document.getElementById('adminPanel').style.display = 'none';
+    window.location.href = "/public/login.html";
     
     showToast('info', 'Ha cerrado sesión correctamente');
 }
