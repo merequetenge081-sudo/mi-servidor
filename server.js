@@ -655,6 +655,13 @@ app.get("/api/export/:type", verifyToken, async (req, res) => {
       regsFromDb = regsFromDb.filter(r => String(r.eventId) === String(eventId));
     }
     
+    // Si el usuario es un líder, restringir la exportación a sus registros únicamente
+    if (req.user && req.user.role === 'leader') {
+      const leaderId = String(req.user.leaderId);
+      regsFromDb = regsFromDb.filter(r => String(r.leaderId) === leaderId);
+      leadersFromDb = leadersFromDb.filter(l => String(l._id) === leaderId);
+    }
+    
     const data = {
       leaders: leadersFromDb,
       registrations: regsFromDb

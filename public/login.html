@@ -336,7 +336,7 @@
                 success.style.display = 'block';
 
                 setTimeout(() => {
-                    window.location.href = '/app.html';
+                    window.location.href = '/app';
                 }, 1500);
             } catch (err) {
                 error.textContent = 'Error de conexión: ' + err.message;
@@ -385,8 +385,8 @@
                 success.style.display = 'block';
 
                 setTimeout(() => {
-                    window.location.href = '/app.html';
-                }, 1500);
+                    window.location.href = '/leader';
+                }, 1200);
             } catch (err) {
                 error.textContent = 'Error de conexión: ' + err.message;
                 error.style.display = 'block';
@@ -400,7 +400,8 @@
             const token = localStorage.getItem('token');
             const role = localStorage.getItem('role');
             if (token && role) {
-                window.location.href = '/app.html';
+                if (role === 'admin') window.location.href = '/app';
+                else if (role === 'leader') window.location.href = '/leader';
             }
         });
     </script>
