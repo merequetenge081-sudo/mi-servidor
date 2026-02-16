@@ -60,17 +60,23 @@
             window.location.href = '/login';
         });
 
+        // Permitir acceso por URL: /leader?id=LEADERID&token=TOKEN
+        function getQueryParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
         window.addEventListener('load', () => {
-            const token = localStorage.getItem('token');
-            const role = localStorage.getItem('role');
-            if (!token || role !== 'leader') { window.location.href = '/'; return; }
-            loadLeaderData();
+            let leaderId = getQueryParam('id') || localStorage.getItem('leaderId');
+            let token = getQueryParam('token') || localStorage.getItem('token');
+            if (!leaderId || !token) {
+                window.location.href = '/login';
+                return;
+            }
+            loadLeaderData(leaderId, token);
         });
 
-        async function loadLeaderData(){
+        async function loadLeaderData(leaderId, token){
             try{
-                const token = localStorage.getItem('token');
-                const leaderId = localStorage.getItem('leaderId');
                 const leaderRes = await fetch(`${API_URL}/api/leaders/${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!leaderRes.ok) { if (leaderRes.status === 401) { window.location.href = '/'; } throw new Error('Error cargando datos del líder'); }
                 const leader = await leaderRes.json();
@@ -86,14 +92,14 @@
                 document.getElementById('totalRegistrations').textContent = totalRegs;
                 document.getElementById('confirmedRegistrations').textContent = confirmedRegs;
 
-                if (totalRegs > 0) { displayRegistrations(regsArray); document.getElementById('registrationsContainer').style.display = 'block'; document.getElementById('emptyMessage').style.display = 'none'; }
+                if (totalRegs > 0) { displayRegistrations(regsArray, leaderId, token); document.getElementById('registrationsContainer').style.display = 'block'; document.getElementById('emptyMessage').style.display = 'none'; }
                 else { document.getElementById('registrationsContainer').style.display = 'none'; document.getElementById('emptyMessage').style.display = 'block'; }
 
                 document.getElementById('loadingMessage').style.display = 'none';
             }catch(err){ console.error('Error:', err); document.getElementById('loadingMessage').innerHTML = '<div class="alert alert-danger">Error cargando datos: '+err.message+'</div>'; }
         }
 
-        function displayRegistrations(registrations){
+        function displayRegistrations(registrations, leaderId, token){
             const tbody = document.getElementById('registrationsTable'); tbody.innerHTML = '';
             registrations.forEach(reg => {
                 const row = document.createElement('tr');
@@ -104,10 +110,31 @@
                     <td>${reg.phone || '-'}</td>
                     <td>${reg.localidad || '-'}</td>
                     <td><span class="badge ${reg.confirmed ? 'bg-success' : 'bg-secondary'}">${reg.confirmed ? '✓ Confirmado' : 'Pendiente'}</span></td>
-                    <td><button class="btn btn-sm btn-outline-primary" onclick="viewDetails('${reg._id}')"><i class="bi bi-eye"></i> Ver</button></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-download"></i></button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        // Modal de edición simple
+        window.editReg = async function(id, leaderId, token) {
+            const res = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const regs = await res.json();
+            const reg = regs.find(r => r._id === id);
+            if (!reg) return alert('Registro no encontrado');
+            const nuevoNombre = prompt('Editar nombre:', reg.firstName || '');
+            if (nuevoNombre === null) return;
+            const body = { firstName: nuevoNombre };
+            const putRes = await fetch(`${API_URL}/api/registrations/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            if (!putRes.ok) return alert('Error al guardar');
+            loadLeaderData(leaderId, token);
+        }
+
+        window.exportReg = function(id, leaderId, token) {
+            alert('Funcionalidad de exportar registro individual próximamente.');
         }
 
         function viewDetails(id){ alert('Ver detalles: ' + id); }
