@@ -289,6 +289,18 @@ app.get("/api/leaders", async (req, res) => {
   res.json(leaders);
 });
 
+// 🔹 Obtener líder por id (protegido)
+app.get('/api/leaders/:id', verifyToken, async (req, res) => {
+  try {
+    const leader = await Leader.findById(req.params.id);
+    if (!leader) return res.status(404).json({ error: 'Líder no encontrado' });
+    res.json(leader);
+  } catch (err) {
+    console.error('Error obteniendo líder:', err);
+    res.status(500).json({ error: 'Error interno' });
+  }
+});
+
 // 🔹 Crear líder
 app.post("/api/leaders", async (req, res) => {
   try {
