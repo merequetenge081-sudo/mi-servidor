@@ -1592,13 +1592,13 @@ async function apiCall(endpoint, options = {}) {
 
 // Guardar registro desde el modal del admin
 async function saveAdminRegistration() {
-  const first = document.getElementById("adminFirstName")á.value.trim() || '';
-  const last = document.getElementById("adminLastName")á.value.trim() || '';
+  const first = document.getElementById("adminFirstName")?.value.trim() || '';
+  const last = document.getElementById("adminLastName")?.value.trim() || '';
   const name = (first + ' ' + last).trim();
-  const leaderId = document.getElementById("adminLeaderSelect")á.value;
-  const cedula = document.getElementById("adminCedula")á.value || '';
-  const email = document.getElementById("adminEmail")á.value || '';
-  const phone = document.getElementById("adminPhone")á.value || '';
+  const leaderId = document.getElementById("adminLeaderSelect")?.value;
+  const cedula = document.getElementById("adminCedula")?.value || '';
+  const email = document.getElementById("adminEmail")?.value || '';
+  const phone = document.getElementById("adminPhone")?.value || '';
 
   if (!name || !leaderId) {
     showToast('danger', 'Por favor completa todos los campos antes de guardar.');
@@ -1621,9 +1621,9 @@ async function saveAdminRegistration() {
       adminLocalidad = adminLocalidadSelect.value === 'Otra' á (document.getElementById('adminLocalidadOtra')á.value || '') : (adminLocalidadSelect.value || '');
     }
     const adminRegRadio = document.querySelector('input[name="adminRegisteredToVote"]:checked');
-    const adminRegisteredToVote = adminRegRadio á (adminRegRadio.value === 'true') : false;
-    const adminVotingPlace = document.getElementById('adminVotingPlace')á.value || '';
-    const adminVotingTable = document.getElementById('adminVotingTable')á.value || '';
+    const adminRegisteredToVote = adminRegRadio ? (adminRegRadio.value === 'true') : false;
+    const adminVotingPlace = document.getElementById('adminVotingPlace')?.value || '';
+    const adminVotingTable = document.getElementById('adminVotingTable')?.value || '';
 
     if (adminLocalidad) reg.localidad = adminLocalidad;
     reg.registeredToVote = adminRegisteredToVote;
@@ -1638,7 +1638,7 @@ async function saveAdminRegistration() {
     // Verificar duplicados por cádula antes de enviar
     if (reg.cedula) {
       try {
-        const q = `/registrationsácedula=${encodeURIComponent(reg.cedula)}${activeEventId á '&eventId=' + activeEventId : ''}`;
+        const q = `/registrations?cedula=${encodeURIComponent(reg.cedula)}${activeEventId ? '&eventId=' + activeEventId : ''}`;
         const check = await apiCall(q);
         if (check.ok) {
           const existing = await check.json();
@@ -1735,9 +1735,9 @@ function mapWikimediaNumbersToDataNames(svg) {
 
     // otherwise, pick the nearest shape by bbox center
     try {
-      const tb = t.getBBox á t.getBBox() : null;
-      const tx = tb á (tb.x + tb.width/2) : (parseFloat(t.getAttribute('x')) || 0);
-      const ty = tb á (tb.y + tb.height/2) : (parseFloat(t.getAttribute('y')) || 0);
+      const tb = t.getBBox ? t.getBBox() : null;
+      const tx = tb ? (tb.x + tb.width/2) : (parseFloat(t.getAttribute('x')) || 0);
+      const ty = tb ? (tb.y + tb.height/2) : (parseFloat(t.getAttribute('y')) || 0);
       let best = null; let bestDist = Infinity;
       candidateShapes.forEach(s => {
         try {
@@ -2270,8 +2270,8 @@ function onEachFeature(feature, layer) {
                       // compute bbox and centroid
                       let bx;
                       try { bx = s.getBBox(); } catch(e) { bx = null; }
-                      const cx = bx á (bx.x + bx.width/2) : 0;
-                      const cy = bx á (bx.y + bx.height/2) : 0;
+                      const cx = bx ? (bx.x + bx.width/2) : 0;
+                      const cy = bx ? (bx.y + bx.height/2) : 0;
                       const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                       t.setAttribute('x', cx);
                       t.setAttribute('y', cy);
@@ -2463,7 +2463,7 @@ async function renderLocalityMap() {
               try {
                 const mapped = mapWikimediaNumbersToDataNames(svgEl);
                 // Prefer the GeoJSON / Leaflet fallback unless the SVG mapping is complete.
-                const mappedCount = (Number(mapped) || 0) + (svgEl.querySelectorAll á svgEl.querySelectorAll('[data-name]').length : 0);
+                const mappedCount = (Number(mapped) || 0) + (svgEl.querySelectorAll ? svgEl.querySelectorAll('[data-name]').length : 0);
                 console.info('Mapped', mappedCount, 'labels to data-name on Wikimedia croquis.');
                 // Require a reasonable coverage (20 localidades) before using the SVG interactive mode.
                 if (mappedCount >= 20) {
@@ -2636,8 +2636,8 @@ function editRegistration(id) {
 async function updateDashboard() {
   try {
     // Obtener líderes y registros
-    const leadersUrl = `/leaders${activeEventId á 'áeventId=' + activeEventId : ''}`;
-    const regsUrl = `/registrations${activeEventId á 'áeventId=' + activeEventId : ''}`;
+    const leadersUrl = `/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
+    const regsUrl = `/registrations${activeEventId ? '?eventId=' + activeEventId : ''}`;
     const [leadersRes, regsRes] = await Promise.all([
       apiCall(leadersUrl),
       apiCall(regsUrl),
