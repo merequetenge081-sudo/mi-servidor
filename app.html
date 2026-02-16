@@ -509,7 +509,7 @@
     <div style="position: relative; left: 0; right: 0; background: rgba(0,0,0,0.12); color: rgba(255,255,255,0.9); padding: 1rem 0.75rem; text-align: center; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 1.2rem;">
       <p style="margin: 0; font-weight: 500;">
         Desarrollado por <strong>Jonnathan Peáa</strong> 
-        <span style="margin: 0 0.5rem;">á</span> 
+        <span style="margin: 0 0.5rem;">•</span> 
         <a href="mailto:jonnathanpena1@gmail.com" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.2s;">jonnathanpena1@gmail.com</a>
       </p>
       <p style="margin: 0.5rem 0 0 0; font-size: 0.8rem; opacity: 0.8;"> ? 2025 Red Social y Política. Todos los derechos reservados.
@@ -788,7 +788,7 @@
                     <th>Cédula</th>
                     <th>Líder</th>
                     <th>Localidad</th>
-                    <th>¿Votanteá</th>
+                    <th>¿Votante?</th>
                     <th>Votación</th>
                     <th>N° Mesa</th>
                     <th>Confirmado</th>
@@ -848,7 +848,7 @@
                 <div class="h6 mb-0" id="quickToday">-</div>
               </div>
               <div class="col-auto ms-auto">
-                <small class="text-white-50">áltima Actividad</small>
+                <small class="text-white-50">Última Actividad</small>
                 <div class="h6 mb-0" id="quickLastActivity">-</div>
               </div>
             </div>
@@ -964,7 +964,7 @@
               <div class="card shadow-sm h-100">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                   <h6 class="mb-0"><i class="bi bi-graph-up"></i> Registros por Dáa (Tendencia)</h6>
-                  <small class="text-muted">áltimos 30 dáas</small>
+                  <small class="text-muted">Últimos 30 días</small>
                 </div>
                 <div class="card-body p-3">
                   <canvas id="analysisDailyChart" style="width:100%; height:250px;"></canvas>
@@ -994,7 +994,7 @@
                   <div class="row align-items-center">
                     <div class="col">
                       <h4 class="mb-0 text-primary" id="avgRegistrationsPerDay">-</h4>
-                      <small class="text-muted">áltimos 7 dáas</small>
+                      <small class="text-muted">Últimos 7 días</small>
                     </div>
                     <div class="col-auto">
                       <i class="bi bi-trending-up text-success" style="font-size: 2rem;"></i>
@@ -1056,7 +1056,7 @@
                       <th class="text-end" style="width: 12%;">Registros</th>
                       <th class="text-end" style="width: 12%;">Confirmados</th>
                       <th class="text-end" style="width: 15%;">% Confirmación</th>
-                      <th style="width: 16%;">áltimo Registro</th>
+                      <th style="width: 16%;">Último Registro</th>
                     </tr>
                   </thead>
                   <tbody id="leaderAnalysisList">
@@ -1295,11 +1295,11 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label">áTienes inscrita la cádula para votará</label>
+              <label class="form-label">¿Tienes inscrita la cédula para votar?</label>
               <div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" type="radio" name="registeredToVote" id="registeredYes" value="true" onchange="toggleVotingPlace(true)">
-                  <label class="form-check-label" for="registeredYes">Sá</label>
+                  <label class="form-check-label" for="registeredYes">Sí</label>
                 </div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" type="radio" name="registeredToVote" id="registeredNo" value="false" onchange="toggleVotingPlace(false)" checked>
@@ -1315,7 +1315,7 @@
                 <label for="votingTable" class="form-label">Námero de mesa</label>
                 <input type="text" class="form-control" id="votingTable" name="votingTable" placeholder="Námero de mesa (ej. 023)">
               </div>
-              <div class="form-text">No estás seguroá <a href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank" rel="noopener noreferrer">áDánde votoá</a></div>
+              <div class="form-text">No estás seguro? <a href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank" rel="noopener noreferrer">¿Dónde voto?</a></div>
             </div>
           </div>
           
@@ -1335,7 +1335,7 @@
         <!-- Pantalla de áxito: se muestra despuás de guardar -->
         <div id="registrationSuccessScreen" style="display:none; text-align:center; padding:2rem;">
           <div style="padding:2rem;">
-            <h2 class="text-success">áRegistro exitoso!</h2>
+            <h2 class="text-success">¡Registro exitoso!</h2>
             <p class="lead">Gracias por registrarte. Hemos recibido tus datos correctamente.</p>
             <p>Si necesitas volver a la página de administracián, usa el botán abajo.</p>
             <div style="margin-top:1.5rem;">
@@ -1478,11 +1478,11 @@
             <input type="text" id="adminLocalidadOtra" name="adminLocalidadOtra" class="form-control mt-2" placeholder="Especifique otra localidad" style="display:none;" />
           </div>
           <div class="mb-3">
-            <label class="form-label">áTiene inscrita la cádula para votará</label>
+            <label class="form-label">¿Tiene inscrita la cédula para votar?</label>
             <div>
                       <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="adminRegisteredToVote" id="adminRegisteredYes" value="true" onchange="toggleAdminVotingPlace(true)">
-                        <label class="form-check-label" for="adminRegisteredYes">Sá</label>
+                        <label class="form-check-label" for="adminRegisteredYes">Sí</label>
                       </div>
                       <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="adminRegisteredToVote" id="adminRegisteredNo" value="false" checked onchange="toggleAdminVotingPlace(false)">
@@ -1497,7 +1497,7 @@
               <label for="adminVotingTable" class="form-label">Námero de mesa</label>
               <input type="text" class="form-control" id="adminVotingTable" name="adminVotingTable" placeholder="Námero de mesa (ej. 023)">
             </div>
-            <div class="form-text">Buscar: <a href="https://www.google.com/searcháq=dánde+voto" target="_blank">áDánde votoá</a></div>
+            <div class="form-text">Buscar: <a href="https://www.google.com/search?q=d%C3%B3nde+voto" target="_blank">¿Dónde voto?</a></div>
           </div>
     </form>
    </div>
@@ -3660,6 +3660,14 @@ let isPublicRegistrationMode = false;
 window.addEventListener("DOMContentLoaded", async () => {
  const urlParams = new URLSearchParams(window.location.search);
  const leaderToken = urlParams.get("leader");
+ 
+ // IMPORTANTE: Verificar autenticación PRIMERO
+ const token = localStorage.getItem('token');
+ const isPublicForm = !!leaderToken;
+ if (!token && !isPublicForm && window.location.pathname !== '/login' && window.location.pathname !== '/') {
+  window.location.href = '/login';
+  return;
+ }
 
  if (leaderToken) {
   isPublicRegistrationMode = true;
