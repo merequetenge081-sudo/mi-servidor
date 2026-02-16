@@ -2791,7 +2791,7 @@ function editEvent(id) {
 // ===================== áá Cargar datos del backend =====================
 async function loadLeaders() {
  try {
-    const url = `${API_BASE}/leaders${activeEventId ? 'áeventId=' + activeEventId : ''}`;
+    const url = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
     const res = await fetch(url);
   if (!res.ok) throw new Error('Error cargando líderes');
   leaders = await res.json();
@@ -2864,7 +2864,7 @@ function stopAutoRefresh() {
 
 async function loadRegistrations() {
  try {
-    const url = `/registrations${activeEventId ? 'áeventId=' + activeEventId : ''}`;
+    const url = `/registrations${activeEventId ? '?eventId=' + activeEventId : ''}`;
     const res = await apiCall(url);
   if (!res.ok) throw new Error('Error cargando registros');
   registrations = await res.json();
@@ -3175,7 +3175,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
   try {
     const cedula = data.cedula || '';
     if (cedula) {
-      const checkUrl = `/registrationsácedula=${encodeURIComponent(cedula)}${activeEventId ? '&eventId=' + activeEventId : ''}`;
+      const checkUrl = `/registrations?cedula=${encodeURIComponent(cedula)}${activeEventId ? '&eventId=' + activeEventId : ''}`;
       const checkRes = await apiCall(checkUrl);
       if (checkRes.ok) {
         const existing = await checkRes.json();
@@ -3282,7 +3282,7 @@ function showQRCode(leader) {
 
   // Generar QR con qrcodejs
   new QRCode(qrContainer, {
-    text: `${window.location.origin}/áleader=${leader.token}`,
+    text: `${window.location.origin}/?leader=${leader.token}`,
     width: 200,
     height: 200,
     colorDark: '#000000',
@@ -3294,7 +3294,7 @@ function showQRCode(leader) {
   if (titleEl) titleEl.innerText = `QR de ${leader.name}`;
 
   // Rellenar el link del registro en el input
-  const registrationLink = `${window.location.origin}/áleader=${leader.token}`;
+  const registrationLink = `${window.location.origin}/?leader=${leader.token}`;
   const linkInput = document.getElementById('leaderRegistrationLink');
   if (linkInput) {
     linkInput.value = registrationLink;
@@ -3761,7 +3761,7 @@ let analysisDailyChart = null;
 // Deteccián de duplicados
 async function detectDuplicates() {
   try {
-    const res = await apiCall(`/duplicates${activeEventId ? 'áeventId=' + activeEventId : ''}`);
+    const res = await apiCall(`/duplicates${activeEventId ? '?eventId=' + activeEventId : ''}`);
     if (!res.ok) throw new Error('Error al solicitar duplicados');
     const data = await res.json();
 
@@ -3886,7 +3886,7 @@ async function refreshAnalysis() {
 
     // Obtener series diarias y renderizar chart
     try {
-      const dailyRes = await apiCall(`/stats/daily${activeEventId ? 'áeventId=' + activeEventId : ''}`);
+      const dailyRes = await apiCall(`/stats/daily${activeEventId ? '?eventId=' + activeEventId : ''}`);
       if (dailyRes.ok) {
         const dailyData = await dailyRes.json();
         renderDailyChart(dailyData);
