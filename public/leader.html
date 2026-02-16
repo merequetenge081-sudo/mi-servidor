@@ -99,25 +99,102 @@
             }catch(err){ console.error('Error:', err); document.getElementById('loadingMessage').innerHTML = '<div class="alert alert-danger">Error cargando datos: '+err.message+'</div>'; }
         }
 
-        function displayRegistrations(registrations, leaderId, token){
-            const tbody = document.getElementById('registrationsTable'); tbody.innerHTML = '';
-            registrations.forEach(reg => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${reg.firstName || ''} ${reg.lastName || ''}</strong></td>
-                    <td>${reg.cedula || '-'}</td>
-                    <td>${reg.email || '-'}</td>
-                    <td>${reg.phone || '-'}</td>
-                    <td>${reg.localidad || '-'}</td>
-                    <td><span class="badge ${reg.confirmed ? 'bg-success' : 'bg-secondary'}">${reg.confirmed ? '✓ Confirmado' : 'Pendiente'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary" onclick="editReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-pencil"></i> Editar</button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="exportReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-download"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+                function displayRegistrations(registrations, leaderId, token){
+                        const tbody = document.getElementById('registrationsTable'); tbody.innerHTML = '';
+                        registrations.forEach(reg => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                        <td><strong>${reg.firstName || ''} ${reg.lastName || ''}</strong></td>
+                                        <td>${reg.cedula || '-'}</td>
+                                        <td>${reg.email || '-'}</td>
+                                        <td>${reg.phone || '-'}</td>
+                                        <td>${reg.localidad || '-'}</td>
+                                        <td><span class="badge ${reg.confirmed ? 'bg-success' : 'bg-secondary'}">${reg.confirmed ? '✓ Confirmado' : 'Pendiente'}</span></td>
+                                        <td>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="editReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-pencil"></i> Editar</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="exportReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-download"></i></button>
+                                        </td>
+                                `;
+                                tbody.appendChild(row);
+                        });
+                }
+
+                // Modal avanzado de edición
+                let editModal = null;
+                window.editReg = async function(id, leaderId, token) {
+                        const res = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                        const regs = await res.json();
+                        const reg = regs.find(r => r._id === id);
+                        if (!reg) return alert('Registro no encontrado');
+
+                        // Crear modal si no existe
+                        if (!editModal) {
+                                editModal = document.createElement('div');
+                                editModal.className = 'modal fade';
+                                editModal.innerHTML = `
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Editar Registro</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="editForm">
+                                                <div class="mb-2"><label>Nombre</label><input class="form-control" id="edit_firstName"></div>
+                                                <div class="mb-2"><label>Apellido</label><input class="form-control" id="edit_lastName"></div>
+                                                <div class="mb-2"><label>Cédula</label><input class="form-control" id="edit_cedula"></div>
+                                                <div class="mb-2"><label>Email</label><input class="form-control" id="edit_email"></div>
+                                                <div class="mb-2"><label>Teléfono</label><input class="form-control" id="edit_phone"></div>
+                                                <div class="mb-2"><label>Localidad</label><input class="form-control" id="edit_localidad"></div>
+                                                <div class="mb-2"><label>¿Inscrito para votar?</label><select class="form-select" id="edit_votante"><option value="true">Sí</option><option value="false">No</option></select></div>
+                                                <div class="mb-2"><label>Puesto de Votación</label><input class="form-control" id="edit_votingPlace"></div>
+                                                <div class="mb-2"><label>Nº Mesa</label><input class="form-control" id="edit_votingTable"></div>
+                                                <div class="mb-2"><label>Confirmado</label><select class="form-select" id="edit_confirmed"><option value="true">Sí</option><option value="false">No</option></select></div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-primary" id="saveEditBtn">Guardar</button>
+                                        </div>
+                                    </div>
+                                </div>`;
+                                document.body.appendChild(editModal);
+                        }
+                        // Rellenar campos
+                        document.getElementById('edit_firstName').value = reg.firstName || '';
+                        document.getElementById('edit_lastName').value = reg.lastName || '';
+                        document.getElementById('edit_cedula').value = reg.cedula || '';
+                        document.getElementById('edit_email').value = reg.email || '';
+                        document.getElementById('edit_phone').value = reg.phone || '';
+                        document.getElementById('edit_localidad').value = reg.localidad || '';
+                        document.getElementById('edit_votante').value = reg.registeredToVote ? 'true' : 'false';
+                        document.getElementById('edit_votingPlace').value = reg.votingPlace || '';
+                        document.getElementById('edit_votingTable').value = reg.votingTable || '';
+                        document.getElementById('edit_confirmed').value = reg.confirmed ? 'true' : 'false';
+
+                        // Mostrar modal
+                        let bsModal = new bootstrap.Modal(editModal);
+                        bsModal.show();
+
+                        document.getElementById('saveEditBtn').onclick = async function() {
+                                const body = {
+                                        firstName: document.getElementById('edit_firstName').value,
+                                        lastName: document.getElementById('edit_lastName').value,
+                                        cedula: document.getElementById('edit_cedula').value,
+                                        email: document.getElementById('edit_email').value,
+                                        phone: document.getElementById('edit_phone').value,
+                                        localidad: document.getElementById('edit_localidad').value,
+                                        registeredToVote: document.getElementById('edit_votante').value === 'true',
+                                        votingPlace: document.getElementById('edit_votingPlace').value,
+                                        votingTable: document.getElementById('edit_votingTable').value,
+                                        confirmed: document.getElementById('edit_confirmed').value === 'true'
+                                };
+                                const putRes = await fetch(`${API_URL}/api/registrations/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                                if (!putRes.ok) return alert('Error al guardar');
+                                bsModal.hide();
+                                loadLeaderData(leaderId, token);
+                        };
+                }
 
         // Modal de edición simple
         window.editReg = async function(id, leaderId, token) {
