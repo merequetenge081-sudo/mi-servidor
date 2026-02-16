@@ -1309,11 +1309,11 @@
             </div>
 
             <div class="mb-3" id="votingPlaceGroup" style="display:none;">
-              <label for="votingPlace" class="form-label">Puesto de Votacián</label>
-              <input type="text" class="form-control" id="votingPlace" name="votingPlace" placeholder="Nombre del puesto de votacián">
+              <label for="votingPlace" class="form-label">Puesto de Votación</label>
+              <input type="text" class="form-control" id="votingPlace" name="votingPlace" placeholder="Nombre del puesto de votación">
               <div class="mt-2">
-                <label for="votingTable" class="form-label">Námero de mesa</label>
-                <input type="text" class="form-control" id="votingTable" name="votingTable" placeholder="Námero de mesa (ej. 023)">
+                <label for="votingTable" class="form-label">Número de mesa</label>
+                <input type="text" class="form-control" id="votingTable" name="votingTable" placeholder="Número de mesa (ej. 023)">
               </div>
               <div class="form-text">No estás seguro? <a href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank" rel="noopener noreferrer">¿Dónde voto?</a></div>
             </div>
@@ -1332,14 +1332,14 @@
             </button>
           </div>
         </form>
-        <!-- Pantalla de áxito: se muestra despuás de guardar -->
+        <!-- Pantalla de éxito: se muestra después de guardar -->
         <div id="registrationSuccessScreen" style="display:none; text-align:center; padding:2rem;">
           <div style="padding:2rem;">
             <h2 class="text-success">¡Registro exitoso!</h2>
             <p class="lead">Gracias por registrarte. Hemos recibido tus datos correctamente.</p>
-            <p>Si necesitas volver a la página de administracián, usa el botán abajo.</p>
+            <p>Si necesitas volver a la página de administración, usa el botón abajo.</p>
             <div style="margin-top:1.5rem;">
-              <button class="btn btn-outline-primary" onclick="showAdminPanel()">Volver al Panel de Administracián</button>
+              <button class="btn btn-outline-primary" onclick="showAdminPanel()">Volver al Panel de Administración</button>
               <button class="btn btn-secondary ms-2" onclick="resetPublicForm()">Registrar otra persona</button>
             </div>
           </div>
@@ -1348,7 +1348,7 @@
       
       <div class="text-center mt-4">
         <button class="btn btn-outline-secondary" onclick="showAdminPanel()">
-          <i class="bi bi-arrow-left"></i> Volver al Panel de Administracián
+          <i class="bi bi-arrow-left"></i> Volver al Panel de Administración
         </button>
       </div>
     </div>
@@ -1374,11 +1374,11 @@
               <input type="email" class="form-control" id="leaderEmail" required>
             </div>
             <div class="mb-3">
-              <label for="leaderPhone" class="form-label">Teláfono</label>
+              <label for="leaderPhone" class="form-label">Teléfono</label>
               <input type="tel" class="form-control" id="leaderPhone" required>
             </div>
             <div class="mb-3">
-              <label for="leaderArea" class="form-label">área/Zona</label>
+              <label for="leaderArea" class="form-label">Área/Zona</label>
               <input type="text" class="form-control" id="leaderArea">
             </div>
             <div class="form-check mb-3">
@@ -1442,7 +1442,7 @@
       <input type="email" class="form-control" id="adminEmail" required>
      </div>
      <div class="mb-3">
-      <label class="form-label">Teláfono</label>
+      <label class="form-label">Teléfono</label>
       <input type="tel" class="form-control" id="adminPhone" required>
      </div>
      <div class="mb-3">
@@ -1453,7 +1453,7 @@
             <label class="form-label">Localidad</label>
             <select id="adminLocalidadSelect" name="adminLocalidad" class="form-select" onchange="toggleAdminLocalidadOther(this.value)">
               <option value="">-- Seleccione Localidad --</option>
-              <option>Usaquán</option>
+              <option>Usaquén</option>
               <option>Chapinero</option>
               <option>Santa Fe</option>
               <option>San Cristábal</option>
@@ -1461,17 +1461,17 @@
               <option>Tunjuelito</option>
               <option>Bosa</option>
               <option>Kennedy</option>
-              <option>Fontibán</option>
+              <option>Fontibón</option>
               <option>Engativá</option>
               <option>Suba</option>
               <option>Barrios Unidos</option>
               <option>Teusaquillo</option>
               <option>Los Mártires</option>
-              <option>Antonio Nariáo</option>
+              <option>Antonio Nariño</option>
               <option>Puente Aranda</option>
               <option>La Candelaria</option>
               <option>Rafael Uribe Uribe</option>
-              <option>Ciudad Bolávar</option>
+              <option>Ciudad Bolívar</option>
               <option>Sumapaz</option>
               <option value="Otra">Otra</option>
             </select>
@@ -1491,11 +1491,11 @@
             </div>
           </div>
           <div class="mb-3" id="adminVotingPlaceGroup" style="display:none;">
-            <label class="form-label">Puesto de Votacián</label>
+            <label class="form-label">Puesto de Votación</label>
             <input type="text" class="form-control" id="adminVotingPlace" name="adminVotingPlace" placeholder="Nombre del puesto de votacián">
             <div class="mt-2">
-              <label for="adminVotingTable" class="form-label">Námero de mesa</label>
-              <input type="text" class="form-control" id="adminVotingTable" name="adminVotingTable" placeholder="Námero de mesa (ej. 023)">
+              <label for="adminVotingTable" class="form-label">Número de mesa</label>
+              <input type="text" class="form-control" id="adminVotingTable" name="adminVotingTable" placeholder="Número de mesa (ej. 023)">
             </div>
             <div class="form-text">Buscar: <a href="https://www.google.com/search?q=d%C3%B3nde+voto" target="_blank">¿Dónde voto?</a></div>
           </div>
@@ -1518,7 +1518,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <p class="text-muted">Se muestran grupos de posibles duplicados (misma cádula o mismo email+teláfono).</p>
+              <p class="text-muted">Se muestran grupos de posibles duplicados (misma cédula o mismo email/teléfono).</p>
               <div id="duplicatesResults">
                 <!-- llenado dinámico -->
               </div>
@@ -1547,7 +1547,7 @@ let registrations = [];
 let activeEventId = localStorage.getItem('activeEventId') || '';
 let activeEvent = null;
 
-// áá Helper para hacer fetch con autenticacián automática
+// Helper para hacer fetch con autenticación automática
 async function apiCall(endpoint, options = {}) {
  const token = localStorage.getItem('token');
  const headers = {
@@ -1570,7 +1570,7 @@ async function apiCall(endpoint, options = {}) {
   localStorage.removeItem('token');
   localStorage.removeItem('role');
   window.location.href = '/login';
-  throw new Error('Sesián expirada. Redirigiendo a login...');
+  throw new Error('Sesión expirada. Redirigiendo a login...');
  }
  
  return response;
