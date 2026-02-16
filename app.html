@@ -4558,13 +4558,14 @@ function toggleLeadersPerformance() {
 // Función para logout/cerrar sesión
 function logout() {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('username');
     localStorage.removeItem('activeEventId');
     activeEventId = null;
     activeEvent = null;
     
-    window.location.href = "/public/login.html";
-    
-    showToast('info', 'Ha cerrado sesión correctamente');
+    window.location.href = "/";
 }
 
 function changeEvent() {
