@@ -3101,24 +3101,27 @@ async function deleteLeader(id) {
 }
 
 async function exportToExcel(type) {
+    const token = localStorage.getItem('token');
     const url = `${API_BASE}/export/${type}${activeEventId ? '?eventId=' + activeEventId : ''}`;
     const res = await fetch(url, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     }
   });
   
   if (res.ok) {
     const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
+    const downloadUrl = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.style.display = 'none';
-    a.href = url;
+    a.href = downloadUrl;
     a.download = `export_${type}_${new Date().toISOString().slice(0, 10)}.xlsx`;
     document.body.appendChild(a);
     a.click();
-    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(downloadUrl);
     showToast('success', `Datos exportados a Excel (${type})`);
   } else {
     showToast('danger', 'Error al exportar datos');
