@@ -2918,7 +2918,7 @@ function updateRegistrationsTable() {
   const tbody = document.getElementById('registrationsTableBody');
   tbody.innerHTML = registrations.map(reg => {
     const nombre = reg.name || ((reg.firstName || '') + ' ' + (reg.lastName || '')).trim() || 'Sin nombre';
-    const lider = (leaders.find(l => l._id === reg.leaderId)á.name) || reg.leaderName || 'Sin líder';
+    const lider = (leaders.find(l => l._id === reg.leaderId).name) || reg.leaderName || 'Sin líder';
     const fecha = reg.date ? new Date(reg.date).toLocaleDateString() : 'Sin fecha';
     const confirmed = reg.confirmed ? true : false;
     const confirmedBy = reg.confirmedBy ? reg.confirmedBy : '';
@@ -2989,7 +2989,7 @@ function showSection(section) {
  const links = document.querySelectorAll('.sidebar .nav-link');
  links.forEach(link => {
   link.classList.remove('active');
-  if (link.getAttribute('onclick')á.includes(section)) {
+  if (link.getAttribute('onclick').includes(section)) {
    link.classList.add('active');
   }
  });
@@ -3155,7 +3155,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
   // Si seleccioná 'Otra' en localidad, obtener el texto especificado
   if (data.localidad === 'Otra') {
-    data.localidad = document.getElementById('localidadOtra')á.value || '';
+    data.localidad = document.getElementById('localidadOtra').value || '';
   }
 
   // Asegurar que el leaderId se asigne. Si no está disponible, enviar token para que el servidor lo resuelva
@@ -3338,17 +3338,17 @@ async function registerPerson() {
     const urlLeaderToken = urlParams.get('leader');
     const leaderId = window.currentLeaderId || null;
     const leaderToken = urlLeaderToken || null;
-    const firstName = document.getElementById('firstName')á.value || '';
-    const lastName = document.getElementById('lastName')á.value || '';
-    const cedula = document.getElementById('cedula')á.value || '';
-    const email = document.getElementById('email')á.value || '';
-    const phone = document.getElementById('phone')á.value || '';
+    const firstName = document.getElementById('firstName').value || '';
+    const lastName = document.getElementById('lastName').value || '';
+    const cedula = document.getElementById('cedula').value || '';
+    const email = document.getElementById('email').value || '';
+    const phone = document.getElementById('phone').value || '';
     // Localidad: puede ser select con opcián 'Otra'
     const localidadSelect = document.getElementById('localidadSelect');
     let localidad = '';
     if (localidadSelect) {
       if (localidadSelect.value === 'Otra') {
-        localidad = document.getElementById('localidadOtra')á.value || '';
+        localidad = document.getElementById('localidadOtra').value || '';
       } else {
         localidad = localidadSelect.value || '';
       }
@@ -3639,9 +3639,9 @@ async function sendNotification(registrationId) {
     
     if (result.success) {
       showToast('success', 'Notificaciones enviadas correctamente');
-      if (result.resultsá.emailá.success) {
+      if (result.results.email.success) {
         console.log('á Email enviado exitosamente');
-      } else if (result.resultsá.emailá.error) {
+      } else if (result.results.email.error) {
         console.log('á Error en email:', result.results.email.error);
       }
     } else {
@@ -4428,7 +4428,7 @@ function applyFilters() {
   let titleText = 'Todos los Registros';
   if (currentFilterLeaderId) {
     const leader = allLeadersData.find(l => l._id === currentFilterLeaderId);
-    titleText = `Registros de ${leaderá.name || 'Líder'}`;
+    titleText = `Registros de ${leader.name || 'Líder'}`;
   } else if (currentSearchTerm) {
     titleText = `Básqueda: "${currentSearchTerm}"`;
   } else if (currentLocalidadFilter) {
@@ -4619,9 +4619,9 @@ function goToCreateEvent() {
 async function saveEventFromPage(event) {
   event.preventDefault();
   
-  const name = document.getElementById('createEventNameInput')á.value;
-  const date = document.getElementById('createEventDateInput')á.value;
-  const description = document.getElementById('createEventDescriptionInput')á.value;
+  const name = document.getElementById('createEventNameInput').value;
+  const date = document.getElementById('createEventDateInput').value;
+  const description = document.getElementById('createEventDescriptionInput').value;
   
   if (!name || !date) {
     showToast('warning', 'Por favor llena el nombre y la fecha');
@@ -4763,7 +4763,7 @@ async function selectEventFromLanding(eventId) {
     document.getElementById('adminPanel').style.display = 'block';
     
     showSection('dashboard');
-    showToast('success', `Evento "${activeEventá.name}" cargado correctamente`);
+    showToast('success', `Evento "${activeEvent.name}" cargado correctamente`);
   } catch (error) {
     console.error('Error seleccionando evento:', error);
     showToast('danger', 'Error al seleccionar el evento');
@@ -5001,9 +5001,9 @@ async function exportFilteredRegistrations() {
       if (cells.length === 0) continue; // Saltar filas sin datos
       
       // Los ándices corresponden a: #, Fecha, Nombre, Cédula, Teláfono, Localidad, áVotanteá, Puesto, Estado, Confirmado Por, Acciones
-      const fullName = cells[2]á.textContent.trim() || '';
-      const fecha = cells[1]á.textContent.trim() || '';
-      const cedula = cells[3]á.textContent.trim() || '';
+      const fullName = cells[2].textContent.trim() || '';
+      const fecha = cells[1].textContent.trim() || '';
+      const cedula = cells[3].textContent.trim() || '';
       const telefono = cells[4]á.textContent.trim() || '';
       const localidad = cells[5]á.textContent.trim() || '';
       const votante = cells[6]á.textContent.trim() || '';
