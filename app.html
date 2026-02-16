@@ -25,8 +25,7 @@
       --light: #f8f9fa;
       --dark: #212529;
     }
-    
-    /* Estilos para la seccián de análisis */
+    /* Estilos para la sección de análisis */
     #analysisSection {
       max-height: calc(100vh - 220px);
       overflow-y: auto;
@@ -305,7 +304,7 @@
       z-index: 9999;
     }
 
-    /* Ocultar completamente landing page en modo páblico */
+    /* Ocultar completamente landing page en modo público */
     .public-registration-mode #landingPage,
     .public-registration-mode #createEventPage,
     .public-registration-mode #viewEventsPage {
@@ -323,8 +322,12 @@
       display: block !important;
       visibility: visible !important;
     }
+      /* New styles added for improved accessibility */
+      .accessible {
+        outline: 2px solid var(--primary);
+      }
 
-    /* Mejoras de usabilidad táctil en máviles */
+    /* Mejoras de usabilidad táctil en móviles */
     @media (max-width: 576px) {
       .form-control {
         padding: 0.75rem 0.85rem;
@@ -345,7 +348,7 @@
       /* Botones principales a ancho completo para facilidad táctil */
       .public-form .btn, .d-grid .btn { width: 100% !important; }
 
-      /* Inputs de formularios en admin tambián más altos */
+      /* Inputs de formularios en admin también más altos */
       #adminRegistrationForm .form-control { min-height: 44px; }
     }
     /* Mobile sidebar / top bar */
@@ -440,13 +443,13 @@
   </style>
 </head>
 <body>
-  <!-- Barra superior mávil: botán hamburguesa para mostrar el sidebar en pantallas pequeáas -->
+  <!-- Barra superior móvil: botón hamburguesa para mostrar el sidebar en pantallas pequeñas -->
   <div id="mobileTopBar" class="d-md-none">
     <button id="sidebarToggle" class="btn btn-outline-secondary me-2" style="padding:6px 8px;"><i class="bi bi-list"></i></button>
     <div class="app-title">Red Social y Política</div>
   </div>
 
-  <!-- Backdrop para el sidebar en mávil (se gestiona por JS) -->
+  <!-- Backdrop para el sidebar en móvil (se gestiona por JS) -->
   <div id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
   <!-- Landing Page (Crear/Ver Eventos) -->
   <div id="landingPage" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); overflow-y: auto; -webkit-overflow-scrolling: touch; z-index: 9000;">
@@ -459,7 +462,7 @@
       </p>
       
       <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
-        <!-- Botán Crear Evento -->
+        <!-- Botón Crear Evento -->
         <div style="flex: 1; min-width: 280px; max-width: 350px;">
           <div style="background: rgba(255,255,255,0.95); border-radius: 16px; padding: 2.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transition: all 0.3s ease; cursor: pointer;" 
              onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 30px 80px rgba(0,0,0,0.4)';" 
@@ -481,7 +484,7 @@
           </div>
         </div>
 
-        <!-- Botán Ver Eventos -->
+        <!-- Botón Ver Eventos -->
         <div style="flex: 1; min-width: 280px; max-width: 350px;">
           <div style="background: rgba(255,255,255,0.95); border-radius: 16px; padding: 2.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transition: all 0.3s ease; cursor: pointer;" 
              onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 30px 80px rgba(0,0,0,0.4)';" 
@@ -493,7 +496,7 @@
               Ver Eventos
             </h3>
             <p style="color: #7f8c8d; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.5;">
-              Accede a eventos existentes para gestionar tu informacián
+              Accede a eventos existentes para gestionar tu información
             </p>
             <button onclick="goToViewEvents()" style="background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s ease;"
                 onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 30px rgba(76, 201, 240, 0.4)';"
@@ -508,7 +511,7 @@
     <!-- Footer -->
     <div style="position: relative; left: 0; right: 0; background: rgba(0,0,0,0.12); color: rgba(255,255,255,0.9); padding: 1rem 0.75rem; text-align: center; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 1.2rem;">
       <p style="margin: 0; font-weight: 500;">
-        Desarrollado por <strong>Jonnathan Peáa</strong> 
+        Desarrollado por <strong>Jonnathan Peña</strong> 
         <span style="margin: 0 0.5rem;">•</span> 
         <a href="mailto:jonnathanpena1@gmail.com" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.2s;">jonnathanpena1@gmail.com</a>
       </p>
@@ -541,8 +544,8 @@
                   <input type="date" class="form-control" id="createEventDateInput" required>
                 </div>
                 <div class="mb-3">
-                  <label for="createEventDescriptionInput" class="form-label">Descripcián (Opcional)</label>
-                  <textarea class="form-control" id="createEventDescriptionInput" rows="3" placeholder="Descripcián del evento..."></textarea>
+                  <label for="createEventDescriptionInput" class="form-label">Descripción (Opcional)</label>
+                  <textarea class="form-control" id="createEventDescriptionInput" rows="3" placeholder="Descripción del evento..."></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary btn-lg w-100" onclick="saveEventFromPage(event)">
                   <i class="bi bi-plus-circle"></i> Crear Evento
@@ -566,7 +569,7 @@
     </div>
     <div class="container-fluid mt-5 pb-5">
       <div id="eventsListContainer" class="row g-4">
-        <!-- Lista de eventos se cargará aquá dinámicamente -->
+        <!-- Lista de eventos se cargará aquí dinámicamente -->
       </div>
     </div>
   </div>
@@ -701,7 +704,7 @@
                         <th>Fecha</th>
                         <th>Persona</th>
                         <th>Líder</th>
-                        <th>Accián</th>
+                        <th>Acción</th>
                       </tr>
                     </thead>
                     <tbody id="recentActivity">
@@ -729,9 +732,12 @@
       <div id="leadersSection" style="display: none;">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
           <h1 class="h3">Gestión de Líderes</h1>
-          <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-toolbar mb-2 mb-md-0" style="gap: 0.5rem;">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
               <i class="bi bi-plus-circle"></i> Nuevo Líder
+            </button>
+            <button class="btn btn-success" onclick="exportToExcel('registrations')">
+              <i class="bi bi-file-earmark-spreadsheet"></i> Exportar todos los registros
             </button>
           </div>
         </div>
@@ -867,7 +873,7 @@
               </li>
               <li class="nav-item" role="presentation">
                 <button class="nav-link text-white" id="tab-geography" data-bs-toggle="tab" data-bs-target="#content-geography" type="button" role="tab">
-                  <i class="bi bi-geo-alt"></i> Geografáa
+                  <i class="bi bi-geo-alt"></i> Geografía
                 </button>
               </li>
               <li class="nav-item" role="presentation">
@@ -950,7 +956,7 @@
             <div class="col-md-3">
               <div class="card h-100 border-start border-4 border-warning shadow-sm">
                 <div class="card-body">
-                  <h6 class="card-title text-muted mb-2"><i class="bi bi-clock"></i> áltima Actividad</h6>
+                  <h6 class="card-title text-muted mb-2"><i class="bi bi-clock"></i> Última Actividad</h6>
                   <p class="h6 fw-bold mb-0" id="lastActivity">-</p>
                   <small class="text-muted" id="lastActivityTime">-</small>
                 </div>
@@ -963,7 +969,7 @@
             <div class="col-lg-8">
               <div class="card shadow-sm h-100">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                  <h6 class="mb-0"><i class="bi bi-graph-up"></i> Registros por Dáa (Tendencia)</h6>
+                  <h6 class="mb-0"><i class="bi bi-graph-up"></i> Registros por Día (Tendencia)</h6>
                   <small class="text-muted">Últimos 30 días</small>
                 </div>
                 <div class="card-body p-3">
@@ -988,7 +994,7 @@
             <div class="col-md-6">
               <div class="card shadow-sm h-100">
                 <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Promedio de Registros/Dáa</h6>
+                  <h6 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Promedio de Registros/Día</h6>
                 </div>
                 <div class="card-body">
                   <div class="row align-items-center">
@@ -1024,14 +1030,14 @@
           </div>
         </div>
 
-        <!-- TAB 2: LáDERES -->
+        <!-- TAB 2: LÍDERES -->
         <div class="tab-pane fade" id="content-leaders" role="tabpanel">
           <!-- Leaders Performance -->
           <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center bg-light">
               <div>
-                <h6 class="mb-0"><i class="bi bi-medal"></i> Desempeáo de Líderes</h6>
-                <small class="text-muted">Ranking y estadásticas detalladas</small>
+                <h6 class="mb-0"><i class="bi bi-medal"></i> Desempeño de Líderes</h6>
+                <small class="text-muted">Ranking y estadísticas detalladas</small>
               </div>
               <div class="btn-group btn-group-sm">
                 <button class="btn btn-outline-secondary" onclick="sortLeadersList('registrations')">
@@ -1052,7 +1058,7 @@
                     <tr>
                       <th style="width: 5%;" class="text-center">#</th>
                       <th style="width: 25%;">Líder</th>
-                      <th style="width: 15%;">área</th>
+                      <th style="width: 15%;">Área</th>
                       <th class="text-end" style="width: 12%;">Registros</th>
                       <th class="text-end" style="width: 12%;">Confirmados</th>
                       <th class="text-end" style="width: 15%;">% Confirmación</th>
@@ -1068,11 +1074,11 @@
           </div>
         </div>
 
-        <!-- TAB 3: GEOGRAFáA -->
+        <!-- TAB 3: GEOGRAFÍA -->
         <div class="tab-pane fade" id="content-geography" role="tabpanel">
           <div class="card shadow-sm">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-              <h6 class="mb-0"><i class="bi bi-geo-alt"></i> Geografáa ? Registros por Localidad (gráficos)</h6>
+              <h6 class="mb-0"><i class="bi bi-geo-alt"></i> Geografía – Registros por Localidad (gráficos)</h6>
             </div>
             <div class="card-body">
               <!-- Mantener solo los gráficos: barras y circular (doughnut). Mapa eliminado por solicitud. -->
@@ -1082,7 +1088,7 @@
                   <canvas id="localidadesChart" style="width:100%; height:100%;"></canvas>
                 </div>
                 <hr />
-                <h6 class="mb-2"><i class="bi bi-pie-chart"></i> Distribucián por Localidad (Circular)</h6>
+                <h6 class="mb-2"><i class="bi bi-pie-chart"></i> Distribución por Localidad (Circular)</h6>
                 <div style="width:280px; max-width:100%;">
                   <canvas id="localidadesDoughnut" style="width:100%; height:260px;"></canvas>
                 </div>
@@ -1131,7 +1137,7 @@
                       <th style="width: 12%;">Fecha</th>
                       <th style="width: 15%;">Nombre Completo</th>
                       <th style="width: 12%;">Cédula</th>
-                      <th style="width: 12%;">Teláfono</th>
+                      <th style="width: 12%;">Teléfono</th>
                       <th style="width: 12%;">Localidad</th>
                       <th style="width: 10%;">Estado</th>
                       <th style="width: 12%;">Confirmado Por</th>
@@ -1162,7 +1168,7 @@
               <div class="card-body text-center p-4">
                 <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
                 <h4 class="my-3">Exportar Líderes</h4>
-                <p class="text-muted">Descarga un archivo Excel con todos los líderes y su informacián.</p>
+                <p class="text-muted">Descarga un archivo Excel con todos los líderes y su información.</p>
                 <button class="btn btn-primary" onclick="exportToExcel('leaders')">
                   <i class="bi bi-download"></i> Exportar Líderes
                 </button>
@@ -1211,7 +1217,7 @@
                 <input type="date" class="form-control" id="eventDate" />
               </div>
               <div class="mb-3">
-                <label class="form-label">Descripcián</label>
+                <label class="form-label">Descripción</label>
                 <textarea class="form-control" id="eventDescription"></textarea>
               </div>
             </form>
@@ -1229,7 +1235,7 @@
     <div class="public-header">
       <div class="container-fluid">
           <h1 class="display-4">Elecciones 2026</h1>
-          <p class="lead">Regástrate para Elecciones 2026</p>
+          <p class="lead">Regístrate para Elecciones 2026</p>
         </div>
       </div>
     
@@ -1237,7 +1243,7 @@
       <div class="public-form">
         <form id="registrationForm">
           <div class="form-section">
-            <div class="form-section-title">Informacián Personal</div>
+            <div class="form-section-title">Información Personal</div>
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="firstName" class="form-label">Nombre</label>
@@ -1258,36 +1264,36 @@
               <div class="form-text">No es necesario</div>
             </div>
             <div class="mb-3">
-              <label for="phone" class="form-label">Teláfono</label>
+              <label for="phone" class="form-label">Teléfono</label>
               <input type="tel" class="form-control" id="phone" name="phone" required>
             </div>
           </div>
           
           <div class="form-section">
-            <div class="form-section-title">Informacián Adicional</div>
+            <div class="form-section-title">Información Adicional</div>
             <div class="mb-3">
               <label for="localidadSelect" class="form-label">Localidad</label>
               <select id="localidadSelect" name="localidad" class="form-select" onchange="toggleLocalidadOther(this.value)" required>
                 <option value="">-- Seleccione Localidad --</option>
-                <option>Usaquán</option>
+                <option>Usaquén</option>
                 <option>Chapinero</option>
                 <option>Santa Fe</option>
-                <option>San Cristábal</option>
+                <option>San Cristóbal</option>
                 <option>Usme</option>
                 <option>Tunjuelito</option>
                 <option>Bosa</option>
                 <option>Kennedy</option>
-                <option>Fontibán</option>
+                <option>Fontibón</option>
                 <option>Engativá</option>
                 <option>Suba</option>
                 <option>Barrios Unidos</option>
                 <option>Teusaquillo</option>
                 <option>Los Mártires</option>
-                <option>Antonio Nariáo</option>
+                <option>Antonio Nariño</option>
                 <option>Puente Aranda</option>
                 <option>La Candelaria</option>
                 <option>Rafael Uribe Uribe</option>
-                <option>Ciudad Bolávar</option>
+                <option>Ciudad Bolívar</option>
                 <option>Sumapaz</option>
                 <option value="Otra">Otra</option>
               </select>
@@ -1315,7 +1321,7 @@
                 <label for="votingTable" class="form-label">Número de mesa</label>
                 <input type="text" class="form-control" id="votingTable" name="votingTable" placeholder="Número de mesa (ej. 023)">
               </div>
-              <div class="form-text">No estás seguro? <a href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank" rel="noopener noreferrer">¿Dónde voto?</a></div>
+              <div class="form-text">¿No estás seguro? <a href="https://wsp.registraduria.gov.co/censo/consultar/" target="_blank" rel="noopener noreferrer">¿Dónde voto?</a></div>
             </div>
           </div>
           
@@ -1456,7 +1462,7 @@
               <option>Usaquén</option>
               <option>Chapinero</option>
               <option>Santa Fe</option>
-              <option>San Cristábal</option>
+              <option>San Cristóbal</option>
               <option>Usme</option>
               <option>Tunjuelito</option>
               <option>Bosa</option>
@@ -1492,7 +1498,7 @@
           </div>
           <div class="mb-3" id="adminVotingPlaceGroup" style="display:none;">
             <label class="form-label">Puesto de Votación</label>
-            <input type="text" class="form-control" id="adminVotingPlace" name="adminVotingPlace" placeholder="Nombre del puesto de votacián">
+            <input type="text" class="form-control" id="adminVotingPlace" name="adminVotingPlace" placeholder="Nombre del puesto de votación">
             <div class="mt-2">
               <label for="adminVotingTable" class="form-label">Número de mesa</label>
               <input type="text" class="form-control" id="adminVotingTable" name="adminVotingTable" placeholder="Número de mesa (ej. 023)">
@@ -1537,7 +1543,7 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
-  <!-- Libreráa qrcodejs necesaria para generar QR simples -->
+  <!-- Librería qrcodejs necesaria para generar QR simples -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <!-- El bloque <script> duplicado ha sido eliminado. -->
 <script>
@@ -1627,7 +1633,7 @@ async function saveAdminRegistration() {
     if (adminLocalidad) reg.localidad = adminLocalidad;
     reg.registeredToVote = adminRegisteredToVote;
     if (adminRegisteredToVote && !adminVotingPlace) {
-      showToast('danger', 'Si indicá que está inscrito para votar, por favor indique el puesto de votacián.');
+      showToast('danger', 'Si indicá que está inscrito para votar, por favor indique el puesto de votación.');
       return;
     }
     if (adminVotingPlace) reg.votingPlace = adminVotingPlace;
@@ -1647,7 +1653,7 @@ async function saveAdminRegistration() {
           }
         }
       } catch (e) {
-        console.warn('No se pudo verificar duplicados por cádula:', e);
+        console.warn('No se pudo verificar duplicados por cedula:', e);
       }
     }
 
@@ -1703,11 +1709,11 @@ async function saveAdminRegistration() {
 function mapWikimediaNumbersToDataNames(svg) {
   if (!svg) return 0;
   const numMap = {
-    1: 'Usaquán', 2: 'Chapinero', 3: 'Santa Fe', 4: 'San Cristábal', 5: 'Usme',
-    6: 'Tunjuelito', 7: 'Bosa', 8: 'Kennedy', 9: 'Fontibán', 10: 'Engativá',
+    1: 'Usaquen', 2: 'Chapinero', 3: 'Santa Fe', 4: 'San Cristóbal', 5: 'Usme',
+    6: 'Tunjuelito', 7: 'Bosa', 8: 'Kennedy', 9: 'Fontibon', 10: 'Engativá',
     11: 'Suba', 12: 'Barrios Unidos', 13: 'Teusaquillo', 14: 'Los Mártires',
-    15: 'Antonio Nariáo', 16: 'Puente Aranda', 17: 'La Candelaria', 18: 'Rafael Uribe',
-    19: 'Ciudad Bolávar', 20: 'Sumapaz'
+    15: 'Antonio Nariño', 16: 'Puente Aranda', 17: 'La Candelaria', 18: 'Rafael Uribe',
+    19: 'Ciudad Bolivar', 20: 'Sumapaz'
   };
   const texts = Array.from(svg.querySelectorAll('text')).filter(t => t && t.textContent && /\d+/.test(t.textContent));
   const candidateShapes = Array.from(svg.querySelectorAll('path, polygon, rect, circle'));
@@ -1756,7 +1762,7 @@ function mapWikimediaNumbersToDataNames(svg) {
   return assigned;
 }
 
-// ===================== áá Map: Bogotá localidades choropleth =====================
+// ===================== aa Map: Bogotá localidades choropleth =====================
 let _bogotaMap = null;
 let _bogotaLayer = null;
 let _bogotaGeo = null;
@@ -1781,7 +1787,7 @@ function normalizeName(s) {
     str = str.normalize('NFD').replace(/\p{Diacritic}/gu, '');
   } catch (e) {
     // Fallback: simple replacements for common accented characters
-    const map = { 'á':'A','á':'E','á':'I','á':'O','á':'U','á':'a','á':'e','á':'i','á':'o','á':'u','á':'N','á':'n','á':'U','á':'u' };
+    const map = { 'á':'A','é':'E','í':'I','ó':'O','ú':'U','á':'a','é':'e','í':'i','ó':'o','ú':'u','ñ':'N','ñ':'n','ü':'U','ü':'u' };
     str = str.split('').map(ch => map[ch] || ch).join('');
   }
   // remove punctuation, keep letters/numbers/spaces and dashes
@@ -1857,7 +1863,7 @@ async function ensureBogotaGeo() {
     if (r2.ok) { _bogotaGeo = await r2.json(); return _bogotaGeo; }
   } catch(e) {}
   // Otherwise ask user to paste URL
-  showToast('info', 'No se encontrá GeoJSON local. Pega una URL en el campo de arriba.');
+  showToast('info', 'No se encontró GeoJSON local. Pega una URL en el campo de arriba.');
   return null;
 }
 
@@ -2544,7 +2550,7 @@ async function renderLocalityMap() {
   }
 }
 
-// ===================== áá Mobile sidebar toggle helpers =====================
+// ===================== aa Mobile sidebar toggle helpers =====================
 function openMobileSidebar() {
   const sb = document.querySelector('.sidebar');
   const backdrop = document.getElementById('sidebarBackdrop');
@@ -2595,11 +2601,11 @@ window.addEventListener('resize', function () {
 });
 
 async function deleteRegistration(id) {
- if (!confirm("áEliminar este registroá")) return;
+ if (!confirm("¿Eliminar este registro?")) return;
  try {
   const response = await apiCall(`/api/registrations/${id}`, { method: "DELETE" });
     if (response.ok) {
-      console.log(`á Registro ${id} eliminado`);
+      console.log(`Registro ${id} eliminado`);
       showToast('success', 'Registro eliminado');
    
    // Recargar datos del servidor para asegurar sincronizacián
@@ -2686,7 +2692,7 @@ async function updateDashboard() {
   }
 }
 
-// ===================== áá Events management =====================
+// ===================== aa Events management =====================
 async function loadEvents() {
   try {
     const res = await apiCall(`/events`);
@@ -2788,7 +2794,7 @@ function editEvent(id) {
 }
 
 
-// ===================== áá Cargar datos del backend =====================
+// ===================== aa Cargar datos del backend =====================
 async function loadLeaders() {
  try {
     const url = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
@@ -2804,7 +2810,7 @@ async function loadLeaders() {
  }
 }
 
-// ===================== áá Auto-refresh en tiempo real =====================
+// ===================== aa Auto-refresh en tiempo real =====================
 async function checkForNewRegistrations() {
   try {
     const regsRes = await apiCall(`/registrations`);
@@ -2814,7 +2820,7 @@ async function checkForNewRegistrations() {
     // Si hay nuevos registros, actualizar automáticamente
     if (currentCount > lastRegistrationCount) {
       lastRegistrationCount = currentCount;
-      console.log(`á Nuevo(s) registro(s) detectado(s). Total: ${currentCount}`);
+      console.log(`Nuevo(s) registro(s) detectado(s). Total: ${currentCount}`);
       
       // Actualizar todos los datos
       await loadLeaders();
@@ -2833,8 +2839,8 @@ async function checkForNewRegistrations() {
         await refreshAnalysis();
       }
       
-      // Mostrar notificacián
-      showToast('success', `á Nuevo registro detectado! Total: ${currentCount}`);
+      // Mostrar notificación
+      showToast('success', `Nuevo registro detectado! Total: ${currentCount}`);
     }
   } catch (error) {
     console.error('Error en checkForNewRegistrations:', error);
@@ -2851,14 +2857,14 @@ function startAutoRefresh() {
     checkForNewRegistrations();
   }, 5000);
   
-  console.log('áá Auto-refresh iniciado (cada 5 segundos)');
+  console.log('Auto-refresh iniciado (cada 5 segundos)');
 }
 
 function stopAutoRefresh() {
   if (autoRefreshInterval) {
     clearInterval(autoRefreshInterval);
     autoRefreshInterval = null;
-    console.log('áá Auto-refresh detenido');
+    console.log(' Auto-refresh detenido');
   }
 }
 
@@ -2878,7 +2884,7 @@ async function loadRegistrations() {
  }
 }
 
-// ===================== áá Actualizar tablas =====================
+// ===================== aa Actualizar tablas =====================
 function updateLeadersTable() {
  const tbody = document.getElementById('leadersTableBody');
  tbody.innerHTML = leaders.map((leader, i) => {
@@ -2924,7 +2930,7 @@ function updateRegistrationsTable() {
     const confirmedBy = reg.confirmedBy ? reg.confirmedBy : '';
     const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
     const localidad = reg.localidad || '-';
-    const votante = reg.registeredToVote ? 'Sá' : 'No';
+    const votante = reg.registeredToVote ? 'Sí' : 'No';
     const votingPlace = reg.votingPlace || '-';
     const votingTable = reg.votingTable || '-';
 
@@ -2941,7 +2947,7 @@ function updateRegistrationsTable() {
         <td>
           ${confirmed ? `
             <div>
-              <span class="badge bg-success">Asistiá á</span>
+              <span class="badge bg-success">Asistió</span>
               <br><small>${confirmedBy} - ${confirmedAt}</small>
             </div>
           ` : `
@@ -2951,21 +2957,21 @@ function updateRegistrationsTable() {
           `}
         </td>
         <td>
-         <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar Notificacián">
+         <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar Notificación">
           <i class="bi bi-envelope-check"></i>
          </button>
          <button class="btn btn-sm btn-outline-success" onclick="confirmRegistration('${reg._id}')" title="Confirmar Asistencia">
           <i class="bi bi-check2-circle"></i>
          </button>
-         <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')">áá</button>
-         <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">ááá</button>
+         <button class="btn btn-sm btn-outline-warning" onclick="editRegistration('${reg._id}')"><i class="bi bi-pencil"></i> Editar</button>
+         <button class="btn btn-sm btn-outline-danger" onclick="deleteRegistration('${reg._id}')">Eliminar</button>
         </td>
       </tr>
     `;
   }).join('');
 }
 
-// ===================== áá Funciones de la interfaz =====================
+// ===================== aa Funciones de la interfaz =====================
 function showSection(section) {
  const sections = ['dashboard', 'leaders', 'registrations', 'exports', 'analysis'];
  sections.forEach(s => {
@@ -3017,7 +3023,7 @@ function openAdminRegistration() {
  new bootstrap.Modal(document.getElementById('adminRegistrationModal')).show();
 }
 
-// ===================== áá Funciones de registro y exportacián =====================
+// ===================== aa Funciones de registro y exportacion =====================
 async function saveLeader() {
  const id = document.getElementById('leaderId').value;
  const name = document.getElementById('leaderName').value;
@@ -3055,9 +3061,9 @@ async function saveLeader() {
   
   if (res.ok) {
    const newLeader = await res.json();
-   console.log('á Líder guardado:', newLeader);
+   console.log('Líder guardado:', newLeader);
    
-   showToast('success', 'Líder guardado con áxito');
+   showToast('success', 'Líder guardado con éxito');
    
    // Recargar líderes desde el backend
    await loadLeaders();
@@ -3082,12 +3088,12 @@ async function saveLeader() {
   }
  } catch (err) {
   console.error('Error saveLeader:', err);
-  showToast('danger', 'Error de conexián al guardar el líder');
+  showToast('danger', 'Error de conexión al guardar el líder');
  }
 }
 
 async function deleteLeader(id) {
- if (!confirm("áEliminar este líderá")) return;
+ if (!confirm("¿Eliminar este líder?")) return;
 
  const res = await apiCall(`/leaders/${id}`, { method: "DELETE" });
  if (res.ok) {
@@ -3127,7 +3133,7 @@ async function exportToExcel(type) {
  }
 }
 
-// ===================== áá Funciones de formulario páblico =====================
+// ===================== aa Funciones de formulario publico =====================
 document.getElementById('registrationForm').addEventListener('submit', async function(e) {
  e.preventDefault();
  
@@ -3164,7 +3170,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
   // Si no hay líder, no continuar
   if (!data.leaderId && !data.leaderToken) {
-    showToast('danger', 'No se encontrá un líder asociado para este registro.');
+    showToast('danger', 'No se encontro un líder asociado para este registro.');
     return;
   }
 
@@ -3187,7 +3193,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
       }
     }
   } catch (err) {
-    console.warn('No se pudo verificar cádula, continuando:', err);
+    console.warn('No se pudo verificar cédula, continuando:', err);
   }
 
   // Enviar peticián al servidor en background
@@ -3208,7 +3214,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
     }
   } catch (err) {
     console.error('Error enviando registro:', err);
-    showToast('danger', 'Error de conexián al enviar el registro');
+    showToast('danger', 'Error de conexión al enviar el registro');
     resetPublicForm();
   }
 });
@@ -3261,7 +3267,7 @@ function resetPublicForm() {
   if (first) first.focus();
 }
 
-// ===================== áá Funciones de QR y enlace =====================
+// ===================== aa Funciones de QR y enlace =====================
 function showQRCode(leader) {
   // Acepta tanto el objeto leader como su _id
   if (typeof leader === 'string' || typeof leader === 'number') {
@@ -3269,13 +3275,13 @@ function showQRCode(leader) {
   }
 
   if (!leader) {
-    showToast('danger', 'No se encontrá el líder');
+    showToast('danger', 'No se encontro el líder');
     return;
   }
 
   const qrContainer = document.getElementById('qrContainer');
   if (!qrContainer) {
-    console.error('No se encontrá #qrContainer en el DOM');
+    console.error('No se encontro #qrContainer en el DOM');
     return;
   }
   qrContainer.innerHTML = ''; // limpiar el contenedor
@@ -3330,7 +3336,7 @@ function copyLeaderLink() {
   showToast('success', 'Enlace copiado al portapapeles');
 }
 
-// ===================== áá Registro páblico (registerPerson) =====================
+// ===================== aa Registro publico (registerPerson) =====================
 async function registerPerson() {
   try {
     // intento de obtener leaderId de URL o variable global
@@ -3367,7 +3373,7 @@ async function registerPerson() {
 
     // Validacián: si declará que está inscrito para votar, debe indicar puesto de votacián
     if (registeredToVote && !votingPlace) {
-      showToast('danger', 'Si indicá que está inscrito para votar, por favor indique el puesto de votacián.');
+      showToast('danger', 'Si indicá que está inscrito para votar, por favor indique el puesto de votacion.');
       return;
     }
 
@@ -3380,12 +3386,12 @@ async function registerPerson() {
     (async () => {
       // Validacián: verificar duplicados por teláfono
       try {
-        const checkRes = await apiCall(`/api/registrationsáphone=${encodeURIComponent(phone)}`);
+        const checkRes = await apiCall(`/api/registrations?phone=${encodeURIComponent(phone)}`);
         if (checkRes.ok) {
           const existingRegs = await checkRes.json();
           if (existingRegs.length > 0) {
             resetPublicForm();
-            showToast('danger', 'á Este námero de teláfono ya está registrado en el sistema. No se permiten registros duplicados.');
+            showToast('danger', ' Este número de teléfono ya está registrado en el sistema. No se permiten registros duplicados.');
             return;
           }
         }
@@ -3408,23 +3414,23 @@ async function registerPerson() {
         } else {
           const errorData = await res.json().catch(() => ({}));
           resetPublicForm();
-          showToast('danger', `á Error al registrar: ${errorData.error || 'Error desconocido'}`);
+          showToast('danger', ` Error al registrar: ${errorData.error || 'Error desconocido'}`);
         }
       } catch (postErr) {
         console.error('Error en POST registerPerson:', postErr);
         resetPublicForm();
-        showToast('danger', 'á Error al registrar la persona (problema de red).');
+        showToast('danger', 'Error al registrar la persona (problema de red).');
       }
     })();
 
   } catch (err) {
     console.error('Error registerPerson:', err);
     resetPublicForm();
-    showToast('danger', 'á Error al procesar el registro');
+    showToast('danger', ' Error al procesar el registro');
   }
 }
 
-// ===================== áá Funciones de notificaciones =====================
+// ===================== aa Funciones de notificaciones =====================
 // Tracker para evitar mostrar toasts duplicados en ventana corta
 const _recentToasts = new Map(); // message -> timestamp
 
@@ -3514,7 +3520,7 @@ function showToast(type, message) {
     const title = document.createElement('div');
     title.style.fontWeight = '700';
     title.style.fontSize = '14px';
-    title.textContent = (type === 'success') ? 'áListo!' : (type === 'warning' ? 'Aviso' : (type === 'info' ? 'Info' : 'Atencián'));
+    title.textContent = (type === 'success') ? 'Listo!' : (type === 'warning' ? 'Aviso' : (type === 'info' ? 'Info' : 'Atención'));
     const text = document.createElement('div');
     text.style.fontSize = '13px';
     text.textContent = message;
@@ -3526,7 +3532,7 @@ function showToast(type, message) {
 
     // close button
     const closeBtn = document.createElement('button');
-    closeBtn.textContent = 'á';
+    closeBtn.textContent = '×';
     closeBtn.style.marginLeft = '12px';
     closeBtn.style.background = 'transparent';
     closeBtn.style.border = 'none';
@@ -3591,7 +3597,7 @@ function toggleAdminLocalidadOther(value) {
 
 async function sendWhatsApp(phone, name) {
   if (!phone) {
-    showToast("danger", "Este registro no tiene námero de teláfono.");
+    showToast("danger", "Este registro no tiene número de teléfono.");
     return;
   }
   const cleaned = String(phone).replace(/[^0-9+]/g, '');
@@ -3621,42 +3627,42 @@ async function sendWhatsApp(phone, name) {
     console.error('Error al enviar WhatsApp:', err);
     showToast('danger', 'Error al conectar con el bot de WhatsApp');
     // Si falla el bot, usar el mátodo de respaldo de abrir WhatsApp web
-    window.open(`https://wa.me/${cleaned}átext=${message}`, "_blank");
+    window.open(`https://wa.me/${cleaned}?text=${message}`, "_blank");
   }
 }
 
 // Enviar notificaciones manualmente para un registro
 async function sendNotification(registrationId) {
   try {
-    console.log('áá Enviando notificacián para registro:', registrationId);
+    console.log(' Enviando notificación para registro:', registrationId);
     
     const response = await apiCall(`/api/send-notification/${registrationId}`, {
       method: 'POST'
     });
     
     const result = await response.json();
-    console.log('áá Respuesta del servidor:', result);
+    console.log(' Respuesta del servidor:', result);
     
     if (result.success) {
       showToast('success', 'Notificaciones enviadas correctamente');
       if (result.results.email.success) {
-        console.log('á Email enviado exitosamente');
+        console.log('Email enviado exitosamente');
       } else if (result.results.email.error) {
-        console.log('á Error en email:', result.results.email.error);
+        console.log(' Error en email:', result.results.email.error);
       }
     } else {
       showToast('danger', 'Error enviando notificaciones: ' + (result.error || 'Error desconocido'));
     }
   } catch (error) {
-    console.error('áá Error de conexián:', error);
-    showToast('danger', 'Error de conexián al servidor');
+    console.error(' Error de conexion:', error);
+    showToast('danger', 'Error de conexion al servidor');
   }
 }
 
 // Variable global para controlar el modo
 let isPublicRegistrationMode = false;
 
-// Detectar si es una vista páblica del formulario
+// Detectar si es una vista publica del formulario
 window.addEventListener("DOMContentLoaded", async () => {
  const urlParams = new URLSearchParams(window.location.search);
  const leaderToken = urlParams.get("leader");
@@ -3671,7 +3677,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
  if (leaderToken) {
   isPublicRegistrationMode = true;
-  console.log('áá Modo registro páblico activado para líder:', leaderToken);
+  console.log(' Modo registro público activado para líder:', leaderToken);
 
   // Agregar clase al body para aplicar estilos CSS de modo páblico
   document.body.classList.add('public-registration-mode');
@@ -3721,19 +3727,19 @@ window.addEventListener("DOMContentLoaded", async () => {
 
  } else {
   isPublicRegistrationMode = false;
-  console.log('áá Modo landing page normal');
+  console.log(' Modo landing page normal');
   document.body.classList.remove('public-registration-mode');
   // Mostrar landing page solo en modo normal
   document.getElementById("landingPage").style.display = "flex";
 
-  // Realizar migracián automática al cargar la página
+  // Realizar migración automática al cargar la página
   try {
-   console.log('áá Iniciando migracián automática de datos...');
+   console.log(' Iniciando migración automática de datos...');
    const migrateRes = await apiCall('/migrate', { method: 'POST' });
    const migrateData = await migrateRes.json();
 
    if (migrateData.success) {
-    console.log(`á Migracián completada: ${migrateData.migratedLeaders} líderes, ${migrateData.migratedRegistrations} registros`);
+    console.log(` Migración completada: ${migrateData.migratedLeaders} líderes, ${migrateData.migratedRegistrations} registros`);
 
     // Recargar datos despuás de migrar
     setTimeout(() => {
@@ -3745,7 +3751,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }, 500);
    }
   } catch (err) {
-   console.error('á Error en migracián:', err);
+   console.error(' Error en migración:', err);
   }
  }
 
@@ -3753,7 +3759,7 @@ window.addEventListener("DOMContentLoaded", async () => {
  await initializePage();
 });
 
-// ===================== áá Funciones de Análisis de Datos =====================
+// ===================== aa Funciones de Analisis de Datos =====================
 // Variables globales para filtrado
 let allRegistrationsData = [];
 let allLeadersData = [];
@@ -3791,7 +3797,7 @@ async function detectDuplicates() {
         });
       }
       if (data.byContact && data.byContact.length) {
-        html += '<h6>Por Email + Teláfono</h6>';
+        html += '<h6>Por Email + Telefono</h6>';
         data.byContact.forEach(group => {
           html += `<div class="mb-3 p-2 border rounded">
             <strong>Contacto: ${group.key}</strong> ? ${group.count} registros
@@ -4004,21 +4010,21 @@ function generateAnalysisInsights(leaders, registrations, stats) {
     // Insight 1: Tasa de confirmación
     if (stats.confirmationRate > 80) {
       insights.push({
-        icon: 'á',
+        icon: '🏆',
         title: 'Excelente Confirmación',
-        description: `Tu tasa de confirmación es del ${stats.confirmationRate}%. áEstá por encima del promedio!`,
+        description: `Tu tasa de confirmación es del ${stats.confirmationRate}%. Está por encima del promedio!`,
         color: 'success'
       });
     } else if (stats.confirmationRate > 50) {
       insights.push({
-        icon: 'áá',
+        icon: '⚠️',
         title: 'Confirmación Moderada',
         description: `Tu tasa de confirmación es del ${stats.confirmationRate}%. Considera seguimiento adicional.`,
         color: 'warning'
       });
     } else {
       insights.push({
-        icon: 'á',
+        icon: '⚠️',
         title: 'Confirmación Baja',
         description: `Tu tasa de confirmación es solo del ${stats.confirmationRate}%. Se recomienda aumentar el seguimiento.`,
         color: 'danger'
@@ -4028,7 +4034,7 @@ function generateAnalysisInsights(leaders, registrations, stats) {
     // Insight 2: Velocidad de crecimiento
     if (stats.todayRegistrations > stats.avgRegistrationsPerDay * 1.5) {
       insights.push({
-        icon: 'áá',
+        icon: '📈',
         title: 'Crecimiento Acelerado Hoy',
         description: `Hoy has registrado ${stats.todayRegistrations} personas, un ${((stats.todayRegistrations / stats.avgRegistrationsPerDay - 1) * 100).toFixed(0)}% más de lo normal.`,
         color: 'info'
@@ -4044,7 +4050,7 @@ function generateAnalysisInsights(leaders, registrations, stats) {
     const topLeader = leaders.find(l => l._id === topLeaderId);
     if (topLeader) {
       insights.push({
-        icon: 'á',
+        icon: '🏆',
         title: 'Líder Destacado',
         description: `${topLeader.name} lidera con ${leaderRegCounts[topLeaderId]} registros.`,
         color: 'primary'
@@ -4054,7 +4060,7 @@ function generateAnalysisInsights(leaders, registrations, stats) {
     // Insight 4: Sugerencia de confirmación
     if (stats.avgConfirmationHours !== '-' && stats.avgConfirmationHours > 24) {
       insights.push({
-        icon: 'áá',
+        icon: '⚠️',
         title: 'Velocidad de Confirmación',
         description: `El tiempo promedio de confirmación es ${stats.avgConfirmationHours} horas. Considera acelerar el proceso.`,
         color: 'warning'
@@ -4071,9 +4077,9 @@ function generateAnalysisInsights(leaders, registrations, stats) {
     });
     if (inactiveLeaders.length > 0) {
       insights.push({
-        icon: 'áá',
+        icon: '⚠️',
         title: 'Líderes Inactivos',
-        description: `${inactiveLeaders.length} líder(es) sin registros en los áltimos 7 dáas. Considera contactarlos.`,
+        description: `${inactiveLeaders.length} líder(es) sin registros en los últimos 7 días. Considera contactarlos.`,
         color: 'danger'
       });
     }
@@ -4115,7 +4121,7 @@ function downloadAnalysisReport() {
     };
 
     const reportContent = `
-REPORTE DE ANáLISIS DE DATOS
+REPORTE DE ANÁLISIS DE DATOS
 =====================================
 Generado: ${stats.generated}
 
@@ -4126,12 +4132,12 @@ Total de Registros: ${stats.totalRegistrations}
 Registros Hoy: ${stats.todayRegistrations}
 Registros Confirmados: ${stats.confirmedCount}
 Tasa de Confirmación: ${stats.confirmationRate}
-Promedio Registros/Dáa (7 dáas): ${stats.avgRegistrationsPerDay}
+Promedio Registros/Día (7 días): ${stats.avgRegistrationsPerDay}
 Velocidad de Confirmación: ${stats.confirmationSpeed}
 
 RECOMENDACIONES
 ---------------
-- Revisa la seccián de Insights para análisis detallados
+- Revisa la sección de Insights para análisis detallados
 - Contacta a líderes inactivos si es necesario
 - Considera acelerar el proceso de confirmación si es necesario
 
@@ -4367,7 +4373,7 @@ function updateLeaderAnalysisList(leaders, registrations, sortBy = 'registration
       </td>
       <td>
         <span class="status-badge ${leader.active ? 'status-active' : 'status-inactive'}">
-          ${leader.active ? 'Activo á' : 'Inactivo á'}
+          ${leader.active ? 'Activo' : 'Inactivo'}
         </span>
       </td>
     </tr>
@@ -4438,7 +4444,7 @@ function applyFilters() {
     const leader = allLeadersData.find(l => l._id === currentFilterLeaderId);
     titleText = `Registros de ${leader.name || 'Líder'}`;
   } else if (currentSearchTerm) {
-    titleText = `Básqueda: "${currentSearchTerm}"`;
+    titleText = `Búsqueda: "${currentSearchTerm}"`;
   } else if (currentLocalidadFilter) {
     // Try to find an example registration to get the pretty localidad name
     const example = allRegistrationsData.find(r => normalizeName(r.localidad || '') === currentLocalidadFilter);
@@ -4473,7 +4479,7 @@ function updateFilteredRegistrationsList(registrations) {
     const confirmedAt = reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : '';
     const fullName = `${reg.firstName || ''} ${reg.lastName || ''}`.trim();
     const localidad = reg.localidad || '-';
-    const votante = reg.registeredToVote ? 'Sá' : 'No';
+    const votante = reg.registeredToVote ? 'Sí' : 'No';
     const votingPlace = reg.votingPlace || '-';
 
     return `
@@ -4492,7 +4498,7 @@ function updateFilteredRegistrationsList(registrations) {
         <td>${votingPlace}</td>
         <td>
           ${confirmed ? `
-            <span class="badge bg-success">Asistiá á</span>
+            <span class="badge bg-success">Asistió</span>
           ` : `
             <span class="badge bg-secondary">No confirmado</span>
           `}
@@ -4609,7 +4615,7 @@ async function refreshEventData() {
 function goToCreateEvent() {
   // No hacer nada si estamos en modo de registro páblico
   if (isPublicRegistrationMode) {
-    console.log('áá goToCreateEvent() bloqueado - modo registro páblico');
+    console.log(' goToCreateEvent() bloqueado - modo registro publico');
     return;
   }
 
@@ -4663,7 +4669,7 @@ async function saveEventFromPage(event) {
 function goToViewEvents() {
   // No hacer nada si estamos en modo de registro páblico
   if (isPublicRegistrationMode) {
-    console.log('áá goToViewEvents() bloqueado - modo registro páblico');
+    console.log(' goToViewEvents() bloqueado - modo registro publico');
     return;
   }
 
@@ -4679,7 +4685,7 @@ function goToViewEvents() {
 function backToLanding() {
   // No hacer nada si estamos en modo de registro páblico
   if (isPublicRegistrationMode) {
-    console.log('áá backToLanding() bloqueado - modo registro páblico');
+    console.log('backToLanding() bloqueado - modo registro publico');
     return;
   }
 
@@ -4779,7 +4785,7 @@ async function selectEventFromLanding(eventId) {
 }
 
 async function deleteEventFromLanding(eventId) {
-  if (!confirm('áEstás seguro de que deseas eliminar este eventoá Se perderán todos los datos asociados.')) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este evento? Se perderán todos los datos asociados.')) {
     return;
   }
   
@@ -4804,7 +4810,7 @@ async function deleteEventFromLanding(eventId) {
 async function initializePage() {
   // No inicializar si estamos en modo de registro páblico
   if (isPublicRegistrationMode) {
-    console.log('áá initializePage() bloqueado - modo registro páblico activo');
+    console.log(' initializePage() bloqueado - modo registro publico activo');
     return;
   }
 
@@ -5023,10 +5029,10 @@ async function exportFilteredRegistrations() {
         'Fecha': fecha || '-',
         'Nombre': fullName,
         'Cédula': cedula !== 'N/A' ? cedula : '',
-        'Teláfono': telefono !== 'N/A' ? telefono : '',
+        'Teléfono': telefono !== 'N/A' ? telefono : '',
         'Localidad': localidad,
-        'áVotanteá': votante,
-        'Puesto de Votacián': puesto !== '-' ? puesto : '',
+        '¿Votante?': votante,
+        'Puesto de Votación': puesto !== '-' ? puesto : '',
         'Asistencia': estado,
         'Confirmado Por': confirmedPor
       });
@@ -5070,7 +5076,7 @@ async function exportLeaderData(leaderId) {
   
   try {
     if (leaderRegs.length === 0) {
-      showToast('warning', 'No hay registros con námero de mesa para exportar');
+      showToast('warning', 'No hay registros con número de mesa para exportar');
       return;
     }
 
@@ -5079,11 +5085,11 @@ async function exportLeaderData(leaderId) {
       'Fecha': new Date(reg.date).toLocaleString('es-CO'),
       'Nombre': `${reg.firstName} ${reg.lastName}`,
       'Cédula': reg.cedula || '',
-      'Teláfono': reg.phone || '',
+      'Teléfono': reg.phone || '',
       'Email': reg.email || '',
-      'Puesto de Votacián': reg.votingPlace || '',
-      'Námero de Mesa': reg.votingTable || '',
-      'Confirmado': reg.confirmed ? 'Sá' : 'No',
+      'Puesto de Votación': reg.votingPlace || '',
+      'Numero de Mesa': reg.votingTable || '',
+      'Confirmado': reg.confirmed ? 'Si' : 'No',
       'Confirmado Por': reg.confirmedBy || '',
       'Confirmado En': reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''
     })));
