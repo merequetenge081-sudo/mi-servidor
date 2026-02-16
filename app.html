@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Red Social y Pol�tica</title>
+    <title>Red Social y Políticaica</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -443,7 +443,7 @@
     <!-- Barra superior m�vil: bot�n hamburguesa para mostrar el sidebar en pantallas peque�as -->
     <div id="mobileTopBar" class="d-md-none">
         <button id="sidebarToggle" class="btn btn-outline-secondary me-2" style="padding:6px 8px;"><i class="bi bi-list"></i></button>
-        <div class="app-title">Red Social y Pol�tica</div>
+        <div class="app-title">Red Social y Políticaica</div>
     </div>
 
     <!-- Backdrop para el sidebar en m�vil (se gestiona por JS) -->
@@ -452,7 +452,7 @@
     <div id="landingPage" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); overflow-y: auto; -webkit-overflow-scrolling: touch; z-index: 9000;">
         <div style="width: 100%; max-width: 900px; text-align: center; padding: 2rem;">
             <h1 style="font-size: 3.5rem; font-weight: 700; color: white; margin-bottom: 1rem;">
-                <i class="bi bi-calendar-event" style="margin-right: 0.5rem;"></i>Red Social y Pol�tica
+                <i class="bi bi-calendar-event" style="margin-right: 0.5rem;"></i>Red Social y Políticaica
             </h1>
             <p style="font-size: 1.25rem; color: rgba(255,255,255,0.9); margin-bottom: 3rem; font-weight: 300;">
                 Gestiona tus eventos y l�deres
@@ -513,7 +513,7 @@
                 <a href="mailto:jonnathanpena1@gmail.com" style="color: rgba(255,255,255,0.9); text-decoration: none; transition: all 0.2s;">jonnathanpena1@gmail.com</a>
             </p>
             <p style="margin: 0.5rem 0 0 0; font-size: 0.8rem; opacity: 0.8;">
-                � 2025 Red Social y Pol�tica. Todos los derechos reservados.
+                � 2025 Red Social y Políticaica. Todos los derechos reservados.
             </p>
         </div>
     </div>
@@ -578,7 +578,7 @@
         <div class="sidebar col-md-3 col-lg-2 p-0">
             <div class="p-4 d-flex flex-column h-100">
                 <div>
-                    <h4 class="text-white mb-4"><i class="bi bi-people-fill"></i> Red Social y Pol�tica</h4>
+                    <h4 class="text-white mb-4"><i class="bi bi-people-fill"></i> Red Social y Política</h4>
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link active" href="#" onclick="showSection('dashboard')">
@@ -587,7 +587,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showSection('leaders')">
-                                <i class="bi bi-person-badge"></i> Gesti�n de L�deres
+                                <i class="bi bi-person-badge"></i> Gestión de Líderes
                             </a>
                         </li>
                         <li class="nav-item">
@@ -602,12 +602,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showSection('analysis')">
-                                <i class="bi bi-graph-up"></i> An�lisis de Datos
+                                <i class="bi bi-graph-up"></i> Análisis de Datos
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showPublicForm()">
-                                <i class="bi bi-link-45deg"></i> Ver Formulario P�blico
+                                <i class="bi bi-link-45deg"></i> Ver Formulario Público
                             </a>
                         </li>
                     </ul>
@@ -617,8 +617,11 @@
                     <button class="btn btn-info w-100 mb-2" onclick="refreshEventData()" title="Actualizar datos del evento">
                         <i class="bi bi-arrow-clockwise"></i> Actualizar Evento
                     </button>
-                    <button class="btn btn-light w-100" onclick="changeEvent()" title="Cambiar de evento">
+                    <button class="btn btn-light w-100 mb-2" onclick="changeEvent()" title="Cambiar de evento">
                         <i class="bi bi-arrow-left-circle"></i> Cambiar Evento
+                    </button>
+                    <button class="btn btn-danger w-100" onclick="logout()" title="Cerrar sesión">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                     </button>
                 </div>
             </div>
@@ -642,7 +645,7 @@
 
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
-                            <i class="bi bi-plus-circle"></i> Nuevo L�der
+                            <i class="bi bi-plus-circle"></i> Nuevo Líder
                         </button>
                     </div>
                 </div>
@@ -659,7 +662,7 @@
                                 <span id="activeLeadersCount">0</span>
                                 <span id="totalLeaders" style="display:none">0</span>
                             </div>
-                            <div>L�deres Activos</div>
+                            <div>Líderes Activos</div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -698,7 +701,7 @@
                                             <tr>
                                                 <th>Fecha</th>
                                                 <th>Persona</th>
-                                                <th>L�der</th>
+                                                <th>Líder</th>
                                                 <th>Acci�n</th>
                                             </tr>
                                         </thead>
@@ -726,10 +729,10 @@
             <!-- Leaders Section -->
             <div id="leadersSection" style="display: none;">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
-                    <h1 class="h3">Gesti�n de L�deres</h1>
+                    <h1 class="h3">Gestión de Líderes</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
-                            <i class="bi bi-plus-circle"></i> Nuevo L�der
+                            <i class="bi bi-plus-circle"></i> Nuevo Líder
                         </button>
                     </div>
                 </div>
@@ -737,7 +740,7 @@
                 <!-- Leaders List -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="bi bi-list-ul"></i> Lista de L�deres
+                        <i class="bi bi-list-ul"></i> Lista de Líderes
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -784,7 +787,7 @@
                                         <th>Fecha</th>
                                         <th>Nombre</th>
                                         <th>C�dula</th>
-                                        <th>L�der</th>
+                                        <th>Líder</th>
                                         <th>Localidad</th>
                                         <th>�Votante?</th>
                                         <th>Puesto Votaci�n</th>
@@ -860,7 +863,7 @@
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link text-white" id="tab-leaders" data-bs-toggle="tab" data-bs-target="#content-leaders" type="button" role="tab">
-                                    <i class="bi bi-people-fill"></i> L�deres
+                                    <i class="bi bi-people-fill"></i> Líderes
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
@@ -895,9 +898,9 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Filtrar por L�der:</label>
+                                    <label class="form-label fw-bold">Filtrar por Líder:</label>
                                     <select class="form-select" id="filterLeaderSelect" onchange="filterByLeader()">
-                                        <option value="">-- Todos los L�deres --</option>
+                                        <option value="">-- Todos los Líderes --</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
@@ -921,7 +924,7 @@
                         <div class="col-md-3">
                             <div class="card h-100 border-start border-4 border-primary shadow-sm">
                                 <div class="card-body">
-                                    <h6 class="card-title text-muted mb-2"><i class="bi bi-people"></i> Total L�deres</h6>
+                                    <h6 class="card-title text-muted mb-2"><i class="bi bi-people"></i> Total Líderes</h6>
                                     <p class="display-6 fw-bold mb-0" id="totalLeaders">-</p>
                                     <small class="text-success" id="activeLeaders">- activos</small>
                                 </div>
@@ -1028,7 +1031,7 @@
                     <div class="card shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center bg-light">
                             <div>
-                                <h6 class="mb-0"><i class="bi bi-medal"></i> Desempe�o de L�deres</h6>
+                                <h6 class="mb-0"><i class="bi bi-medal"></i> Desempe�o de Líderes</h6>
                                 <small class="text-muted">Ranking y estad�sticas detalladas</small>
                             </div>
                             <div class="btn-group btn-group-sm">
@@ -1049,7 +1052,7 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th style="width: 5%;" class="text-center">#</th>
-                                            <th style="width: 25%;">L�der</th>
+                                            <th style="width: 25%;">Líder</th>
                                             <th style="width: 15%;">�rea</th>
                                             <th class="text-end" style="width: 12%;">Registros</th>
                                             <th class="text-end" style="width: 12%;">Confirmados</th>
@@ -1159,10 +1162,10 @@
                         <div class="card leader-card">
                             <div class="card-body text-center p-4">
                                 <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
-                                <h4 class="my-3">Exportar L�deres</h4>
+                                <h4 class="my-3">Exportar Líderes</h4>
                                 <p class="text-muted">Descarga un archivo Excel con todos los l�deres y su informaci�n.</p>
                                 <button class="btn btn-primary" onclick="exportToExcel('leaders')">
-                                    <i class="bi bi-download"></i> Exportar L�deres
+                                    <i class="bi bi-download"></i> Exportar Líderes
                                 </button>
                             </div>
                         </div>
@@ -1357,7 +1360,7 @@
         <div class="modal-dialog modal-fullscreen-sm-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="leaderModalLabel">Nuevo L�der</h5>
+                    <h5 class="modal-title" id="leaderModalLabel">Nuevo Líder</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1382,14 +1385,14 @@
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="leaderActive" checked>
                             <label class="form-check-label" for="leaderActive">
-                                L�der Activo
+                                Líder Activo
                             </label>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="saveLeader()">Guardar L�der</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLeader()">Guardar Líder</button>
                 </div>
             </div>
         </div>
@@ -1444,7 +1447,7 @@
             <input type="tel" class="form-control" id="adminPhone" required>
           </div>
           <div class="mb-3">
-            <label class="form-label">L�der</label>
+            <label class="form-label">Líder</label>
             <select class="form-select" id="adminLeaderSelect"></select>
           </div>
                     <div class="mb-3">
@@ -3053,9 +3056,9 @@ async function saveLeader() {
     
     if (res.ok) {
       const newLeader = await res.json();
-      console.log('? L�der guardado:', newLeader);
+      console.log('? Líder guardado:', newLeader);
       
-      showToast('success', 'L�der guardado con �xito');
+      showToast('success', 'Líder guardado con �xito');
       
       // Recargar l�deres desde el backend
       await loadLeaders();
@@ -3091,7 +3094,7 @@ async function deleteLeader(id) {
   if (res.ok) {
     leaders = leaders.filter(l => l._id !== id);
     updateLeadersTable();
-    showToast('success', 'L�der eliminado correctamente');
+    showToast('success', 'Líder eliminado correctamente');
   } else {
     showToast('danger', 'Error al eliminar l�der');
   }
@@ -3812,7 +3815,7 @@ async function refreshAnalysis() {
         
         // Llenar selector de l�deres
         const leaderSelect = document.getElementById('filterLeaderSelect');
-        leaderSelect.innerHTML = '<option value="">-- Todos los L�deres --</option>' + 
+        leaderSelect.innerHTML = '<option value="">-- Todos los Líderes --</option>' + 
             leadersData.map(l => `<option value="${l._id}">${l.name} (${registrationsData.filter(r => r.leaderId === l._id).length} registros)</option>`).join('');
 
         // Estad�sticas generales
@@ -4032,7 +4035,7 @@ function generateAnalysisInsights(leaders, registrations, stats) {
         if (topLeader) {
             insights.push({
                 icon: '?',
-                title: 'L�der Destacado',
+                title: 'Líder Destacado',
                 description: `${topLeader.name} lidera con ${leaderRegCounts[topLeaderId]} registros.`,
                 color: 'primary'
             });
@@ -4059,7 +4062,7 @@ function generateAnalysisInsights(leaders, registrations, stats) {
         if (inactiveLeaders.length > 0) {
             insights.push({
                 icon: '??',
-                title: 'L�deres Inactivos',
+                title: 'Líderes Inactivos',
                 description: `${inactiveLeaders.length} l�der(es) sin registros en los �ltimos 7 d�as. Considera contactarlos.`,
                 color: 'danger'
             });
@@ -4108,7 +4111,7 @@ Generado: ${stats.generated}
 
 RESUMEN EJECUTIVO
 -----------------
-Total de L�deres: ${stats.totalLeaders} (${stats.activeLeaders})
+Total de Líderes: ${stats.totalLeaders} (${stats.activeLeaders})
 Total de Registros: ${stats.totalRegistrations}
 Registros Hoy: ${stats.todayRegistrations}
 Registros Confirmados: ${stats.confirmedCount}
@@ -4425,7 +4428,7 @@ function applyFilters() {
     let titleText = 'Todos los Registros';
     if (currentFilterLeaderId) {
         const leader = allLeadersData.find(l => l._id === currentFilterLeaderId);
-        titleText = `Registros de ${leader?.name || 'L�der'}`;
+        titleText = `Registros de ${leader?.name || 'Líder'}`;
     } else if (currentSearchTerm) {
         titleText = `B�squeda: "${currentSearchTerm}"`;
     } else if (currentLocalidadFilter) {
@@ -4551,6 +4554,20 @@ function toggleLeadersPerformance() {
 }
 
 // ===================== ?? Landing Page Functions =====================
+
+// Función para logout/cerrar sesión
+function logout() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('activeEventId');
+    activeEventId = null;
+    activeEvent = null;
+    
+    document.getElementById('landingPage').style.display = 'flex';
+    document.getElementById('adminPanel').style.display = 'none';
+    
+    showToast('info', 'Ha cerrado sesión correctamente');
+}
+
 function changeEvent() {
     // No hacer nada si estamos en modo de registro p�blico
     if (isPublicRegistrationMode) return;
@@ -4855,7 +4872,7 @@ async function editLeader(id) {
   const updated = await res.json();
   leaders = leaders.map(l => (l._id === updated._id ? updated : l));
   updateLeadersTable();
-  showToast('success', 'L�der actualizado correctamente');
+  showToast('success', 'Líder actualizado correctamente');
 }
 
 async function sendQRToLeader(leaderId) {
