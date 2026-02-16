@@ -69,20 +69,20 @@ async function saveAdminRegistration() {
 }
 
 async function deleteRegistration(id) {
-  if (!confirm("Â¿Eliminar este registro?")) return;
+  if (!confirm("¿Eliminar este registro?")) return;
   await fetch(`/api/registrations/${id}`, { method: "DELETE" });
   alert("âœ… Registro eliminado");
   loadRegistrations();
 }
 
 function editRegistration(id) {
-  alert("âœï¸ FunciÃ³n de ediciÃ³n pendiente â€” aquÃ­ puedes abrir un modal con los datos.");
+  alert("âœï¸ Función de edición pendiente â€” aquí puedes abrir un modal con los datos.");
 }
 
-// ðŸ”¹ Define primero la funciÃ³n updateDashboard (solicitud del usuario)
+// ðŸ”¹ Define primero la función updateDashboard (solicitud del usuario)
 async function updateDashboard() {
     try {
-        // Obtener lÃ­deres y registros
+        // Obtener líderes y registros
         const leadersUrl = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
         const regsUrl = `${API_BASE}/registrations${activeEventId ? '?eventId=' + activeEventId : ''}`;
         const [leadersRes, regsRes] = await Promise.all([
@@ -169,7 +169,7 @@ async function saveEvent() {
 
 async function selectEvent(eventId) {
     try {
-        // cargar evento para mostrar nombre y persistir selecciÃ³n
+        // cargar evento para mostrar nombre y persistir selección
         const res = await fetch(`${API_BASE}/events`);
         const events = await res.json();
         const ev = events.find(e => String(e._id) === String(eventId));
@@ -177,7 +177,7 @@ async function selectEvent(eventId) {
         activeEventId = ev._id;
         activeEvent = ev;
         localStorage.setItem('activeEventId', activeEventId);
-        // cerrar modal si estÃ¡ abierto
+        // cerrar modal si está abierto
         const modalEl = document.getElementById('eventModal');
         const modal = bootstrap.Modal.getInstance(modalEl);
         if (modal) modal.hide();
@@ -215,13 +215,13 @@ async function loadLeaders() {
   try {
         const url = `${API_BASE}/leaders${activeEventId ? '?eventId=' + activeEventId : ''}`;
         const res = await fetch(url);
-    if (!res.ok) throw new Error('Error cargando lÃ­deres');
+    if (!res.ok) throw new Error('Error cargando líderes');
     leaders = await res.json();
     updateLeadersTable();
     return leaders;
   } catch (error) {
     console.error('Error en loadLeaders:', error);
-    showToast('danger', 'Error cargando lÃ­deres');
+    showToast('danger', 'Error cargando líderes');
     throw error;
   }
 }
@@ -233,7 +233,7 @@ async function checkForNewRegistrations() {
         const registrations = await regsRes.json();
         const currentCount = registrations.length;
         
-        // Si hay nuevos registros, actualizar automÃ¡ticamente
+        // Si hay nuevos registros, actualizar automáticamente
         if (currentCount > lastRegistrationCount) {
             lastRegistrationCount = currentCount;
             console.log(`âœ… Nuevo(s) registro(s) detectado(s). Total: ${currentCount}`);
@@ -255,7 +255,7 @@ async function checkForNewRegistrations() {
                 await refreshAnalysis();
             }
             
-            // Mostrar notificaciÃ³n
+            // Mostrar notificación
             showToast('success', `âœ… Nuevo registro detectado! Total: ${currentCount}`);
         }
     } catch (error) {
@@ -330,7 +330,7 @@ function updateRegistrationsTable() {
     const tbody = document.getElementById('registrationsTableBody');
     tbody.innerHTML = registrations.map(reg => {
         const nombre = reg.name || ((reg.firstName || '') + ' ' + (reg.lastName || '')).trim() || 'Sin nombre';
-        const lider = (leaders.find(l => l._id === reg.leaderId)?.name) || reg.leaderName || 'Sin lÃ­der';
+        const lider = (leaders.find(l => l._id === reg.leaderId)?.name) || reg.leaderName || 'Sin líder';
         const fecha = reg.date ? new Date(reg.date).toLocaleDateString() : 'Sin fecha';
         const confirmed = reg.confirmed ? true : false;
         const confirmedBy = reg.confirmedBy ? reg.confirmedBy : '';
@@ -344,7 +344,7 @@ function updateRegistrationsTable() {
                 <td>
                     ${confirmed ? `
                         <div>
-                            <span class="badge bg-success">AsistiÃ³ âœ…</span>
+                            <span class="badge bg-success">Asistió âœ…</span>
                             <br><small>${confirmedBy} - ${confirmedAt}</small>
                         </div>
                     ` : `
@@ -354,7 +354,7 @@ function updateRegistrationsTable() {
                     `}
                 </td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar NotificaciÃ³n">
+                  <button class="btn btn-sm btn-outline-primary" onclick="sendNotification('${reg._id}')" title="Reenviar Notificación">
                     <i class="bi bi-envelope-check"></i>
                   </button>
                   <button class="btn btn-sm btn-outline-success" onclick="confirmRegistration('${reg._id}')" title="Confirmar Asistencia">
@@ -378,7 +378,7 @@ function showSection(section) {
     }
   });
   
-  // Si es la secciÃ³n de anÃ¡lisis, actualizar datos
+  // Si es la sección de análisis, actualizar datos
   if (section === 'analysis') {
     refreshAnalysis();
   }
@@ -406,7 +406,7 @@ function showAdminPanel() {
 function openAdminRegistration() {
   // Limpiar formulario
   document.getElementById('adminRegistrationForm').reset();
-  // Cargar lÃ­deres para el selector
+  // Cargar líderes para el selector
   const leaderSelect = document.getElementById('adminLeaderSelect');
   leaderSelect.innerHTML = leaders.map(leader => `
     <option value="${leader._id}">${leader.name}</option>
@@ -415,7 +415,7 @@ function openAdminRegistration() {
   new bootstrap.Modal(document.getElementById('adminRegistrationModal')).show();
 }
 
-// ===================== ðŸ”¹ Funciones de registro y exportaciÃ³n =====================
+// ===================== ðŸ”¹ Funciones de registro y exportación =====================
 async function saveLeader() {
   const id = document.getElementById('leaderId').value;
   const name = document.getElementById('leaderName').value;
@@ -444,26 +444,26 @@ async function saveLeader() {
   });
   
   if (res.ok) {
-    showToast('success', 'LÃ­der guardado con Ã©xito');
+    showToast('success', 'Líder guardado con éxito');
     loadLeaders();
     // Cerrar modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('leaderModal'));
     modal.hide();
   } else {
-    showToast('danger', 'Error al guardar el lÃ­der');
+    showToast('danger', 'Error al guardar el líder');
   }
 }
 
 async function deleteLeader(id) {
-  if (!confirm("Â¿Eliminar este lÃ­der?")) return;
+  if (!confirm("¿Eliminar este líder?")) return;
 
   const res = await fetch(`${API_BASE}/leaders/${id}`, { method: "DELETE" });
   if (res.ok) {
     leaders = leaders.filter(l => l._id !== id);
     updateLeadersTable();
-    showToast('success', 'LÃ­der eliminado correctamente');
+    showToast('success', 'Líder eliminado correctamente');
   } else {
-    showToast('danger', 'Error al eliminar lÃ­der');
+    showToast('danger', 'Error al eliminar líder');
   }
 }
 
@@ -492,7 +492,7 @@ async function exportToExcel(type) {
   }
 }
 
-// ===================== ðŸ”¹ Funciones de formulario pÃºblico =====================
+// ===================== ðŸ”¹ Funciones de formulario público =====================
 document.getElementById('registrationForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
@@ -515,7 +515,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
   });
   
   if (res.ok) {
-    showToast('success', 'Registro enviado con Ã©xito');
+    showToast('success', 'Registro enviado con éxito');
     this.reset();
   } else {
     showToast('danger', 'Error al enviar el registro');
@@ -530,13 +530,13 @@ function showQRCode(leader) {
     }
 
     if (!leader) {
-        showToast('danger', 'No se encontrÃ³ el lÃ­der');
+        showToast('danger', 'No se encontró el líder');
         return;
     }
 
     const qrContainer = document.getElementById('qrContainer');
     if (!qrContainer) {
-        console.error('No se encontrÃ³ #qrContainer en el DOM');
+        console.error('No se encontró #qrContainer en el DOM');
         return;
     }
     qrContainer.innerHTML = ''; // limpiar el contenedor
@@ -565,13 +565,13 @@ function copyLeaderLink() {
         return;
     }
     leaderLink.select();
-    leaderLink.setSelectionRange(0, 99999); // Para dispositivos mÃ³viles
+    leaderLink.setSelectionRange(0, 99999); // Para dispositivos móviles
 
     document.execCommand("copy");
     showToast('success', 'Enlace copiado al portapapeles');
 }
 
-// ===================== ðŸ”¹ Registro pÃºblico (registerPerson) =====================
+// ===================== ðŸ”¹ Registro público (registerPerson) =====================
 async function registerPerson() {
     try {
         // intento de obtener leaderId de URL o variable global
@@ -583,7 +583,7 @@ async function registerPerson() {
         const phone = document.getElementById('phone')?.value || '';
 
         if (!leaderId) {
-            alert('No se encontrÃ³ un lÃ­der asociado para este registro.');
+            alert('No se encontró un líder asociado para este registro.');
             return;
         }
 
@@ -619,14 +619,14 @@ function showToast(type, message) {
 
 async function sendWhatsApp(phone, name) {
     if (!phone) {
-        showToast("danger", "Este registro no tiene nÃºmero de telÃ©fono.");
+        showToast("danger", "Este registro no tiene número de teléfono.");
         return;
     }
     const cleaned = String(phone).replace(/[^0-9+]/g, '');
     const message = encodeURIComponent(`Hola ${name || ''}! âœ… Gracias por registrarte con nosotros.`);
     
     try {
-        // Enviar mensaje a travÃ©s del bot de WhatsApp
+        // Enviar mensaje a través del bot de WhatsApp
         const res = await fetch('http://localhost:4000/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -648,7 +648,7 @@ async function sendWhatsApp(phone, name) {
     } catch (err) {
         console.error('Error al enviar WhatsApp:', err);
         showToast('danger', 'Error al conectar con el bot de WhatsApp');
-        // Si falla el bot, usar el mÃ©todo de respaldo de abrir WhatsApp web
+        // Si falla el bot, usar el método de respaldo de abrir WhatsApp web
         window.open(`https://wa.me/${cleaned}?text=${message}`, "_blank");
     }
 }
@@ -656,7 +656,7 @@ async function sendWhatsApp(phone, name) {
 // Enviar notificaciones manualmente para un registro
 async function sendNotification(registrationId) {
     try {
-        console.log('ðŸ”„ Enviando notificaciÃ³n para registro:', registrationId);
+        console.log('ðŸ”„ Enviando notificación para registro:', registrationId);
         
         const response = await fetch(`/api/send-notification/${registrationId}`, {
             method: 'POST'
@@ -676,12 +676,12 @@ async function sendNotification(registrationId) {
             showToast('danger', 'Error enviando notificaciones: ' + (result.error || 'Error desconocido'));
         }
     } catch (error) {
-        console.error('ðŸ’¥ Error de conexiÃ³n:', error);
-        showToast('danger', 'Error de conexiÃ³n al servidor');
+        console.error('ðŸ’¥ Error de conexión:', error);
+        showToast('danger', 'Error de conexión al servidor');
     }
 }
 
-// Detectar si es una vista pÃºblica del formulario
+// Detectar si es una vista pública del formulario
 window.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const leaderToken = urlParams.get("leader");
@@ -695,12 +695,12 @@ window.addEventListener("DOMContentLoaded", () => {
     // Mostrar solo el formulario
         document.getElementById("publicForm").style.display = "block";
 
-    // Guardar el token para registrar con ese lÃ­der
+    // Guardar el token para registrar con ese líder
     localStorage.setItem("publicLeaderToken", leaderToken);
   }
 });
 
-// ===================== ðŸ”¹ Funciones de AnÃ¡lisis de Datos =====================
+// ===================== ðŸ”¹ Funciones de Análisis de Datos =====================
 // Variables globales para filtrado
 let allRegistrationsData = [];
 let allLeadersData = [];
@@ -723,12 +723,12 @@ async function refreshAnalysis() {
         allLeadersData = leadersData;
         allRegistrationsData = registrationsData;
         
-        // Llenar selector de lÃ­deres
+        // Llenar selector de líderes
         const leaderSelect = document.getElementById('filterLeaderSelect');
-        leaderSelect.innerHTML = '<option value="">-- Todos los LÃ­deres --</option>' + 
+        leaderSelect.innerHTML = '<option value="">-- Todos los Líderes --</option>' + 
             leadersData.map(l => `<option value="${l._id}">${l.name} (${leadersData.filter(ld => ld._id === l._id).length ? leadersData.filter(ld => ld._id === l._id).reduce((acc, li) => acc + (registrationsData.filter(r => r.leaderId === li._id).length), 0) : 0} registros)</option>`).join('');
 
-        // EstadÃ­sticas generales
+        // Estadísticas generales
         const totalLeaders = leadersData.length;
         const activeLeaders = leadersData.filter(l => l.active).length;
         const totalRegistrations = registrationsData.length;
@@ -740,7 +740,7 @@ async function refreshAnalysis() {
             new Date(r.date).setHours(0,0,0,0) === today
         ).length;
 
-        // Ãšltima actividad
+        // Última actividad
         const lastReg = registrationsData.sort((a,b) => new Date(b.date) - new Date(a.date))[0];
         const lastActivity = lastReg ? `${lastReg.firstName || ''} ${lastReg.lastName || ''}`.trim() : '-';
         const lastActivityTime = lastReg ? new Date(lastReg.date).toLocaleString('es-CO') : '-';
@@ -755,16 +755,16 @@ async function refreshAnalysis() {
         document.getElementById('lastActivity').textContent = lastActivity;
         document.getElementById('lastActivityTime').textContent = lastActivityTime;
 
-        // Actualizar tabla de lÃ­deres
+        // Actualizar tabla de líderes
         updateLeaderAnalysisList(leadersData, registrationsData);
         
         // Aplicar filtros iniciales
         applyFilters();
 
-        showToast('success', 'AnÃ¡lisis actualizado');
+        showToast('success', 'Análisis actualizado');
     } catch (error) {
-        console.error('Error al actualizar anÃ¡lisis:', error);
-        showToast('danger', 'Error al actualizar anÃ¡lisis');
+        console.error('Error al actualizar análisis:', error);
+        showToast('danger', 'Error al actualizar análisis');
     }
 }
 
@@ -857,12 +857,12 @@ function filterByConfirmed() {
 function applyFilters() {
     let filtered = [...allRegistrationsData];
 
-    // Filtrar por lÃ­der
+    // Filtrar por líder
     if (currentFilterLeaderId) {
         filtered = filtered.filter(r => r.leaderId === currentFilterLeaderId);
     }
 
-    // Filtrar por bÃºsqueda de nombre
+    // Filtrar por búsqueda de nombre
     if (currentSearchTerm) {
         filtered = filtered.filter(r => {
             const fullName = `${r.firstName || ''} ${r.lastName || ''}`.toLowerCase();
@@ -870,7 +870,7 @@ function applyFilters() {
         });
     }
 
-    // Filtrar por confirmaciÃ³n
+    // Filtrar por confirmación
     if (currentConfirmedFilter === 'confirmed') {
         filtered = filtered.filter(r => r.confirmed);
     } else if (currentConfirmedFilter === 'unconfirmed') {
@@ -880,13 +880,13 @@ function applyFilters() {
     // Ordenar por fecha descendente
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Actualizar tÃ­tulo
+    // Actualizar título
     let titleText = 'Todos los Registros';
     if (currentFilterLeaderId) {
         const leader = allLeadersData.find(l => l._id === currentFilterLeaderId);
-        titleText = `Registros de ${leader?.name || 'LÃ­der'}`;
+        titleText = `Registros de ${leader?.name || 'Líder'}`;
     } else if (currentSearchTerm) {
-        titleText = `BÃºsqueda: "${currentSearchTerm}"`;
+        titleText = `Búsqueda: "${currentSearchTerm}"`;
     }
     document.getElementById('selectedLeaderTitle').textContent = titleText;
     document.getElementById('registroCount').textContent = `${filtered.length} registros`;
@@ -928,7 +928,7 @@ function updateFilteredRegistrationsList(registrations) {
                 <td>${reg.phone || 'N/A'}</td>
                 <td>
                     ${confirmed ? `
-                        <span class="badge bg-success">AsistiÃ³ âœ…</span>
+                        <span class="badge bg-success">Asistió âœ…</span>
                     ` : `
                         <span class="badge bg-secondary">No confirmado</span>
                     `}
@@ -958,7 +958,7 @@ function updateFilteredRegistrationsList(registrations) {
     }).join('');
 }
 
-// FunciÃ³n para mostrar detalles de un lÃ­der especÃ­fico
+// Función para mostrar detalles de un líder específico
 function showLeaderDetails(leaderId) {
     selectLeaderFilter(leaderId);
     const leader = allLeadersData.find(l => l._id === leaderId);
@@ -966,7 +966,7 @@ function showLeaderDetails(leaderId) {
     showToast('success', `Mostrando registros de ${leader.name}`);
 }
 
-// FunciÃ³n para exportar datos de un lÃ­der especÃ­fico
+// Función para exportar datos de un líder específico
 async function exportLeaderData(leaderId) {
     const leader = allLeadersData.find(l => l._id === leaderId);
     const leaderRegs = allRegistrationsData.filter(r => r.leaderId === leaderId);
@@ -976,10 +976,10 @@ async function exportLeaderData(leaderId) {
         const worksheet = XLSX.utils.json_to_sheet(leaderRegs.map(reg => ({
             'Fecha': new Date(reg.date).toLocaleString('es-CO'),
             'Nombre': `${reg.firstName} ${reg.lastName}`,
-            'CÃ©dula': reg.cedula || '',
-            'TelÃ©fono': reg.phone || '',
+            'Cédula': reg.cedula || '',
+            'Teléfono': reg.phone || '',
             'Email': reg.email || '',
-            'Confirmado': reg.confirmed ? 'SÃ­' : 'No',
+            'Confirmado': reg.confirmed ? 'Sí' : 'No',
             'Confirmado Por': reg.confirmedBy || '',
             'Confirmado En': reg.confirmedAt ? new Date(reg.confirmedAt).toLocaleString('es-CO') : ''
         })));
@@ -1022,7 +1022,7 @@ function toggleLeadersPerformance() {
     }
 }
 
-// FunciÃ³n para inicializar la pÃ¡gina
+// Función para inicializar la página
 async function initializePage() {
     try {
         // Cargar eventos y si hay un evento activo, cargar datos del mismo
@@ -1045,7 +1045,7 @@ async function initializePage() {
             openEventModal();
         }
     } catch (error) {
-        console.error('Error inicializando la pÃ¡gina:', error);
+        console.error('Error inicializando la página:', error);
         showToast('danger', 'Error cargando los datos iniciales');
     }
 }
@@ -1053,7 +1053,7 @@ async function initializePage() {
 // Cargar datos iniciales
 initializePage();
 
-// Iniciar auto-refresh automÃ¡tico
+// Iniciar auto-refresh automático
 startAutoRefresh();
 
 // ===================== ðŸ”¹ Click handlers para tarjetas =====================
@@ -1069,12 +1069,12 @@ startAutoRefresh();
     });
 })();
 
-// FunciÃ³n para editar lÃ­der
+// Función para editar líder
 async function editLeader(id) {
   const leader = leaders.find(l => l._id === id);
   if (!leader) return;
 
-  const nuevoNombre = prompt("Editar nombre del lÃ­der:", leader.name);
+  const nuevoNombre = prompt("Editar nombre del líder:", leader.name);
   if (!nuevoNombre) return;
 
   const res = await fetch(`${API_BASE}/leaders`, {
@@ -1086,14 +1086,14 @@ async function editLeader(id) {
   const updated = await res.json();
   leaders = leaders.map(l => (l._id === updated._id ? updated : l));
   updateLeadersTable();
-  showToast('success', 'LÃ­der actualizado correctamente');
+  showToast('success', 'Líder actualizado correctamente');
 }
 
 async function sendQRToLeader(leaderId) {
     try {
         const leader = leaders.find(l => l._id === leaderId);
         if (!leader) {
-            showToast('danger', 'No se encontrÃ³ el lÃ­der');
+            showToast('danger', 'No se encontró el líder');
             return;
         }
 
@@ -1126,7 +1126,7 @@ async function confirmRegistration(regId) {
             return;
         }
 
-        // Pedir quiÃ©n confirma
+        // Pedir quién confirma
         const confirmer = prompt('Nombre de la persona que confirma la asistencia:', 'Admin');
         if (!confirmer) return;
 
@@ -1192,7 +1192,7 @@ async function toggleConfirm(regId, value) {
         showToast('success', value ? 'Confirmado' : 'Desconfirmado');
     } catch (err) {
         console.error('Error toggling confirm:', err);
-        showToast('danger', 'Error actualizando confirmaciÃ³n');
+        showToast('danger', 'Error actualizando confirmación');
     }
 }
 

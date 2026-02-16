@@ -1,0 +1,51 @@
+import os
+import io
+
+# Mappings comunes de mojibake -> correcto
+REPLACEMENTS = {
+    'Ã¡': 'á', 'Ã©': 'é', 'Ã­': 'í', 'Ã³': 'ó', 'Ãº': 'ú',
+    'Ã±': 'ñ', 'Ã‘': 'Ñ', 'Ã‰': 'É', 'Ãš': 'Ú', 'Ã“': 'Ó',
+    'Â¡': '¡', 'Â¿': '¿', 'â': '–', 'â': '—', 'â¦': '…',
+    'â': '“', 'â': '”', 'â': '‘', 'â': '’',
+    '\xc3\xa1': 'á', '\xc3\xa9': 'é'
+}
+
+EXT = {'.js', '.html', '.py', '.md', '.txt', '.cjs', '.json', '.css', '.csv'}
+
+root = os.path.abspath(os.path.dirname(__file__))
+changed_files = []
+
+for dirpath, dirnames, filenames in os.walk(root):
+    # skip node_modules, .git
+    if 'node_modules' in dirpath or '.git' in dirpath:
+        continue
+    for fn in filenames:
+        path = os.path.join(dirpath, fn)
+        _, ext = os.path.splitext(fn)
+        if ext.lower() not in EXT:
+            continue
+        try:
+            with io.open(path, 'r', encoding='utf-8') as f:
+                s = f.read()
+        except Exception:
+            # intentar con latin-1 y luego decodificar
+            try:
+                with io.open(path, 'r', encoding='latin-1') as f:
+                    s = f.read()
+            except Exception:
+                continue
+        original = s
+        for bad, good in REPLACEMENTS.items():
+            if bad in s:
+                s = s.replace(bad, good)
+        if s != original:
+            # crear backup
+            with io.open(path + '.bak', 'w', encoding='utf-8') as b:
+                b.write(original)
+            with io.open(path, 'w', encoding='utf-8') as f:
+                f.write(s)
+            changed_files.append(path)
+
+print('Archivos modificados:', len(changed_files))
+for p in changed_files:
+    print('-', os.path.relpath(p, root))

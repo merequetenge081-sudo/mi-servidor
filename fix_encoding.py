@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Fix encoding issues in app.html by detecting and converting corrupted characters
+"""
+import re
+import sys
+
+def detect_and_fix_encoding(file_path):
+    """
+    Read file with different encodings and fix corrupted UTF-8
+    """
+    # Try reading with different encodings
+    content = None
+    encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
+    
+    for enc in encodings:
+        try:
+            with open(file_path, 'r', encoding=enc) as f:
+                content = f.read()
+            print(f"✓ File read successfully with encoding: {enc}")
+            break
+        except Exception as e:
+            continue
+    
+    if content is None:
+        print("✗ Could not read file with any standard encoding")
+        return False
+    
+    # Map of known corrupted characters and their fixes
+    replacements = {
+        # Tildes and accents
+        '\u00e1': 'á',      # overline a
+        '\u00e9': 'é',      # overline e
+        '\u00ed': 'í',      # overline i
+        '\u00f3': 'ó',      # overline o
+        '\u00fa': 'ú',      # overline u
+        '\u00f1': 'ñ',      # overline n
+        
+        # Double tilde (broken encoding)
+        '~': '~',  # already correct but keep tilde if needed
+        
+        # Common Latin-1 to UTF-8 corruption patterns
+        '¡': 'á',
+        'Â©': 'é',  
+        'Â³': 'í',
+        'Â²': 'ó',
+        'Â¹': 'ú',
+        'ñ': 'ñ',
+        'á': 'á',
+        'é': 'é',
+        'í': 'í',
+        'ó': 'ó',
+        'Ã¹': 'ú',
+        'É': 'É',
+    }
+    
+    original_length = len(content)
+    
+    # Apply direct replacements
+    for old, new in replacements.items():
+        if old in content:
+            content = content.replace(old, new)
+            print(f"  Fixed: {repr(old)} → {repr(new)}")
+    
+    # Fix specific known corruptions
+    corruptions = [
+        ('Políticaica', 'Política'),
+        ('desempe~o', 'desempeño'),
+        ('An~lisis', 'Análisis'),
+        ('confir~o', 'confirmó'),
+        ('~', 'á'),  # Generic tilde replace in context
+        ('  ', ' '),  # Remove double spaces
+    ]
+    
+    for corrupted, fixed in corruptions:
+        if corrupted in content:
+            content = content.replace(corrupted, fixed)
+            print(f"  Fixed: '{corrupted}' → '{fixed}'")
+    
+    # Regex patterns for remaining issues
+    regex_patterns = [
+        # Fix double-encoded accents
+        (r'¡([a-z])', r'á\1'),  # Broken á
+        (r'Â©([a-z])', r'é\1'),  # Broken é
+        (r'Â³([a-z])', r'í\1'),  # Broken í
+        (r'Â²([a-z])', r'ó\1'),  # Broken ó
+        (r'Â¹([a-z])', r'ú\1'),  # Broken ú
+    ]
+    
+    for pattern, replacement in regex_patterns:
+        matches = re.findall(pattern, content, re.IGNORECASE)
+        if matches:
+            content = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
+            print(f"  Fixed regex pattern: {pattern}")
+    
+    # Remove any remaining weird Unicode replacement characters
+    content = content.replace('\ufffd', '?')  # Replace Unicode replacement char
+    
+    # Write back as UTF-8
+    with open(file_path, 'w', encoding='utf-8-sig') as f:
+        f.write(content)
+    
+    print(f"\n✅ File saved successfully as UTF-8")
+    print(f"Original length: {original_length}")
+    print(f"Final length: {len(content)}")
+    return True
+
+if __name__ == '__main__':
+    file_path = 'app.html'
+    if len(sys.argv) > 1:
+        file_path = sys.argv[1]
+    
+    print(f"Processing: {file_path}\n")
+    if detect_and_fix_encoding(file_path):
+        print(f"\n✅ Encoding fixed successfully!")
+    else:
+        print(f"\n✗ Failed to fix encoding")
+        sys.exit(1)
