@@ -14,10 +14,21 @@
         .card { border:none; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.06); margin-bottom:2rem }
         .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border-radius:10px 10px 0 0 !important; padding:1rem; border:none }
         .btn-logout { background:#dc3545; color:white; border:none }
-        .stat-card { background:white; border-radius:10px; padding:1.25rem; text-align:center }
-        .table thead th { background:#f8f9fa; color:#333; border-bottom:2px solid #667eea }
+        .stat-card { background:white; border-radius:10px; padding:1.25rem; text-align:center; box-shadow:0 2px 8px rgba(102,126,234,0.08); }
+        .table thead th { background:#e9eafc; color:#333; border-bottom:2px solid #764ba2; font-weight:600; }
+        .badge.bg-success { background: linear-gradient(90deg,#43e97b 0%,#38f9d7 100%)!important; color:#222; font-weight:500; }
+        .badge.bg-secondary { background: linear-gradient(90deg,#e0eafc 0%,#cfdef3 100%)!important; color:#555; font-weight:500; }
+        .btn-outline-primary { border:1.5px solid #764ba2; color:#764ba2; font-weight:500; }
+        .btn-outline-primary:hover { background:#764ba2; color:white; }
+        .btn-outline-secondary { border:1.5px solid #667eea; color:#667eea; font-weight:500; }
+        .btn-outline-secondary:hover { background:#667eea; color:white; }
+        .modal-content { border-radius:16px; box-shadow:0 4px 24px rgba(102,126,234,0.12); }
+        .modal-header { border-radius:16px 16px 0 0; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
+        .modal-footer { border-radius:0 0 16px 16px; }
         .loading { display:inline-block; width:8px; height:8px; border-radius:50%; background:white; margin-left:5px; animation: loading 0.6s infinite alternate }
         @keyframes loading { to { opacity: 0.3 } }
+        .toast-container { position:fixed; top:1.5rem; right:1.5rem; z-index:9999; }
+        .toast { min-width:220px; }
     </style>
 </head>
 <body>
@@ -46,11 +57,12 @@
                 <div class="table-responsive" id="registrationsContainer" style="display:none;">
                     <table class="table table-hover"><thead><tr><th>Nombre</th><th>Cédula</th><th>Email</th><th>Teléfono</th><th>Localidad</th><th>Confirmado</th><th>Acciones</th></tr></thead><tbody id="registrationsTable"></tbody></table>
                 </div>
-                <div id="emptyMessage" class="alert alert-warning" style="display:none;">No hay registros aún.</div>
+                <div id="emptyMessage" class="alert alert-warning" style="display:none;">No hay registros por mostrar.</div>
             </div>
         </div>
     </div>
 
+    <div class="toast-container" id="toastContainer"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_URL = window.location.origin;
@@ -122,99 +134,121 @@
                 // Modal avanzado de edición
                 let editModal = null;
                 window.editReg = async function(id, leaderId, token) {
-                        const res = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                        const regs = await res.json();
-                        const reg = regs.find(r => r._id === id);
-                        if (!reg) return alert('Registro no encontrado');
+                    const res = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    const regs = await res.json();
+                    const reg = regs.find(r => r._id === id);
+                    if (!reg) return showToast('danger', 'Registro no encontrado');
 
-                        // Crear modal si no existe
-                        if (!editModal) {
-                                editModal = document.createElement('div');
-                                editModal.className = 'modal fade';
-                                editModal.innerHTML = `
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Editar Registro</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form id="editForm">
-                                                <div class="mb-2"><label>Nombre</label><input class="form-control" id="edit_firstName"></div>
-                                                <div class="mb-2"><label>Apellido</label><input class="form-control" id="edit_lastName"></div>
-                                                <div class="mb-2"><label>Cédula</label><input class="form-control" id="edit_cedula"></div>
-                                                <div class="mb-2"><label>Email</label><input class="form-control" id="edit_email"></div>
-                                                <div class="mb-2"><label>Teléfono</label><input class="form-control" id="edit_phone"></div>
-                                                <div class="mb-2"><label>Localidad</label><input class="form-control" id="edit_localidad"></div>
-                                                <div class="mb-2"><label>¿Inscrito para votar?</label><select class="form-select" id="edit_votante"><option value="true">Sí</option><option value="false">No</option></select></div>
-                                                <div class="mb-2"><label>Puesto de Votación</label><input class="form-control" id="edit_votingPlace"></div>
-                                                <div class="mb-2"><label>Nº Mesa</label><input class="form-control" id="edit_votingTable"></div>
-                                                <div class="mb-2"><label>Confirmado</label><select class="form-select" id="edit_confirmed"><option value="true">Sí</option><option value="false">No</option></select></div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="button" class="btn btn-primary" id="saveEditBtn">Guardar</button>
-                                        </div>
-                                    </div>
-                                </div>`;
-                                document.body.appendChild(editModal);
-                        }
-                        // Rellenar campos
-                        document.getElementById('edit_firstName').value = reg.firstName || '';
-                        document.getElementById('edit_lastName').value = reg.lastName || '';
-                        document.getElementById('edit_cedula').value = reg.cedula || '';
-                        document.getElementById('edit_email').value = reg.email || '';
-                        document.getElementById('edit_phone').value = reg.phone || '';
-                        document.getElementById('edit_localidad').value = reg.localidad || '';
-                        document.getElementById('edit_votante').value = reg.registeredToVote ? 'true' : 'false';
-                        document.getElementById('edit_votingPlace').value = reg.votingPlace || '';
-                        document.getElementById('edit_votingTable').value = reg.votingTable || '';
-                        document.getElementById('edit_confirmed').value = reg.confirmed ? 'true' : 'false';
+                    // Crear modal si no existe
+                    if (!editModal) {
+                        editModal = document.createElement('div');
+                        editModal.className = 'modal fade';
+                        editModal.innerHTML = `
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Editar Registro</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="editForm">
+                                        <div class="mb-2"><label>Nombre</label><input class="form-control" id="edit_firstName"></div>
+                                        <div class="mb-2"><label>Apellido</label><input class="form-control" id="edit_lastName"></div>
+                                        <div class="mb-2"><label>Cédula</label><input class="form-control" id="edit_cedula"></div>
+                                        <div class="mb-2"><label>Email</label><input class="form-control" id="edit_email"></div>
+                                        <div class="mb-2"><label>Teléfono</label><input class="form-control" id="edit_phone"></div>
+                                        <div class="mb-2"><label>Localidad</label><input class="form-control" id="edit_localidad"></div>
+                                        <div class="mb-2"><label>¿Inscrito para votar?</label><select class="form-select" id="edit_votante"><option value="true">Sí</option><option value="false">No</option></select></div>
+                                        <div class="mb-2"><label>Puesto de Votación</label><input class="form-control" id="edit_votingPlace"></div>
+                                        <div class="mb-2"><label>Nº Mesa</label><input class="form-control" id="edit_votingTable"></div>
+                                        <div class="mb-2"><label>Confirmado</label><select class="form-select" id="edit_confirmed"><option value="true">Sí</option><option value="false">No</option></select></div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" id="saveEditBtn">Guardar</button>
+                                </div>
+                            </div>
+                        </div>`;
+                        document.body.appendChild(editModal);
+                    }
+                    // Rellenar campos
+                    document.getElementById('edit_firstName').value = reg.firstName || '';
+                    document.getElementById('edit_lastName').value = reg.lastName || '';
+                    document.getElementById('edit_cedula').value = reg.cedula || '';
+                    document.getElementById('edit_email').value = reg.email || '';
+                    document.getElementById('edit_phone').value = reg.phone || '';
+                    document.getElementById('edit_localidad').value = reg.localidad || '';
+                    document.getElementById('edit_votante').value = reg.registeredToVote ? 'true' : 'false';
+                    document.getElementById('edit_votingPlace').value = reg.votingPlace || '';
+                    document.getElementById('edit_votingTable').value = reg.votingTable || '';
+                    document.getElementById('edit_confirmed').value = reg.confirmed ? 'true' : 'false';
 
-                        // Mostrar modal
-                        let bsModal = new bootstrap.Modal(editModal);
-                        bsModal.show();
+                    // Mostrar modal
+                    let bsModal = new bootstrap.Modal(editModal);
+                    bsModal.show();
 
-                        document.getElementById('saveEditBtn').onclick = async function() {
-                                const body = {
-                                        firstName: document.getElementById('edit_firstName').value,
-                                        lastName: document.getElementById('edit_lastName').value,
-                                        cedula: document.getElementById('edit_cedula').value,
-                                        email: document.getElementById('edit_email').value,
-                                        phone: document.getElementById('edit_phone').value,
-                                        localidad: document.getElementById('edit_localidad').value,
-                                        registeredToVote: document.getElementById('edit_votante').value === 'true',
-                                        votingPlace: document.getElementById('edit_votingPlace').value,
-                                        votingTable: document.getElementById('edit_votingTable').value,
-                                        confirmed: document.getElementById('edit_confirmed').value === 'true'
-                                };
-                                const putRes = await fetch(`${API_URL}/api/registrations/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-                                if (!putRes.ok) return alert('Error al guardar');
-                                bsModal.hide();
-                                loadLeaderData(leaderId, token);
+                    document.getElementById('saveEditBtn').onclick = async function() {
+                        const body = {
+                            firstName: document.getElementById('edit_firstName').value,
+                            lastName: document.getElementById('edit_lastName').value,
+                            cedula: document.getElementById('edit_cedula').value,
+                            email: document.getElementById('edit_email').value,
+                            phone: document.getElementById('edit_phone').value,
+                            localidad: document.getElementById('edit_localidad').value,
+                            registeredToVote: document.getElementById('edit_votante').value === 'true',
+                            votingPlace: document.getElementById('edit_votingPlace').value,
+                            votingTable: document.getElementById('edit_votingTable').value,
+                            confirmed: document.getElementById('edit_confirmed').value === 'true'
                         };
+                        const putRes = await fetch(`${API_URL}/api/registrations/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                        if (!putRes.ok) return showToast('danger', 'Error al guardar');
+                        bsModal.hide();
+                        showToast('success', 'Registro actualizado');
+                        loadLeaderData(leaderId, token);
+                    };
                 }
 
-        // Modal de edición simple
-        window.editReg = async function(id, leaderId, token) {
-            const res = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-            const regs = await res.json();
-            const reg = regs.find(r => r._id === id);
-            if (!reg) return alert('Registro no encontrado');
-            const nuevoNombre = prompt('Editar nombre:', reg.firstName || '');
-            if (nuevoNombre === null) return;
-            const body = { firstName: nuevoNombre };
-            const putRes = await fetch(`${API_URL}/api/registrations/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-            if (!putRes.ok) return alert('Error al guardar');
-            loadLeaderData(leaderId, token);
+        // (Eliminado: edición simple, solo queda la avanzada con modal y notificaciones visuales)
+
+        // Exportar registro individual a Excel
+        window.exportReg = async function(id, leaderId, token) {
+            try {
+                const res = await fetch(`${API_URL}/api/registrations/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) return showToast('danger', 'Error exportando registro');
+                const reg = await res.json();
+                // Generar XLSX simple (solo este registro)
+                const headers = ['Nombre', 'Apellido', 'Cédula', 'Email', 'Teléfono', 'Localidad', '¿Inscrito para votar?', 'Puesto de Votación', 'Nº Mesa', 'Confirmado'];
+                const row = [
+                    reg.firstName||'', reg.lastName||'', reg.cedula||'', reg.email||'', reg.phone||'', reg.localidad||'',
+                    reg.registeredToVote ? 'Sí' : 'No', reg.votingPlace||'', reg.votingTable||'', reg.confirmed ? 'Sí' : 'No'
+                ];
+                const csv = [headers.join(','), row.map(v=>`"${(v||'').toString().replace(/"/g,'""')}` ).join(',')].join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `registro_${reg.cedula||reg._id}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast('success', 'Registro exportado correctamente');
+            } catch (e) { showToast('danger', 'Error exportando registro'); }
         }
 
-        window.exportReg = function(id, leaderId, token) {
-            alert('Funcionalidad de exportar registro individual próximamente.');
+        // Notificaciones visuales modernas
+        function showToast(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-bg-${type} border-0 show mb-2`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `<div class="d-flex"><div class="toast-body">${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+            container.appendChild(toast);
+            setTimeout(()=>{ toast.classList.remove('show'); setTimeout(()=>toast.remove(), 500); }, 3500);
         }
 
-        function viewDetails(id){ alert('Ver detalles: ' + id); }
+        // Eliminar alert() y mensajes con 'á' corrupta
+        // ...existing code...
     </script>
 </body>
 </html>
