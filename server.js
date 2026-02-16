@@ -171,10 +171,16 @@ async function logAudit(req, action, resourceType, resourceId, changes = null, d
   }
 }
 
-// 🔹 Ruta principal
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "app.html")));
+// 🔹 Ruta principal - Login
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public/login.html")));
 
-// 🔹 Ruta de login
+// 🔹 Ruta de app - Dashboard (Admin)
+app.get("/app", (req, res) => res.sendFile(path.join(__dirname, "app.html")));
+
+// 🔹 Ruta de panel del líder
+app.get("/leader", (req, res) => res.sendFile(path.join(__dirname, "public/leader.html")));
+
+// 🔹 Ruta de login (compatibilidad)
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "public/login.html")));
 
 // 🔹 Ruta de auditoría
