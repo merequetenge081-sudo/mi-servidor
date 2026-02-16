@@ -445,6 +445,31 @@ app.post('/api/auth/leader-login', async (req, res) => {
   res.json({ token });
 });
 
+// Leader passwordless login (solo con ID)
+app.post('/api/auth/leader-login-id', async (req, res) => {
+  try {
+    const { leaderId } = req.body;
+    if (!leaderId) return res.status(400).json({ error: 'Falta leaderId' });
+    const leader = await Leader.findById(leaderId);
+    if (!leader) {
+      await logAudit({ ip: req.ip }, 'LOGIN', 'leader', leaderId, null, 'Failed passwordless login attempt');
+      return res.status(404).json({ error: 'Líder no encontrado' });
+    }
+
+    // Generar token sin comprobar contraseña
+    const token = generateToken({ role: 'leader', leaderId: String(leader._id), name: leader.name });
+
+    // Registrar login exitoso en auditoría
+    const mockReq = { ip: req.ip, user: { role: 'leader', leaderId: String(leader._id), name: leader.name } };
+    await logAudit(mockReq, 'LOGIN', 'leader', String(leader._id), null, 'Passwordless login successful');
+
+    return res.json({ token });
+  } catch (err) {
+    console.error('Error en leader-login-id:', err);
+    return res.status(500).json({ error: 'Error interno' });
+  }
+});
+
 // 🔹 Eliminar líder
 app.delete("/api/leaders/:id", async (req, res) => {
   await Leader.findByIdAndDelete(req.params.id);
