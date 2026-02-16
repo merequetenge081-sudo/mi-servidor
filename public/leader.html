@@ -1,6 +1,238 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Panel Líder</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#7c3aed;--muted:#94a3b8;--surface:#0b1220}
+    body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#071029 0%,#041225 100%);color:#e6eef8}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2dd4bf);display:flex;align-items:center;justify-content:center;font-weight:700}
+    h1{font-size:20px;margin:0}
+    .sub{color:var(--muted);font-size:13px}
+    .card{background:rgba(255,255,255,0.03);padding:16px;border-radius:12px;margin-top:20px}
+    .controls{display:flex;gap:8px;align-items:center}
+    button{background:var(--accent);border:none;color:white;padding:8px 12px;border-radius:8px;cursor:pointer}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.04);text-align:left;font-size:13px}
+    th{color:var(--muted);font-weight:600}
+    .small{font-size:12px;color:var(--muted)}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#e6eef8}
+    .actions button{margin-right:6px}
+    .center{text-align:center}
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center}
+    .modal .panel{background:#02111b;padding:18px;border-radius:10px;width:520px}
+    label{display:block;font-size:13px;margin-top:8px;color:var(--muted)}
+    input[type=text],input[type=email]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#e6eef8}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">LD</div>
+        <div>
+          <h1 id="leaderName">Panel del Líder</h1>
+          <div class="sub">Gestiona tus registros — verás solo los tuyos</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="refreshBtn" class="btn-ghost">↻ Actualizar</button>
+        <button id="exportBtn">⬇ Exportar XLSX</button>
+        <button id="logoutBtn" class="btn-ghost">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="small">Registros</div>
+      <div id="emptyHint" class="small center" style="display:none;margin-top:18px">No hay registros aún</div>
+      <table id="regsTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Nombre</th>
+            <th>Cédula</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Confirmado</th>
+            <th class="center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="panel">
+      <h3 id="modalTitle">Editar registro</h3>
+      <div>
+        <label>Nombre</label>
+        <input id="m_firstName" type="text">
+        <label>Apellido</label>
+        <input id="m_lastName" type="text">
+        <label>Cédula</label>
+        <input id="m_cedula" type="text">
+        <label>Email</label>
+        <input id="m_email" type="email">
+        <label>Teléfono</label>
+        <input id="m_phone" type="text">
+        <label><input id="m_confirmed" type="checkbox"> Confirmado</label>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button id="cancelBtn" class="btn-ghost">Cancelar</button>
+        <button id="saveBtn">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const leaderId = localStorage.getItem('leaderId');
+    if (!token || role !== 'leader') {
+      return window.location.href = '/login';
+    }
+
+    const API = window.location.origin;
+    const headersAuth = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('token'); localStorage.removeItem('role'); localStorage.removeItem('leaderId');
+      window.location.href = '/login';
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', loadRegs);
+    document.getElementById('exportBtn').addEventListener('click', exportXls);
+
+    let currentEditingId = null;
+
+    async function loadRegs() {
+      try {
+        const res = await fetch(API + '/api/registrations', { headers: headersAuth });
+        if (!res.ok) throw new Error('No autorizado o error al cargar');
+        const regs = await res.json();
+        renderTable(regs);
+      } catch (err) {
+        alert('Error: ' + err.message);
+        if (err.message.includes('No autorizado')) window.location.href = '/login';
+      }
+    }
+
+    function renderTable(regs) {
+      const tbl = document.getElementById('regsTable');
+      const body = tbl.querySelector('tbody');
+      body.innerHTML = '';
+      if (!regs || regs.length === 0) {
+        tbl.style.display = 'none';
+        document.getElementById('emptyHint').style.display = 'block';
+        return;
+      }
+      tbl.style.display = '';
+      document.getElementById('emptyHint').style.display = 'none';
+      regs.forEach(r => {
+        const tr = document.createElement('tr');
+        const date = new Date(r.date || r.createdAt || Date.now()).toLocaleString('es-CO');
+        tr.innerHTML = `
+          <td>${date}</td>
+          <td>${(r.firstName||'') + ' ' + (r.lastName||'')}</td>
+          <td>${r.cedula||''}</td>
+          <td>${r.phone||''}</td>
+          <td>${r.email||''}</td>
+          <td>${r.confirmed? 'Sí':'No'}</td>
+          <td class="actions center">
+            <button class="btn-ghost" data-id="${r._id}" data-action="edit">Editar</button>
+            <button class="btn-ghost" data-id="${r._id}" data-action="delete">Eliminar</button>
+          </td>`;
+        body.appendChild(tr);
+      });
+
+      // attach handlers
+      body.querySelectorAll('button[data-action="edit"]').forEach(b => b.addEventListener('click', onEdit));
+      body.querySelectorAll('button[data-action="delete"]').forEach(b => b.addEventListener('click', onDelete));
+    }
+
+    async function onEdit(e) {
+      const id = e.currentTarget.dataset.id;
+      currentEditingId = id;
+      // fetch single registro (the list already has it but we'll fetch for fresh data)
+      const res = await fetch(API + '/api/registrations?cedula=&eventId=', { headers: headersAuth });
+      // simple approach: request all and find by id
+      const all = await (await fetch(API + '/api/registrations', { headers: headersAuth })).json();
+      const reg = all.find(x => x._id === id);
+      if (!reg) return alert('Registro no encontrado');
+      document.getElementById('m_firstName').value = reg.firstName || '';
+      document.getElementById('m_lastName').value = reg.lastName || '';
+      document.getElementById('m_cedula').value = reg.cedula || '';
+      document.getElementById('m_email').value = reg.email || '';
+      document.getElementById('m_phone').value = reg.phone || '';
+      document.getElementById('m_confirmed').checked = !!reg.confirmed;
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    document.getElementById('cancelBtn').addEventListener('click', () => { document.getElementById('modal').style.display = 'none'; });
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      if (!currentEditingId) return;
+      const body = {
+        firstName: document.getElementById('m_firstName').value,
+        lastName: document.getElementById('m_lastName').value,
+        cedula: document.getElementById('m_cedula').value,
+        email: document.getElementById('m_email').value,
+        phone: document.getElementById('m_phone').value,
+        confirmed: document.getElementById('m_confirmed').checked
+      };
+      try {
+        const res = await fetch(API + '/api/registrations/' + currentEditingId, { method: 'PUT', headers: headersAuth, body: JSON.stringify(body) });
+        if (!res.ok) throw new Error('Error al guardar');
+        document.getElementById('modal').style.display = 'none';
+        await loadRegs();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    });
+
+    async function onDelete(e) {
+      const id = e.currentTarget.dataset.id;
+      if (!confirm('Confirmar eliminación de registro?')) return;
+      try {
+        const res = await fetch(API + '/api/registrations/' + id, { method: 'DELETE', headers: headersAuth });
+        if (!res.ok) throw new Error('No autorizado o error');
+        await loadRegs();
+      } catch (err) { alert('Error: ' + err.message); }
+    }
+
+    async function exportXls() {
+      try {
+        const res = await fetch(API + '/api/export/registrations', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!res.ok) throw new Error('Export failed');
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'registros.xlsx';
+        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      } catch (err) { alert('Error exportando: ' + err.message); }
+    }
+
+    // load leader name (optional)
+    (async function loadLeaderName(){
+      try {
+        const res = await fetch(API + '/api/leaders');
+        const list = await res.json();
+        const me = list.find(l => String(l._id) === String(leaderId));
+        if (me) document.getElementById('leaderName').textContent = me.name || 'Panel del Líder';
+      } catch (e){}
+      loadRegs();
+    })();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel del Líder - Sistema de Registro</title>
