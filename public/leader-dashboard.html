@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Líder</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0d6efd">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+</head>
+<body class="bg-gray-100">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-user-tie text-2xl text-green-600"></i>
+        <h1 class="text-2xl font-bold text-gray-800">Panel de Líder</h1>
+      </div>
+      <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Información del líder -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800" id="leader-name">Cargando...</h2>
+          <p class="text-gray-600" id="leader-info"></p>
+        </div>
+        <div class="text-right">
+          <button onclick="showQRModal()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition">
+            <i class="fas fa-qrcode mr-2"></i>Ver mi QR
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+          <i class="fas fa-clipboard-list text-4xl text-blue-500"></i>
+          <span class="text-4xl font-bold text-gray-800" id="total-registrations">0</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-700">Total Registros</h3>
+        <p class="text-sm text-gray-500">Personas registradas</p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+          <i class="fas fa-check-circle text-4xl text-green-500"></i>
+          <span class="text-4xl font-bold text-gray-800" id="confirmed-registrations">0</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-700">Confirmados</h3>
+        <p class="text-sm text-gray-500">Registros confirmados</p>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+          <i class="fas fa-clock text-4xl text-yellow-500"></i>
+          <span class="text-4xl font-bold text-gray-800" id="pending-registrations">0</span>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-700">Pendientes</h3>
+        <p class="text-sm text-gray-500">Sin confirmar</p>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">Acciones Rápidas</h3>
+      <div class="flex flex-wrap gap-4">
+        <button onclick="copyFormLink()" class="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition">
+          <i class="fas fa-link mr-2"></i>Copiar Link de Formulario
+        </button>
+        <button onclick="exportMyRegistrations()" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition">
+          <i class="fas fa-file-excel mr-2"></i>Exportar Mis Registros
+        </button>
+        <button onclick="loadRegistrations()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition">
+          <i class="fas fa-sync mr-2"></i>Actualizar
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de registros -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xl font-bold text-gray-800">Mis Registros</h3>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Buscar..."
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Nombre
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Cédula
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Teléfono
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Localidad
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Estado
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Fecha
+              </th>
+            </tr>
+          </thead>
+          <tbody id="registrations-tbody" class="bg-white divide-y divide-gray-200">
+            <tr>
+              <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p>Cargando registros...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal QR -->
+  <div id="qr-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold text-gray-800">Mi Código QR</h3>
+        <button onclick="closeQRModal()" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+      <div class="text-center">
+        <div id="qr-container" class="mb-4">
+          <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+        </div>
+        <p class="text-sm text-gray-600 mb-4" id="form-url"></p>
+        <button onclick="downloadQR()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition w-full">
+          <i class="fas fa-download mr-2"></i>Descargar QR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/leader-dashboard.js"></script>
+</body>
+</html>
