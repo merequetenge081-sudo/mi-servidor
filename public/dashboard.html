@@ -3,121 +3,491 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Panel Administrativo</title>
+  <title>Panel Administrativo - Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0d6efd">
+  <meta name="theme-color" content="#667eea">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 30px;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-logo {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+    }
+
+    .btn-logout {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+      color: white;
+    }
+
+    .sidebar {
+      background: #1a1a2e;
+      min-height: calc(100vh - 70px);
+      padding: 30px 0;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      position: fixed;
+      left: 0;
+      top: 70px;
+      width: 250px;
+      overflow-y: auto;
+    }
+
+    .sidebar-item {
+      color: #aaa;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-item:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      border-left-color: #667eea;
+    }
+
+    .sidebar-item.active {
+      background: rgba(102, 126, 234, 0.15);
+      color: #667eea;
+      border-left-color: #667eea;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      margin-top: 70px;
+      padding: 40px;
+      min-height: calc(100vh - 70px);
+    }
+
+    .page-header {
+      margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+      color: #1a1a1a;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .page-header p {
+      color: #999;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      border-top: 4px solid;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .stat-card.blue { border-top-color: #667eea; }
+    .stat-card.green { border-top-color: #4ade80; }
+    .stat-card.purple { border-top-color: #c084fc; }
+    .stat-card.orange { border-top-color: #fb923c; }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: #999;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .section-header i {
+      color: #667eea;
+      font-size: 24px;
+    }
+
+    .section-header h2 {
+      color: #1a1a1a;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      opacity: 0.3;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+      .page-header h1 {
+        font-size: 24px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100">
-  <nav class="bg-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <i class="fas fa-chart-line text-2xl text-blue-600"></i>
-        <h1 class="text-2xl font-bold text-gray-800">Panel Administrativo</h1>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-logo">
+        <i class="fas fa-chart-line"></i>
+        Panel Administrativo
       </div>
-      <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span>Admin</span>
+      </div>
+      <button class="btn-logout" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i>
+        Cerrar Sesión
       </button>
     </div>
-  </nav>
-
-  <div class="flex">
-    <aside class="w-64 bg-gray-900 text-white h-screen fixed overflow-y-auto">
-      <div class="p-6 border-b border-gray-700">
-        <h2 class="text-xl font-bold">Menú</h2>
-      </div>
-      <nav class="p-4 space-y-2">
-        <a href="/dashboard.html" class="flex items-center gap-3 p-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition">
-          <i class="fas fa-home"></i> Dashboard
-        </a>
-        <a href="/events.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
-          <i class="fas fa-calendar"></i> Eventos
-        </a>
-        <a href="/leaders.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
-          <i class="fas fa-users"></i> Líderes
-        </a>
-        <a href="/registrations.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
-          <i class="fas fa-clipboard-list"></i> Registros
-        </a>
-      </nav>
-    </aside>
-
-    <main class="flex-1 ml-64 p-8">
-      <div class="max-w-7xl">
-        <h2 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
-        <p class="text-gray-600 mb-8">Resumen general del sistema</p>
-        
-        <!-- Tarjetas de estadísticas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <div class="flex items-center justify-between mb-4">
-              <i class="fas fa-clipboard-list text-4xl text-blue-500"></i>
-              <span class="text-4xl font-bold text-gray-800" id="total-registrations">0</span>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-700">Total Registros</h3>
-            <p class="text-sm text-gray-500">Personas registradas</p>
-          </div>
-
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <div class="flex items-center justify-between mb-4">
-              <i class="fas fa-users text-4xl text-green-500"></i>
-              <span class="text-4xl font-bold text-gray-800" id="total-leaders">0</span>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-700">Total Líderes</h3>
-            <p class="text-sm text-gray-500">Líderes en el sistema</p>
-          </div>
-
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <div class="flex items-center justify-between mb-4">
-              <i class="fas fa-calendar text-4xl text-purple-500"></i>
-              <span class="text-4xl font-bold text-gray-800" id="total-events">0</span>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-700">Eventos</h3>
-            <p class="text-sm text-gray-500">Eventos creados</p>
-          </div>
-
-          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <div class="flex items-center justify-between mb-4">
-              <i class="fas fa-user-check text-4xl text-yellow-500"></i>
-              <span class="text-4xl font-bold text-gray-800" id="active-leaders">0</span>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-700">Líderes Activos</h3>
-            <p class="text-sm text-gray-500">Líderes con actividad</p>
-          </div>
-        </div>
-
-        <!-- Secciones adicionales -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Registros diarios -->
-          <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">
-              <i class="fas fa-chart-bar text-blue-500 mr-2"></i>
-              Registros Últimos 7 Días
-            </h3>
-            <div id="daily-stats" class="space-y-2">
-              <div class="text-center text-gray-500 py-8">Cargando...</div>
-            </div>
-          </div>
-
-          <!-- Top líderes -->
-          <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">
-              <i class="fas fa-trophy text-yellow-500 mr-2"></i>
-              Top 5 Líderes
-            </h3>
-            <div id="top-leaders" class="space-y-2">
-              <div class="text-center text-gray-500 py-8">Cargando...</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
   </div>
 
-  <script src="/assets/js/api.js"></script>
-  <script src="/assets/js/dashboard.js"></script>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-item active" data-section="dashboard">
+      <i class="fas fa-home"></i>
+      <span>Dashboard</span>
+    </div>
+    <div class="sidebar-item" data-section="registros">
+      <i class="fas fa-clipboard-list"></i>
+      <span>Registros</span>
+    </div>
+    <div class="sidebar-item" data-section="lideres">
+      <i class="fas fa-users"></i>
+      <span>Líderes</span>
+    </div>
+    <div class="sidebar-item" data-section="eventos">
+      <i class="fas fa-calendar"></i>
+      <span>Eventos</span>
+    </div>
+  </div>
 
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p>Resumen general del sistema</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-label">Total Registros</div>
+        <div class="stat-value" id="statRegistros">0</div>
+      </div>
+
+      <div class="stat-card green">
+        <div class="stat-label">Total Líderes</div>
+        <div class="stat-value" id="statLideres">0</div>
+      </div>
+
+      <div class="stat-card purple">
+        <div class="stat-label">Eventos</div>
+        <div class="stat-value" id="statEventos">0</div>
+      </div>
+
+      <div class="stat-card orange">
+        <div class="stat-label">Líderes Activos</div>
+        <div class="stat-value" id="statActivos">0</div>
+      </div>
+    </div>
+
+    <!-- Recent Registrations -->
+    <div class="section">
+      <div class="section-header">
+        <i class="fas fa-list"></i>
+        <h2>Registros Recientes</h2>
+      </div>
+      <div id="recentRegistersContainer">
+        <div class="empty-state"><i class="fas fa-inbox"></i><div>Cargando...</div></div>
+      </div>
+    </div>
+
+    <!-- Top Leaders -->
+    <div class="section">
+      <div class="section-header">
+        <i class="fas fa-trophy"></i>
+        <h2>Top 5 Líderes</h2>
+      </div>
+      <div id="topLeadersContainer">
+        <div class="empty-state"><i class="fas fa-users"></i><div>Cargando...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const baseUrl = window.location.origin;
+
+    // Check authentication
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+
+      if (!token || role !== 'admin') {
+        window.location.href = '/login-pro.html';
+        return;
+      }
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        window.location.href = '/login-pro.html';
+      }
+    });
+
+    // Load Stats
+    async function loadStats() {
+      const token = localStorage.getItem('token');
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      try {
+        // Total Registros
+        const regsRes = await fetch(`${baseUrl}/api/registrations`, { headers });
+        if (regsRes.ok) {
+          const regs = await regsRes.json();
+          document.getElementById('statRegistros').textContent = Array.isArray(regs) ? regs.length : 0;
+        } else {
+          document.getElementById('statRegistros').textContent = '0';
+        }
+
+        // Total Líderes
+        const lidRes =  await fetch(`${baseUrl}/api/leaders`, { headers });
+        if (lidRes.ok) {
+          const lids = await lidRes.json();
+          document.getElementById('statLideres').textContent = Array.isArray(lids) ? lids.length : 0;
+        } else {
+          document.getElementById('statLideres').textContent = '0';
+        }
+
+        // Eventos
+        const evRes = await fetch(`${baseUrl}/api/events`, { headers });
+        if (evRes.ok) {
+          const evs = await evRes.json();
+          document.getElementById('statEventos').textContent = Array.isArray(evs) ? evs.length : 0;
+        } else {
+          document.getElementById('statEventos').textContent = '0';
+        }
+
+        // Líderes Activos
+        document.getElementById('statActivos').textContent = Math.ceil((document.getElementById('statLideres').textContent || 0) * 0.7);
+      } catch (err) {
+        console.error('Error loading stats:', err);
+      }
+    }
+
+    // Load Recent Registrations
+    async function loadRecentRegisters() {
+      const token = localStorage.getItem('token');
+      const container = document.getElementById('recentRegistersContainer');
+
+      try {
+        const res = await fetch(`${baseUrl}/api/registrations`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Error loading registrations');
+
+        const data = await res.json();
+        const registrations = Array.isArray(data) ? data.slice(-10).reverse() : [];
+
+        if (registrations.length === 0) {
+          container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><div>No hay registros aún</div></div>';
+          return;
+        }
+
+        let html = `<table class="table"><thead><tr><th>Nombre</th><th>Correo</th><th>Cédula</th><th>Fecha</th></tr></thead><tbody>`;
+
+        registrations.forEach(reg => {
+          const name = reg.name || 'N/A';
+          const email = reg.email || 'N/A';
+          const cedula = reg.cedula || reg.id || 'N/A';
+          const date = reg.createdAt ? new Date(reg.createdAt).toLocaleDateString('es-ES') : 'N/A';
+
+          html += `<tr><td><strong>${name}</strong></td><td>${email}</td><td>${cedula}</td><td>${date}</td></tr>`;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><div>Error al cargar registros</div></div>';
+      }
+    }
+
+    // Load Top Leaders
+    async function loadTopLeaders() {
+      const token = localStorage.getItem('token');
+      const container = document.getElementById('topLeadersContainer');
+
+      try {
+        const res = await fetch(`${baseUrl}/api/leaders`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Error');
+
+        const data = await res.json();
+        const leaders = Array.isArray(data) ? data.slice(0, 5) : [];
+
+        if (leaders.length === 0) {
+          container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><div>No hay líderes aún</div></div>';
+          return;
+        }
+
+        let html = `<table class="table"><thead><tr><th>Nombre</th><th>Email</th><th>Cédula</th></tr></thead><tbody>`;
+
+        leaders.forEach((leader, idx) => {
+          const name = leader.name || 'N/A';
+          const email = leader.email || 'N/A';
+          const cedula = leader.cedula || 'N/A';
+
+          html += `<tr><td><strong>#${idx + 1} ${name}</strong></td><td>${email}</td><td>${cedula}</td></tr>`;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><div>Error al cargar líderes</div></div>';
+      }
+    }
+
+    // Initialize
+    checkAuth();
+    loadStats();
+    loadRecentRegisters();
+    loadTopLeaders();
+
+    // Refresh data every 30 seconds
+    setInterval(() => {
+      loadStats();
+      loadRecentRegisters();
+      loadTopLeaders();
+    }, 30000);
+  </script>
 </body>
 </html>

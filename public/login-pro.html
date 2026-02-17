@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Sistema de Gestión</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .login-logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 32px;
+      margin: 0 auto 15px;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .login-header h1 {
+      color: #1a1a1a;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .login-header p {
+      color: #666;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: flex;
+      align-items: center;
+      color: #1a1a1a;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .form-group label i {
+      margin-right: 8px;
+      color: #667eea;
+      width: 18px;
+    }
+
+    .form-control {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background-color: #f8f9fa;
+    }
+
+    .form-control:focus {
+      border-color: #667eea;
+      background-color: white;
+      box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.1);
+      outline: none;
+    }
+
+    .form-control::placeholder {
+      color: #999;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .btn-login.loading {
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .error-message {
+      display: none;
+      background-color: #fee;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      color: #c33;
+      font-size: 14px;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .error-message i {
+      margin-right: 8px;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 25px;
+      padding-top: 25px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .form-footer a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .form-footer a:hover {
+      color: #764ba2;
+    }
+
+    .switch-user-type {
+      display: flex;
+      gap: 0;
+      margin-bottom: 25px;
+    }
+
+    .switch-user-type button {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      color: #666;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 0;
+    }
+
+    .switch-user-type button:first-child {
+      border-radius: 8px 0 0 8px;
+    }
+
+    .switch-user-type button:last-child {
+      border-radius: 0 8px 8px 0;
+    }
+
+    .switch-user-type button.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: #667eea;
+    }
+
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .input-group-icon {
+      position: relative;
+    }
+
+    .input-group-icon i {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #667eea;
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    @media (max-width: 600px) {
+      .login-card {
+        padding: 30px 20px;
+      }
+
+      .login-header h1 {
+        font-size: 24px;
+      }
+
+      .btn-login {
+        padding: 14px;
+        font-size: 15px;
+      }
+    }
+
+    .loading-spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-spinner.show {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h1>Sistema de Gestión</h1>
+        <p>Iniciar sesión para continuar</p>
+      </div>
+
+      <div id="errorMessage" class="error-message">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText"></span>
+      </div>
+
+      <!-- Switch entre Admin y Líder -->
+      <div class="switch-user-type">
+        <button type="button" class="active" data-role="admin">
+          <i class="fas fa-user-shield"></i> Admin
+        </button>
+        <button type="button" data-role="leader">
+          <i class="fas fa-users"></i> Líder
+        </button>
+      </div>
+
+      <!-- Form Admin -->
+      <form id="adminForm" class="form-section active">
+        <div class="form-group">
+          <label>
+            <i class="fas fa-user"></i>
+            Usuario
+          </label>
+          <div class="input-group-icon">
+            <input type="text" class="form-control" id="adminUsername" placeholder="Ingresa tu usuario" required autocomplete="username">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <i class="fas fa-lock"></i>
+            Contraseña
+          </label>
+          <div class="input-group-icon">
+            <input type="password" class="form-control" id="adminPassword" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
+            <i class="fas fa-lock"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login">
+          <span class="loading-spinner" id="adminSpinner"></span>
+          <span>Iniciar Sesión</span>
+        </button>
+      </form>
+
+      <!-- Form Líder -->
+      <form id="leaderForm" class="form-section">
+        <div class="form-group">
+          <label>
+            <i class="fas fa-envelope"></i>
+            Correo Electrónico
+          </label>
+          <div class="input-group-icon">
+            <input type="email" class="form-control" id="leaderEmail" placeholder="tu@correo.com" required autocomplete="email">
+            <i class="fas fa-envelope"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <i class="fas fa-lock"></i>
+            Contraseña
+          </label>
+          <div class="input-group-icon">
+            <input type="password" class="form-control" id="leaderPassword" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
+            <i class="fas fa-lock"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login">
+          <span class="loading-spinner" id="leaderSpinner"></span>
+          <span>Iniciar Sesión</span>
+        </button>
+      </form>
+
+      <div class="form-footer">
+        <div>© 2026 Sistema de Gestión. Todos los derechos reservados.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const baseUrl = window.location.origin;
+    let currentRole = 'admin';
+
+    // Switch entre Admin y Líder
+    document.querySelectorAll('.switch-user-type button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.switch-user-type button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRole = btn.dataset.role;
+
+        document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+        if (currentRole === 'admin') {
+          document.getElementById('adminForm').classList.add('active');
+        } else {
+          document.getElementById('leaderForm').classList.add('active');
+        }
+
+        clearError();
+      });
+    });
+
+    // Admin Login
+    document.getElementById('adminForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('adminUsername').value;
+      const password = document.getElementById('adminPassword').value;
+
+      if (!username || !password) {
+        showError('Por favor completa todos los campos');
+        return;
+      }
+
+      await submitLogin('/api/auth/admin-login', { username, password }, 'admin');
+    });
+
+    // Líder Login
+    document.getElementById('leaderForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('leaderEmail').value;
+      const password = document.getElementById('leaderPassword').value;
+
+      if (!email || !password) {
+        showError('Por favor completa todos los campos');
+        return;
+      }
+
+      await submitLogin('/api/auth/leader-login', { email, password }, 'leader');
+    });
+
+    async function submitLogin(endpoint, body, role) {
+      const spinner = document.getElementById(role === 'admin' ? 'adminSpinner' : 'leaderSpinner');
+      const button = document.querySelector(`.btn-login`);
+
+      spinner.classList.add('show');
+      button.classList.add('loading');
+
+      try {
+        const response = await fetch(`${baseUrl}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('role', role);
+          
+          // Redirigir según rol
+          const redirectUrl = role === 'admin' ? '/dashboard.html' : '/leader-dashboard.html';
+          window.location.href = redirectUrl;
+        } else {
+          showError(data.error || 'Credenciales inválidas');
+        }
+      } catch (err) {
+        showError('Error al conectar con el servidor');
+        console.error('Login error:', err);
+      } finally {
+        spinner.classList.remove('show');
+        button.classList.remove('loading');
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      const errorText = document.getElementById('errorText');
+      errorText.textContent = message;
+      errorDiv.classList.add('show');
+      setTimeout(() => {
+        errorDiv.classList.remove('show');
+      }, 5000);
+    }
+
+    function clearError() {
+      document.getElementById('errorMessage').classList.remove('show');
+    }
+
+    // Validación en tiempo real
+    document.getElementById('adminUsername').addEventListener('input', clearError);
+    document.getElementById('adminPassword').addEventListener('input', clearError);
+    document.getElementById('leaderEmail').addEventListener('input', clearError);
+    document.getElementById('leaderPassword').addEventListener('input', clearError);
+  </script>
+</body>
+</html>

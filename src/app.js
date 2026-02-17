@@ -103,29 +103,39 @@ app.use((req, res, next) => {
 
 // ==================== RUTAS HTML (ANTES QUE MIDDLEWARE) ====================
 // Estas rutas NO necesitan authentication ni organization validation
-// Ruta raíz - Login
+// Ruta raíz - Login Profesional
 app.get("/", (req, res) => {
-  res.sendFile(join(__dirname, "../public/login.html"));
+  res.sendFile(join(__dirname, "../public/login-pro.html"));
 });
 
-// Ruta dashboard de admin
-app.get("/app", (req, res) => {
-  res.sendFile(join(__dirname, "../public/app.html"));
+// Ruta login antiguo (por compatibilidad)
+app.get("/login", (req, res) => {
+  res.sendFile(join(__dirname, "../public/login-pro.html"));
 });
 
-// Ruta panel del líder
-app.get("/leader", (req, res) => {
-  res.sendFile(join(__dirname, "../public/leader.html"));
+// Dashboard Admin
+app.get("/dashboard.html", (req, res) => {
+  res.sendFile(join(__dirname, "../public/dashboard.html"));
 });
 
-// Ruta formulario público de registro
+// Formulario público de registro
 app.get("/form", (req, res) => {
   res.sendFile(join(__dirname, "../public/form.html"));
 });
 
-// Ruta formulario público con token del líder
+// Formulario con token del líder
 app.get("/registration/:token", (req, res) => {
   res.sendFile(join(__dirname, "../public/form.html"));
+});
+
+// Ruta app antiguo (por compatibilidad)
+app.get("/app", (req, res) => {
+  res.redirect("/dashboard.html");
+});
+
+// Ruta leader antiguo (por compatibilidad)
+app.get("/leader", (req, res) => {
+  res.sendFile(join(__dirname, "../public/leader.html"));
 });
 
 // ==================== ORGANIZATION MIDDLEWARE ====================
