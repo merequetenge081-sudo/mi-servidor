@@ -203,8 +203,10 @@ function copyQRLink() {
 
 async function loadTopLeaders() {
   try {
-    const leaders = await api.getTopLeaders(5);
-    renderRanking(leaders);
+    // Sort leaders by registrations count (descending) and take top 5
+    const sorted = [...allLeaders].sort((a, b) => (b.registrations || 0) - (a.registrations || 0));
+    const topLeaders = sorted.slice(0, 5);
+    renderRanking(topLeaders);
   } catch (error) {
     console.error('Error loading top leaders:', error);
   }
@@ -239,10 +241,12 @@ function renderRanking(leaders) {
 
 async function loadLeaderStats(leaderId) {
   try {
-    const result = await api.getRegistrations({ leaderId, limit: 1000 });
+    const result = await api.getRegistrations({ leaderId, limit: 10000 });
+    const total = result.total || 0;
+    const confirmed = (result.data || []).filter(r => r.confirmed).length;
     return {
-      total: result.total || 0,
-      confirmed: result.confirmedCount || 0
+      total: total,
+      confirmed: confirmed
     };
   } catch (error) {
     console.error('Error loading stats for leader:', leaderId);
