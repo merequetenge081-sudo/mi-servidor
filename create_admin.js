@@ -1,24 +1,10 @@
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import bcryptjs from 'bcryptjs';
+import { addAdmin, findAdminByUsername } from './src/utils/userDb.js';
 
 dotenv.config();
-const mongoURL = process.env.MONGO_URL;
-if (!mongoURL) {
-  console.error('ERROR: debe definir MONGO_URL en .env antes de ejecutar este script');
-  process.exit(1);
-}
-
-const AdminSchema = new mongoose.Schema({
-  username: { type: String, unique: true },
-  passwordHash: String,
-  createdAt: { type: Date, default: () => new Date() }
-});
-const Admin = mongoose.model('Admin', AdminSchema);
 
 async function main() {
-  await mongoose.connect(mongoURL);
-
   const argvUser = process.argv[2];
   const argvPass = process.argv[3];
   const username = argvUser || process.env.ADMIN_USER || 'admin';
@@ -29,19 +15,17 @@ async function main() {
     process.exit(1);
   }
 
-  const hash = await bcrypt.hash(password, 10);
-
-  const existing = await Admin.findOne({ username });
+  const hash = await bcryptjs.hash(password, 10);
+  
+  const existing = findAdminByUsername(username);
+  addAdmin(username, hash);
+  
   if (existing) {
-    existing.passwordHash = hash;
-    await existing.save();
-    console.log(`Actualizado admin '${username}'`);
+    console.log(`✅ Actualizado admin '${username}'`);
   } else {
-    await Admin.create({ username, passwordHash: hash });
-    console.log(`Creado admin '${username}'`);
+    console.log(`✅ Creado admin '${username}'`);
   }
 
-  await mongoose.disconnect();
   process.exit(0);
 }
 

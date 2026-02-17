@@ -3,23 +3,40 @@
   "version": "1.0.0",
   "main": "server.js",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build:js": "terser public/assets/js/*.js -o public/assets/js/app.min.js",
+    "build:css": "cleancss -o public/assets/css/style.min.css public/assets/css/*.css"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "canvas": "^3.2.1",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.0",
     "exceljs": "^4.4.0",
     "express": "^4.21.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^8.19.3",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.10",
     "qrcode-terminal": "^0.12.0",
     "resend": "^6.4.1",
     "twilio": "^5.10.4",
-    "whatsapp-web.js": "^1.34.1"
+    "whatsapp-web.js": "^1.34.1",
+    "winston": "^3.14.2",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "terser": "^5.31.3"
   },
   "description": "",
   "keywords": [],

@@ -1,0 +1,147 @@
+import { Leader } from "../models/Leader.js";
+import { Registration } from "../models/Registration.js";
+import { AuditService } from "../services/audit.service.js";
+import bcryptjs from "bcryptjs";
+
+export async function createLeader(req, res) {
+  try {
+    const { leaderId, name, email, phone, area, eventId, password } = req.body;
+    const user = req.user;
+
+    if (!leaderId || !name) {
+      return res.status(400).json({ error: "leaderId y name son requeridos" });
+    }
+
+    const existing = await Leader.findOne({ leaderId });
+    if (existing) {
+      return res.status(400).json({ error: "leaderId ya existe" });
+    }
+
+    const passwordHash = password ? await bcryptjs.hash(password, 10) : null;
+
+    const leader = new Leader({
+      leaderId,
+      name,
+      email,
+      phone,
+      area,
+      eventId,
+      passwordHash,
+      registrations: 0
+    });
+
+    await leader.save();
+
+    await AuditService.log("CREATE", "Leader", leader._id.toString(), user, { leaderId, name }, `Líder ${name} creado`);
+
+    res.status(201).json(leader);
+  } catch (error) {
+    console.error("Create leader error:", error.message);
+    res.status(500).json({ error: "Error al crear líder" });
+  }
+}
+
+export async function getLeaders(req, res) {
+  try {
+    const { eventId, active } = req.query;
+    const filter = {};
+
+    if (eventId) filter.eventId = eventId;
+    if (active !== undefined) filter.active = active === "true";
+
+    const leaders = await Leader.find(filter).sort({ name: 1 });
+    res.json(leaders);
+  } catch (error) {
+    console.error("Get leaders error:", error.message);
+    res.status(500).json({ error: "Error al obtener líderes" });
+  }
+}
+
+export async function getLeader(req, res) {
+  try {
+    const leader = await Leader.findById(req.params.id);
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+    res.json(leader);
+  } catch (error) {
+    console.error("Get leader error:", error.message);
+    res.status(500).json({ error: "Error al obtener líder" });
+  }
+}
+
+export async function updateLeader(req, res) {
+  try {
+    const { name, email, phone, area, active } = req.body;
+    const user = req.user;
+
+    const leader = await Leader.findById(req.params.id);
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+
+    const changes = {};
+    if (name !== undefined) {
+      changes.name = { old: leader.name, new: name };
+      leader.name = name;
+    }
+    if (email !== undefined) {
+      changes.email = { old: leader.email, new: email };
+      leader.email = email;
+    }
+    if (phone !== undefined) {
+      changes.phone = { old: leader.phone, new: phone };
+      leader.phone = phone;
+    }
+    if (area !== undefined) {
+      changes.area = { old: leader.area, new: area };
+      leader.area = area;
+    }
+    if (active !== undefined) {
+      changes.active = { old: leader.active, new: active };
+      leader.active = active;
+    }
+
+    leader.updatedAt = new Date();
+    await leader.save();
+
+    await AuditService.log("UPDATE", "Leader", leader._id.toString(), user, changes, `Líder ${leader.name} actualizado`);
+
+    res.json(leader);
+  } catch (error) {
+    console.error("Update leader error:", error.message);
+    res.status(500).json({ error: "Error al actualizar líder" });
+  }
+}
+
+export async function deleteLeader(req, res) {
+  try {
+    const user = req.user;
+    const leader = await Leader.findById(req.params.id);
+
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+
+    const registrationCount = await Registration.countDocuments({ leaderId: leader.leaderId });
+
+    await Leader.deleteOne({ _id: req.params.id });
+    await AuditService.log("DELETE", "Leader", leader._id.toString(), user, { registrations: registrationCount }, `Líder ${leader.name} eliminado`);
+
+    res.json({ message: "Líder eliminado", registrationsDeleted: registrationCount });
+  } catch (error) {
+    console.error("Delete leader error:", error.message);
+    res.status(500).json({ error: "Error al eliminar líder" });
+  }
+}
+
+export async function getTopLeaders(req, res) {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const leaders = await Leader.find({ active: true }).sort({ registrations: -1 }).limit(limit);
+    res.json(leaders);
+  } catch (error) {
+    console.error("Get top leaders error:", error.message);
+    res.status(500).json({ error: "Error al obtener líderes destacados" });
+  }
+}

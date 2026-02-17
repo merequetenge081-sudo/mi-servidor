@@ -1,0 +1,11 @@
+{
+  "admins": [
+    {
+      "id": "1771311803328",
+      "username": "admin",
+      "passwordHash": "$2a$10$SiMVFlds8Ep1zRrHOAXcY.oPo3A6eb6GrVqh/pCg3iRZ0oSnTQSLC",
+      "createdAt": "2026-02-17T07:03:23.328Z"
+    }
+  ],
+  "leaders": []
+}
