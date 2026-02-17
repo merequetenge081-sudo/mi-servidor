@@ -10,6 +10,8 @@ let currentUser = null;
 let isProcessing = false;
 let currentQRLeader = null;
 let currentQRData = null;
+let dailyTrendChart = null;
+let topLeadersChart = null;
 
 // ==================== UX UTILITIES ====================
 
@@ -289,11 +291,237 @@ async function loadLeaders() {
 
     // Load ranking
     await loadTopLeaders();
+
+    // Load analytics
+    await loadAnalytics();
   } catch (error) {
     console.error('Error loading leaders:', error);
     showToast('Error al cargar líderes', 'error');
   } finally {
     hideLoader();
+  }
+}
+
+// ==================== ANALYTICS ====================
+
+async function loadAnalytics() {
+  try {
+    // Load KPIs
+    await loadKPIs();
+    
+    // Load daily trend chart
+    await loadDailyTrendChart();
+    
+    // Load top leaders chart
+    await loadTopLeadersChart();
+    
+    // Load recent activity
+    await loadRecentActivity();
+  } catch (error) {
+    console.error('Error loading analytics:', error);
+  }
+}
+
+async function loadKPIs() {
+  try {
+    const stats = await api.get('/api/stats');
+    
+    const totalLeaders = allLeaders.length;
+    const totalRegistrations = stats.totalRegistrations || 0;
+    const confirmed = stats.confirmedRegistrations || 0;
+    const conversion = totalRegistrations > 0 ? Math.round((confirmed / totalRegistrations) * 100) : 0;
+
+    document.getElementById('kpi-total-leaders').textContent = totalLeaders;
+    document.getElementById('kpi-total-registrations').textContent = totalRegistrations;
+    document.getElementById('kpi-confirmed').textContent = confirmed;
+    document.getElementById('kpi-conversion').textContent = conversion + '%';
+  } catch (error) {
+    console.error('Error loading KPIs:', error);
+  }
+}
+
+async function loadDailyTrendChart() {
+  try {
+    // Hide skeleton
+    const skeleton = document.getElementById('daily-chart-skeleton');
+    const canvas = document.getElementById('dailyTrendChart');
+    
+    const dailyStats = await api.get('/api/stats/daily');
+    
+    if (!dailyStats || !dailyStats.data || dailyStats.data.length === 0) {
+      return;
+    }
+
+    const sortedData = dailyStats.data.sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-7);
+    
+    const labels = sortedData.map(d => {
+      const date = new Date(d.date);
+      return date.toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
+    });
+
+    const registrationData = sortedData.map(d => d.registrations || 0);
+    const confirmedData = sortedData.map(d => d.confirmed || 0);
+
+    skeleton.classList.add('hidden');
+    canvas.classList.remove('hidden');
+
+    if (dailyTrendChart) {
+      dailyTrendChart.destroy();
+    }
+
+    dailyTrendChart = new Chart(document.getElementById('dailyTrendChart'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Registros',
+            data: registrationData,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            fill: true,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#3b82f6'
+          },
+          {
+            label: 'Confirmados',
+            data: confirmedData,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            fill: true,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#10b981'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading daily trend chart:', error);
+  }
+}
+
+async function loadTopLeadersChart() {
+  try {
+    const skeleton = document.getElementById('top-leaders-skeleton');
+    const canvas = document.getElementById('topLeadersChart');
+
+    // Get top 5 leaders sorted by registrations
+    const topLeaders = [...allLeaders]
+      .sort((a, b) => (b.registrations || 0) - (a.registrations || 0))
+      .slice(0, 5)
+      .reverse();
+
+    if (!topLeaders || topLeaders.length === 0) {
+      return;
+    }
+
+    const labels = topLeaders.map(l => l.name);
+    const registrationData = topLeaders.map(l => l.registrations || 0);
+
+    skeleton.classList.add('hidden');
+    canvas.classList.remove('hidden');
+
+    if (topLeadersChart) {
+      topLeadersChart.destroy();
+    }
+
+    topLeadersChart = new Chart(document.getElementById('topLeadersChart'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Registros',
+            data: registrationData,
+            backgroundColor: [
+              '#3b82f6',
+              '#10b981',
+              '#f59e0b',
+              '#ef4444',
+              '#8b5cf6'
+            ],
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error loading top leaders chart:', error);
+  }
+}
+
+async function loadRecentActivity() {
+  try {
+    const skeleton = document.getElementById('recent-activity-skeleton');
+    const listContainer = document.getElementById('recent-activity-list');
+
+    const registrations = await api.getRegistrations({ limit: 5 });
+    const recentData = (registrations.data || []).slice(0, 5);
+
+    if (!recentData || recentData.length === 0) {
+      skeleton.classList.add('hidden');
+      listContainer.classList.remove('hidden');
+      listContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Sin registros recientes</p>';
+      return;
+    }
+
+    const html = recentData.map(reg => `
+      <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+        <div class="flex-1">
+          <p class="font-semibold text-gray-800">${reg.firstName} ${reg.lastName}</p>
+          <p class="text-sm text-gray-600">Cédula: ${reg.cedula}</p>
+          <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
+            <span><i class="fas fa-user text-blue-600 mr-1"></i>${reg.leaderName}</span>
+            <span><i class="fas fa-clock text-gray-600 mr-1"></i>${new Date(reg.createdAt).toLocaleDateString('es-CO')}</span>
+            <span class="px-2 py-1 rounded-full ${reg.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+              ${reg.confirmed ? '✓ Confirmado' : 'Pendiente'}
+            </span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    skeleton.classList.add('hidden');
+    listContainer.classList.remove('hidden');
+    listContainer.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading recent activity:', error);
   }
 }
 
