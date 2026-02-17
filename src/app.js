@@ -101,19 +101,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// ==================== ORGANIZATION MIDDLEWARE ====================
-// Multi-tenant context (extracts and validates org from JWT)
-app.use(organizationMiddleware);
-
-// ==================== RUTAS ====================
-app.use("/api", apiRoutes);
-
-// Health check
-app.get("/health", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
-// ==================== RUTAS HTML ====================
+// ==================== RUTAS HTML (ANTES QUE MIDDLEWARE) ====================
+// Estas rutas NO necesitan authentication ni organization validation
 // Ruta raíz - Login
 app.get("/", (req, res) => {
   res.sendFile(join(__dirname, "../public/login.html"));
@@ -137,6 +126,19 @@ app.get("/form", (req, res) => {
 // Ruta formulario público con token del líder
 app.get("/registration/:token", (req, res) => {
   res.sendFile(join(__dirname, "../public/form.html"));
+});
+
+// ==================== ORGANIZATION MIDDLEWARE ====================
+// Multi-tenant context (extracts and validates org from JWT)
+// Apply AFTER HTML routes so they don't try to access req.user
+app.use(organizationMiddleware);
+
+// ==================== RUTAS API ====================
+app.use("/api", apiRoutes);
+
+// Health check
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // ==================== ERROR HANDLING ====================

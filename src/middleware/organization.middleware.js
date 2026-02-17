@@ -8,6 +8,11 @@ import logger from "../config/logger.js";
 
 export async function organizationMiddleware(req, res, next) {
   try {
+    // Solo validar si el usuario está autenticado (req.user existe)
+    if (!req.user) {
+      return next(); // Skip si no hay usuario, dejar pasar
+    }
+
     // Extract from JWT token (already decoded by authMiddleware)
     const organizationId = req.user?.organizationId;
     
