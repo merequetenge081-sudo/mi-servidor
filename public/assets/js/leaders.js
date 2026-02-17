@@ -8,6 +8,8 @@ let editingLeaderId = null;
 let confirmCallback = null;
 let currentUser = null;
 let isProcessing = false;
+let currentQRLeader = null;
+let currentQRData = null;
 
 // ==================== UX UTILITIES ====================
 
@@ -187,7 +189,17 @@ function closeFormModal() {
 // ==================== QR MODAL ====================
 
 function closeQRModal() {
-  document.getElementById('qr-modal').classList.add('hidden');
+  const modal = document.getElementById('qr-modal');
+  const content = document.getElementById('qr-modal-content');
+  
+  modal.style.opacity = '0';
+  content.style.transform = 'scale(0.95)';
+  
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    currentQRLeader = null;
+    currentQRData = null;
+  }, 300);
 }
 
 function copyQRLink() {
@@ -391,16 +403,108 @@ function clearFilters() {
 async function viewQR(leaderId) {
   showLoader();
   try {
+    const leader = allLeaders.find(l => l.leaderId === leaderId);
+    if (!leader) {
+      showToast('Líder no encontrado', 'error');
+      return;
+    }
+
+    currentQRLeader = leader;
+
     const response = await api.getLeaderQR(leaderId);
-    
+    currentQRData = response;
+
+    // Fill modal with data
     document.getElementById('qr-image').src = response.qrCode;
     document.getElementById('qr-link').value = response.formUrl;
-    document.getElementById('qr-modal').classList.remove('hidden');
+    document.getElementById('qr-leader-name').textContent = leader.name;
+    document.getElementById('qr-leader-id').textContent = leader.leaderId;
+    document.getElementById('qr-registrations').textContent = leaderStats[leader._id]?.total || 0;
+
+    // Animate modal opening
+    const modal = document.getElementById('qr-modal');
+    const content = document.getElementById('qr-modal-content');
+    
+    modal.classList.remove('hidden');
+    // Reset transform for animation
+    content.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+      modal.style.opacity = '1';
+      content.style.transform = 'scale(1)';
+    }, 10);
   } catch (error) {
     console.error('Error obtaining QR:', error);
     showToast('Error al obtener el código QR', 'error');
   } finally {
     hideLoader();
+  }
+}
+
+async function downloadQR() {
+  if (!currentQRData || !currentQRLeader) {
+    showToast('Datos de QR no disponibles', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('download-qr-btn');
+  btn.disabled = true;
+  btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+  try {
+    const link = document.createElement('a');
+    link.href = currentQRData.qrCode;
+    link.download = `QR_${currentQRLeader.leaderId}_${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('Código QR descargado exitosamente', 'success');
+  } catch (error) {
+    console.error('Error downloading QR:', error);
+    showToast('Error al descargar el código QR', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+}
+
+async function copyLink() {
+  const btn = document.getElementById('copy-link-btn');
+  btn.disabled = true;
+  btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+  try {
+    const link = document.getElementById('qr-link').value;
+    await navigator.clipboard.writeText(link);
+    showToast('Link copiado al portapapeles', 'success');
+  } catch (error) {
+    console.error('Error copying link:', error);
+    showToast('Error al copiar el link', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+}
+
+async function openForm() {
+  if (!currentQRData) {
+    showToast('Datos de formulario no disponibles', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('open-form-btn');
+  btn.disabled = true;
+  btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+  try {
+    window.open(currentQRData.formUrl, '_blank');
+    showToast('Formulario abierto en nueva pestaña', 'success');
+  } catch (error) {
+    console.error('Error opening form:', error);
+    showToast('Error al abrir el formulario', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('opacity-50', 'cursor-not-allowed');
   }
 }
 
@@ -522,6 +626,9 @@ window.closeConfirmModal = closeConfirmModal;
 window.applyFilters = applyFilters;
 window.clearFilters = clearFilters;
 window.viewQR = viewQR;
+window.downloadQR = downloadQR;
+window.copyLink = copyLink;
+window.openForm = openForm;
 window.copyLeaderLink = copyLeaderLink;
 window.copyQRLink = copyQRLink;
 window.toggleActive = toggleActive;
