@@ -1,77 +1,183 @@
-// Leader Dashboard JS
+// Leader Dashboard - Professional Leader Panel
+
+// State
 let currentLeader = null;
 let currentQRData = null;
 let allRegistrations = [];
+let currentPage = 1;
+let totalPages = 1;
+let confirmCallback = null;
+const PAGE_SIZE = 10;
 
-// Inicializar dashboard
-async function initLeaderDashboard() {
-  if (!requireAuth()) return;
+// ==================== UX UTILITIES ====================
 
+function showLoader() {
+  document.getElementById('loader-overlay').classList.remove('hidden');
+}
+
+function hideLoader() {
+  document.getElementById('loader-overlay').classList.add('hidden');
+}
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `px-6 py-4 rounded-lg shadow-lg text-white flex items-center gap-3 transform transition-all duration-300 ${
+    type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+  }`;
+  toast.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} text-xl"></i>
+    <span>${message}</span>
+  `;
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+function openConfirmModal(title, message, callback, icon = 'fa-exclamation-triangle', iconColor = 'text-yellow-500') {
+  const modal = document.getElementById('confirm-modal');
+  document.getElementById('confirm-icon').className = `fas ${icon} text-3xl ${iconColor}`;
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-message').textContent = message;
+  
+  confirmCallback = callback;
+  document.getElementById('confirm-btn').onclick = () => {
+    closeConfirmModal();
+    callback();
+  };
+  
+  modal.classList.remove('hidden');
+}
+
+function closeConfirmModal() {
+  document.getElementById('confirm-modal').classList.add('hidden');
+  confirmCallback = null;
+}
+
+// ==================== INITIALIZATION ====================
+
+async function init() {
+  // Verify authentication
+  if (!requireAuth()) {
+    window.location.href = '/login.html';
+    return;
+  }
+
+  // Get current user
   const user = getUser();
-  if (!user || user.role !== "leader") {
-    alert("Acceso denegado. Solo líderes pueden acceder.");
+  if (!user || user.role !== 'leader') {
+    showToast('Acceso denegado. Solo líderes pueden acceder.', 'error');
     logout();
     return;
   }
 
   currentLeader = user;
-  await loadLeaderData();
-  await loadRegistrations();
+  document.getElementById('leader-name-header').textContent = user.username || user.name || '-';
 
-  // Agregar listener para búsqueda
-  const searchInput = document.getElementById("search-input");
-  if (searchInput) {
-    searchInput.addEventListener("input", filterRegistrations);
-  }
-}
-
-// Cargar datos del líder
-async function loadLeaderData() {
+  showLoader();
   try {
-    const leaderNameEl = document.getElementById("leader-name");
-    const leaderInfoEl = document.getElementById("leader-info");
-
-    leaderNameEl.textContent = currentLeader.username || "Líder";
-    leaderInfoEl.textContent = `ID: ${currentLeader.leaderId}`;
-  } catch (error) {
-    console.error("Error cargando datos del líder:", error);
-  }
-}
-
-// Cargar registros del líder
-async function loadRegistrations() {
-  try {
-    const data = await api.getRegistrationsByLeader(currentLeader.leaderId, { limit: 1000 });
+    // Load leader info
+    await loadLeaderInfo();
     
-    allRegistrations = data.data || [];
-    const total = data.total || 0;
-    const confirmed = data.confirmedCount || 0;
-    const pending = total - confirmed;
-
-    // Actualizar estadísticas
-    document.getElementById("total-registrations").textContent = total;
-    document.getElementById("confirmed-registrations").textContent = confirmed;
-    document.getElementById("pending-registrations").textContent = pending;
-
-    // Renderizar tabla
-    renderRegistrations(allRegistrations);
+    // Load active event
+    await loadActiveEvent();
+    
+    // Load QR
+    await loadQRData();
+    
+    // Load registrations
+    await loadRegistrationsData();
   } catch (error) {
-    console.error("Error cargando registros:", error);
-    showError("Error al cargar registros");
+    console.error('Error initializing dashboard:', error);
+    showToast('Error al cargar el panel', 'error');
+  } finally {
+    hideLoader();
   }
 }
 
-// Renderizar tabla de registros
-function renderRegistrations(registrations) {
-  const tbody = document.getElementById("registrations-tbody");
-  if (!tbody) return;
+// ==================== DATA LOADING ====================
 
+async function loadLeaderInfo() {
+  try {
+    document.getElementById('leader-name').textContent = currentLeader.name || currentLeader.username || '-';
+    document.getElementById('leader-id').textContent = currentLeader.leaderId || '-';
+    document.getElementById('leader-area').textContent = currentLeader.area || 'Sin área';
+  } catch (error) {
+    console.error('Error loading leader info:', error);
+  }
+}
+
+async function loadActiveEvent() {
+  try {
+    const event = await api.getActiveEvent();
+    if (event && event._id) {
+      document.getElementById('leader-event').textContent = event.name || event._id;
+    }
+  } catch (error) {
+    console.error('Error loading active event:', error);
+  }
+}
+
+async function loadQRData() {
+  try {
+    currentQRData = await api.getLeaderQR(currentLeader.leaderId);
+    document.getElementById('qr-image').src = currentQRData.qrCode;
+    document.getElementById('qr-link').value = currentQRData.formUrl;
+  } catch (error) {
+    console.error('Error loading QR:', error);
+    showToast('Error al cargar código QR', 'error');
+  }
+}
+
+async function loadRegistrationsData() {
+  try {
+    const response = await api.getRegistrations({ leaderId: currentLeader.leaderId, page: 1, limit: 10000 });
+    allRegistrations = response.data || [];
+
+    const total = allRegistrations.length;
+    const confirmed = allRegistrations.filter(r => r.confirmed).length;
+    const conversion = total > 0 ? Math.round((confirmed / total) * 100) : 0;
+
+    // Update KPIs
+    document.getElementById('kpi-total').textContent = total;
+    document.getElementById('kpi-confirmed').textContent = confirmed;
+    document.getElementById('kpi-conversion').textContent = conversion + '%';
+
+    // Calculate pagination
+    currentPage = 1;
+    totalPages = Math.ceil(total / PAGE_SIZE);
+
+    // Render first page
+    renderRegistrationsPage();
+  } catch (error) {
+    console.error('Error loading registrations:', error);
+    showToast('Error al cargar registros', 'error');
+  }
+}
+
+// ==================== TABLE RENDERING ====================
+
+function renderRegistrationsPage() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
+  const pageRegistrations = allRegistrations.slice(start, end);
+
+  renderRegistrationsTable(pageRegistrations);
+  updatePaginationControls();
+}
+
+function renderRegistrationsTable(registrations) {
+  const tbody = document.getElementById('registrations-tbody');
+  
   if (!registrations || registrations.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-          <i class="fas fa-inbox text-4xl mb-2"></i>
-          <p>No hay registros aún</p>
+        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+          <i class="fas fa-inbox text-5xl mb-4 text-gray-300"></i>
+          <p class="text-lg font-semibold">No hay registros</p>
         </td>
       </tr>
     `;
@@ -79,151 +185,218 @@ function renderRegistrations(registrations) {
   }
 
   tbody.innerHTML = registrations.map(reg => `
-    <tr class="hover:bg-gray-50">
-      <td class="px-6 py-4 text-sm font-medium text-gray-900">
-        ${reg.firstName || ''} ${reg.lastName || ''}
-      </td>
-      <td class="px-6 py-4 text-sm text-gray-600">
-        ${reg.cedula || 'N/A'}
-      </td>
-      <td class="px-6 py-4 text-sm text-gray-600">
-        ${reg.phone || 'N/A'}
-      </td>
-      <td class="px-6 py-4 text-sm text-gray-600">
-        ${reg.localidad || 'N/A'}
-      </td>
-      <td class="px-6 py-4">
-        <span class="px-2 py-1 text-xs rounded-full ${reg.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-          ${reg.confirmed ? 'Confirmado' : 'Pendiente'}
+    <tr class="border-b hover:bg-gray-50 transition">
+      <td class="px-6 py-4 text-sm font-medium text-gray-900">${reg.firstName} ${reg.lastName}</td>
+      <td class="px-6 py-4 text-sm text-gray-600">${reg.cedula || '-'}</td>
+      <td class="px-6 py-4 text-center">
+        <span class="px-3 py-1 text-xs font-semibold rounded-full ${
+          reg.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+        }">
+          ${reg.confirmed ? '✓ Confirmado' : 'Pendiente'}
         </span>
       </td>
-      <td class="px-6 py-4 text-sm text-gray-500">
-        ${reg.createdAt ? new Date(reg.createdAt).toLocaleDateString('es-CO') : 'N/A'}
+      <td class="px-6 py-4 text-sm text-gray-600">${new Date(reg.createdAt).toLocaleDateString('es-CO')}</td>
+      <td class="px-6 py-4 text-center">
+        <div class="flex items-center justify-center gap-2">
+          ${!reg.confirmed ? `
+            <button onclick="confirmRegistration('${reg._id}')" class="p-2 text-green-600 hover:bg-green-50 rounded transition" title="Confirmar">
+              <i class="fas fa-check"></i>
+            </button>
+          ` : `
+            <button onclick="unconfirmRegistration('${reg._id}')" class="p-2 text-yellow-600 hover:bg-yellow-50 rounded transition" title="Desconfirmar">
+              <i class="fas fa-times"></i>
+            </button>
+          `}
+          <button onclick="deleteRegistration('${reg._id}')" class="p-2 text-red-600 hover:bg-red-50 rounded transition" title="Eliminar">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
       </td>
     </tr>
   `).join('');
 }
 
-// Filtrar registros
-function filterRegistrations() {
-  const searchInput = document.getElementById("search-input");
-  if (!searchInput) return;
-
-  const searchTerm = searchInput.value.toLowerCase();
-  
-  const filtered = allRegistrations.filter(reg => {
-    const name = `${reg.firstName || ''} ${reg.lastName || ''}`.toLowerCase();
-    const cedula = (reg.cedula || '').toLowerCase();
-    const phone = (reg.phone || '').toLowerCase();
-    const localidad = (reg.localidad || '').toLowerCase();
-    
-    return name.includes(searchTerm) || 
-           cedula.includes(searchTerm) || 
-           phone.includes(searchTerm) || 
-           localidad.includes(searchTerm);
-  });
-
-  renderRegistrations(filtered);
+function updatePaginationControls() {
+  document.getElementById('pagination-info').textContent = `Página ${currentPage} de ${totalPages}`;
+  document.getElementById('prev-btn').disabled = currentPage === 1;
+  document.getElementById('next-btn').disabled = currentPage === totalPages;
 }
 
-// Mostrar modal QR
-async function showQRModal() {
-  const modal = document.getElementById("qr-modal");
-  if (!modal) return;
-
-  modal.classList.remove("hidden");
-
-  try {
-    const qrData = await api.getLeaderQR(currentLeader.leaderId);
-    currentQRData = qrData;
-
-    const qrContainer = document.getElementById("qr-container");
-    const formUrlEl = document.getElementById("form-url");
-
-    if (qrContainer && qrData.qrCode) {
-      qrContainer.innerHTML = `<img src="${qrData.qrCode}" alt="QR Code" class="mx-auto" />`;
-    }
-
-    if (formUrlEl && qrData.formUrl) {
-      formUrlEl.textContent = qrData.formUrl;
-    }
-  } catch (error) {
-    console.error("Error generando QR:", error);
-    showError("Error al generar código QR");
-    closeQRModal();
+function previousPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    renderRegistrationsPage();
   }
 }
 
-// Cerrar modal QR
-function closeQRModal() {
-  const modal = document.getElementById("qr-modal");
-  if (modal) {
-    modal.classList.add("hidden");
+function nextPage() {
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderRegistrationsPage();
   }
 }
 
-// Descargar QR
-function downloadQR() {
-  if (!currentQRData || !currentQRData.qrCode) {
-    showError("No hay código QR para descargar");
+// ==================== QR ACTIONS ====================
+
+function copyQRLink() {
+  if (!currentQRData || !currentQRData.formUrl) {
+    showToast('Link no disponible', 'error');
     return;
   }
 
-  const link = document.createElement("a");
-  link.download = `qr-leader-${currentLeader.leaderId}.png`;
+  navigator.clipboard.writeText(currentQRData.formUrl).then(() => {
+    showToast('Link copiado al portapapeles', 'success');
+  }).catch(() => {
+    showToast('Error al copiar el link', 'error');
+  });
+}
+
+function downloadQR() {
+  if (!currentQRData || !currentQRData.qrCode) {
+    showToast('Código QR no disponible', 'error');
+    return;
+  }
+
+  const link = document.createElement('a');
   link.href = currentQRData.qrCode;
+  link.download = `QR_${currentLeader.leaderId}_${Date.now()}.png`;
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
+  showToast('Código QR descargado', 'success');
 }
 
-// Copiar link del formulario
-async function copyFormLink() {
-  try {
-    const qrData = await api.getLeaderQR(currentLeader.leaderId);
-    
-    if (qrData.formUrl) {
-      await navigator.clipboard.writeText(qrData.formUrl);
-      showSuccess("Link copiado al portapapeles");
-    }
-  } catch (error) {
-    console.error("Error copiando link:", error);
-    showError("Error al copiar link");
+function openForm() {
+  if (!currentQRData || !currentQRData.formUrl) {
+    showToast('URL del formulario no disponible', 'error');
+    return;
+  }
+
+  window.open(currentQRData.formUrl, '_blank');
+  showToast('Formulario abierto en nueva pestaña', 'success');
+}
+
+function shareQR() {
+  if (!currentQRData || !currentQRData.formUrl) {
+    showToast('URL no disponible', 'error');
+    return;
+  }
+
+  const text = `Escanea mi código QR o accede aquí: ${currentQRData.formUrl}`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: 'Mi Código QR',
+      text: text,
+      url: currentQRData.formUrl
+    }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Información copiada', 'success');
+    });
   }
 }
 
-// Exportar registros del líder
-function exportMyRegistrations() {
+// ==================== REGISTRATION ACTIONS ====================
+
+async function confirmRegistration(registrationId) {
+  openConfirmModal(
+    'Confirmar Registro',
+    '¿Está seguro que desea confirmar este registro?',
+    async () => {
+      showLoader();
+      try {
+        await api.confirmRegistration(registrationId);
+        showToast('Registro confirmado exitosamente', 'success');
+        await loadRegistrationsData();
+      } catch (error) {
+        showToast('Error al confirmar registro', 'error');
+      } finally {
+        hideLoader();
+      }
+    },
+    'fa-check-circle',
+    'text-green-500'
+  );
+}
+
+async function unconfirmRegistration(registrationId) {
+  openConfirmModal(
+    'Desconfirmar Registro',
+    '¿Está seguro que desea desconfirmar este registro?',
+    async () => {
+      showLoader();
+      try {
+        await api.unconfirmRegistration(registrationId);
+        showToast('Registro desconfirmado exitosamente', 'success');
+        await loadRegistrationsData();
+      } catch (error) {
+        showToast('Error al desconfirmar registro', 'error');
+      } finally {
+        hideLoader();
+      }
+    },
+    'fa-times-circle',
+    'text-yellow-500'
+  );
+}
+
+async function deleteRegistration(registrationId) {
+  openConfirmModal(
+    'Eliminar Registro',
+    '¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.',
+    async () => {
+      showLoader();
+      try {
+        await api.deleteRegistration(registrationId);
+        showToast('Registro eliminado exitosamente', 'success');
+        await loadRegistrationsData();
+      } catch (error) {
+        showToast('Error al eliminar registro', 'error');
+      } finally {
+        hideLoader();
+      }
+    },
+    'fa-trash',
+    'text-red-500'
+  );
+}
+
+// ==================== EXPORT ====================
+
+function exportRegistrations() {
+  showLoader();
   try {
-    const token = localStorage.getItem("token");
-    const url = `${window.location.origin}/api/export/registrations?leaderId=${currentLeader.leaderId}&token=${token}`;
-    window.open(url, "_blank");
-    showSuccess("Iniciando descarga...");
+    const token = localStorage.getItem('token');
+    const url = `/api/export/registrations?leaderId=${currentLeader.leaderId}&token=${token}`;
+    window.open(url, '_blank');
+    showToast('Iniciando descarga de Excel', 'success');
   } catch (error) {
-    console.error("Error exportando:", error);
-    showError("Error al exportar registros");
+    console.error('Error exporting:', error);
+    showToast('Error al exportar registros', 'error');
+  } finally {
+    hideLoader();
   }
 }
 
-// Mostrar mensaje de éxito
-function showSuccess(message) {
-  alert(message);
-}
+// ==================== INITIALIZATION ====================
 
-// Mostrar mensaje de error
-function showError(message) {
-  alert(message);
-}
-
-// Inicializar cuando el DOM esté listo
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initLeaderDashboard);
+  document.addEventListener('DOMContentLoaded', init);
 } else {
-  initLeaderDashboard();
+  init();
 }
 
-// Exponer funciones globalmente
-window.showQRModal = showQRModal;
-window.closeQRModal = closeQRModal;
+// Expose globally
+window.copyQRLink = copyQRLink;
 window.downloadQR = downloadQR;
-window.copyFormLink = copyFormLink;
-window.exportMyRegistrations = exportMyRegistrations;
-window.loadRegistrations = loadRegistrations;
+window.openForm = openForm;
+window.shareQR = shareQR;
+window.confirmRegistration = confirmRegistration;
+window.unconfirmRegistration = unconfirmRegistration;
+window.deleteRegistration = deleteRegistration;
+window.exportRegistrations = exportRegistrations;
+window.previousPage = previousPage;
+window.nextPage = nextPage;
+window.closeConfirmModal = closeConfirmModal;
+window.logout = logout;
