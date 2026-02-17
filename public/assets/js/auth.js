@@ -13,17 +13,35 @@ async function handleLogin(event) {
   }
 
   try {
-    const endpoint = role === "admin" ? "/auth/admin-login" : "/auth/leader-login";
+    let endpoint = "";
+    let body = {};
+
+    if (role === "admin") {
+      endpoint = "/api/auth/admin-login";
+      body = {
+        username,
+        password
+      };
+    } else if (role === "leader") {
+      endpoint = "/api/auth/leader-login";
+      body = {
+        password,
+        leaderId: username
+      };
+    } else if (role === "leader-id") {
+      endpoint = "/api/auth/leader-login-id";
+      body = {
+        leaderId: username,
+        password
+      };
+    }
+
     const baseUrl = window.location.origin;
-    
-    const response = await fetch(`${baseUrl}/api${endpoint}`, {
+
+    const response = await fetch(`${baseUrl}${endpoint}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: role === "admin" ? username : undefined,
-        password,
-        leaderId: role === "leader" ? username : undefined
-      })
+      body: JSON.stringify(body)
     });
 
     const data = await response.json();
