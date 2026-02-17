@@ -13,6 +13,10 @@ import { roleMiddleware } from "../middleware/role.middleware.js";
 
 const router = express.Router();
 
+// ==================== ENDPOINTS PÚBLICOS ====================
+// Endpoint público para obtener información del líder por token (formulario de registro)
+router.get("/registro/:token", leaderController.getLeaderByToken);
+
 // ==================== AUTENTICACIÓN ====================
 router.post("/auth/admin-login", adminLogin);
 router.post("/auth/leader-login", leaderLogin);

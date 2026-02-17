@@ -7,7 +7,7 @@ const leaderSchema = new mongoose.Schema({
   phone: String,
   area: String,
   passwordHash: String,
-  token: String,
+  token: { type: String, unique: true, required: true },
   active: { type: Boolean, default: true },
   eventId: String,
   registrations: { type: Number, default: 0 },
@@ -16,7 +16,7 @@ const leaderSchema = new mongoose.Schema({
 });
 
 // Índices para optimización
-leaderSchema.index({ token: 1 });
+leaderSchema.index({ token: 1 }, { unique: true });
 leaderSchema.index({ eventId: 1 });
 leaderSchema.index({ active: 1, registrations: -1 });
 leaderSchema.index({ email: 1 });

@@ -2,10 +2,16 @@ import { Leader } from "../models/Leader.js";
 import { Registration } from "../models/Registration.js";
 import { AuditService } from "../services/audit.service.js";
 import bcryptjs from "bcryptjs";
+import crypto from "crypto";
+
+// Generar token único de 32 caracteres hexadecimales
+function generateToken() {
+  return crypto.randomBytes(16).toString("hex");
+}
 
 export async function createLeader(req, res) {
   try {
-    const { leaderId, name, email, phone, area, eventId, password } = req.body;
+    const { leaderId, name, email, phone, area, eventId, password, token: providedToken } = req.body;
     const user = req.user;
 
     if (!leaderId || !name) {
@@ -15,6 +21,16 @@ export async function createLeader(req, res) {
     const existing = await Leader.findOne({ leaderId });
     if (existing) {
       return res.status(400).json({ error: "leaderId ya existe" });
+    }
+
+    // Generar token automáticamente (no permitir token manual)
+    let token = generateToken();
+    let tokenExists = await Leader.findOne({ token });
+    
+    // Si el token existe (muy improbable), generar uno nuevo
+    while (tokenExists) {
+      token = generateToken();
+      tokenExists = await Leader.findOne({ token });
     }
 
     const passwordHash = password ? await bcryptjs.hash(password, 10) : null;
@@ -27,6 +43,7 @@ export async function createLeader(req, res) {
       area,
       eventId,
       passwordHash,
+      token,
       registrations: 0
     });
 
@@ -37,6 +54,12 @@ export async function createLeader(req, res) {
     res.status(201).json(leader);
   } catch (error) {
     console.error("Create leader error:", error.message);
+    
+    // Manejar error de token duplicado (por si acaso)
+    if (error.code === 11000 && error.keyPattern?.token) {
+      return res.status(500).json({ error: "Error al generar token único, intenta nuevamente" });
+    }
+    
     res.status(500).json({ error: "Error al crear líder" });
   }
 }
@@ -184,5 +207,36 @@ export async function generateLeaderQR(req, res) {
   } catch (error) {
     console.error("Generate QR error:", error.message);
     res.status(500).json({ error: "Error al generar código QR" });
+  }
+}
+
+// Endpoint público para obtener información del líder por token
+export async function getLeaderByToken(req, res) {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({ error: "Token requerido" });
+    }
+
+    const leader = await Leader.findOne({ token }).select('leaderId name eventId active');
+
+    if (!leader) {
+      return res.status(404).json({ error: "Token inválido o líder no encontrado" });
+    }
+
+    if (!leader.active) {
+      return res.status(403).json({ error: "Líder inactivo" });
+    }
+
+    // Retornar solo datos necesarios para el formulario público
+    res.json({
+      leaderId: leader.leaderId,
+      name: leader.name,
+      eventId: leader.eventId
+    });
+  } catch (error) {
+    console.error("Get leader by token error:", error.message);
+    res.status(500).json({ error: "Error al obtener información del líder" });
   }
 }
