@@ -133,3 +133,25 @@ export async function deleteEvent(req, res) {
     res.status(500).json({ error: "Error al eliminar evento" });
   }
 }
+
+export async function getActiveEvent(req, res) {
+  try {
+    const event = await Event.findOne({ active: true }).sort({ createdAt: -1 });
+    
+    if (!event) {
+      return res.status(404).json({ error: "No hay evento activo" });
+    }
+
+    const registrationCount = await Registration.countDocuments({ eventId: event._id.toString() });
+    const confirmedCount = await Registration.countDocuments({ eventId: event._id.toString(), confirmed: true });
+
+    res.json({
+      ...event.toObject(),
+      registrationCount,
+      confirmedCount
+    });
+  } catch (error) {
+    console.error("Get active event error:", error.message);
+    res.status(500).json({ error: "Error al obtener evento activo" });
+  }
+}

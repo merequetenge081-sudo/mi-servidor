@@ -145,3 +145,44 @@ export async function getTopLeaders(req, res) {
     res.status(500).json({ error: "Error al obtener líderes destacados" });
   }
 }
+
+export async function generateLeaderQR(req, res) {
+  try {
+    const user = req.user;
+    const { leaderId } = req.params;
+
+    // Control de acceso: admin puede ver todo, leader solo su propio QR
+    if (user.role === "leader" && user.leaderId !== leaderId) {
+      return res.status(403).json({ error: "No tienes permiso para generar este QR" });
+    }
+
+    const leader = await Leader.findOne({ leaderId });
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+
+    // Generar URL del formulario con leaderId
+    const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+    const formUrl = `${baseUrl}/form.html?leaderId=${leaderId}`;
+
+    // Generar QR como base64 usando qrcode
+    const QRCode = (await import("qrcode")).default;
+    const qrDataUrl = await QRCode.toDataURL(formUrl, {
+      errorCorrectionLevel: "M",
+      type: "image/png",
+      quality: 0.92,
+      margin: 1,
+      width: 300
+    });
+
+    res.json({
+      leaderId,
+      leaderName: leader.name,
+      formUrl,
+      qrCode: qrDataUrl
+    });
+  } catch (error) {
+    console.error("Generate QR error:", error.message);
+    res.status(500).json({ error: "Error al generar código QR" });
+  }
+}

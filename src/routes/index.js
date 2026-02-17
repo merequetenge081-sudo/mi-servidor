@@ -22,6 +22,7 @@ router.post("/auth/leader-login-id", leaderLoginById);
 router.post("/leaders", authMiddleware, roleMiddleware("admin"), leaderController.createLeader);
 router.get("/leaders", authMiddleware, leaderController.getLeaders);
 router.get("/leaders/top", authMiddleware, leaderController.getTopLeaders);
+router.get("/leaders/:leaderId/qr", authMiddleware, leaderController.generateLeaderQR);
 router.get("/leaders/:id", authMiddleware, leaderController.getLeader);
 router.put("/leaders/:id", authMiddleware, roleMiddleware("admin"), leaderController.updateLeader);
 router.delete("/leaders/:id", authMiddleware, roleMiddleware("admin"), leaderController.deleteLeader);
@@ -29,6 +30,7 @@ router.delete("/leaders/:id", authMiddleware, roleMiddleware("admin"), leaderCon
 // ==================== REGISTRACIONES ====================
 router.post("/registrations", authMiddleware, registrationController.createRegistration);
 router.get("/registrations", authMiddleware, registrationController.getRegistrations);
+router.get("/registrations/leader/:leaderId", authMiddleware, registrationController.getRegistrationsByLeader);
 router.get("/registrations/:id", authMiddleware, registrationController.getRegistration);
 router.put("/registrations/:id", authMiddleware, registrationController.updateRegistration);
 router.delete("/registrations/:id", authMiddleware, roleMiddleware("admin"), registrationController.deleteRegistration);
@@ -38,6 +40,7 @@ router.post("/registrations/:id/unconfirm", authMiddleware, roleMiddleware("admi
 // ==================== EVENTOS ====================
 router.post("/events", authMiddleware, roleMiddleware("admin"), eventController.createEvent);
 router.get("/events", authMiddleware, eventController.getEvents);
+router.get("/events/active", authMiddleware, eventController.getActiveEvent);
 router.get("/events/:id", authMiddleware, eventController.getEvent);
 router.put("/events/:id", authMiddleware, roleMiddleware("admin"), eventController.updateEvent);
 router.delete("/events/:id", authMiddleware, roleMiddleware("admin"), eventController.deleteEvent);

@@ -243,3 +243,41 @@ export async function unconfirmRegistration(req, res) {
     res.status(500).json({ error: "Error al revertir confirmación" });
   }
 }
+
+export async function getRegistrationsByLeader(req, res) {
+  try {
+    const user = req.user;
+    const { leaderId } = req.params;
+    const { eventId, confirmed, page = 1, limit = 50 } = req.query;
+
+    // Control de acceso: leaders solo pueden ver sus propios registros
+    if (user.role === "leader" && user.leaderId !== leaderId) {
+      return res.status(403).json({ error: "No tienes permiso para ver estos registros" });
+    }
+
+    const filter = { leaderId };
+    if (eventId) filter.eventId = eventId;
+    if (confirmed !== undefined) filter.confirmed = confirmed === "true";
+
+    const skip = (page - 1) * limit;
+    const registrations = await Registration.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Registration.countDocuments(filter);
+    const confirmedCount = await Registration.countDocuments({ ...filter, confirmed: true });
+
+    res.json({
+      data: registrations,
+      total,
+      confirmedCount,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      pages: Math.ceil(total / limit)
+    });
+  } catch (error) {
+    console.error("Get registrations by leader error:", error.message);
+    res.status(500).json({ error: "Error al obtener registros del líder" });
+  }
+}

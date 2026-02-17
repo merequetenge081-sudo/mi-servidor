@@ -1,58 +1,10 @@
 // Registrations.js - Gestión de registros
-const baseUrl = window.location.origin;
-
-// Verificar autenticación
-function checkAuth() {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    window.location.href = "/login.html";
-    return null;
-  }
-  return token;
-}
-
-// Logout
-function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  window.location.href = "/login.html";
-}
-
-// Fetch con autorización
-async function authFetch(endpoint, options = {}) {
-  const token = checkAuth();
-  if (!token) return null;
-
-  try {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-        ...options.headers
-      }
-    });
-
-    if (response.status === 401) {
-      logout();
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error en fetch:", error);
-    return null;
-  }
-}
 
 // Cargar registros
 async function loadRegistrations() {
-  const registrations = await authFetch("/api/registrations");
-  if (!registrations) return;
+  try {
+    const registrations = await api.getRegistrations();
+    if (!registrations) return;
 
   const tbody = document.getElementById("registrations-tbody");
   if (!tbody) return;
@@ -98,6 +50,9 @@ async function loadRegistrations() {
   if (counter) {
     counter.textContent = registrations.length;
   }
+  } catch (error) {
+    console.error("Error cargando registros:", error);
+  }
 }
 
 // Filtrar registros
@@ -116,7 +71,7 @@ function filterRegistrations() {
 
 // Inicializar
 async function initRegistrations() {
-  checkAuth();
+  requireAuth();
   await loadRegistrations();
 
   // Agregar listener para búsqueda
@@ -134,6 +89,5 @@ if (document.readyState === 'loading') {
 }
 
 // Exponer funciones globalmente
-window.logout = logout;
 window.loadRegistrations = loadRegistrations;
 window.filterRegistrations = filterRegistrations;
