@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Red Social y Política</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #f5f7fb 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+
+        /* ============== NAVBAR ============== */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand { 
+            font-weight: 700; 
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ============== SIDEBAR ============== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 260px;
+            height: calc(100vh - 60px);
+            background: #1a1a2e;
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+
+        .nav-link {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #aaa;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, #667eea 0%, rgba(102, 126, 234, 0.2) 100%);
+            color: #667eea;
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        /* ============== MAIN CONTENT ============== */
+        .main-content {
+            margin-left: 260px;
+            margin-top: 60px;
+            padding: 40px 30px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title i {
+            color: #667eea;
+            font-size: 32px;
+        }
+
+        /* ============== STATS GRID ============== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* ============== CARDS ============== */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 22px 28px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-body {
+            padding: 28px;
+        }
+
+        /* ============== TABLES ============== */
+        .table {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .table thead th {
+            background: #f8f9ff;
+            color: #1a1a2e;
+            border-bottom: 2px solid #667eea;
+            font-weight: 600;
+            padding: 16px;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody td {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9ff;
+            transform: scale(1.01);
+        }
+
+        /* ============== BUTTONS ============== */
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 11px 22px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-outline-secondary {
+            border: 1px solid #ddd;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #f8f9ff;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        /* ============== FILTERS ============== */
+        .filters {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #f8f9ff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* ============== BADGES ============== */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-confirmed {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        /* ============== MODALS ============== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #667eea;
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #1a1a2e;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 11px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        /* ============== CHARTS ============== */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        /* ============== TOP ACTION BAR ============== */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        /* ============== RESPONSIVE ============== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar-brand {
+                font-size: 14px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+        }
+
+        /* ============== LOADING ============== */
+        .loading {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            margin-right: 8px;
+            animation: bounce 1.4s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="navbar-brand">
+            <i class="bi bi-speedometer2"></i>
+            Dashboard - <span id="eventNameDisplay" style="font-weight: 600;">Evento</span>
+        </div>
+        <div class="navbar-actions">
+            <span id="adminUsername">Admin</span>
+            <button class="btn-logout" id="logoutBtn" title="Cerrar sesión">
+                <i class="bi bi-box-arrow-right"></i> Salir
+            </button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="nav-link active" data-section="dashboard">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </div>
+        <div class="nav-link" data-section="leaders">
+            <i class="bi bi-people-fill"></i> Gestión de Líderes
+        </div>
+        <div class="nav-link" data-section="registrations">
+            <i class="bi bi-table"></i> Registros
+        </div>
+        <div class="nav-link" data-section="analytics">
+            <i class="bi bi-bar-chart"></i> Análisis
+        </div>
+        <div class="nav-link" data-section="export">
+            <i class="bi bi-download"></i> Exportar
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboard" class="section active">
+            <div class="page-title">
+                <i class="bi bi-speedometer2"></i> Dashboard General
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-people"></i></div>
+                    <div class="stat-value" id="totalLeaders">0</div>
+                    <div class="stat-label">Líderes Activos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-clipboard-check"></i></div>
+                    <div class="stat-value" id="totalRegistrations">0</div>
+                    <div class="stat-label">Registros Totales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                    <div class="stat-value" id="confirmedCount">0</div>
+                    <div class="stat-label">Confirmados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-percent"></i></div>
+                    <div class="stat-value" id="confirmRate">0%</div>
+                    <div class="stat-label">Tasa Confirmación</div>
+                </div>
+            </div>
+
+            <!-- CHARTS ROW -->
+            <div class="chart-row">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-pie-chart"></i> Estado de Registros
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="confirmationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-bar-chart"></i> Top 5 Líderes
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="topLeadersChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-clock-history"></i> Últimos Registros (Top 10)
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Cédula</th>
+                                    <th>Líder</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentRegistrations">
+                                <tr><td colspan="6" class="text-center" style="padding: 40px;"><span class="loading"></span>Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEADERS SECTION -->
+        <div id="leaders" class="section">
+            <div class="action-bar">
+                <div class="page-title" style="margin-bottom: 0;">
+                    <i class="bi bi-people-fill"></i> Gestión de Líderes
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" id="exportLeadersBtnSection">
+                        <i class="bi bi-download"></i> Exportar Líderes
+                    </button>
+                    <button class="btn btn-primary" id="newLeaderBtn">
+                        <i class="bi bi-plus-circle"></i> Nuevo Líder
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-list"></i> Lista de Líderes
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Registros</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadersTable">
+                                <tr><td colspan="5" class="text-center" style="padding: 40px;"><span class="loading"></span>Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REGISTRATIONS SECTION -->
+        <div id="registrations" class="section">
+            <div class="page-title">
+                <i class="bi bi-table"></i> Registros
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label><i class="bi bi-search"></i> Buscar</label>
+                    <input type="text" id="searchInput" placeholder="Nombre, email, cédula...">
+                </div>
+                <div class="filter-group">
+                    <label>Líder</label>
+                    <select id="leaderFilter"></select>
+                </div>
+                <div class="filter-group">
+                    <label>Estado</label>
+                    <select id="statusFilter">
+                        <option value="">Todos</option>
+                        <option value="confirmed">Confirmados</option>
+                        <option value="pending">Pendientes</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-table"></i> Tabla de Registros
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Cédula</th>
+                                    <th>Localidad</th>
+                                    <th>Líder</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registrationsTable">
+                                <tr><td colspan="8" class="text-center" style="padding: 40px;"><span class="loading"></span>Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYTICS SECTION -->
+        <div id="analytics" class="section">
+            <div class="page-title">
+                <i class="bi bi-bar-chart"></i> Análisis de Datos
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-percent"></i></div>
+                    <div class="stat-value" id="avgConfirmRate">0%</div>
+                    <div class="stat-label">Tasa Promedio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-bar-chart"></i></div>
+                    <div class="stat-value" id="avgRegsPerLeader">0</div>
+                    <div class="stat-label">Registros/Líder</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-geo-alt"></i></div>
+                    <div class="stat-value" id="localidadesCount">0</div>
+                    <div class="stat-label">Localidades</div>
+                </div>
+            </div>
+
+            <div class="chart-row">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-bar-chart"></i> Registros por Líder
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 350px;">
+                            <canvas id="leaderRegistrationsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-geo-alt"></i> Registros por Localidad
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 350px;">
+                            <canvas id="localityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-table"></i> Detalles por Líder
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Líder</th>
+                                    <th>Registros</th>
+                                    <th>Confirmados</th>
+                                    <th>Pendientes</th>
+                                    <th>% Confirmación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderDetailTable">
+                                <tr><td colspan="5" class="text-center" style="padding: 40px;"><span class="loading"></span>Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPORT SECTION -->
+        <div id="export" class="section">
+            <div class="page-title">
+                <i class="bi bi-download"></i> Exportar Datos
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-file-earmark-excel"></i> Opciones de Exportación
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
+                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-clipboard-check"></i> Todos los Registros</h6>
+                            <button class="btn btn-primary" id="exportRegsBtn" style="width: 100%;">
+                                <i class="bi bi-download"></i> Descargar Excel
+                            </button>
+                            <small style="color: #999; display: block; margin-top: 10px;">Exporta todos los registros del evento actual</small>
+                        </div>
+
+                        <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
+                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-people"></i> Todos los Líderes</h6>
+                            <button class="btn btn-primary" id="exportLeadersBtn" style="width: 100%;">
+                                <i class="bi bi-download"></i> Descargar Excel
+                            </button>
+                            <small style="color: #999; display: block; margin-top: 10px;">Exporta lista de líderes con estadísticas</small>
+                        </div>
+
+                        <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
+                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-person"></i> Registros por Líder</h6>
+                            <select id="exportLeaderSelect" style="margin-bottom: 10px; width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;"></select>
+                            <button class="btn btn-primary" id="exportByLeaderBtn" style="width: 100%;">
+                                <i class="bi bi-download"></i> Descargar
+                            </button>
+                            <small style="color: #999; display: block; margin-top: 10px;">Exporta registros de un líder específico</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="leaderModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeLeaderModal">&times;</button>
+            <div class="modal-header"><i class="bi bi-person-plus"></i> Crear Nuevo Líder</div>
+            <div class="form-group">
+                <label><i class="bi bi-person"></i> Nombre Completo</label>
+                <input type="text" id="leaderName" placeholder="Ej: Juan Pérez">
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-envelope"></i> Correo Electrónico</label>
+                <input type="email" id="leaderEmail" placeholder="juan@example.com">
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-telephone"></i> Teléfono</label>
+                <input type="text" id="leaderPhone" placeholder="+57 310 1234567">
+            </div>
+            <button class="btn btn-primary" id="saveLiderBtn" style="width: 100%; margin-top: 20px;">
+                <i class="bi bi-check-circle"></i> Guardar Líder
+            </button>
+        </div>
+    </div>
+
+    <div id="qrModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <button class="modal-close" id="closeQrModal">&times;</button>
+            <div class="modal-header" style="text-align: center;"><i class="bi bi-qr-code"></i> Código QR</div>
+            <div style="text-align: center; padding: 20px; background: #f8f9ff; border-radius: 12px; margin-bottom: 20px;">
+                <div id="qrCode" style="display: inline-block;"></div>
+            </div>
+            <label style="font-weight: 600; color: #1a1a2e; margin-bottom: 8px; display: block;">Link de Registro</label>
+            <input type="text" id="qrLink" readonly style="margin-bottom: 15px;">
+            <button class="btn btn-primary" id="copyQrBtn" style="width: 100%;">
+                <i class="bi bi-clipboard"></i> Copiar Link
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = window.location.origin;
+        let currentToken = localStorage.getItem('token');
+        let currentEventId = localStorage.getItem('eventId');
+        let allLeaders = [];
+        let allRegistrations = [];
+        let charts = {};
+
+        function checkAuth() {
+            if (!currentToken || !currentEventId) {
+                window.location.href = '/';
+            }
+        }
+
+        async function apiCall(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentToken}`,
+                ...options.headers
+            };
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers
+            });
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            }
+            return response;
+        }
+
+        async function loadDashboard() {
+            try {
+                document.getElementById('eventNameDisplay').textContent = localStorage.getItem('eventName') || 'Evento';
+
+                const leadersRes = await apiCall('/api/leaders');
+                const leadersData = await leadersRes.json();
+                allLeaders = Array.isArray(leadersData) ? leadersData : (leadersData.data || []);
+
+                const regsRes = await apiCall(`/api/registrations?eventId=${currentEventId}`);
+                const regsData = await regsRes.json();
+                allRegistrations = Array.isArray(regsData) ? regsData : (regsData.data || []);
+
+                updateStats();
+                loadLeadersTable();
+                loadRecentRegistrations();
+                populateLeaderFilter();
+                populateExportLeader();
+                loadCharts();
+                loadAnalytics();
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }
+
+        function updateStats() {
+            const confirmed = allRegistrations.filter(r => r.confirmed).length;
+            const rate = allRegistrations.length > 0 ? ((confirmed / allRegistrations.length) * 100).toFixed(1) : 0;
+            document.getElementById('totalLeaders').textContent = allLeaders.length;
+            document.getElementById('totalRegistrations').textContent = allRegistrations.length;
+            document.getElementById('confirmedCount').textContent = confirmed;
+            document.getElementById('confirmRate').textContent = rate + '%';
+        }
+
+        function loadRecentRegistrations() {
+            const recent = allRegistrations.slice(0, 10);
+            const html = recent.map(reg => `
+                <tr>
+                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
+                    <td>${reg.email || '-'}</td>
+                    <td>${reg.cedula || '-'}</td>
+                    <td>${reg.leaderName || '-'}</td>
+                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
+                    <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
+                </tr>
+            `).join('');
+            document.getElementById('recentRegistrations').innerHTML = html || '<tr><td colspan="6" class="text-center" style="padding: 40px; color: #999;">Sin registros</td></tr>';
+        }
+
+        function loadLeadersTable() {
+            const html = allLeaders.map(leader => `
+                <tr>
+                    <td><strong>${leader.name}</strong></td>
+                    <td>${leader.email || '-'}</td>
+                    <td>${leader.phone || '-'}</td>
+                    <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600;">${leader.registrations || 0}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-token="${leader.token}" data-leader-name="${leader.name}">
+                            <i class="bi bi-qr-code"></i> QR
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="5" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
+
+            document.querySelectorAll('.qr-btn').forEach(btn => {
+                btn.addEventListener('click', () => showQR(btn.dataset.leaderToken, btn.dataset.leaderName));
+            });
+            document.querySelectorAll('.delete-leader-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteLeader(btn.dataset.leaderId));
+            });
+        }
+
+        function populateLeaderFilter() {
+            const select = document.getElementById('leaderFilter');
+            select.innerHTML = '<option value="">-- Todos los Líderes --</option>' + 
+                allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+        }
+
+        function populateExportLeader() {
+            const select = document.getElementById('exportLeaderSelect');
+            select.innerHTML = allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+        }
+
+        function filterRegistrations() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const leaderId = document.getElementById('leaderFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            const filtered = allRegistrations.filter(r => {
+                const matchSearch = !search || 
+                    `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
+                    r.email.toLowerCase().includes(search) ||
+                    r.cedula.includes(search);
+                const matchLeader = !leaderId || r.leaderId === leaderId;
+                const matchStatus = !status || (status === 'confirmed' ? r.confirmed : !r.confirmed);
+                return matchSearch && matchLeader && matchStatus;
+            });
+
+            const html = filtered.map(reg => `
+                <tr>
+                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
+                    <td>${reg.email || '-'}</td>
+                    <td>${reg.cedula || '-'}</td>
+                    <td>${reg.localidad || '-'}</td>
+                    <td>${reg.leaderName || '-'}</td>
+                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
+                    <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${reg.confirmed}">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('registrationsTable').innerHTML = html || 
+                '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros</td></tr>';
+
+            document.querySelectorAll('.toggle-confirm-btn').forEach(btn => {
+                btn.addEventListener('click', () => toggleConfirm(btn.dataset.regId, btn.dataset.confirmed === 'true'));
+            });
+        }
+
+        async function showQR(leaderToken, leaderName) {
+            const qrContainer = document.getElementById('qrCode');
+            qrContainer.innerHTML = '';
+            const link = `${API_URL}/registro/${leaderToken}`;
+            document.getElementById('qrLink').value = link;
+            new QRCode(qrContainer, { text: link, width: 250, height: 250 });
+            document.getElementById('qrModal').classList.add('active');
+        }
+
+        async function deleteLeader(leaderId) {
+            if (confirm('¿Eliminar este líder?')) {
+                const res = await apiCall(`/api/leaders/${leaderId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    loadDashboard();
+                }
+            }
+        }
+
+        async function toggleConfirm(regId, isConfirmed) {
+            const endpoint = isConfirmed ? `/api/registrations/${regId}/unconfirm` : `/api/registrations/${regId}/confirm`;
+            await apiCall(endpoint, { method: 'POST' });
+            loadDashboard();
+        }
+
+        function loadCharts() {
+            // Confirmation Pie Chart
+            const confirmed = allRegistrations.filter(r => r.confirmed).length;
+            const pending = allRegistrations.length - confirmed;
+
+            if (charts.confirmation) charts.confirmation.destroy();
+            const ctxConfirm = document.getElementById('confirmationChart').getContext('2d');
+            charts.confirmation = new Chart(ctxConfirm, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Confirmados', 'Pendientes'],
+                    datasets: [{
+                        data: [confirmed, pending],
+                        backgroundColor: ['#4CAF50', '#FFB74D'],
+                        borderColor: white,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Top 5 Leaders Bar Chart
+            const leaderData = allLeaders
+                .map(l => ({
+                    name: l.name,
+                    count: allRegistrations.filter(r => r.leaderId === l._id).length
+                }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+
+            if (charts.topLeaders) charts.topLeaders.destroy();
+            const ctxTop = document.getElementById('topLeadersChart').getContext('2d');
+            charts.topLeaders = new Chart(ctxTop, {
+                type: 'bar',
+                data: {
+                    labels: leaderData.map(l => l.name),
+                    datasets: [{
+                        label: 'Registros',
+                        data: leaderData.map(l => l.count),
+                        backgroundColor: '#667eea',
+                        borderRadius: 8,
+                        hoverBackgroundColor: '#764ba2'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function loadAnalytics() {
+            const total = allRegistrations.length;
+            const confirmed = allRegistrations.filter(r => r.confirmed).length;
+            const rate = total > 0 ? ((confirmed / total) * 100).toFixed(1) : 0;
+            const leadersCount = allLeaders.length;
+            const avgRegs = leadersCount > 0 ? (total / leadersCount).toFixed(1) : 0;
+            
+            const localidades = new Set(allRegistrations.map(r => r.localidad).filter(l => l));
+
+            document.getElementById('avgConfirmRate').textContent = rate + '%';
+            document.getElementById('avgRegsPerLeader').textContent = avgRegs;
+            document.getElementById('localidadesCount').textContent = localidades.size;
+
+            // Leader Registrations Chart
+            const leaderStats = allLeaders.map(l => ({
+                name: l.name.split(' ')[0],
+                registros: allRegistrations.filter(r => r.leaderId === l._id).length
+            })).sort((a, b) => b.registros - a.registros);
+
+            if (charts.leaderRegs) charts.leaderRegs.destroy();
+            const ctxLeaderRegs = document.getElementById('leaderRegistrationsChart').getContext('2d');
+            charts.leaderRegs = new Chart(ctxLeaderRegs, {
+                type: 'bar',
+                data: {
+                    labels: leaderStats.map(l => l.name),
+                    datasets: [{
+                        label: 'Registros',
+                        data: leaderStats.map(l => l.registros),
+                        backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Locality Chart
+            const localityData = {};
+            allRegistrations.forEach(r => {
+                localityData[r.localidad] = (localityData[r.localidad] || 0) + 1;
+            });
+
+            const topLocalities = Object.entries(localityData)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            if (charts.locality) charts.locality.destroy();
+            const ctxLocality = document.getElementById('localityChart').getContext('2d');
+            charts.locality = new Chart(ctxLocality, {
+                type: 'doughnut',
+                data: {
+                    labels: topLocalities.map(l => l[0]),
+                    datasets: [{
+                        data: topLocalities.map(l => l[1]),
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#FF6B6B', '#4ECDC4', '#45B7D1',
+                            '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'
+                        ],
+                        borderWidth: 2,
+                        borderColor: 'white'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+
+            // Leader Details Table
+            const leaderDetails = allLeaders.map(l => {
+                const leaderRegs = allRegistrations.filter(r => r.leaderId === l._id);
+                const leaderConfirmed = leaderRegs.filter(r => r.confirmed).length;
+                return {
+                    name: l.name,
+                    total: leaderRegs.length,
+                    confirmed: leaderConfirmed,
+                    pending: leaderRegs.length - leaderConfirmed,
+                    rate: leaderRegs.length > 0 ? ((leaderConfirmed / leaderRegs.length) * 100).toFixed(1) : 0
+                };
+            }).sort((a, b) => b.total - a.total);
+
+            const tableHtml = leaderDetails.map(l => `
+                <tr>
+                    <td><strong>${l.name}</strong></td>
+                    <td><span style="background: #e3f2fd; padding: 6px 12px; border-radius: 20px; color: #667eea; font-weight: 600;">${l.total}</span></td>
+                    <td><span style="background: #e8f5e9; padding: 6px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600;">${l.confirmed}</span></td>
+                    <td><span style="background: #fff3e0; padding: 6px 12px; border-radius: 20px; color: #f57c00; font-weight: 600;">${l.pending}</span></td>
+                    <td><strong style="color: #667eea;">${l.rate}%</strong></td>
+                </tr>
+            `).join('');
+            document.getElementById('leaderDetailTable').innerHTML = tableHtml;
+        }
+
+        function exportToExcel(data, filename) {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+            XLSX.writeFile(wb, filename);
+        }
+
+        // NAV LINKS
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const section = link.dataset.section;
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.getElementById(section).classList.add('active');
+                link.classList.add('active');
+                if (section === 'registrations') filterRegistrations();
+            });
+        });
+
+        // BUTTONS
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            localStorage.removeItem('eventId');
+            window.location.href = '/';
+        });
+
+        document.getElementById('newLeaderBtn').addEventListener('click', () => {
+            document.getElementById('leaderModal').classList.add('active');
+        });
+
+        document.getElementById('closeLeaderModal').addEventListener('click', () => {
+            document.getElementById('leaderModal').classList.remove('active');
+        });
+
+        document.getElementById('closeQrModal').addEventListener('click', () => {
+            document.getElementById('qrModal').classList.remove('active');
+        });
+
+        document.getElementById('saveLiderBtn').addEventListener('click', async () => {
+            const name = document.getElementById('leaderName').value;
+            const email = document.getElementById('leaderEmail').value;
+            const phone = document.getElementById('leaderPhone').value;
+            if (!name) return alert('Ingresa el nombre');
+            const res = await apiCall('/api/leaders', {
+                method: 'POST',
+                body: JSON.stringify({ name, email, phone })
+            });
+            if (res.ok) {
+                document.getElementById('leaderModal').classList.remove('active');
+                document.getElementById('leaderName').value = '';
+                document.getElementById('leaderEmail').value = '';
+                document.getElementById('leaderPhone').value = '';
+                loadDashboard();
+            }
+        });
+
+        document.getElementById('copyQrBtn').addEventListener('click', () => {
+            document.getElementById('qrLink').select();
+            document.execCommand('copy');
+            alert('✓ Link copiado al portapapeles');
+        });
+
+        document.getElementById('searchInput').addEventListener('input', filterRegistrations);
+        document.getElementById('leaderFilter').addEventListener('change', filterRegistrations);
+        document.getElementById('statusFilter').addEventListener('change', filterRegistrations);
+
+        document.getElementById('exportRegsBtn').addEventListener('click', () => {
+            const data = allRegistrations.map(r => ({
+                Nombre: `${r.firstName} ${r.lastName}`,
+                Email: r.email || '',
+                Cédula: r.cedula || '',
+                Localidad: r.localidad || '',
+                Líder: r.leaderName || '',
+                Puesto: r.votingPlace || '',
+                Mesa: r.votingTable || '',
+                Fecha: new Date(r.date).toLocaleDateString('es-CO'),
+                Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
+            }));
+            exportToExcel(data, `registros_${new Date().toISOString().slice(0,10)}.xlsx`);
+        });
+
+        document.getElementById('exportLeadersBtn').addEventListener('click', () => {
+            const data = allLeaders.map(l => ({
+                Nombre: l.name,
+                Email: l.email || '',
+                Teléfono: l.phone || '',
+                Registros: l.registrations || 0,
+                Activo: l.active ? 'Sí' : 'No'
+            }));
+            exportToExcel(data, `lideres_${new Date().toISOString().slice(0,10)}.xlsx`);
+        });
+
+        // Botón de exportar líderes en la sección de líderes
+        document.getElementById('exportLeadersBtnSection').addEventListener('click', () => {
+            const data = allLeaders.map(l => ({
+                Nombre: l.name,
+                Email: l.email || '',
+                Teléfono: l.phone || '',
+                Registros: l.registrations || 0,
+                Activo: l.active ? 'Sí' : 'No'
+            }));
+            exportToExcel(data, `lideres_${new Date().toISOString().slice(0,10)}.xlsx`);
+        });
+
+        document.getElementById('exportByLeaderBtn').addEventListener('click', () => {
+            const leaderId = document.getElementById('exportLeaderSelect').value;
+            const leader = allLeaders.find(l => l._id === leaderId);
+            const filtered = allRegistrations.filter(r => r.leaderId === leaderId);
+            const data = filtered.map(r => ({
+                Nombre: `${r.firstName} ${r.lastName}`,
+                Email: r.email || '',
+                Cédula: r.cedula || '',
+                Localidad: r.localidad || '',
+                Puesto: r.votingPlace || '',
+                Mesa: r.votingTable || '',
+                Teléfono: r.phone || '',
+                Fecha: new Date(r.date).toLocaleDateString('es-CO'),
+                Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
+            }));
+            exportToExcel(data, `registros_${leader.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        });
+
+        checkAuth();
+        window.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>
