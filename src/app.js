@@ -24,20 +24,25 @@ app.use(
         scriptSrc: [
           "'self'",
           "'unsafe-inline'",
-          "https://cdn.jsdelivr.net"
+          "https://cdn.jsdelivr.net",
+          "https://cdn.tailwindcss.com"
         ],
         styleSrc: [
           "'self'",
           "'unsafe-inline'",
-          "https://cdn.jsdelivr.net"
+          "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
+          "https://cdn.tailwindcss.com"
         ],
         imgSrc: ["'self'", "data:"],
         connectSrc: [
           "'self'",
-          "https://cdn.jsdelivr.net"
+          "https://cdn.jsdelivr.net",
+          "https://cdn.tailwindcss.com"
         ],
         fontSrc: [
           "'self'",
+          "https://cdnjs.cloudflare.com",
           "https://cdn.jsdelivr.net",
           "data:"
         ],
