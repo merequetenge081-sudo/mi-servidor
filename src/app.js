@@ -117,7 +117,6 @@ app.get("/login", (req, res) => {
 app.get("/dashboard.html", (req, res) => {
   res.sendFile(join(__dirname, "../public/dashboard.html"));
 });
-});
 
 // Formulario público de registro
 app.get("/form", (req, res) => {
