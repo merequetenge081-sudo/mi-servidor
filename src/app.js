@@ -26,8 +26,10 @@ app.use(
           "'self'",
           "'unsafe-inline'",
           "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
           "https://cdn.tailwindcss.com"
         ],
+        scriptSrcAttr: ["'unsafe-inline'"],
         styleSrc: [
           "'self'",
           "'unsafe-inline'",
@@ -39,6 +41,7 @@ app.use(
         connectSrc: [
           "'self'",
           "https://cdn.jsdelivr.net",
+          "https://cdnjs.cloudflare.com",
           "https://cdn.tailwindcss.com"
         ],
         fontSrc: [
