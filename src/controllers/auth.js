@@ -32,7 +32,12 @@ export async function adminLogin(req, res) {
     }
 
     const token = jwt.sign(
-      { userId: admin._id, role: "admin", username: admin.username },
+      { 
+        userId: admin._id, 
+        role: "admin", 
+        username: admin.username,
+        organizationId: admin.organizationId || null // Multi-tenant context
+      },
       config.jwtSecret,
       { expiresIn: "12h" }
     );
@@ -76,7 +81,13 @@ export async function leaderLogin(req, res) {
     }
 
     const token = jwt.sign(
-      { userId: leader._id, leaderId: leader.leaderId, role: "leader", name: leader.name },
+      { 
+        userId: leader._id, 
+        leaderId: leader.leaderId, 
+        role: "leader", 
+        name: leader.name,
+        organizationId: leader.organizationId // Multi-tenant context
+      },
       config.jwtSecret,
       { expiresIn: "12h" }
     );
@@ -90,10 +101,10 @@ export async function leaderLogin(req, res) {
 
 export async function leaderLoginById(req, res) {
   try {
-    const { leaderId, password } = req.body;
+    const { leaderId } = req.body;
 
-    if (!leaderId || !password) {
-      return res.status(400).json({ error: "LeaderId y password requeridos" });
+    if (!leaderId) {
+      return res.status(400).json({ error: "LeaderId requerido" });
     }
 
     let leader;
@@ -104,17 +115,19 @@ export async function leaderLoginById(req, res) {
       return res.status(503).json({ error: "Base de datos no disponible" });
     }
 
-    if (!leader || !leader.passwordHash) {
-      return res.status(401).json({ error: "Credenciales inválidas" });
+    if (!leader) {
+      return res.status(401).json({ error: "Líder no encontrado" });
     }
 
-    const isValid = await bcryptjs.compare(password, leader.passwordHash);
-    if (!isValid) {
-      return res.status(401).json({ error: "Credenciales inválidas" });
-    }
-
+    // Passwordless login: solo verificamos que el líder existe
     const token = jwt.sign(
-      { userId: leader._id, leaderId: leader.leaderId, role: "leader", name: leader.name },
+      { 
+        userId: leader._id, 
+        leaderId: leader.leaderId, 
+        role: "leader", 
+        name: leader.name,
+        organizationId: leader.organizationId // Multi-tenant context
+      },
       config.jwtSecret,
       { expiresIn: "12h" }
     );

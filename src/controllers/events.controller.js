@@ -21,7 +21,7 @@ export async function createEvent(req, res) {
       active: true,
       registrationCount: 0,
       confirmedCount: 0,
-      organizationId: req.user?.organizationId || null // Multi-tenant support
+      organizationId: req.user.organizationId // Multi-tenant: asignar org automáticamente
     });
 
     await event.save();
@@ -52,13 +52,14 @@ export async function getEvents(req, res) {
 
 export async function getEvent(req, res) {
   try {
-    const event = await Event.findById(req.params.id);
+    const orgId = req.user.organizationId; // Multi-tenant filter
+    const event = await Event.findOne({ _id: req.params.id, organizationId: orgId });
     if (!event) {
       return res.status(404).json({ error: "Evento no encontrado" });
     }
 
-    const registrationCount = await Registration.countDocuments({ eventId: event._id.toString() });
-    const confirmedCount = await Registration.countDocuments({ eventId: event._id.toString(), confirmed: true });
+    const registrationCount = await Registration.countDocuments({ eventId: event._id.toString(), organizationId: orgId });
+    const confirmedCount = await Registration.countDocuments({ eventId: event._id.toString(), confirmed: true, organizationId: orgId });
 
     res.json({
       ...event.toObject(),
@@ -74,9 +75,10 @@ export async function getEvent(req, res) {
 export async function updateEvent(req, res) {
   try {
     const user = req.user;
+    const orgId = req.user.organizationId; // Multi-tenant filter
     const { name, description, date, location, active } = req.body;
 
-    const event = await Event.findById(req.params.id);
+    const event = await Event.findOne({ _id: req.params.id, organizationId: orgId });
     if (!event) {
       return res.status(404).json({ error: "Evento no encontrado" });
     }
@@ -118,13 +120,14 @@ export async function updateEvent(req, res) {
 export async function deleteEvent(req, res) {
   try {
     const user = req.user;
-    const event = await Event.findById(req.params.id);
+    const orgId = req.user.organizationId; // Multi-tenant filter
+    const event = await Event.findOne({ _id: req.params.id, organizationId: orgId });
 
     if (!event) {
       return res.status(404).json({ error: "Evento no encontrado" });
     }
 
-    const registrationCount = await Registration.countDocuments({ eventId: event._id.toString() });
+    const registrationCount = await Registration.countDocuments({ eventId: event._id.toString(), organizationId: orgId });
 
     await Event.deleteOne({ _id: req.params.id });
 
@@ -139,14 +142,15 @@ export async function deleteEvent(req, res) {
 
 export async function getActiveEvent(req, res) {
   try {
-    const event = await Event.findOne({ active: true }).sort({ createdAt: -1 });
+    const orgId = req.user.organizationId; // Multi-tenant filter
+    const event = await Event.findOne({ active: true, organizationId: orgId }).sort({ createdAt: -1 });
     
     if (!event) {
       return res.status(404).json({ error: "No hay evento activo" });
     }
 
-    const registrationCount = await Registration.countDocuments({ eventId: event._id.toString() });
-    const confirmedCount = await Registration.countDocuments({ eventId: event._id.toString(), confirmed: true });
+    const registrationCount = await Registration.countDocuments({ eventId: event._id.toString(), organizationId: orgId });
+    const confirmedCount = await Registration.countDocuments({ eventId: event._id.toString(), confirmed: true, organizationId: orgId });
 
     res.json({
       ...event.toObject(),

@@ -58,7 +58,7 @@ export async function createRegistration(req, res) {
         whatsappSent: false
       },
       confirmed: false,
-      organizationId: event.organizationId || null // Inherit from event
+      organizationId: leader.organizationId // Multi-tenant: Heredar organizationId del líder
     });
 
     await registration.save();
@@ -112,7 +112,8 @@ export async function getRegistrations(req, res) {
 
 export async function getRegistration(req, res) {
   try {
-    const registration = await Registration.findById(req.params.id);
+    const orgId = req.user.organizationId; // Multi-tenant filter
+    const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId });
     if (!registration) {
       return res.status(404).json({ error: "Registro no encontrado" });
     }
@@ -126,9 +127,10 @@ export async function getRegistration(req, res) {
 export async function updateRegistration(req, res) {
   try {
     const user = req.user;
+    const orgId = req.user.organizationId; // Multi-tenant filter
     const { firstName, lastName, email, phone, localidad, registeredToVote, votingPlace, votingTable } = req.body;
 
-    const registration = await Registration.findById(req.params.id);
+    const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId });
     if (!registration) {
       return res.status(404).json({ error: "Registro no encontrado" });
     }
@@ -190,7 +192,8 @@ export async function updateRegistration(req, res) {
 export async function deleteRegistration(req, res) {
   try {
     const user = req.user;
-    const registration = await Registration.findById(req.params.id);
+    const orgId = req.user.organizationId; // Multi-tenant filter
+    const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId });
 
     if (!registration) {
       return res.status(404).json({ error: "Registro no encontrado" });

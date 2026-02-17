@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const adminSchema = new mongoose.Schema({
-  username: { type: String, unique: true, required: true },
+  username: { type: String, required: true },
   passwordHash: { type: String, required: true },
   email: String,
   organizationId: { 
@@ -15,7 +15,7 @@ const adminSchema = new mongoose.Schema({
 });
 
 // Índices para optimización
-adminSchema.index({ organizationId: 1 });
+adminSchema.index({ username: 1 }, { unique: true });
 adminSchema.index({ role: 1 });
 
 export const Admin = mongoose.model("Admin", adminSchema);

@@ -46,7 +46,8 @@ export async function createLeader(req, res) {
       eventId,
       passwordHash,
       token,
-      registrations: 0
+      registrations: 0,
+      organizationId: req.user.organizationId // Multi-tenant: asignar org automáticamente
     });
 
     await leader.save();
@@ -84,7 +85,8 @@ export async function getLeaders(req, res) {
 
 export async function getLeader(req, res) {
   try {
-    const leader = await Leader.findById(req.params.id);
+    const orgId = req.user.organizationId; // Multi-tenant filter
+    const leader = await Leader.findOne({ _id: req.params.id, organizationId: orgId });
     if (!leader) {
       return res.status(404).json({ error: "Líder no encontrado" });
     }
@@ -99,8 +101,9 @@ export async function updateLeader(req, res) {
   try {
     const { name, email, phone, area, active } = req.body;
     const user = req.user;
+    const orgId = req.user.organizationId; // Multi-tenant filter
 
-    const leader = await Leader.findById(req.params.id);
+    const leader = await Leader.findOne({ _id: req.params.id, organizationId: orgId });
     if (!leader) {
       return res.status(404).json({ error: "Líder no encontrado" });
     }
@@ -142,7 +145,8 @@ export async function updateLeader(req, res) {
 export async function deleteLeader(req, res) {
   try {
     const user = req.user;
-    const leader = await Leader.findById(req.params.id);
+    const orgId = req.user.organizationId; // Multi-tenant filter
+    const leader = await Leader.findOne({ _id: req.params.id, organizationId: orgId });
 
     if (!leader) {
       return res.status(404).json({ error: "Líder no encontrado" });
