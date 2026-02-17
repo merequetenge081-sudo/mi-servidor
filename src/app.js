@@ -16,7 +16,28 @@ const app = express();
 
 // ==================== SEGURIDAD ====================
 // Helmet - Asegurar headers HTTP
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.jsdelivr.net"
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdn.jsdelivr.net"
+        ],
+        imgSrc: ["'self'", "data:"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'", "https://cdn.jsdelivr.net", "data:"],
+      },
+    },
+  })
+);
 
 // Compression - Comprimir respuestas
 app.use(compression());
