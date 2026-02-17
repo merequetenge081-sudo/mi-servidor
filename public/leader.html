@@ -3,254 +3,588 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sistema profesional de gestión de registros y líderes">
-    <meta name="theme-color" content="#0d6efd">
-    <title>Panel del Líder - Sistema de Registro</title>
+    <title>Panel del Líder - Red Social y Política</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        body { background: #f5f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .navbar-brand { font-weight:700; font-size:1.25rem; }
-        .container-main { padding: 2rem 0; }
-        .card { border:none; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.06); margin-bottom:2rem }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border-radius:10px 10px 0 0 !important; padding:1rem; border:none }
-        .btn-logout { background:#dc3545; color:white; border:none }
-        .stat-card { background:white; border-radius:10px; padding:1.25rem; text-align:center; box-shadow:0 2px 8px rgba(102,126,234,0.08); }
-        .table thead th { background:#e9eafc; color:#333; border-bottom:2px solid #764ba2; font-weight:600; }
-        .badge.bg-success { background: linear-gradient(90deg,#43e97b 0%,#38f9d7 100%)!important; color:#222; font-weight:500; }
-        .badge.bg-secondary { background: linear-gradient(90deg,#e0eafc 0%,#cfdef3 100%)!important; color:#555; font-weight:500; }
-        .btn-outline-primary { border:1.5px solid #764ba2; color:#764ba2; font-weight:500; }
-        .btn-outline-primary:hover { background:#764ba2; color:white; }
-        .btn-outline-secondary { border:1.5px solid #667eea; color:#667eea; font-weight:500; }
-        .btn-outline-secondary:hover { background:#667eea; color:white; }
-        .modal-content { border-radius:16px; box-shadow:0 4px 24px rgba(102,126,234,0.12); }
-        .modal-header { border-radius:16px 16px 0 0; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; }
-        .modal-footer { border-radius:0 0 16px 16px; }
-        .loading { display:inline-block; width:8px; height:8px; border-radius:50%; background:white; margin-left:5px; animation: loading 0.6s infinite alternate }
-        @keyframes loading { to { opacity: 0.3 } }
-        .toast-container { position:fixed; top:1.5rem; right:1.5rem; z-index:9999; }
-        .toast { min-width:220px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --light-bg: #f5f7fb;
+            --white: #ffffff;
+            --dark-sidebar: #1a1a2e;
+            --text-dark: #1a1a1a;
+            --text-muted: #999;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+        }
+        
+        /* ============== NAVBAR ============== */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .navbar-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .btn-logout {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+        
+        .btn-logout:hover {
+            opacity: 0.8;
+        }
+        
+        /* ============== CONTENT ============== */
+        .content {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* ============== CARDS ============== */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            padding: 20px;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        /* ============== STATS ============== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            margin: 10px 0;
+            color: var(--primary);
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .stat-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        /* ============== TABLES ============== */
+        .table {
+            margin: 0;
+        }
+        
+        .table thead th {
+            background: #f0f0f0;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+            padding: 15px;
+        }
+        
+        .table tbody td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .table tbody tr:hover {
+            background: #f9f9f9;
+        }
+        
+        /* ============== BUTTONS ============== */
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 10px 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102,126,234,0.3);
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        /* ============== FILTERS ============== */
+        .filters {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* ============== QR CODE ============== */
+        .qr-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .qr-section h4 {
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+        
+        #qrCode canvas {
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .link-section {
+            margin-top: 20px;
+        }
+        
+        .link-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .link-input input {
+            flex: 1;
+        }
+        
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-copy:hover {
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="bi bi-person-badge"></i> Panel del Líder</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><span class="navbar-text text-white me-3" id="leaderName">Cargando...</span></li>
-                    <li class="nav-item"><button class="btn btn-logout" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</button></li>
-                </ul>
+    <!-- ============== NAVBAR ============== -->
+    <div class="navbar">
+        <div class="navbar-brand">
+            <i class="bi bi-people-fill"></i> Red Social y Política - Panel del Líder
+        </div>
+        <div class="navbar-actions">
+            <span id="leaderName">Líder</span>
+            <button class="btn-logout" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+            </button>
+        </div>
+    </div>
+
+    <!-- ============== CONTENT ============== -->
+    <div class="content">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="bi bi-clipboard-check" style="font-size: 32px; color: var(--primary);"></i>
+                <h3 id="totalRegistrations">0</h3>
+                <p>Registros Totales</p>
+            </div>
+            <div class="stat-card">
+                <i class="bi bi-calendar3" style="font-size: 32px; color: var(--primary);"></i>
+                <h3 id="registrationsToday">0</h3>
+                <p>Registros Hoy</p>
+            </div>
+            <div class="stat-card">
+                <i class="bi bi-calendar-check" style="font-size: 32px; color: #4CAF50;"></i>
+                <h3 id="confirmedRegistrations">0</h3>
+                <p>Registros Confirmados</p>
+            </div>
+            <div class="stat-card">
+                <i class="bi bi-percent" style="font-size: 32px; color: var(--primary);"></i>
+                <h3 id="confirmationRate">0%</h3>
+                <p>Tasa de Confirmación</p>
             </div>
         </div>
-    </nav>
 
-    <div class="container-lg container-main">
-        <div class="row mb-4">
-            <div class="col-md-6"><div class="stat-card"><h3 id="totalRegistrations">0</h3><p>Registros Totales</p></div></div>
-            <div class="col-md-6"><div class="stat-card"><h3 id="confirmedRegistrations">0</h3><p>Confirmados</p></div></div>
+        <!-- QR Code Section -->
+        <div class="qr-section">
+            <h4>
+                <i class="bi bi-qr-code"></i> Tu Link de Registro
+            </h4>
+            <div id="qrCode" style="display: inline-block;"></div>
+            <div class="link-section">
+                <label>Comparte este link para que otros se registren:</label>
+                <div class="link-input">
+                    <input type="text" id="registrationLink" readonly>
+                    <button class="btn-copy" onclick="copyLink()">
+                        <i class="bi bi-clipboard"></i> Copiar Link
+                    </button>
+                </div>
+            </div>
         </div>
 
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Buscar por nombre</label>
+                <input type="text" id="searchInput" placeholder="Nombre o email...">
+            </div>
+            <div class="filter-group">
+                <label>Filtrar por estado</label>
+                <select id="filterStatus">
+                    <option value="">Todos</option>
+                    <option value="confirmed">Confirmados</option>
+                    <option value="pending">Pendientes</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Registrations Table -->
         <div class="card">
-            <div class="card-header"><i class="bi bi-list-check"></i> Mis Registros</div>
+            <div class="card-header">
+                <i class="bi bi-table"></i> Mis Registros
+            </div>
             <div class="card-body">
-                <div id="loadingMessage" class="alert alert-info"><span class="loading"></span> Cargando registros...</div>
-                <div class="table-responsive" id="registrationsContainer" style="display:none;">
-                    <table class="table table-hover"><thead><tr><th>Nombre</th><th>Cédula</th><th>Email</th><th>Teléfono</th><th>Localidad</th><th>Confirmado</th><th>Acciones</th></tr></thead><tbody id="registrationsTable"></tbody></table>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Cédula</th>
+                                <th>Localidad</th>
+                                <th>Puesto Votación</th>
+                                <th>Mesa</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registrationsTable">
+                            <tr><td colspan="9" class="text-center text-muted">Cargando...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div id="emptyMessage" class="alert alert-warning" style="display:none;">No hay registros por mostrar.</div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-download"></i> Descargar Mis Registros
+            </div>
+            <div class="card-body">
+                <button class="btn btn-primary" onclick="exportMyRegistrations()">
+                    <i class="bi bi-download"></i> Descargar Excel
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+
     <script>
         const API_URL = window.location.origin;
+        let currentToken = localStorage.getItem('token');
+        let currentLeaderId = localStorage.getItem('leaderId');
+        let leaderData = null;
+        let myRegistrations = [];
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('token'); localStorage.removeItem('role'); localStorage.removeItem('leaderId');
-            window.location.href = '/login';
-        });
-
-        // Permitir acceso por URL: /leader?id=LEADERID&token=TOKEN
-        function getQueryParam(name) {
-            const url = new URL(window.location.href);
-            return url.searchParams.get(name);
-        }
-        window.addEventListener('load', () => {
-            let leaderId = getQueryParam('id') || localStorage.getItem('leaderId');
-            let token = getQueryParam('token') || localStorage.getItem('token');
-            if (!leaderId || !token) {
-                window.location.href = '/login';
+        // ============== AUTHENTICATION ==============
+        function checkAuth() {
+            if (!currentToken || !currentLeaderId) {
+                window.location.href = '/';
                 return;
             }
-            loadLeaderData(leaderId, token);
-        });
-
-        async function loadLeaderData(leaderId, token){
-            try{
-                const leaderRes = await fetch(`${API_URL}/api/leaders/${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!leaderRes.ok) { if (leaderRes.status === 401) { window.location.href = '/'; } throw new Error('Error cargando datos del líder'); }
-                const leader = await leaderRes.json();
-                document.getElementById('leaderName').textContent = leader.name || 'Líder';
-
-                const regsRes = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!regsRes.ok) throw new Error('Error cargando registros');
-                const registrations = await regsRes.json();
-                const regsArray = Array.isArray(registrations) ? registrations : registrations.data || [];
-
-                const totalRegs = regsArray.length;
-                const confirmedRegs = regsArray.filter(r => r.confirmed).length;
-                document.getElementById('totalRegistrations').textContent = totalRegs;
-                document.getElementById('confirmedRegistrations').textContent = confirmedRegs;
-
-                if (totalRegs > 0) { displayRegistrations(regsArray, leaderId, token); document.getElementById('registrationsContainer').style.display = 'block'; document.getElementById('emptyMessage').style.display = 'none'; }
-                else { document.getElementById('registrationsContainer').style.display = 'none'; document.getElementById('emptyMessage').style.display = 'block'; }
-
-                document.getElementById('loadingMessage').style.display = 'none';
-            }catch(err){ console.error('Error:', err); document.getElementById('loadingMessage').innerHTML = '<div class="alert alert-danger">Error cargando datos: '+err.message+'</div>'; }
         }
 
-                function displayRegistrations(registrations, leaderId, token){
-                        const tbody = document.getElementById('registrationsTable'); tbody.innerHTML = '';
-                        registrations.forEach(reg => {
-                                const row = document.createElement('tr');
-                                row.innerHTML = `
-                                        <td><strong>${reg.firstName || ''} ${reg.lastName || ''}</strong></td>
-                                        <td>${reg.cedula || '-'}</td>
-                                        <td>${reg.email || '-'}</td>
-                                        <td>${reg.phone || '-'}</td>
-                                        <td>${reg.localidad || '-'}</td>
-                                        <td><span class="badge ${reg.confirmed ? 'bg-success' : 'bg-secondary'}">${reg.confirmed ? '✓ Confirmado' : 'Pendiente'}</span></td>
-                                        <td>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="editReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-pencil"></i> Editar</button>
-                                                <button class="btn btn-sm btn-outline-secondary" onclick="exportReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-download"></i></button>
-                                        </td>
-                                `;
-                                tbody.appendChild(row);
-                        });
-                }
+        function logout() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('leaderId');
+                window.location.href = '/';
+            }
+        }
 
-                // Modal avanzado de edición
-                let editModal = null;
-                window.editReg = async function(id, leaderId, token) {
-                    const res = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                    const regs = await res.json();
-                    const reg = regs.find(r => r._id === id);
-                    if (!reg) return showToast('danger', 'Registro no encontrado');
+        // ============== API CALLS ==============
+        async function apiCall(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentToken}`,
+                ...options.headers
+            };
+            
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers
+            });
 
-                    // Crear modal si no existe
-                    if (!editModal) {
-                        editModal = document.createElement('div');
-                        editModal.className = 'modal fade';
-                        editModal.innerHTML = `
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Editar Registro</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form id="editForm">
-                                        <div class="mb-2"><label>Nombre</label><input class="form-control" id="edit_firstName"></div>
-                                        <div class="mb-2"><label>Apellido</label><input class="form-control" id="edit_lastName"></div>
-                                        <div class="mb-2"><label>Cédula</label><input class="form-control" id="edit_cedula"></div>
-                                        <div class="mb-2"><label>Email</label><input class="form-control" id="edit_email"></div>
-                                        <div class="mb-2"><label>Teléfono</label><input class="form-control" id="edit_phone"></div>
-                                        <div class="mb-2"><label>Localidad</label><input class="form-control" id="edit_localidad"></div>
-                                        <div class="mb-2"><label>¿Inscrito para votar?</label><select class="form-select" id="edit_votante"><option value="true">Sí</option><option value="false">No</option></select></div>
-                                        <div class="mb-2"><label>Puesto de Votación</label><input class="form-control" id="edit_votingPlace"></div>
-                                        <div class="mb-2"><label>Nº Mesa</label><input class="form-control" id="edit_votingTable"></div>
-                                        <div class="mb-2"><label>Confirmado</label><select class="form-select" id="edit_confirmed"><option value="true">Sí</option><option value="false">No</option></select></div>
-                                    </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="button" class="btn btn-primary" id="saveEditBtn">Guardar</button>
-                                </div>
-                            </div>
-                        </div>`;
-                        document.body.appendChild(editModal);
-                    }
-                    // Rellenar campos
-                    document.getElementById('edit_firstName').value = reg.firstName || '';
-                    document.getElementById('edit_lastName').value = reg.lastName || '';
-                    document.getElementById('edit_cedula').value = reg.cedula || '';
-                    document.getElementById('edit_email').value = reg.email || '';
-                    document.getElementById('edit_phone').value = reg.phone || '';
-                    document.getElementById('edit_localidad').value = reg.localidad || '';
-                    document.getElementById('edit_votante').value = reg.registeredToVote ? 'true' : 'false';
-                    document.getElementById('edit_votingPlace').value = reg.votingPlace || '';
-                    document.getElementById('edit_votingTable').value = reg.votingTable || '';
-                    document.getElementById('edit_confirmed').value = reg.confirmed ? 'true' : 'false';
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            }
 
-                    // Mostrar modal
-                    let bsModal = new bootstrap.Modal(editModal);
-                    bsModal.show();
+            return response;
+        }
 
-                    document.getElementById('saveEditBtn').onclick = async function() {
-                        const body = {
-                            firstName: document.getElementById('edit_firstName').value,
-                            lastName: document.getElementById('edit_lastName').value,
-                            cedula: document.getElementById('edit_cedula').value,
-                            email: document.getElementById('edit_email').value,
-                            phone: document.getElementById('edit_phone').value,
-                            localidad: document.getElementById('edit_localidad').value,
-                            registeredToVote: document.getElementById('edit_votante').value === 'true',
-                            votingPlace: document.getElementById('edit_votingPlace').value,
-                            votingTable: document.getElementById('edit_votingTable').value,
-                            confirmed: document.getElementById('edit_confirmed').value === 'true'
-                        };
-                        const putRes = await fetch(`${API_URL}/api/registrations/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-                        if (!putRes.ok) return showToast('danger', 'Error al guardar');
-                        bsModal.hide();
-                        showToast('success', 'Registro actualizado');
-                        loadLeaderData(leaderId, token);
-                    };
-                }
-
-        // (Eliminado: edición simple, solo queda la avanzada con modal y notificaciones visuales)
-
-        // Exportar registro individual a Excel
-        window.exportReg = async function(id, leaderId, token) {
+        // ============== LOAD DATA ==============
+        async function loadLeaderPanel() {
             try {
-                const res = await fetch(`${API_URL}/api/registrations/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) return showToast('danger', 'Error exportando registro');
-                const reg = await res.json();
-                // Generar XLSX simple (solo este registro)
-                const headers = ['Nombre', 'Apellido', 'Cédula', 'Email', 'Teléfono', 'Localidad', '¿Inscrito para votar?', 'Puesto de Votación', 'Nº Mesa', 'Confirmado'];
-                const row = [
-                    reg.firstName||'', reg.lastName||'', reg.cedula||'', reg.email||'', reg.phone||'', reg.localidad||'',
-                    reg.registeredToVote ? 'Sí' : 'No', reg.votingPlace||'', reg.votingTable||'', reg.confirmed ? 'Sí' : 'No'
-                ];
-                const csv = [headers.join(','), row.map(v=>`"${(v||'').toString().replace(/"/g,'""')}` ).join(',')].join('\n');
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `registro_${reg.cedula||reg._id}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                showToast('success', 'Registro exportado correctamente');
-            } catch (e) { showToast('danger', 'Error exportando registro'); }
+                // Load leader data
+                const leaderRes = await apiCall(`/api/leaders/${currentLeaderId}`);
+                leaderData = await leaderRes.json();
+                document.getElementById('leaderName').textContent = leaderData.name || 'Líder';
+
+                // Generate QR Code
+                const registrationLink = `${API_URL}/registro/${leaderData._id}`;
+                document.getElementById('registrationLink').value = registrationLink;
+                
+                const qrContainer = document.getElementById('qrCode');
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: registrationLink,
+                    width: 250,
+                    height: 250
+                });
+
+                // Load registrations
+                const regsRes = await apiCall('/api/registrations');
+                const allRegistrations = await regsRes.json();
+                myRegistrations = allRegistrations.filter(r => r.leaderId === currentLeaderId);
+
+                updateStats();
+                loadRegistrationsTable();
+            } catch (err) {
+                console.error('Error loading panel:', err);
+            }
         }
 
-        // Notificaciones visuales modernas
-        function showToast(type, message) {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-bg-${type} border-0 show mb-2`;
-            toast.setAttribute('role', 'alert');
-            toast.innerHTML = `<div class="d-flex"><div class="toast-body">${message}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
-            container.appendChild(toast);
-            setTimeout(()=>{ toast.classList.remove('show'); setTimeout(()=>toast.remove(), 500); }, 3500);
+        function updateStats() {
+            const today = new Date().toDateString();
+            const confirmedRegs = myRegistrations.filter(r => r.confirmed);
+            const registrationsToday = myRegistrations.filter(r => 
+                new Date(r.date).toDateString() === today
+            );
+            
+            const total = myRegistrations.length;
+            const confirmed = confirmedRegs.length;
+            const rate = total > 0 ? ((confirmed / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('totalRegistrations').textContent = total;
+            document.getElementById('registrationsToday').textContent = registrationsToday.length;
+            document.getElementById('confirmedRegistrations').textContent = confirmed;
+            document.getElementById('confirmationRate').textContent = rate + '%';
         }
 
-        // Eliminar alert() y mensajes con 'á' corrupta
-        // ...existing code...
+        function loadRegistrationsTable() {
+            const html = myRegistrations.map(reg => `
+                <tr>
+                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
+                    <td>${reg.email || '-'}</td>
+                    <td>${reg.cedula || '-'}</td>
+                    <td>${reg.localidad || '-'}</td>
+                    <td>${reg.votingPlace || '-'}</td>
+                    <td>${reg.votingTable || '-'}</td>
+                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
+                    <td>
+                        <span class="badge ${reg.confirmed ? 'bg-success' : 'bg-warning'}">
+                            ${reg.confirmed ? 'Confirmado' : 'Pendiente'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleConfirm('${reg._id}', ${reg.confirmed})">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('registrationsTable').innerHTML = html || '<tr><td colspan="9" class="text-center text-muted">Sin registros</td></tr>';
+        }
+
+        // ============== FILTERS ==============
+        document.getElementById('searchInput').addEventListener('input', filterRegistrations);
+        document.getElementById('filterStatus').addEventListener('change', filterRegistrations);
+
+        function filterRegistrations() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value;
+
+            const filtered = myRegistrations.filter(r => {
+                const matchSearch = !search || 
+                    r.firstName.toLowerCase().includes(search) ||
+                    r.lastName.toLowerCase().includes(search) ||
+                    r.email.toLowerCase().includes(search);
+                
+                const matchStatus = !status || (status === 'confirmed' ? r.confirmed : !r.confirmed);
+                
+                return matchSearch && matchStatus;
+            });
+
+            const html = filtered.map(reg => `
+                <tr>
+                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
+                    <td>${reg.email || '-'}</td>
+                    <td>${reg.cedula || '-'}</td>
+                    <td>${reg.localidad || '-'}</td>
+                    <td>${reg.votingPlace || '-'}</td>
+                    <td>${reg.votingTable || '-'}</td>
+                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
+                    <td>
+                        <span class="badge ${reg.confirmed ? 'bg-success' : 'bg-warning'}">
+                            ${reg.confirmed ? 'Confirmado' : 'Pendiente'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleConfirm('${reg._id}', ${reg.confirmed})">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('registrationsTable').innerHTML = html || '<tr><td colspan="9" class="text-center text-muted">Sin resultados</td></tr>';
+        }
+
+        // ============== ACTIONS ==============
+        async function toggleConfirm(id, currentStatus) {
+            try {
+                const endpoint = currentStatus ? `/api/registrations/${id}/unconfirm` : `/api/registrations/${id}/confirm`;
+                const res = await apiCall(endpoint, { method: 'POST' });
+                if (res.ok) {
+                    loadLeaderPanel();
+                }
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }
+
+        function copyLink() {
+            const link = document.getElementById('registrationLink');
+            link.select();
+            document.execCommand('copy');
+            alert('Link copiado al portapapeles');
+        }
+
+        function exportMyRegistrations() {
+            const data = myRegistrations.map(r => ({
+                'Nombre': `${r.firstName} ${r.lastName}`,
+                'Email': r.email || '',
+                'Cédula': r.cedula || '',
+                'Localidad': r.localidad || '',
+                'Puesto Votación': r.votingPlace || '',
+                'Mesa': r.votingTable || '',
+                'Teléfono': r.phone || '',
+                'Fecha': new Date(r.date).toLocaleDateString('es-CO'),
+                'Estado': r.confirmed ? 'Confirmado' : 'Pendiente'
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Mis Registros');
+            XLSX.writeFile(wb, `mis_registros_${leaderData.name}.xlsx`);
+        }
+
+        // ============== INIT ==============
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadLeaderPanel();
+        });
     </script>
 </body>
 </html>
