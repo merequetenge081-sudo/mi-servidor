@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Panel Administrativo</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0d6efd">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+</head>
+<body class="bg-gray-100">
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-chart-line text-2xl text-blue-600"></i>
+        <h1 class="text-2xl font-bold text-gray-800">Panel Administrativo</h1>
+      </div>
+      <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+
+  <div class="flex">
+    <aside class="w-64 bg-gray-900 text-white h-screen fixed overflow-y-auto">
+      <div class="p-6 border-b border-gray-700">
+        <h2 class="text-xl font-bold">Menú</h2>
+      </div>
+      <nav class="p-4 space-y-2">
+        <a href="/dashboard.html" class="flex items-center gap-3 p-3 bg-blue-600 rounded-lg hover:bg-blue-700">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 ml-64 p-8">
+      <div class="max-w-7xl">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Dashboard</h2>
+        <p class="text-gray-600">Bienvenido a tu panel administrativo</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          <div class="bg-white rounded-lg shadow p-6">
+            <i class="fas fa-calendar text-3xl text-blue-500 mb-4"></i>
+            <h3 class="text-lg font-bold text-gray-800">Eventos</h3>
+            <p class="text-gray-600">Gestiona tus eventos</p>
+          </div>
+          <div class="bg-white rounded-lg shadow p-6">
+            <i class="fas fa-users text-3xl text-green-500 mb-4"></i>
+            <h3 class="text-lg font-bold text-gray-800">Líderes</h3>
+            <p class="text-gray-600">Gestiona tus líderes</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/assets/js/utils.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login.html";
+    }
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js")
+        .then(() => console.log("Service Worker registrado"))
+        .catch(err => console.warn("Error registrando SW:", err));
+    }
+  </script>
+</body>
+</html>
