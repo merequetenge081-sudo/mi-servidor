@@ -3,8 +3,20 @@ import mongoose from "mongoose";
 const adminSchema = new mongoose.Schema({
   username: { type: String, unique: true, required: true },
   passwordHash: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+  email: String,
+  organizationId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Organization',
+    sparse: true // Permite null para admins globales
+  },
+  role: { type: String, enum: ['super_admin', 'org_admin'], default: 'super_admin' },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
+
+// Índices para optimización
+adminSchema.index({ organizationId: 1 });
+adminSchema.index({ role: 1 });
 
 export const Admin = mongoose.model("Admin", adminSchema);
 

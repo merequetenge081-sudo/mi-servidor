@@ -8,8 +8,10 @@ import * as exportController from "../controllers/export.controller.js";
 import * as duplicatesController from "../controllers/duplicates.controller.js";
 import * as auditController from "../controllers/audit.controller.js";
 import * as whatsappController from "../controllers/whatsapp.controller.js";
+import * as organizationController from "../controllers/organization.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { roleMiddleware } from "../middleware/role.middleware.js";
+import { organizationRoleMiddleware } from "../middleware/organization.middleware.js";
 import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
 import logger from "../config/logger.js";
 
@@ -34,6 +36,14 @@ router.get("/registro/:token", leaderController.getLeaderByToken);
 router.post("/auth/admin-login", adminLogin);
 router.post("/auth/leader-login", leaderLogin);
 router.post("/auth/leader-login-id", leaderLoginById);
+
+// ==================== ORGANIZACIONES (MULTI-TENANT) ====================
+router.post("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.createOrganization);
+router.get("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.getOrganizations);
+router.get("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin", "org_admin"), organizationController.getOrganizationDetails);
+router.put("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.updateOrganization);
+router.delete("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.deleteOrganization);
+router.get("/organizations/:orgId/stats", authMiddleware, organizationRoleMiddleware("super_admin", "org_admin"), organizationController.getOrganizationStats);
 
 // ==================== LÍDERES ====================
 router.post("/leaders", authMiddleware, roleMiddleware("admin"), leaderController.createLeader);

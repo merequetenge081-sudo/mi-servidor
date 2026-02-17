@@ -1,8 +1,10 @@
 import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
+import { Event } from "../models/Event.js";
 import { AuditService } from "../services/audit.service.js";
 import { ValidationService } from "../services/validation.service.js";
 import logger from "../config/logger.js";
+import { buildOrgFilter } from "../middleware/organization.middleware.js";
 
 export async function createRegistration(req, res) {
   try {
@@ -22,6 +24,12 @@ export async function createRegistration(req, res) {
     }
     if (!leader.active) {
       return res.status(403).json({ error: "El líder está inactivo" });
+    }
+
+    // Get event to inherit organizationId
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ error: "Evento no encontrado" });
     }
 
     // Check duplicate by cedula + eventId
@@ -49,7 +57,8 @@ export async function createRegistration(req, res) {
         smsSent: false,
         whatsappSent: false
       },
-      confirmed: false
+      confirmed: false,
+      organizationId: event.organizationId || null // Inherit from event
     });
 
     await registration.save();
@@ -69,7 +78,7 @@ export async function createRegistration(req, res) {
 export async function getRegistrations(req, res) {
   try {
     const { eventId, leaderId, confirmed, cedula, page = 1, limit = 50 } = req.query;
-    const filter = {};
+    const filter = buildOrgFilter(req); // Multi-tenant filtering
 
     if (eventId) filter.eventId = eventId;
     if (leaderId) filter.leaderId = leaderId;

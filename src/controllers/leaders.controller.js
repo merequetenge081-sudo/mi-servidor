@@ -4,6 +4,7 @@ import { AuditService } from "../services/audit.service.js";
 import logger from "../config/logger.js";
 import bcryptjs from "bcryptjs";
 import crypto from "crypto";
+import { buildOrgFilter } from "../middleware/organization.middleware.js";
 
 // Generar token único de 32 caracteres hexadecimales
 function generateToken() {
@@ -68,7 +69,7 @@ export async function createLeader(req, res) {
 export async function getLeaders(req, res) {
   try {
     const { eventId, active } = req.query;
-    const filter = {};
+    const filter = buildOrgFilter(req); // Multi-tenant filtering
 
     if (eventId) filter.eventId = eventId;
     if (active !== undefined) filter.active = active === "true";
@@ -162,7 +163,8 @@ export async function deleteLeader(req, res) {
 export async function getTopLeaders(req, res) {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    const leaders = await Leader.find({ active: true }).sort({ registrations: -1 }).limit(limit);
+    const filter = buildOrgFilter(req); // Multi-tenant filtering
+    const leaders = await Leader.find({ ...filter, active: true }).sort({ registrations: -1 }).limit(limit);
     res.json(leaders);
   } catch (error) {
     logger.error("Get top leaders error:", { error: error.message, stack: error.stack });

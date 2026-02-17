@@ -2,6 +2,7 @@ import { Event } from "../models/Event.js";
 import { Registration } from "../models/Registration.js";
 import { AuditService } from "../services/audit.service.js";
 import logger from "../config/logger.js";
+import { buildOrgFilter } from "../middleware/organization.middleware.js";
 
 export async function createEvent(req, res) {
   try {
@@ -19,7 +20,8 @@ export async function createEvent(req, res) {
       location,
       active: true,
       registrationCount: 0,
-      confirmedCount: 0
+      confirmedCount: 0,
+      organizationId: req.user?.organizationId || null // Multi-tenant support
     });
 
     await event.save();
@@ -36,7 +38,7 @@ export async function createEvent(req, res) {
 export async function getEvents(req, res) {
   try {
     const { active } = req.query;
-    const filter = {};
+    const filter = buildOrgFilter(req); // Multi-tenant filtering
 
     if (active !== undefined) filter.active = active === "true";
 

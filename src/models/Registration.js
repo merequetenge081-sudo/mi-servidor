@@ -22,6 +22,14 @@ const registrationSchema = new mongoose.Schema({
   confirmed: { type: Boolean, default: false },
   confirmedBy: String,
   confirmedAt: Date,
+  
+  // Multi-tenant support
+  organizationId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Organization',
+    sparse: true
+  },
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -49,6 +57,9 @@ registrationSchema.index({ cedula: 1 });
 registrationSchema.index({ email: 1 });
 registrationSchema.index({ createdAt: -1 });
 registrationSchema.index({ confirmed: 1, eventId: 1 });
+registrationSchema.index({ organizationId: 1 }); // Nuevo índice para filtrado por org
+registrationSchema.index({ organizationId: 1, eventId: 1 }); // Compound índice
+registrationSchema.index({ organizationId: 1, leaderId: 1 }); // Compound índice
 
 export const Registration = mongoose.model("Registration", registrationSchema);
 
