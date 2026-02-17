@@ -3,97 +3,352 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sistema profesional de gestión de registros y líderes">
+  <meta name="description" content="Formulario público de registro">
   <meta name="theme-color" content="#0d6efd">
-  <title>Formulario Público - Registro</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Formulario de Registro</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="container py-5">
-    <div class="card p-4 mx-auto" style="max-width:700px;">
-      <h2 class="mb-3">Formulario de Registro</h2>
-      <p id="infoToken" class="text-muted small"></p>
-      <form id="publicForm">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Nombre</label>
-            <input id="firstName" class="form-control" required>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen py-8 px-4">
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Loader -->
+  <div id="loader" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 flex items-center gap-4">
+      <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
+      <span class="text-lg font-semibold">Procesando...</span>
+    </div>
+  </div>
+
+  <div class="container mx-auto max-w-2xl">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="inline-block bg-blue-100 rounded-full p-4 mb-4">
+        <i class="fas fa-clipboard-list text-4xl text-blue-600"></i>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-800 mb-2">Formulario de Registro</h1>
+      <p class="text-gray-600">Completa tus datos para ser registrado en el evento</p>
+    </div>
+
+    <!-- Información del Líder -->
+    <div id="leader-info" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8">
+      <div class="flex items-center gap-4">
+        <div class="bg-green-100 rounded-full p-3">
+          <i class="fas fa-check-circle text-2xl text-green-600"></i>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600">Registrando con:</p>
+          <p id="leader-name" class="text-2xl font-bold text-gray-800"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="error-alert" class="hidden bg-red-50 border-l-4 border-red-600 rounded-lg p-4 mb-8">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-exclamation-circle text-2xl text-red-600"></i>
+        <div>
+          <p class="font-semibold text-red-800">Error</p>
+          <p id="error-message" class="text-red-700 text-sm"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <form id="publicForm" class="space-y-6">
+        <!-- Nombre y Apellido -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <i class="fas fa-user text-blue-600 mr-2"></i>Nombre *
+            </label>
+            <input 
+              id="firstName" 
+              type="text"
+              placeholder="Juan"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            >
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Apellido</label>
-            <input id="lastName" class="form-control" required>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <i class="fas fa-user text-blue-600 mr-2"></i>Apellido *
+            </label>
+            <input 
+              id="lastName" 
+              type="text"
+              placeholder="Pérez"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            >
           </div>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Cédula</label>
-          <input id="cedula" class="form-control">
+
+        <!-- Cédula -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-id-card text-blue-600 mr-2"></i>Cédula
+          </label>
+          <input 
+            id="cedula" 
+            type="text"
+            placeholder="1234567890"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
         </div>
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input id="email" type="email" class="form-control" required>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-envelope text-blue-600 mr-2"></i>Email *
+          </label>
+          <input 
+            id="email" 
+            type="email"
+            placeholder="tu@email.com"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          >
         </div>
-        <div class="mb-3">
-          <label class="form-label">Teléfono</label>
-          <input id="phone" class="form-control">
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-phone text-blue-600 mr-2"></i>Teléfono
+          </label>
+          <input 
+            id="phone" 
+            type="tel"
+            placeholder="3001234567"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
         </div>
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary">Enviar Registro</button>
+
+        <!-- Localidad -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>Localidad
+          </label>
+          <input 
+            id="locality" 
+            type="text"
+            placeholder="Bogotá"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-4 pt-6">
+          <button 
+            type="submit" 
+            class="flex-1 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition shadow-md flex items-center justify-center gap-2"
+          >
+            <i class="fas fa-paper-plane"></i>
+            Enviar Registro
+          </button>
+          <button 
+            type="reset" 
+            class="flex-1 bg-gray-300 text-gray-800 font-semibold py-3 rounded-lg hover:bg-gray-400 transition"
+          >
+            <i class="fas fa-redo mr-2"></i>Limpiar
+          </button>
         </div>
       </form>
+
+      <!-- Info adicional -->
+      <div class="mt-8 pt-8 border-t border-gray-200">
+        <p class="text-sm text-gray-600 text-center">
+          <i class="fas fa-shield-alt text-green-600 mr-2"></i>
+          Tus datos están protegidos y se usarán solo para este evento
+        </p>
+      </div>
+    </div>
+
+    <!-- Éxito Modal -->
+    <div id="success-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center">
+        <div class="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-check text-4xl text-green-600"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">¡Éxito!</h2>
+        <p class="text-gray-600 mb-6">Tu registro ha sido enviado correctamente.</p>
+        <button onclick="resetForm()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+          OK
+        </button>
+      </div>
     </div>
   </div>
 
   <script>
-    // Extraer token desde la ruta /registro/:token
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const token = pathParts[pathParts.length - 1] || null;
-    document.getElementById('infoToken').textContent = token ? `Registrando para el líder: ${token}` : 'Registrando (sin token)';
+    // ==================== STATE ====================
+    let leaderData = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenParam = urlParams.get('token');
+    const leaderIdParam = urlParams.get('leaderId');
 
+    // ==================== UX UTILITIES ====================
+    function showLoader() {
+      document.getElementById('loader').classList.remove('hidden');
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').classList.add('hidden');
+    }
+
+    function showError(message) {
+      const alert = document.getElementById('error-alert');
+      document.getElementById('error-message').textContent = message;
+      alert.classList.remove('hidden');
+      hideLoader();
+    }
+
+    function hideError() {
+      document.getElementById('error-alert').classList.add('hidden');
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `px-6 py-4 rounded-lg shadow-lg text-white flex items-center gap-3 transform transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+      }`;
+      toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} text-xl"></i>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function resetForm() {
+      document.getElementById('publicForm').reset();
+      document.getElementById('success-modal').classList.add('hidden');
+    }
+
+    // ==================== VALIDATE LEADER ====================
+    async function validateLeader() {
+      showLoader();
+      hideError();
+
+      // Si tiene token, usar endpoint público
+      if (tokenParam) {
+        try {
+          const response = await fetch(`/api/registro/${tokenParam}`);
+          
+          if (!response.ok) {
+            if (response.status === 404) {
+              showError('Token inválido. Verifica el enlace del QR.');
+            } else if (response.status === 403) {
+              showError('El líder está inactivo. Contacta con el administrador.');
+            } else {
+              showError('Error al validar el token.');
+            }
+            hideLoader();
+            return;
+          }
+
+          leaderData = await response.json();
+          displayLeaderInfo();
+          hideLoader();
+        } catch (error) {
+          console.error('Error validating leader by token:', error);
+          showError('Error al conectar con el servidor.');
+          hideLoader();
+        }
+      } else if (leaderIdParam) {
+        // Fallback antiguo (por compatibilidad)
+        console.warn('Usando leaderId directo (método antiguo). Se recomienda usar token.');
+        leaderData = { leaderId: leaderIdParam };
+        displayLeaderInfo();
+        hideLoader();
+      } else {
+        showError('No se proporcionó token ni leaderId válido.');
+        hideLoader();
+      }
+    }
+
+    function displayLeaderInfo() {
+      if (!leaderData) return;
+      
+      const infoDiv = document.getElementById('leader-info');
+      document.getElementById('leader-name').textContent = leaderData.name || 'Líder del evento';
+      infoDiv.classList.remove('hidden');
+    }
+
+    // ==================== FORM SUBMISSION ====================
     document.getElementById('publicForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+      hideError();
 
-      const firstName = document.getElementById('firstName').value;
-      const lastName = document.getElementById('lastName').value;
-      const cedula = document.getElementById('cedula').value;
-      const email = document.getElementById('email').value;
-      const phone = document.getElementById('phone').value;
-
-      // Buscar el leaderId a partir del token
-      let leaderId = null;
-      if (token) {
-        try {
-          const res = await fetch('/api/leaders');
-          if (res.ok) {
-            const leaders = await res.json();
-            const leader = leaders.find(l => l.token === token);
-            if (leader) leaderId = leader._id;
-          }
-        } catch (err) {
-          console.error('Error buscando líder por token:', err);
-        }
+      if (!leaderData) {
+        showError('Error: Líder no validado.');
+        return;
       }
 
-      const payload = { leaderId, firstName, lastName, cedula, email, phone };
+      showLoader();
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const cedula = document.getElementById('cedula').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const locality = document.getElementById('locality').value.trim();
+
+      const payload = {
+        leaderId: leaderData.leaderId,
+        eventId: leaderData.eventId,
+        firstName,
+        lastName,
+        cedula,
+        email,
+        phone,
+        locality,
+        confirmed: false
+      };
 
       try {
-        const r = await fetch('/api/registrations', {
+        const response = await fetch('/api/registrations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
-        if (r.ok) {
-          alert('Registro enviado con éxito');
-          this.reset();
-        } else {
-          alert('Error al enviar registro');
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Error al enviar registro');
         }
-      } catch (err) {
-        console.error('Error enviando registro:', err);
-        alert('Error al enviar registro');
+
+        hideLoader();
+        document.getElementById('success-modal').classList.remove('hidden');
+        showToast('Registro enviado exitosamente', 'success');
+      } catch (error) {
+        console.error('Error submitting registration:', error);
+        showError(error.message || 'Error al enviar el registro. Intenta nuevamente.');
       }
     });
+
+    // ==================== INITIALIZATION ====================
+    async function init() {
+      if (!tokenParam && !leaderIdParam) {
+        showError('No hay información válida para procesar el registro. Verifica el enlace del QR.');
+        return;
+      }
+      
+      await validateLeader();
+    }
+
+    // Iniciar cuando DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
