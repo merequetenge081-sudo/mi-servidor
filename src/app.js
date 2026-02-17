@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import logger from "./config/logger.js";
 import apiRoutes from "./routes/index.js";
+import { organizationMiddleware } from "./middleware/organization.middleware.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -99,6 +100,10 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+// ==================== ORGANIZATION MIDDLEWARE ====================
+// Multi-tenant context (extracts and validates org from JWT)
+app.use(organizationMiddleware);
 
 // ==================== RUTAS ====================
 app.use("/api", apiRoutes);

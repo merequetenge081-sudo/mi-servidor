@@ -10,7 +10,12 @@ export function authMiddleware(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, config.jwtSecret);
-    req.user = decoded;
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role || 'super_admin', // Default to super_admin for BC
+      organizationId: decoded.organizationId || null // Multi-tenant org context
+    };
     next();
   } catch (error) {
     return res.status(401).json({ error: "Token inválido" });

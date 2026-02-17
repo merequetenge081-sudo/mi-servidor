@@ -11,6 +11,14 @@ const leaderSchema = new mongoose.Schema({
   active: { type: Boolean, default: true },
   eventId: String,
   registrations: { type: Number, default: 0 },
+  
+  // Multi-tenant support
+  organizationId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Organization',
+    sparse: true
+  },
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -21,6 +29,8 @@ leaderSchema.index({ eventId: 1 });
 leaderSchema.index({ active: 1, registrations: -1 });
 leaderSchema.index({ email: 1 });
 leaderSchema.index({ createdAt: -1 });
+leaderSchema.index({ organizationId: 1 }); // Nuevo índice para filtrado por org
+leaderSchema.index({ organizationId: 1, active: 1 }); // Compound índice
 
 export const Leader = mongoose.model("Leader", leaderSchema);
 

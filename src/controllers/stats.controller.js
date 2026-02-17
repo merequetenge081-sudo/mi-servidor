@@ -1,63 +1,76 @@
-import { Event } from "../models/Event.js";
-import { Registration } from "../models/Registration.js";
-import { Leader } from "../models/Leader.js";
 import logger from "../config/logger.js";
+import StatsService from "../services/stats.service.js";
+import cacheService from "../services/cache.service.js";
 
 export async function getStats(req, res) {
   try {
     const { eventId } = req.query;
-
-    const totalRegistrations = await Registration.countDocuments(eventId ? { eventId } : {});
-    const totalConfirmed = await Registration.countDocuments(eventId ? { eventId, confirmed: true } : { confirmed: true });
-    const totalLeaders = await Leader.countDocuments({ active: true });
-    const totalEvents = await Event.countDocuments({ active: true });
-
-    const registeredToVote = await Registration.countDocuments(
-      eventId
-        ? { eventId, registeredToVote: true }
-        : { registeredToVote: true }
+    const organizationId = req.user?.organizationId || null;
+    
+    // Use cache for stats
+    const cacheKey = cacheService.buildKey('stats', eventId || 'all', organizationId);
+    const stats = await cacheService.getOrFetch(
+      cacheKey,
+      () => StatsService.getStats(organizationId, eventId),
+      300 // 5 min TTL
     );
-
-    const stats = {
-      totalRegistrations,
-      totalConfirmed,
-      confirmationRate: totalRegistrations > 0 ? ((totalConfirmed / totalRegistrations) * 100).toFixed(2) : 0,
-      totalLeaders,
-      totalEvents,
-      registeredToVote,
-      notRegisteredToVote: totalRegistrations - registeredToVote
-    };
-
+    
     res.json(stats);
   } catch (error) {
-    logger.error("Get stats error:", { error: error.message, stack: error.stack });
-    res.status(500).json({ error: "Error al obtener estadísticas" });
+    logger.error('Get stats error:', { error: error.message });
+    res.status(500).json({ error: 'Error al obtener estadísticas' });
   }
 }
 
 export async function getDailyStats(req, res) {
   try {
-    const { eventId } = req.query;
-
-    const match = eventId ? { eventId } : {};
-
-    const dailyStats = await Registration.aggregate([
-      { $match: match },
-      {
-        $group: {
-          _id: { $substr: ["$date", 0, 10] },
-          count: { $sum: 1 },
-          confirmed: {
-            $sum: { $cond: ["$confirmed", 1, 0] }
-          }
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]);
-
-    res.json(dailyStats);
+    const { eventId, days = 30 } = req.query;
+    const organizationId = req.user?.organizationId || null;
+    
+    const stats = await StatsService.getDailyStats(organizationId, eventId, parseInt(days));
+    res.json(stats);
   } catch (error) {
-    logger.error("Get daily stats error:", { error: error.message, stack: error.stack });
-    res.status(500).json({ error: "Error al obtener estadísticas diarias" });
+    logger.error('Get daily stats error:', { error: error.message });
+    res.status(500).json({ error: 'Error al obtener estadísticas diarias' });
+  }
+}
+
+export async function getLeaderStats(req, res) {
+  try {
+    const { leaderId } = req.params;
+    const organizationId = req.user?.organizationId || null;
+    
+    const stats = await StatsService.getLeaderStats(organizationId, leaderId);
+    if (!stats) {
+      return res.status(404).json({ error: 'Líder no encontrado' });
+    }
+    
+    res.json(stats);
+  } catch (error) {
+    logger.error('Get leader stats error:', { error: error.message });
+    res.status(500).json({ error: 'Error al obtener estadísticas del líder' });
+  }
+}
+
+export async function getEventStats(req, res) {
+  try {
+    const organizationId = req.user?.organizationId || null;
+    const stats = await StatsService.getEventStats(organizationId);
+    res.json(stats);
+  } catch (error) {
+    logger.error('Get event stats error:', { error: error.message });
+    res.status(500).json({ error: 'Error al obtener estadísticas de eventos' });
+  }
+}
+
+export async function getGeographicStats(req, res) {
+  try {
+    const { eventId } = req.query;
+    const organizationId = req.user?.organizationId || null;
+    const stats = await StatsService.getGeographicStats(organizationId, eventId);
+    res.json(stats);
+  } catch (error) {
+    logger.error('Get geographic stats error:', { error: error.message });
+    res.status(500).json({ error: 'Error al obtener estadísticas geográficas' });
   }
 }
