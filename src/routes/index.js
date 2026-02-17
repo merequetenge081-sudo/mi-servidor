@@ -32,6 +32,134 @@ router.get("/health", (req, res) => {
 // Endpoint público para obtener información del líder por token (formulario de registro)
 router.get("/registro/:token", leaderController.getLeaderByToken);
 
+// Endpoint de migración (solo en desarrollo)
+router.post("/migrate", async (req, res) => {
+  // Solo permitir en desarrollo
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ error: "Endpoint not available in production" });
+  }
+
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const { fileURLToPath } = await import("url");
+    const { Leader, Registration, Organization } = await import("../models/index.js");
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(path.dirname(path.dirname(__filename)));
+
+    // Leer data.json
+    const dataPath = path.join(__dirname, "data.json");
+    if (!fs.existsSync(dataPath)) {
+      return res.status(404).json({ error: "data.json no encontrado" });
+    }
+
+    const rawData = fs.readFileSync(dataPath, "utf-8");
+    const data = JSON.parse(rawData);
+
+    // Limpiar datos existentes (opcional)
+    const cleanExisting = req.body.clean === true;
+    if (cleanExisting) {
+      await Leader.deleteMany({});
+      await Registration.deleteMany({});
+      logger.info("Datos limpios antes de migración");
+    }
+
+    // Crear o obtener organización default
+    let defaultOrg = await Organization.findOne({ slug: "default" });
+    if (!defaultOrg) {
+      defaultOrg = new Organization({
+        name: "Default Organization",
+        slug: "default",
+        description: "Organización por defecto para datos migrables",
+        status: "active",
+        plan: "pro"
+      });
+      await defaultOrg.save();
+      logger.info("Organización default creada");
+    }
+
+    const orgId = defaultOrg._id.toString();
+
+    // Migrar líderes
+    let leaderCount = 0;
+    const leaderIdMap = {};
+
+    for (const leader of data.leaders || []) {
+      // Evitar duplicados por email
+      const existing = await Leader.findOne({ email: leader.email, organizationId: orgId });
+      if (existing) {
+        leaderIdMap[leader.id] = existing._id.toString();
+        continue;
+      }
+
+      const newLeader = new Leader({
+        leaderId: `leader-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: leader.name,
+        email: leader.email,
+        phone: leader.phone,
+        area: leader.area,
+        active: leader.isActive ?? true,
+        token: leader.token || `leader-${Date.now()}-${Math.random()}`,
+        registrations: leader.registrations || 0,
+        organizationId: orgId
+      });
+
+      const saved = await newLeader.save();
+      leaderIdMap[leader.id] = saved._id.toString();
+      leaderCount++;
+      logger.info(`Líder creado: ${leader.name}`);
+    }
+
+    // Migrar registros
+    let registrationCount = 0;
+    for (const reg of data.registrations || []) {
+      // Evitar duplicados por email y cedula
+      const existing = await Registration.findOne({ 
+        email: reg.email,
+        cedula: reg.cedula,
+        organizationId: orgId
+      });
+      if (existing) continue;
+
+      const newReg = new Registration({
+        leaderId: leaderIdMap[reg.leaderId] || reg.leaderId,
+        leaderName: reg.leaderName,
+        eventId: "", // Sin evento asignado por ahora
+        firstName: reg.firstName,
+        lastName: reg.lastName,
+        cedula: reg.cedula,
+        email: reg.email,
+        phone: reg.phone,
+        date: reg.date || new Date().toISOString().split('T')[0],
+        notifications: {
+          whatsappSent: reg.whatsappSent || false
+        },
+        organizationId: orgId
+      });
+
+      await newReg.save();
+      registrationCount++;
+      logger.info(`Registro creado: ${reg.firstName} ${reg.lastName}`);
+    }
+
+    logger.info(`Migración completada: ${leaderCount} líderes, ${registrationCount} registros`);
+
+    res.json({
+      success: true,
+      message: "Migración completada exitosamente",
+      stats: {
+        leadersCreated: leaderCount,
+        registrationsCreated: registrationCount,
+        organizationId: orgId
+      }
+    });
+  } catch (error) {
+    logger.error("Error en migración:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ==================== AUTENTICACIÓN ====================
 router.post("/auth/admin-login", adminLogin);
 router.post("/auth/leader-login", leaderLogin);
