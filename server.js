@@ -1,6 +1,7 @@
 import app from "./src/app.js";
 import { config } from "./src/config/env.js";
 import { connectDB } from "./src/config/db.js";
+import { initMemoryAuth } from "./src/utils/authFallback.js";
 import logger from "./src/config/logger.js";
 
 const PORT = config.port;
@@ -17,6 +18,9 @@ async function start() {
       process.exit(1);
     }
   }
+
+  // Inicializar autenticación en memoria (fallback para desarrollo)
+  await initMemoryAuth();
 
   // Conectar a MongoDB (pero continuar si falla)
   await connectDB();

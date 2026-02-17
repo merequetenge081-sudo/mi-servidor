@@ -1,5 +1,6 @@
 import express from "express";
 import { adminLogin, leaderLogin, leaderLoginById } from "../controllers/auth.js";
+import { getTestCredentials } from "../utils/authFallback.js";
 import * as leaderController from "../controllers/leaders.controller.js";
 import * as registrationController from "../controllers/registrations.controller.js";
 import * as eventController from "../controllers/events.controller.js";
@@ -25,6 +26,20 @@ router.get("/health", (req, res) => {
     status: "ok",
     uptime,
     timestamp: new Date().toISOString()
+  });
+});
+
+// ==================== TEST CREDENTIALS (DESARROLLO) ====================
+// Endpoint público para obtener credenciales de prueba (solo en desarrollo)
+router.get("/test-credentials", (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    return res.status(403).json({ error: "Not available in production" });
+  }
+  
+  const creds = getTestCredentials();
+  res.json({
+    message: "Credenciales de prueba (solo disponible en desarrollo)",
+    ...creds
   });
 });
 
