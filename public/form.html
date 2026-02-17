@@ -1,274 +1,391 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Formulario público de registro">
-  <meta name="theme-color" content="#667eea">
-  <title>Formulario Público - Registro</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="manifest" href="/manifest.json">
-  <style>
-    body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding-top: 20px;
-    }
-    .form-container {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      padding: 40px;
-      margin-bottom: 20px;
-    }
-    .form-title {
-      color: #333;
-      margin-bottom: 10px;
-      font-weight: 700;
-    }
-    .form-subtitle {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 30px;
-    }
-    .form-label {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-    }
-    .form-control:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    .btn-submit {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-      color: white;
-      font-weight: 600;
-      padding: 12px 20px;
-      transition: all 0.3s;
-    }
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
-      color: white;
-    }
-    .alert-custom {
-      border-radius: 5px;
-      margin-bottom: 20px;
-    }
-    .leader-info {
-      background: #f0f4ff;
-      border-left: 4px solid #667eea;
-      padding: 12px 15px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      color: #333;
-    }
-    .success-icon {
-      color: #28a745;
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Registro - Red Social y Política</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .form-container {
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h1 {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .required::after {
+            content: '*';
+            color: #dc3545;
+            margin-left: 5px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .form-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+        }
+        
+        .form-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .form-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(102,126,234,0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-  <div class="container" style="max-width: 600px;">
-    <!-- Formulario de Registro -->
-    <div id="formSection" class="form-container">
-      <h2 class="form-title">📝 Formulario de Registro</h2>
-      <p class="form-subtitle" id="leaderInfo"></p>
-      
-      <div id="errorAlert" class="alert alert-danger alert-custom" role="alert" style="display: none;"></div>
-      <div id="successAlert" class="alert alert-success alert-custom" role="alert" style="display: none;"></div>
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h1><i class="bi bi-people-fill"></i> Red Social y Política</h1>
+                <p id="leaderInfo">Formulario de Registro</p>
+            </div>
 
-      <form id="publicForm">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="firstName" class="form-label">Nombre *</label>
-            <input type="text" class="form-control" id="firstName" required>
-          </div>
-          <div class="col-md-6">
-            <label for="lastName" class="form-label">Apellido *</label>
-            <input type="text" class="form-control" id="lastName" required>
-          </div>
-        </div>
+            <div class="alert alert-danger" id="errorAlert"></div>
+            <div class="alert alert-success" id="successAlert">
+                <i class="bi bi-check-circle"></i>
+                <strong>¡Registro completado!</strong>
+                <p>Tu información ha sido registrada exitosamente. Gracias por tu participación.</p>
+            </div>
 
-        <div class="mb-3">
-          <label for="cedula" class="form-label">Cédula de Identidad</label>
-          <input type="text" class="form-control" id="cedula" placeholder="Ej: 123456789">
-        </div>
+            <form id="publicForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="required">Nombre</label>
+                            <input type="text" id="firstName" placeholder="Tu nombre" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="required">Apellido</label>
+                            <input type="text" id="lastName" placeholder="Tu apellido" required>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="mb-3">
-          <label for="email" class="form-label">Email *</label>
-          <input type="email" class="form-control" id="email" required>
-        </div>
+                <div class="form-group">
+                    <label>Email <span style="color: #999;">(Opcional)</span></label>
+                    <input type="email" id="email" placeholder="tu@email.com">
+                    <div class="form-text">
+                        Tu email nos ayudará a contactarte si es necesario
+                    </div>
+                </div>
 
-        <div class="mb-3">
-          <label for="phone" class="form-label">Teléfono *</label>
-          <input type="tel" class="form-control" id="phone" placeholder="Ej: 3001234567" required>
-        </div>
+                <div class="form-group">
+                    <label class="required">Cédula</label>
+                    <input type="text" id="cedula" placeholder="Tu número de cédula" required>
+                </div>
 
-        <div class="mb-3">
-          <label for="localidad" class="form-label">Localidad/Municipio</label>
-          <input type="text" class="form-control" id="localidad" placeholder="Ej: Bogotá">
-        </div>
+                <div class="form-group">
+                    <label class="required">Localidad / Lugar de Votación</label>
+                    <select id="localidad" required>
+                        <option value="">Selecciona tu localidad</option>
+                        <option value="Usaquén">Usaquén</option>
+                        <option value="Chapinero">Chapinero</option>
+                        <option value="La Candelaria">La Candelaria</option>
+                        <option value="San Cristóbal">San Cristóbal</option>
+                        <option value="Usme">Usme</option>
+                        <option value="Tunjuelito">Tunjuelito</option>
+                        <option value="Bosa">Bosa</option>
+                        <option value="Kennedy">Kennedy</option>
+                        <option value="Fontibón">Fontibón</option>
+                        <option value="Engativá">Engativá</option>
+                        <option value="Suba">Suba</option>
+                        <option value="Barrios Unidos">Barrios Unidos</option>
+                        <option value="Teusaquillo">Teusaquillo</option>
+                        <option value="Los Mártires">Los Mártires</option>
+                        <option value="Antonio Nariño">Antonio Nariño</option>
+                        <option value="Puente Aranda">Puente Aranda</option>
+                        <option value="La Sabana">La Sabana</option>
+                        <option value="Simmonds">Simmonds</option>
+                        <option value="Palermo">Palermo</option>
+                        <option value="Rafael Uribe">Rafael Uribe</option>
+                    </select>
+                    <div class="form-text">
+                        ¿No sabes tu localidad? 
+                        <a href="https://www.registraduria.gov.co/buscar-puesto-votacion" target="_blank">
+                            Click aquí para consultar en la Registraduría
+                        </a>
+                    </div>
+                </div>
 
-        <div class="d-grid gap-2 pt-3">
-          <button type="submit" class="btn btn-submit" id="submitBtn">
-            <i class="bi bi-send"></i> Enviar Registro
-          </button>
-          <button type="reset" class="btn btn-outline-secondary">
-            Limpiar Formulario
-          </button>
+                <div class="form-group">
+                    <label class="required">Puesto de Votación</label>
+                    <input type="text" id="votingPlace" placeholder="Ej: Colegio San José, Salón 101" required>
+                    <div class="form-text">
+                        El lugar donde debes ir a votar
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Número de Mesa</label>
+                    <input type="text" id="votingTable" placeholder="Ej: 001" required>
+                    <div class="form-text">
+                        Tu número de mesa de votación
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" id="phone" placeholder="+57 3XX XXX XXXX">
+                    <div class="form-text">
+                        Para contactarte si es necesario
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="bi bi-check-lg"></i> Enviar Registro
+                </button>
+            </form>
+
+            <div class="success-message" id="successMessage">
+                <div style="font-size: 60px; color: #4CAF50; margin-bottom: 20px;">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <h3 style="color: #333;">¡Gracias por tu registro!</h3>
+                <p style="color: #999; margin: 10px 0;">
+                    Tu información ha sido registrada exitosamente
+                </p>
+                <p style="color: #999; font-size: 12px;">
+                    Serás contactado pronto por tu líder con más información
+                </p>
+            </div>
         </div>
-      </form>
     </div>
 
-    <!-- Pantalla de Éxito -->
-    <div id="successSection" class="form-container text-center" style="display: none;">
-      <div class="success-icon">✓</div>
-      <h2 class="form-title">¡Registro Exitoso!</h2>
-      <p class="form-subtitle">Tu registro ha sido guardado correctamente.</p>
-      <p id="successMessage" class="text-muted mb-4"></p>
-      <button class="btn btn-submit" onclick="location.reload()">Registrar Otro</button>
-    </div>
-  </div>
+    <script>
+        const API_URL = window.location.origin;
+        let leaderToken = null;
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const API_URL = window.location.origin;
-    let currentLeaderId = null;
-    let currentLeaderToken = null;
-
-    // Extraer token desde la URL
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    currentLeaderToken = pathParts[pathParts.length - 1] || null;
-
-    // Validar token y cargar info del líder
-    async function loadLeaderInfo() {
-      if (!currentLeaderToken) {
-        showError('No se proporcionó un token válido. Verifica el enlace del QR o contacta al líder.');
-        return false;
-      }
-
-      try {
-        const res = await fetch(`${API_URL}/api/registro/${currentLeaderToken}`);
-        if (!res.ok) {
-          showError('Token inválido o líder no disponible');
-          return false;
+        // Extract leader token from URL
+        function getLeaderFromURL() {
+            const pathParts = window.location.pathname.split('/').filter(Boolean);
+            leaderToken = pathParts[pathParts.length - 1];
+            
+            if (leaderToken && leaderToken !== 'form') {
+                document.getElementById('leaderInfo').textContent = `Registrando para: ${leaderToken}`;
+            }
         }
 
-        const leader = await res.json();
-        currentLeaderId = leader.leaderId;
-        document.getElementById('leaderInfo').innerHTML = `
-          <strong>Líder:</strong> ${leader.name}<br>
-          <small class="text-muted">Evento: ${leader.eventId || 'No especificado'}</small>
-        `;
-        return true;
-      } catch (err) {
-        console.error('Error cargando info del líder:', err);
-        showError('Error al conectar con el servidor');
-        return false;
-      }
-    }
+        // Handle form submission
+        document.getElementById('publicForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    function showError(message) {
-      const alert = document.getElementById('errorAlert');
-      alert.textContent = message;
-      alert.style.display = 'block';
-      document.getElementById('formSection').style.display = 'block';
-      document.getElementById('successSection').style.display = 'none';
-    }
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const cedula = document.getElementById('cedula').value.trim();
+            const localidad = document.getElementById('localidad').value;
+            const votingPlace = document.getElementById('votingPlace').value.trim();
+            const votingTable = document.getElementById('votingTable').value.trim();
+            const phone = document.getElementById('phone').value.trim();
 
-    function showSuccess(registrationId) {
-      document.getElementById('formSection').style.display = 'none';
-      document.getElementById('successSection').style.display = 'block';
-      document.getElementById('successMessage').textContent = `ID del Registro: ${registrationId}`;
-    }
+            // Clear messages
+            document.getElementById('errorAlert').classList.remove('show');
 
-    // Manejar envío del formulario
-    document.getElementById('publicForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
+            // Validation
+            if (!firstName || !lastName || !cedula || !localidad || !votingPlace || !votingTable) {
+                showError('Por favor completa todos los campos requeridos');
+                return;
+            }
 
-      if (!currentLeaderId) {
-        showError('Líder no validado. Recarga la página e intenta de nuevo.');
-        return;
-      }
+            // Disable submit button
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Procesando...';
 
-      const firstName = document.getElementById('firstName').value.trim();
-      const lastName = document.getElementById('lastName').value.trim();
-      const cedula = document.getElementById('cedula').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const localidad = document.getElementById('localidad').value.trim();
+            try {
+                // Find leader by token
+                let leaderId = null;
+                if (leaderToken && leaderToken !== 'form') {
+                    const leadersRes = await fetch(`${API_URL}/api/leaders`);
+                    const leaders = await leadersRes.json();
+                    const leader = leaders.find(l => l._id === leaderToken || l.token === leaderToken);
+                    if (leader) leaderId = leader._id;
+                }
 
-      // Validaciones
-      if (!firstName || !lastName) {
-        showError('El nombre y apellido son requeridos');
-        return;
-      }
+                // Submit registration
+                const payload = {
+                    leaderId,
+                    firstName,
+                    lastName,
+                    email: email || null,
+                    cedula,
+                    phone: phone || null,
+                    localidad,
+                    votingPlace,
+                    votingTable,
+                    registeredToVote: true,
+                    date: new Date().toISOString()
+                };
 
-      if (!email || !email.includes('@')) {
-        showError('Ingresa un email válido');
-        return;
-      }
+                const response = await fetch(`${API_URL}/api/registrations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-      if (!phone || phone.replace(/\D/g, '').length < 7) {
-        showError('Ingresa un teléfono válido');
-        return;
-      }
-
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
-
-      try {
-        const payload = {
-          leaderId: currentLeaderId,
-          firstName,
-          lastName,
-          cedula: cedula || undefined,
-          email,
-          phone,
-          localidad: localidad || undefined,
-          confirmed: false
-        };
-
-        const response = await fetch(`${API_URL}/api/registrations`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+                if (response.ok) {
+                    // Hide form and show success
+                    document.getElementById('publicForm').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('show');
+                    document.getElementById('successAlert').classList.add('show');
+                    
+                    // Reset after 3 seconds
+                    setTimeout(() => {
+                        location.reload();
+                    }, 5000);
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Error al enviar el registro. Por favor intenta de nuevo.');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                showError('Error de conexión. Por favor intenta de nuevo.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-lg"></i> Enviar Registro';
+            }
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          showError(data.error || 'Error al enviar el registro');
-          btn.disabled = false;
-          btn.innerHTML = '<i class="bi bi-send"></i> Enviar Registro';
-          return;
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            alert.textContent = message;
+            alert.classList.add('show');
+            alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // Éxito
-        showSuccess(data._id || 'Guardado');
-      } catch (err) {
-        console.error('Error:', err);
-        showError('Error de conexión. Intenta más tarde.');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-send"></i> Enviar Registro';
-      }
-    });
-
-    // Cargar info del líder al iniciar
-    window.addEventListener('load', loadLeaderInfo);
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js')
-        .catch(err => console.warn('Error registrando SW:', err));
-    }
-  </script>
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            getLeaderFromURL();
+        });
+    </script>
 </body>
 </html>
