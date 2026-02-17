@@ -3,8 +3,7 @@ import bcryptjs from "bcryptjs";
 import { Admin } from "../models/Admin.js";
 import { Leader } from "../models/Leader.js";
 import { AuditService } from "../services/audit.service.js";
-
-const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_change_me";
+import { config } from "../config/env.js";
 
 export async function adminLogin(req, res) {
   try {
@@ -33,7 +32,7 @@ export async function adminLogin(req, res) {
 
     const token = jwt.sign(
       { userId: admin._id, role: "admin", username: admin.username },
-      JWT_SECRET,
+      config.jwtSecret,
       { expiresIn: "12h" }
     );
 
@@ -77,7 +76,7 @@ export async function leaderLogin(req, res) {
 
     const token = jwt.sign(
       { userId: leader._id, leaderId: leader.leaderId, role: "leader", name: leader.name },
-      JWT_SECRET,
+      config.jwtSecret,
       { expiresIn: "12h" }
     );
 
@@ -121,7 +120,7 @@ export async function leaderLoginById(req, res) {
 
     const token = jwt.sign(
       { userId: leader._id, leaderId: leader.leaderId, role: "leader", name: leader.name },
-      JWT_SECRET,
+      config.jwtSecret,
       { expiresIn: "12h" }
     );
 

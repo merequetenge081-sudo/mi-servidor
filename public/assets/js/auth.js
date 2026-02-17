@@ -14,8 +14,9 @@ async function handleLogin(event) {
 
   try {
     const endpoint = role === "admin" ? "/auth/admin-login" : "/auth/leader-login";
+    const baseUrl = window.location.origin;
     
-    const response = await fetch(`http://localhost:5000/api${endpoint}`, {
+    const response = await fetch(`${baseUrl}/api${endpoint}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
