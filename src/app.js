@@ -32,8 +32,15 @@ app.use(
           "https://cdn.jsdelivr.net"
         ],
         imgSrc: ["'self'", "data:"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'", "https://cdn.jsdelivr.net", "data:"],
+        connectSrc: [
+          "'self'",
+          "https://cdn.jsdelivr.net"
+        ],
+        fontSrc: [
+          "'self'",
+          "https://cdn.jsdelivr.net",
+          "data:"
+        ],
       },
     },
   })
