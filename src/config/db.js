@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import logger from "./logger.js";
 
 const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost:27017/mi-servidor";
 
@@ -12,7 +13,7 @@ export async function connectDB() {
       }),
       new Promise((_, reject) => setTimeout(() => reject(new Error("Connection timeout")), 5000))
     ]);
-    console.log("✓ Conectado a MongoDB");
+    logger.info("✓ Conectado a MongoDB");
     return true;
   } catch (error) {
     console.error("✗ Error conectando a MongoDB:", error.message);
