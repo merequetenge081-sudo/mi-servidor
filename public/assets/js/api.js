@@ -33,6 +33,28 @@ function requireAuth() {
   return true;
 }
 
+// Función fetchWithAuth solicitada por el usuario
+async function fetchWithAuth(url, options = {}) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(options.headers || {})
+    }
+  });
+
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/login.html";
+    return;
+  }
+
+  return response.json();
+}
+
 // Cliente HTTP genérico con autenticación
 async function apiRequest(endpoint, options = {}) {
   const token = getToken();
@@ -160,3 +182,4 @@ window.requireAuth = requireAuth;
 window.logout = logout;
 window.getUser = getUser;
 window.isAuthenticated = isAuthenticated;
+window.fetchWithAuth = fetchWithAuth;
