@@ -9,11 +9,11 @@ const eventSchema = new mongoose.Schema({
   registrationCount: { type: Number, default: 0 },
   confirmedCount: { type: Number, default: 0 },
   
-  // Multi-tenant support
+  // Multi-tenant support (REQUIRED for isolation)
   organizationId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Organization',
-    sparse: true
+    type: String,
+    required: true,
+    index: true
   },
   
   createdAt: { type: Date, default: Date.now },
@@ -22,8 +22,7 @@ const eventSchema = new mongoose.Schema({
 
 // Índices para optimización
 eventSchema.index({ active: 1, createdAt: -1 });
-eventSchema.index({ organizationId: 1 }); // Nuevo índice para filtrado por org
-eventSchema.index({ organizationId: 1, active: 1 }); // Compound índice
+eventSchema.index({ organizationId: 1, active: 1 });
 eventSchema.index({ createdAt: -1 });
 
 export const Event = mongoose.model("Event", eventSchema);

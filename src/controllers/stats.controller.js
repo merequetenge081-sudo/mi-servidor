@@ -5,7 +5,7 @@ import cacheService from "../services/cache.service.js";
 export async function getStats(req, res) {
   try {
     const { eventId } = req.query;
-    const organizationId = req.user?.organizationId || null;
+    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
     
     // Use cache for stats
     const cacheKey = cacheService.buildKey('stats', eventId || 'all', organizationId);
@@ -25,7 +25,7 @@ export async function getStats(req, res) {
 export async function getDailyStats(req, res) {
   try {
     const { eventId, days = 30 } = req.query;
-    const organizationId = req.user?.organizationId || null;
+    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
     
     const stats = await StatsService.getDailyStats(organizationId, eventId, parseInt(days));
     res.json(stats);
@@ -38,7 +38,7 @@ export async function getDailyStats(req, res) {
 export async function getLeaderStats(req, res) {
   try {
     const { leaderId } = req.params;
-    const organizationId = req.user?.organizationId || null;
+    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
     
     const stats = await StatsService.getLeaderStats(organizationId, leaderId);
     if (!stats) {
@@ -54,7 +54,7 @@ export async function getLeaderStats(req, res) {
 
 export async function getEventStats(req, res) {
   try {
-    const organizationId = req.user?.organizationId || null;
+    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
     const stats = await StatsService.getEventStats(organizationId);
     res.json(stats);
   } catch (error) {
@@ -66,7 +66,7 @@ export async function getEventStats(req, res) {
 export async function getGeographicStats(req, res) {
   try {
     const { eventId } = req.query;
-    const organizationId = req.user?.organizationId || null;
+    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
     const stats = await StatsService.getGeographicStats(organizationId, eventId);
     res.json(stats);
   } catch (error) {

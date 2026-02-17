@@ -37,11 +37,10 @@ const auditLogSchema = new mongoose.Schema({
 // Índices para auditoría y búsqueda
 auditLogSchema.index({ timestamp: -1 });
 auditLogSchema.index({ userId: 1 });
-auditLogSchema.index({ organizationId: 1 });
 auditLogSchema.index({ resourceType: 1 });
 auditLogSchema.index({ action: 1 });
-auditLogSchema.index({ organizationId: 1, timestamp: -1 }); // Compound para reportes
-auditLogSchema.index({ resourceType: 1, resourceId: 1 }); // Para buscar cambios en un recurso
-auditLogSchema.index({ organizationId: 1, action: 1, timestamp: -1 }); // Para reportes por acción
+auditLogSchema.index({ organizationId: 1, timestamp: -1 });
+auditLogSchema.index({ resourceType: 1, resourceId: 1 });
+auditLogSchema.index({ organizationId: 1, action: 1, timestamp: -1 });
 
 export const AuditLog = mongoose.model("AuditLog", auditLogSchema);

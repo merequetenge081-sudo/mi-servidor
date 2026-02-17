@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 const organizationSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  slug: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  slug: { type: String, required: true },
   description: String,
   email: String,
   phone: String,
@@ -34,6 +34,7 @@ const organizationSchema = new mongoose.Schema({
 });
 
 // Índices para búsqueda y filtrado
+organizationSchema.index({ name: 1 }, { unique: true });
 organizationSchema.index({ slug: 1 }, { unique: true });
 organizationSchema.index({ status: 1 });
 organizationSchema.index({ plan: 1 });
