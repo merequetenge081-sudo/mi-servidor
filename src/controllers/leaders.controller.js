@@ -1,6 +1,7 @@
 import { Leader } from "../models/Leader.js";
 import { Registration } from "../models/Registration.js";
 import { AuditService } from "../services/audit.service.js";
+import logger from "../config/logger.js";
 import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 
@@ -53,7 +54,7 @@ export async function createLeader(req, res) {
 
     res.status(201).json(leader);
   } catch (error) {
-    console.error("Create leader error:", error.message);
+    logger.error("Create leader error:", { error: error.message, stack: error.stack });
     
     // Manejar error de token duplicado (por si acaso)
     if (error.code === 11000 && error.keyPattern?.token) {
@@ -75,7 +76,7 @@ export async function getLeaders(req, res) {
     const leaders = await Leader.find(filter).sort({ name: 1 });
     res.json(leaders);
   } catch (error) {
-    console.error("Get leaders error:", error.message);
+    logger.error("Get leaders error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener líderes" });
   }
 }
@@ -88,7 +89,7 @@ export async function getLeader(req, res) {
     }
     res.json(leader);
   } catch (error) {
-    console.error("Get leader error:", error.message);
+    logger.error("Get leader error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener líder" });
   }
 }
@@ -132,7 +133,7 @@ export async function updateLeader(req, res) {
 
     res.json(leader);
   } catch (error) {
-    console.error("Update leader error:", error.message);
+    logger.error("Update leader error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al actualizar líder" });
   }
 }
@@ -205,7 +206,7 @@ export async function generateLeaderQR(req, res) {
       qrCode: qrDataUrl
     });
   } catch (error) {
-    console.error("Generate QR error:", error.message);
+    logger.error("Generate QR error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al generar código QR" });
   }
 }

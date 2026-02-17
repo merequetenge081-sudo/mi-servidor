@@ -2,6 +2,7 @@ import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { AuditService } from "../services/audit.service.js";
 import { ValidationService } from "../services/validation.service.js";
+import logger from "../config/logger.js";
 
 export async function createRegistration(req, res) {
   try {
@@ -12,6 +13,15 @@ export async function createRegistration(req, res) {
     const validation = ValidationService.validateRegistration({ leaderId, eventId, firstName, lastName, cedula, registeredToVote, votingPlace, votingTable });
     if (!validation.valid) {
       return res.status(400).json({ error: validation.error });
+    }
+
+    // Validate leader is active
+    const leader = await Leader.findOne({ leaderId });
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+    if (!leader.active) {
+      return res.status(403).json({ error: "El líder está inactivo" });
     }
 
     // Check duplicate by cedula + eventId
@@ -51,7 +61,7 @@ export async function createRegistration(req, res) {
 
     res.status(201).json(registration);
   } catch (error) {
-    console.error("Create registration error:", error.message);
+    logger.error("Create registration error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al crear registro" });
   }
 }
@@ -66,11 +76,15 @@ export async function getRegistrations(req, res) {
     if (confirmed !== undefined) filter.confirmed = confirmed === "true";
     if (cedula) filter.cedula = cedula;
 
-    const skip = (page - 1) * limit;
+    // Force maximum limit of 100
+    let parsedLimit = parseInt(limit) || 50;
+    parsedLimit = Math.min(parsedLimit, 100);
+
+    const skip = (page - 1) * parsedLimit;
     const registrations = await Registration.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(parsedLimit);
 
     const total = await Registration.countDocuments(filter);
 
@@ -78,11 +92,11 @@ export async function getRegistrations(req, res) {
       data: registrations,
       total,
       page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(total / limit)
+      limit: parsedLimit,
+      pages: Math.ceil(total / parsedLimit)
     });
   } catch (error) {
-    console.error("Get registrations error:", error.message);
+    logger.error("Get registrations error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener registros" });
   }
 }
@@ -95,7 +109,7 @@ export async function getRegistration(req, res) {
     }
     res.json(registration);
   } catch (error) {
-    console.error("Get registration error:", error.message);
+    logger.error("Get registration error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener registro" });
   }
 }
@@ -159,7 +173,7 @@ export async function updateRegistration(req, res) {
 
     res.json(registration);
   } catch (error) {
-    console.error("Update registration error:", error.message);
+    logger.error("Update registration error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al actualizar registro" });
   }
 }
@@ -183,7 +197,7 @@ export async function deleteRegistration(req, res) {
 
     res.json({ message: "Registro eliminado" });
   } catch (error) {
-    console.error("Delete registration error:", error.message);
+    logger.error("Delete registration error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al eliminar registro" });
   }
 }
@@ -211,7 +225,7 @@ export async function confirmRegistration(req, res) {
 
     res.json(registration);
   } catch (error) {
-    console.error("Confirm registration error:", error.message);
+    logger.error("Confirm registration error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al confirmar registro" });
   }
 }
@@ -239,7 +253,7 @@ export async function unconfirmRegistration(req, res) {
 
     res.json(registration);
   } catch (error) {
-    console.error("Unconfirm registration error:", error.message);
+    logger.error("Unconfirm registration error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al revertir confirmación" });
   }
 }
@@ -277,7 +291,7 @@ export async function getRegistrationsByLeader(req, res) {
       pages: Math.ceil(total / limit)
     });
   } catch (error) {
-    console.error("Get registrations by leader error:", error.message);
+    logger.error("Get registrations by leader error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener registros del líder" });
   }
 }

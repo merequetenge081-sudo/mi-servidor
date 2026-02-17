@@ -3,6 +3,7 @@ import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
 import { AuditService } from "../services/audit.service.js";
 import ExcelJS from "exceljs";
+import logger from "../config/logger.js";
 
 export async function exportData(req, res) {
   try {
@@ -109,7 +110,7 @@ export async function exportData(req, res) {
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
-    console.error("Export error:", error.message);
+    logger.error("Export error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al exportar datos" });
   }
 }

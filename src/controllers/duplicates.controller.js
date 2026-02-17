@@ -1,4 +1,5 @@
 import { Registration } from "../models/Registration.js";
+import logger from "../config/logger.js";
 
 export async function getDuplicates(req, res) {
   try {
@@ -32,7 +33,7 @@ export async function getDuplicates(req, res) {
 
     res.json(result);
   } catch (error) {
-    console.error("Get duplicates error:", error.message);
+    logger.error("Get duplicates error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener duplicados" });
   }
 }

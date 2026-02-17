@@ -10,8 +10,21 @@ import * as auditController from "../controllers/audit.controller.js";
 import * as whatsappController from "../controllers/whatsapp.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { roleMiddleware } from "../middleware/role.middleware.js";
+import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
+import logger from "../config/logger.js";
 
 const router = express.Router();
+const startTime = Date.now();
+
+// ==================== HEALTH CHECK ====================
+router.get("/health", (req, res) => {
+  const uptime = Math.floor((Date.now() - startTime) / 1000);
+  res.json({
+    status: "ok",
+    uptime,
+    timestamp: new Date().toISOString()
+  });
+});
 
 // ==================== ENDPOINTS PÚBLICOS ====================
 // Endpoint público para obtener información del líder por token (formulario de registro)
@@ -32,7 +45,7 @@ router.put("/leaders/:id", authMiddleware, roleMiddleware("admin"), leaderContro
 router.delete("/leaders/:id", authMiddleware, roleMiddleware("admin"), leaderController.deleteLeader);
 
 // ==================== REGISTRACIONES ====================
-router.post("/registrations", authMiddleware, registrationController.createRegistration);
+router.post("/registrations", rateLimitMiddleware, registrationController.createRegistration);
 router.get("/registrations", authMiddleware, registrationController.getRegistrations);
 router.get("/registrations/leader/:leaderId", authMiddleware, registrationController.getRegistrationsByLeader);
 router.get("/registrations/:id", authMiddleware, registrationController.getRegistration);
@@ -67,7 +80,7 @@ router.get("/audit-stats", authMiddleware, roleMiddleware("admin"), auditControl
 router.post("/send-whatsapp", authMiddleware, roleMiddleware("admin"), whatsappController.sendWhatsApp);
 router.post("/leaders/:id/send-qr", authMiddleware, roleMiddleware("admin"), whatsappController.sendQRCode);
 
-// ==================== HEALTH CHECK ====================
+// ==================== API HOME ====================
 router.get("/", (req, res) => {
   res.json({ message: "API Home" });
 });
