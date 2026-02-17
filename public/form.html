@@ -1,206 +1,274 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Formulario público de registro profesional">
-  <meta name="theme-color" content="#0d6efd">
-  <title>Formulario de Registro</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Formulario público de registro">
+  <meta name="theme-color" content="#667eea">
+  <title>Formulario Público - Registro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding-top: 20px;
+    }
+    .form-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      margin-bottom: 20px;
+    }
+    .form-title {
+      color: #333;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .form-subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    .form-label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    .form-control:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 12px 20px;
+      transition: all 0.3s;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+      color: white;
+    }
+    .alert-custom {
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .leader-info {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 12px 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+    .success-icon {
+      color: #28a745;
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen py-8 px-4">
-  <!-- Toast Container -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+<body>
+  <div class="container" style="max-width: 600px;">
+    <!-- Formulario de Registro -->
+    <div id="formSection" class="form-container">
+      <h2 class="form-title">📝 Formulario de Registro</h2>
+      <p class="form-subtitle" id="leaderInfo"></p>
+      
+      <div id="errorAlert" class="alert alert-danger alert-custom" role="alert" style="display: none;"></div>
+      <div id="successAlert" class="alert alert-success alert-custom" role="alert" style="display: none;"></div>
 
-  <!-- Loader -->
-  <div id="loader" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 flex flex-col items-center gap-4">
-      <i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
-      <span class="text-lg font-semibold text-gray-800">Procesando...</span>
-    </div>
-  </div>
-
-  <!-- Error Screen -->
-  <div id="error-screen" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center">
-      <div class="bg-red-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-        <i class="fas fa-times-circle text-4xl text-red-600"></i>
-      </div>
-      <h2 class="text-2xl font-bold text-gray-800 mb-2">Error</h2>
-      <p id="error-screen-message" class="text-gray-600 mb-6"></p>
-      <button onclick="location.reload()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-        Intentar de nuevo
-      </button>
-    </div>
-  </div>
-
-  <!-- Anti-Duplicate Modal -->
-  <div id="duplicate-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-      <div class="bg-yellow-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-        <i class="fas fa-exclamation-triangle text-4xl text-yellow-600"></i>
-      </div>
-      <h2 class="text-2xl font-bold text-gray-800 mb-2 text-center">Registro Duplicado</h2>
-      <p class="text-gray-600 mb-6 text-center">
-        Ya existe un registro con esta cédula. ¿Deseas continuar de todas formas?
-      </p>
-      <div class="flex gap-3">
-        <button onclick="closeDuplicateModal()" class="flex-1 bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition font-semibold">
-          Cancelar
-        </button>
-        <button onclick="confirmDuplicateSubmit()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">
-          Continuar
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Success Modal -->
-  <div id="success-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center animate-bounce">
-      <div class="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-        <i class="fas fa-check-circle text-4xl text-green-600"></i>
-      </div>
-      <h2 class="text-2xl font-bold text-gray-800 mb-2">¡Registro Exitoso!</h2>
-      <p class="text-gray-600 mb-2">Tu registro ha sido confirmado.</p>
-      <p class="text-sm text-gray-500 mb-6">ID: <span id="registration-id" class="font-mono font-bold text-gray-700"></span></p>
-      <div class="flex gap-3">
-        <button onclick="registerAnother()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">
-          Registrar Otro
-        </button>
-        <button onclick="closeForm()" class="flex-1 bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition font-semibold">
-          Cerrar
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="container mx-auto max-w-2xl">
-    <!-- Header -->
-    <div class="text-center mb-8">
-      <div class="inline-block bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full p-4 mb-4">
-        <i class="fas fa-clipboard-list text-4xl text-blue-600"></i>
-      </div>
-      <h1 class="text-4xl font-bold text-gray-800 mb-2">Formulario de Registro</h1>
-      <p class="text-gray-600" id="event-name">Completa tus datos para ser registrado en el evento</p>
-    </div>
-
-    <!-- Información del Líder -->
-    <div id="leader-info" class="hidden bg-white rounded-lg shadow-lg p-6 mb-8 border-l-4 border-green-500">
-      <div class="flex items-center gap-4">
-        <div class="bg-green-100 rounded-full p-3 flex-shrink-0">
-          <i class="fas fa-check-circle text-2xl text-green-600"></i>
-        </div>
-        <div>
-          <p class="text-sm text-gray-600">Registrando con:</p>
-          <p id="leader-name" class="text-2xl font-bold text-gray-800"></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Formulario -->
-    <div class="bg-white rounded-lg shadow-lg p-8">
-      <form id="publicForm" class="space-y-6">
-        <!-- Nombre -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            <i class="fas fa-user text-blue-600 mr-2"></i>Nombre Completo *
-          </label>
-          <input 
-            id="firstName" 
-            type="text"
-            placeholder="Juan Carlos"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-          >
-          <p id="firstName-error" class="text-red-600 text-sm mt-1 hidden"></p>
+      <form id="publicForm">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="firstName" class="form-label">Nombre *</label>
+            <input type="text" class="form-control" id="firstName" required>
+          </div>
+          <div class="col-md-6">
+            <label for="lastName" class="form-label">Apellido *</label>
+            <input type="text" class="form-control" id="lastName" required>
+          </div>
         </div>
 
-        <!-- Apellido -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            <i class="fas fa-user text-blue-600 mr-2"></i>Apellido *
-          </label>
-          <input 
-            id="lastName" 
-            type="text"
-            placeholder="Pérez García"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-          >
-          <p id="lastName-error" class="text-red-600 text-sm mt-1 hidden"></p>
+        <div class="mb-3">
+          <label for="cedula" class="form-label">Cédula de Identidad</label>
+          <input type="text" class="form-control" id="cedula" placeholder="Ej: 123456789">
         </div>
 
-        <!-- Cédula -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            <i class="fas fa-id-card text-blue-600 mr-2"></i>Cédula *
-          </label>
-          <input 
-            id="cedula" 
-            type="text"
-            placeholder="1234567890"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-          >
-          <p id="cedula-error" class="text-red-600 text-sm mt-1 hidden"></p>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email *</label>
+          <input type="email" class="form-control" id="email" required>
         </div>
 
-        <!-- Teléfono -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            <i class="fas fa-phone text-blue-600 mr-2"></i>Teléfono *
-          </label>
-          <input 
-            id="phone" 
-            type="tel"
-            placeholder="3001234567"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-          >
-          <p id="phone-error" class="text-red-600 text-sm mt-1 hidden"></p>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Teléfono *</label>
+          <input type="tel" class="form-control" id="phone" placeholder="Ej: 3001234567" required>
         </div>
 
-        <!-- Email -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            <i class="fas fa-envelope text-blue-600 mr-2"></i>Email (Opcional)
-          </label>
-          <input 
-            id="email" 
-            type="email"
-            placeholder="tu@email.com"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-          >
-          <p id="email-error" class="text-red-600 text-sm mt-1 hidden"></p>
+        <div class="mb-3">
+          <label for="localidad" class="form-label">Localidad/Municipio</label>
+          <input type="text" class="form-control" id="localidad" placeholder="Ej: Bogotá">
         </div>
 
-        <!-- Botones -->
-        <div class="flex gap-4 pt-6">
-          <button 
-            id="submitBtn"
-            type="submit" 
-            class="flex-1 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <i class="fas fa-paper-plane"></i>
-            Enviar Registro
+        <div class="d-grid gap-2 pt-3">
+          <button type="submit" class="btn btn-submit" id="submitBtn">
+            <i class="bi bi-send"></i> Enviar Registro
           </button>
-          <button 
-            type="reset" 
-            class="flex-1 bg-gray-300 text-gray-800 font-semibold py-3 rounded-lg hover:bg-gray-400 transition"
-          >
-            <i class="fas fa-redo mr-2"></i>Limpiar
+          <button type="reset" class="btn btn-outline-secondary">
+            Limpiar Formulario
           </button>
         </div>
       </form>
+    </div>
 
-      <!-- Info adicional -->
-      <div class="mt-8 pt-8 border-t border-gray-200">
-        <p class="text-sm text-gray-600 text-center">
-          <i class="fas fa-shield-alt text-green-600 mr-2"></i>
-          Tus datos están protegidos y se usarán solo para este evento
-        </p>
-      </div>
+    <!-- Pantalla de Éxito -->
+    <div id="successSection" class="form-container text-center" style="display: none;">
+      <div class="success-icon">✓</div>
+      <h2 class="form-title">¡Registro Exitoso!</h2>
+      <p class="form-subtitle">Tu registro ha sido guardado correctamente.</p>
+      <p id="successMessage" class="text-muted mb-4"></p>
+      <button class="btn btn-submit" onclick="location.reload()">Registrar Otro</button>
     </div>
   </div>
 
-  <script src="assets/js/form.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = window.location.origin;
+    let currentLeaderId = null;
+    let currentLeaderToken = null;
+
+    // Extraer token desde la URL
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    currentLeaderToken = pathParts[pathParts.length - 1] || null;
+
+    // Validar token y cargar info del líder
+    async function loadLeaderInfo() {
+      if (!currentLeaderToken) {
+        showError('No se proporcionó un token válido. Verifica el enlace del QR o contacta al líder.');
+        return false;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/registro/${currentLeaderToken}`);
+        if (!res.ok) {
+          showError('Token inválido o líder no disponible');
+          return false;
+        }
+
+        const leader = await res.json();
+        currentLeaderId = leader.leaderId;
+        document.getElementById('leaderInfo').innerHTML = `
+          <strong>Líder:</strong> ${leader.name}<br>
+          <small class="text-muted">Evento: ${leader.eventId || 'No especificado'}</small>
+        `;
+        return true;
+      } catch (err) {
+        console.error('Error cargando info del líder:', err);
+        showError('Error al conectar con el servidor');
+        return false;
+      }
+    }
+
+    function showError(message) {
+      const alert = document.getElementById('errorAlert');
+      alert.textContent = message;
+      alert.style.display = 'block';
+      document.getElementById('formSection').style.display = 'block';
+      document.getElementById('successSection').style.display = 'none';
+    }
+
+    function showSuccess(registrationId) {
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('successSection').style.display = 'block';
+      document.getElementById('successMessage').textContent = `ID del Registro: ${registrationId}`;
+    }
+
+    // Manejar envío del formulario
+    document.getElementById('publicForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      if (!currentLeaderId) {
+        showError('Líder no validado. Recarga la página e intenta de nuevo.');
+        return;
+      }
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const cedula = document.getElementById('cedula').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const localidad = document.getElementById('localidad').value.trim();
+
+      // Validaciones
+      if (!firstName || !lastName) {
+        showError('El nombre y apellido son requeridos');
+        return;
+      }
+
+      if (!email || !email.includes('@')) {
+        showError('Ingresa un email válido');
+        return;
+      }
+
+      if (!phone || phone.replace(/\D/g, '').length < 7) {
+        showError('Ingresa un teléfono válido');
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+
+      try {
+        const payload = {
+          leaderId: currentLeaderId,
+          firstName,
+          lastName,
+          cedula: cedula || undefined,
+          email,
+          phone,
+          localidad: localidad || undefined,
+          confirmed: false
+        };
+
+        const response = await fetch(`${API_URL}/api/registrations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          showError(data.error || 'Error al enviar el registro');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-send"></i> Enviar Registro';
+          return;
+        }
+
+        // Éxito
+        showSuccess(data._id || 'Guardado');
+      } catch (err) {
+        console.error('Error:', err);
+        showError('Error de conexión. Intenta más tarde.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-send"></i> Enviar Registro';
+      }
+    });
+
+    // Cargar info del líder al iniciar
+    window.addEventListener('load', loadLeaderInfo);
+
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .catch(err => console.warn('Error registrando SW:', err));
+    }
+  </script>
 </body>
 </html>

@@ -113,6 +113,32 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// ==================== RUTAS HTML ====================
+// Ruta raíz - Login
+app.get("/", (req, res) => {
+  res.sendFile(join(__dirname, "../public/login.html"));
+});
+
+// Ruta dashboard de admin
+app.get("/app", (req, res) => {
+  res.sendFile(join(__dirname, "../public/app.html"));
+});
+
+// Ruta panel del líder
+app.get("/leader", (req, res) => {
+  res.sendFile(join(__dirname, "../public/leader.html"));
+});
+
+// Ruta formulario público de registro
+app.get("/form", (req, res) => {
+  res.sendFile(join(__dirname, "../public/form.html"));
+});
+
+// Ruta formulario público con token del líder
+app.get("/registration/:token", (req, res) => {
+  res.sendFile(join(__dirname, "../public/form.html"));
+});
+
 // ==================== ERROR HANDLING ====================
 // 404 handler
 app.use((req, res) => {
