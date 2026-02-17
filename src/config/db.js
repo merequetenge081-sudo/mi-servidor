@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import logger from "./logger.js";
 
 const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost:27017/mi-servidor";
@@ -16,8 +15,8 @@ export async function connectDB() {
     logger.info("✓ Conectado a MongoDB");
     return true;
   } catch (error) {
-    console.error("✗ Error conectando a MongoDB:", error.message);
-    console.warn("⚠️ Continuando sin base de datos (algunos endpoints pueden no funcionar)");
+    logger.error("✗ Error conectando a MongoDB:", { error: error.message, stack: error.stack });
+    logger.warn("⚠️ Continuando sin base de datos (algunos endpoints pueden no funcionar)");
     return false;
   }
 }

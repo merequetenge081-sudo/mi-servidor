@@ -6,7 +6,7 @@ const NotificationService = {
       logger.info(`[EMAIL] → to: ${to} | subject: ${subject} | body: ${body.substring(0, 50)}...`);
       return { success: true };
     } catch (error) {
-      console.error(`[EMAIL ERROR] → ${error.message}`);
+      logger.error(`[EMAIL ERROR] → ${error.message}`, { error: error.message, stack: error.stack });
       return { success: false, error: error.message };
     }
   },
@@ -16,7 +16,7 @@ const NotificationService = {
       logger.info(`[WHATSAPP] → to: ${to} | message: ${message.substring(0, 50)}...`);
       return { success: true };
     } catch (error) {
-      console.error(`[WHATSAPP ERROR] → ${error.message}`);
+      logger.error(`[WHATSAPP ERROR] → ${error.message}`, { error: error.message, stack: error.stack });
       return { success: false, error: error.message };
     }
   },
@@ -26,7 +26,7 @@ const NotificationService = {
       logger.info(`[SMS] → to: ${to} | message: ${message.substring(0, 50)}...`);
       return { success: true };
     } catch (error) {
-      console.error(`[SMS ERROR] → ${error.message}`);
+      logger.error(`[SMS ERROR] → ${error.message}`, { error: error.message, stack: error.stack });
       return { success: false, error: error.message };
     }
   },
@@ -66,7 +66,7 @@ const NotificationService = {
 
       return results;
     } catch (error) {
-      console.error(`[NOTIFICATION ERROR] → ${error.message}`);
+      logger.error(`[NOTIFICATION ERROR] → ${error.message}`, { error: error.message, stack: error.stack });
       return {
         email: false,
         whatsapp: false,
@@ -112,7 +112,7 @@ export async function sendNotifications(data = {}) {
 
     return results;
   } catch (error) {
-    console.error(`[NOTIFICATION ERROR] → ${error.message}`);
+    logger.error(`[NOTIFICATION ERROR] → ${error.message}`, { error: error.message, stack: error.stack });
     return {
       email: false,
       whatsapp: false,

@@ -1,4 +1,4 @@
-import fs from "fs";
+import logger from "../config/logger.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import bcryptjs from "bcryptjs";
@@ -14,7 +14,7 @@ function loadUsers() {
       return JSON.parse(data);
     }
   } catch (err) {
-    console.warn("Error cargando usuarios:", err.message);
+    logger.warn("Error cargando usuarios:", { error: err.message });
   }
   return { admins: [], leaders: [] };
 }

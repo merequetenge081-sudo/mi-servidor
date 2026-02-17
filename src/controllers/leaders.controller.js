@@ -154,7 +154,7 @@ export async function deleteLeader(req, res) {
 
     res.json({ message: "Líder eliminado", registrationsDeleted: registrationCount });
   } catch (error) {
-    console.error("Delete leader error:", error.message);
+    logger.error("Delete leader error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al eliminar líder" });
   }
 }
@@ -165,7 +165,7 @@ export async function getTopLeaders(req, res) {
     const leaders = await Leader.find({ active: true }).sort({ registrations: -1 }).limit(limit);
     res.json(leaders);
   } catch (error) {
-    console.error("Get top leaders error:", error.message);
+    logger.error("Get top leaders error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener líderes destacados" });
   }
 }
@@ -237,7 +237,7 @@ export async function getLeaderByToken(req, res) {
       eventId: leader.eventId
     });
   } catch (error) {
-    console.error("Get leader by token error:", error.message);
+    logger.error("Get leader by token error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener información del líder" });
   }
 }
