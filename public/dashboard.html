@@ -29,46 +29,94 @@
         <h2 class="text-xl font-bold">Menú</h2>
       </div>
       <nav class="p-4 space-y-2">
-        <a href="/dashboard.html" class="flex items-center gap-3 p-3 bg-blue-600 rounded-lg hover:bg-blue-700">
+        <a href="/dashboard.html" class="flex items-center gap-3 p-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition">
           <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="/events.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-calendar"></i> Eventos
+        </a>
+        <a href="/leaders.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-users"></i> Líderes
+        </a>
+        <a href="/registrations.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-clipboard-list"></i> Registros
         </a>
       </nav>
     </aside>
 
     <main class="flex-1 ml-64 p-8">
       <div class="max-w-7xl">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">Dashboard</h2>
-        <p class="text-gray-600">Bienvenido a tu panel administrativo</p>
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
+        <p class="text-gray-600 mb-8">Resumen general del sistema</p>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          <div class="bg-white rounded-lg shadow p-6">
-            <i class="fas fa-calendar text-3xl text-blue-500 mb-4"></i>
-            <h3 class="text-lg font-bold text-gray-800">Eventos</h3>
-            <p class="text-gray-600">Gestiona tus eventos</p>
+        <!-- Tarjetas de estadísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+              <i class="fas fa-clipboard-list text-4xl text-blue-500"></i>
+              <span class="text-4xl font-bold text-gray-800" id="total-registrations">0</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700">Total Registros</h3>
+            <p class="text-sm text-gray-500">Personas registradas</p>
           </div>
-          <div class="bg-white rounded-lg shadow p-6">
-            <i class="fas fa-users text-3xl text-green-500 mb-4"></i>
-            <h3 class="text-lg font-bold text-gray-800">Líderes</h3>
-            <p class="text-gray-600">Gestiona tus líderes</p>
+
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+              <i class="fas fa-users text-4xl text-green-500"></i>
+              <span class="text-4xl font-bold text-gray-800" id="total-leaders">0</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700">Total Líderes</h3>
+            <p class="text-sm text-gray-500">Líderes en el sistema</p>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+              <i class="fas fa-calendar text-4xl text-purple-500"></i>
+              <span class="text-4xl font-bold text-gray-800" id="total-events">0</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700">Eventos</h3>
+            <p class="text-sm text-gray-500">Eventos creados</p>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <div class="flex items-center justify-between mb-4">
+              <i class="fas fa-user-check text-4xl text-yellow-500"></i>
+              <span class="text-4xl font-bold text-gray-800" id="active-leaders">0</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700">Líderes Activos</h3>
+            <p class="text-sm text-gray-500">Líderes con actividad</p>
+          </div>
+        </div>
+
+        <!-- Secciones adicionales -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Registros diarios -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+              <i class="fas fa-chart-bar text-blue-500 mr-2"></i>
+              Registros Últimos 7 Días
+            </h3>
+            <div id="daily-stats" class="space-y-2">
+              <div class="text-center text-gray-500 py-8">Cargando...</div>
+            </div>
+          </div>
+
+          <!-- Top líderes -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+              <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+              Top 5 Líderes
+            </h3>
+            <div id="top-leaders" class="space-y-2">
+              <div class="text-center text-gray-500 py-8">Cargando...</div>
+            </div>
           </div>
         </div>
       </div>
     </main>
   </div>
 
-  <script type="module" src="/assets/js/utils.js"></script>
-  <script>
-    function logout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login.html";
-    }
+  <script src="/assets/js/dashboard.js"></script>
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js")
-        .then(() => console.log("Service Worker registrado"))
-        .catch(err => console.warn("Error registrando SW:", err));
-    }
-  </script>
 </body>
 </html>

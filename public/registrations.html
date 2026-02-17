@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registros - Panel Administrativo</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0d6efd">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+</head>
+<body class="bg-gray-100">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-clipboard-list text-2xl text-purple-600"></i>
+        <h1 class="text-2xl font-bold text-gray-800">Registros</h1>
+      </div>
+      <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white min-h-screen fixed">
+      <div class="p-6 border-b border-gray-700">
+        <h2 class="text-xl font-bold">Menú</h2>
+      </div>
+      <nav class="p-4 space-y-2">
+        <a href="/dashboard.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="/events.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-calendar"></i> Eventos
+        </a>
+        <a href="/leaders.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-users"></i> Líderes
+        </a>
+        <a href="/registrations.html" class="flex items-center gap-3 p-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition">
+          <i class="fas fa-clipboard-list"></i> Registros
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 p-8">
+      <div class="max-w-7xl">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800">Registros</h2>
+            <p class="text-gray-600 mt-1">Total: <span id="registrations-count" class="font-semibold">0</span> registros</p>
+          </div>
+        </div>
+
+        <!-- Barra de búsqueda -->
+        <div class="mb-6">
+          <div class="relative">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Buscar por nombre, email, teléfono, localidad..."
+              class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
+          </div>
+        </div>
+
+        <!-- Tabla de registros -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Nombre
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Teléfono
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Localidad
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Dirección
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Líder
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Evento
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Fecha Registro
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="registrations-tbody" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                    <p>Cargando registros...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/assets/js/registrations.js"></script>
+</body>
+</html>
