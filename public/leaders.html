@@ -6,6 +6,7 @@
   <title>Gestión de Líderes - Panel Administrativo</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0d6efd">
 </head>
@@ -75,7 +76,101 @@
           </button>
         </div>
 
-        <!-- Ranking Top 5 -->
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <!-- Total Líderes -->
+          <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-600 text-sm font-medium">Total Líderes</p>
+                <p id="kpi-total-leaders" class="text-3xl font-bold text-blue-600 mt-2">0</p>
+              </div>
+              <i class="fas fa-users text-3xl text-blue-200"></i>
+            </div>
+          </div>
+
+          <!-- Total Registros -->
+          <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-600">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-600 text-sm font-medium">Total Registros</p>
+                <p id="kpi-total-registrations" class="text-3xl font-bold text-green-600 mt-2">0</p>
+              </div>
+              <i class="fas fa-clipboard-list text-3xl text-green-200"></i>
+            </div>
+          </div>
+
+          <!-- Confirmados -->
+          <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-600">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-600 text-sm font-medium">Confirmados</p>
+                <p id="kpi-confirmed" class="text-3xl font-bold text-purple-600 mt-2">0</p>
+              </div>
+              <i class="fas fa-check-circle text-3xl text-purple-200"></i>
+            </div>
+          </div>
+
+          <!-- % Conversión -->
+          <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-600">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-600 text-sm font-medium">% Conversión</p>
+                <p id="kpi-conversion" class="text-3xl font-bold text-orange-600 mt-2">0%</p>
+              </div>
+              <i class="fas fa-chart-pie text-3xl text-orange-200"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Daily Trend Chart -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-chart-line text-blue-600"></i>
+              Tendencia de Registros
+            </h3>
+            <div id="daily-chart-skeleton" class="space-y-2 mb-4">
+              <div class="h-4 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-48 bg-gray-100 rounded animate-pulse"></div>
+            </div>
+            <canvas id="dailyTrendChart" class="hidden"></canvas>
+          </div>
+
+          <!-- Top Leaders Chart -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-chart-bar text-green-600"></i>
+              Top 5 Líderes
+            </h3>
+            <div id="top-leaders-skeleton" class="space-y-3 mb-4">
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+            <canvas id="topLeadersChart" class="hidden"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-history text-purple-600"></i>
+            Actividad Reciente
+          </h3>
+          <div id="recent-activity-skeleton" class="space-y-3 mb-4">
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+          <div id="recent-activity-list" class="space-y-3 hidden"></div>
+        </div>
+
         <div class="mb-6">
           <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <i class="fas fa-star text-yellow-500"></i>
