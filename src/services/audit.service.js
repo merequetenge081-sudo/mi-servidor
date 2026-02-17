@@ -1,3 +1,4 @@
+import logger from "../config/logger.js";
 import { AuditLog } from "../models/AuditLog.js";
 
 export class AuditService {
@@ -17,7 +18,7 @@ export class AuditService {
 
       await AuditLog.create(auditData);
     } catch (error) {
-      console.error("Audit log failed (non-blocking):", error.message);
+      logger.error("Audit log failed (non-blocking):", { error: error.message, stack: error.stack });
     }
   }
 

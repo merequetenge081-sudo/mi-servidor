@@ -40,7 +40,7 @@ export async function adminLogin(req, res) {
     try {
       await AuditService.log("LOGIN", "Admin", admin._id.toString(), { username, role: "admin" }, {}, `Admin ${username} inició sesión`);
     } catch (auditError) {
-      console.warn("Audit log error:", auditError.message);
+      logger.warn("Audit log error:", { error: auditError.message });
     }
 
     res.json({ token });
@@ -80,12 +80,6 @@ export async function leaderLogin(req, res) {
       config.jwtSecret,
       { expiresIn: "12h" }
     );
-
-    try {
-      await AuditService.log("LOGIN", "Leader", leader._id.toString(), { leaderId: leader.leaderId, role: "leader" }, {}, `Líder ${leader.name} inició sesión`);
-    } catch (auditError) {
-      console.warn("Audit log error:", auditError.message);
-    }
 
     res.json({ token });
   } catch (error) {
@@ -128,7 +122,7 @@ export async function leaderLoginById(req, res) {
     try {
       await AuditService.log("LOGIN", "Leader", leader._id.toString(), { leaderId: leader.leaderId, role: "leader" }, {}, `Líder ${leader.name} inició sesión`);
     } catch (auditError) {
-      console.warn("Audit log error:", auditError.message);
+      logger.warn("Audit log error:", { error: auditError.message });
     }
 
     res.json({ token });
