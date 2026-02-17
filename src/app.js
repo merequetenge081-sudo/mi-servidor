@@ -105,17 +105,18 @@ app.use((req, res, next) => {
 // Estas rutas NO necesitan authentication ni organization validation
 // Ruta raíz - Login Profesional
 app.get("/", (req, res) => {
-  res.sendFile(join(__dirname, "../public/login-pro.html"));
+  res.sendFile(join(__dirname, "../public/index.html"));
 });
 
 // Ruta login antiguo (por compatibilidad)
 app.get("/login", (req, res) => {
-  res.sendFile(join(__dirname, "../public/login-pro.html"));
+  res.sendFile(join(__dirname, "../public/index.html"));
 });
 
 // Dashboard Admin
 app.get("/dashboard.html", (req, res) => {
   res.sendFile(join(__dirname, "../public/dashboard.html"));
+});
 });
 
 // Formulario público de registro
