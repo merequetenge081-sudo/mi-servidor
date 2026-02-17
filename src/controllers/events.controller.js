@@ -1,6 +1,7 @@
 import { Event } from "../models/Event.js";
 import { Registration } from "../models/Registration.js";
 import { AuditService } from "../services/audit.service.js";
+import logger from "../config/logger.js";
 
 export async function createEvent(req, res) {
   try {
@@ -27,7 +28,7 @@ export async function createEvent(req, res) {
 
     res.status(201).json(event);
   } catch (error) {
-    console.error("Create event error:", error.message);
+    logger.error("Create event error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al crear evento" });
   }
 }
@@ -42,7 +43,7 @@ export async function getEvents(req, res) {
     const events = await Event.find(filter).sort({ date: -1 });
     res.json(events);
   } catch (error) {
-    console.error("Get events error:", error.message);
+    logger.error("Get events error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener eventos" });
   }
 }
@@ -63,7 +64,7 @@ export async function getEvent(req, res) {
       confirmedCount
     });
   } catch (error) {
-    console.error("Get event error:", error.message);
+    logger.error("Get event error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener evento" });
   }
 }
@@ -107,7 +108,7 @@ export async function updateEvent(req, res) {
 
     res.json(event);
   } catch (error) {
-    console.error("Update event error:", error.message);
+    logger.error("Update event error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al actualizar evento" });
   }
 }
@@ -129,7 +130,7 @@ export async function deleteEvent(req, res) {
 
     res.json({ message: "Evento eliminado", registrationsCount: registrationCount });
   } catch (error) {
-    console.error("Delete event error:", error.message);
+    logger.error("Delete event error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al eliminar evento" });
   }
 }
@@ -151,7 +152,7 @@ export async function getActiveEvent(req, res) {
       confirmedCount
     });
   } catch (error) {
-    console.error("Get active event error:", error.message);
+    logger.error("Get active event error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener evento activo" });
   }
 }

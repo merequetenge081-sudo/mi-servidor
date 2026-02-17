@@ -1,4 +1,5 @@
 import { AuditService } from "../services/audit.service.js";
+import logger from "../config/logger.js";
 
 export async function getAuditLogs(req, res) {
   try {
@@ -21,7 +22,7 @@ export async function getAuditLogs(req, res) {
       pages: Math.ceil(total.length / limit)
     });
   } catch (error) {
-    console.error("Get audit logs error:", error.message);
+    logger.error("Get audit logs error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener logs de auditoría" });
   }
 }
@@ -32,7 +33,7 @@ export async function getAuditStats(req, res) {
     const stats = await AuditService.getStats(resourceType);
     res.json(stats);
   } catch (error) {
-    console.error("Get audit stats error:", error.message);
+    logger.error("Get audit stats error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener estadísticas de auditoría" });
   }
 }

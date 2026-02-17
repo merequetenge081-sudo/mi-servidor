@@ -4,6 +4,7 @@ import { Admin } from "../models/Admin.js";
 import { Leader } from "../models/Leader.js";
 import { AuditService } from "../services/audit.service.js";
 import { config } from "../config/env.js";
+import logger from "../config/logger.js";
 
 export async function adminLogin(req, res) {
   try {
@@ -17,7 +18,7 @@ export async function adminLogin(req, res) {
     try {
       admin = await Admin.findOne({ username });
     } catch (mongoError) {
-      console.error("MongoDB error:", mongoError.message);
+      logger.error("MongoDB error:", { error: mongoError.message, stack: mongoError.stack });
       return res.status(503).json({ error: "Base de datos no disponible" });
     }
     
@@ -44,7 +45,7 @@ export async function adminLogin(req, res) {
 
     res.json({ token });
   } catch (error) {
-    console.error("Admin login error:", error.message);
+    logger.error("Admin login error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al iniciar sesión" });
   }
 }
@@ -61,7 +62,7 @@ export async function leaderLogin(req, res) {
     try {
       leader = await Leader.findOne({ email });
     } catch (mongoError) {
-      console.error("MongoDB error:", mongoError.message);
+      logger.error("MongoDB error:", { error: mongoError.message, stack: mongoError.stack });
       return res.status(503).json({ error: "Base de datos no disponible" });
     }
 
@@ -88,7 +89,7 @@ export async function leaderLogin(req, res) {
 
     res.json({ token });
   } catch (error) {
-    console.error("Leader login error:", error.message);
+    logger.error("Leader login error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al iniciar sesión" });
   }
 }
@@ -105,7 +106,7 @@ export async function leaderLoginById(req, res) {
     try {
       leader = await Leader.findOne({ leaderId });
     } catch (mongoError) {
-      console.error("MongoDB error:", mongoError.message);
+      logger.error("MongoDB error:", { error: mongoError.message, stack: mongoError.stack });
       return res.status(503).json({ error: "Base de datos no disponible" });
     }
 
@@ -132,7 +133,7 @@ export async function leaderLoginById(req, res) {
 
     res.json({ token });
   } catch (error) {
-    console.error("Leader login error:", error.message);
+    logger.error("Leader login error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al iniciar sesión" });
   }
 }

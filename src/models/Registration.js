@@ -26,6 +26,21 @@ const registrationSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Middleware pre-save: sanitizar strings
+registrationSchema.pre('save', function(next) {
+  // Trim all string fields
+  if (this.firstName) this.firstName = this.firstName.trim();
+  if (this.lastName) this.lastName = this.lastName.trim();
+  if (this.cedula) this.cedula = this.cedula.trim();
+  if (this.email) this.email = this.email.trim();
+  if (this.phone) this.phone = this.phone.trim();
+  if (this.localidad) this.localidad = this.localidad.trim();
+  if (this.leaderName) this.leaderName = this.leaderName.trim();
+  if (this.votingPlace) this.votingPlace = this.votingPlace.trim();
+  if (this.votingTable) this.votingTable = this.votingTable.trim();
+  next();
+});
+
 // Índices para optimización
 registrationSchema.index({ cedula: 1, eventId: 1 }, { unique: true });
 registrationSchema.index({ leaderId: 1 });

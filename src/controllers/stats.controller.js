@@ -1,6 +1,7 @@
 import { Event } from "../models/Event.js";
 import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
+import logger from "../config/logger.js";
 
 export async function getStats(req, res) {
   try {
@@ -29,7 +30,7 @@ export async function getStats(req, res) {
 
     res.json(stats);
   } catch (error) {
-    console.error("Get stats error:", error.message);
+    logger.error("Get stats error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener estadísticas" });
   }
 }
@@ -56,7 +57,7 @@ export async function getDailyStats(req, res) {
 
     res.json(dailyStats);
   } catch (error) {
-    console.error("Get daily stats error:", error.message);
+    logger.error("Get daily stats error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener estadísticas diarias" });
   }
 }

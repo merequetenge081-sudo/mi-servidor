@@ -1,6 +1,7 @@
 import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { AuditService } from "../services/audit.service.js";
+import logger from "../config/logger.js";
 
 export async function sendWhatsApp(req, res) {
   try {
@@ -30,7 +31,7 @@ export async function sendWhatsApp(req, res) {
 
         await AuditService.log("SEND_WHATSAPP", "Registration", regId, user, { phone: registration.phone }, `Mensaje WhatsApp enviado a ${registration.phone}`);
       } catch (error) {
-        console.error(`Failed to send WhatsApp to ${regId}:`, error.message);
+        logger.error(`Failed to send WhatsApp to ${regId}:`, { error: error.message, stack: error.stack });
         failedIds.push(regId);
       }
     }
@@ -42,7 +43,7 @@ export async function sendWhatsApp(req, res) {
       message: `${sentCount} mensajes enviados correctamente`
     });
   } catch (error) {
-    console.error("Send WhatsApp error:", error.message);
+    logger.error("Send WhatsApp error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al enviar mensajes WhatsApp" });
   }
 }
@@ -73,7 +74,7 @@ export async function sendQRCode(req, res) {
       email: leader.email
     });
   } catch (error) {
-    console.error("Send QR error:", error.message);
+    logger.error("Send QR error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al enviar código QR" });
   }
 }
