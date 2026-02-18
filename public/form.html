@@ -177,6 +177,60 @@
         .success-message.show {
             display: block;
         }
+
+        /* Botones de ubicación estilizados */
+        .ubicacion-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .ubicacion-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .ubicacion-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .ubicacion-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 50px;
+        }
+
+        .ubicacion-label:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateY(-1px);
+        }
+
+        .ubicacion-option input[type="radio"]:checked + .ubicacion-label {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .ubicacion-label i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
     </style>
 </head>
 
@@ -225,30 +279,97 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="required">Localidad / Lugar de Votación</label>
-                    <select id="localidad" required>
-                        <option value="">Selecciona tu localidad</option>
-                        <option value="Usaquén">Usaquén</option>
-                        <option value="Chapinero">Chapinero</option>
-                        <option value="La Candelaria">La Candelaria</option>
-                        <option value="San Cristóbal">San Cristóbal</option>
-                        <option value="Usme">Usme</option>
-                        <option value="Tunjuelito">Tunjuelito</option>
-                        <option value="Bosa">Bosa</option>
-                        <option value="Kennedy">Kennedy</option>
-                        <option value="Fontibón">Fontibón</option>
-                        <option value="Engativá">Engativá</option>
-                        <option value="Suba">Suba</option>
-                        <option value="Barrios Unidos">Barrios Unidos</option>
-                        <option value="Teusaquillo">Teusaquillo</option>
-                        <option value="Los Mártires">Los Mártires</option>
-                        <option value="Antonio Nariño">Antonio Nariño</option>
-                        <option value="Puente Aranda">Puente Aranda</option>
-                        <option value="La Sabana">La Sabana</option>
-                        <option value="Simmonds">Simmonds</option>
-                        <option value="Palermo">Palermo</option>
-                        <option value="Rafael Uribe">Rafael Uribe</option>
-                    </select>
+                    <label class="required">Ubicación</label>
+                    <div class="ubicacion-selector">
+                        <div class="ubicacion-option">
+                            <input type="radio" name="ubicacionTipo" id="ubicacionBogota" value="bogota" onchange="toggleUbicacion('bogota')" checked>
+                            <label for="ubicacionBogota" class="ubicacion-label">
+                                <i class="bi bi-buildings"></i>
+                                Bogotá D.C.
+                            </label>
+                        </div>
+                        <div class="ubicacion-option">
+                            <input type="radio" name="ubicacionTipo" id="ubicacionResto" value="resto" onchange="toggleUbicacion('resto')">
+                            <label for="ubicacionResto" class="ubicacion-label">
+                                <i class="bi bi-geo-alt"></i>
+                                Resto del país
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Localidades de Bogotá -->
+                    <div id="bogotaContainer">
+                        <label class="required">Localidad</label>
+                        <select id="localidad" required>
+                            <option value="">Selecciona tu localidad</option>
+                            <option value="Usaquén">Usaquén</option>
+                            <option value="Chapinero">Chapinero</option>
+                            <option value="Santa Fe">Santa Fe</option>
+                            <option value="San Cristóbal">San Cristóbal</option>
+                            <option value="Usme">Usme</option>
+                            <option value="Tunjuelito">Tunjuelito</option>
+                            <option value="Bosa">Bosa</option>
+                            <option value="Kennedy">Kennedy</option>
+                            <option value="Fontibón">Fontibón</option>
+                            <option value="Engativá">Engativá</option>
+                            <option value="Suba">Suba</option>
+                            <option value="Barrios Unidos">Barrios Unidos</option>
+                            <option value="Teusaquillo">Teusaquillo</option>
+                            <option value="Los Mártires">Los Mártires</option>
+                            <option value="Antonio Nariño">Antonio Nariño</option>
+                            <option value="Puente Aranda">Puente Aranda</option>
+                            <option value="La Candelaria">La Candelaria</option>
+                            <option value="Rafael Uribe Uribe">Rafael Uribe Uribe</option>
+                            <option value="Ciudad Bolívar">Ciudad Bolívar</option>
+                            <option value="Sumapaz">Sumapaz</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Departamentos del resto del país -->
+                    <div id="restoContainer" style="display: none;">
+                        <label class="required">Departamento</label>
+                        <select id="departamento" onchange="actualizarCapital()">
+                            <option value="">Selecciona tu departamento</option>
+                            <option value="Amazonas">Amazonas</option>
+                            <option value="Antioquia">Antioquia</option>
+                            <option value="Arauca">Arauca</option>
+                            <option value="Atlántico">Atlántico</option>
+                            <option value="Bolívar">Bolívar</option>
+                            <option value="Boyacá">Boyacá</option>
+                            <option value="Caldas">Caldas</option>
+                            <option value="Caquetá">Caquetá</option>
+                            <option value="Casanare">Casanare</option>
+                            <option value="Cauca">Cauca</option>
+                            <option value="Cesar">Cesar</option>
+                            <option value="Chocó">Chocó</option>
+                            <option value="Córdoba">Córdoba</option>
+                            <option value="Cundinamarca">Cundinamarca</option>
+                            <option value="Guainía">Guainía</option>
+                            <option value="Guaviare">Guaviare</option>
+                            <option value="Huila">Huila</option>
+                            <option value="La Guajira">La Guajira</option>
+                            <option value="Magdalena">Magdalena</option>
+                            <option value="Meta">Meta</option>
+                            <option value="Nariño">Nariño</option>
+                            <option value="Norte de Santander">Norte de Santander</option>
+                            <option value="Putumayo">Putumayo</option>
+                            <option value="Quindío">Quindío</option>
+                            <option value="Risaralda">Risaralda</option>
+                            <option value="San Andrés y Providencia">San Andrés y Providencia</option>
+                            <option value="Santander">Santander</option>
+                            <option value="Sucre">Sucre</option>
+                            <option value="Tolima">Tolima</option>
+                            <option value="Valle del Cauca">Valle del Cauca</option>
+                            <option value="Vaupés">Vaupés</option>
+                            <option value="Vichada">Vichada</option>
+                        </select>
+                        
+                        <div id="capitalContainer" style="margin-top: 12px; display: none;">
+                            <label>Capital</label>
+                            <input type="text" id="capital" readonly style="background: #f5f5f5; cursor: not-allowed;">
+                        </div>
+                    </div>
+                    
                     <div class="form-text">
                         ¿No sabes tu localidad?
                         <a href="https://www.registraduria.gov.co/buscar-puesto-votacion" target="_blank">
@@ -303,6 +424,81 @@
 
     <script>
         const API_URL = window.location.origin;
+        
+        // Capitales de los departamentos de Colombia
+        const capitalesColombia = {
+            'Amazonas': 'Leticia',
+            'Antioquia': 'Medellín',
+            'Arauca': 'Arauca',
+            'Atlántico': 'Barranquilla',
+            'Bolívar': 'Cartagena',
+            'Boyacá': 'Tunja',
+            'Caldas': 'Manizales',
+            'Caquetá': 'Florencia',
+            'Casanare': 'Yopal',
+            'Cauca': 'Popayán',
+            'Cesar': 'Valledupar',
+            'Chocó': 'Quibdó',
+            'Córdoba': 'Montería',
+            'Cundinamarca': 'Bogotá D.C.',
+            'Guainía': 'Inírida',
+            'Guaviare': 'San José del Guaviare',
+            'Huila': 'Neiva',
+            'La Guajira': 'Riohacha',
+            'Magdalena': 'Santa Marta',
+            'Meta': 'Villavicencio',
+            'Nariño': 'Pasto',
+            'Norte de Santander': 'Cúcuta',
+            'Putumayo': 'Mocoa',
+            'Quindío': 'Armenia',
+            'Risaralda': 'Pereira',
+            'San Andrés y Providencia': 'San Andrés',
+            'Santander': 'Bucaramanga',
+            'Sucre': 'Sincelejo',
+            'Tolima': 'Ibagué',
+            'Valle del Cauca': 'Cali',
+            'Vaupés': 'Mitú',
+            'Vichada': 'Puerto Carreño'
+        };
+        
+        // Mostrar/ocultar contenedores según ubicación
+        function toggleUbicacion(tipo) {
+            const bogotaContainer = document.getElementById('bogotaContainer');
+            const restoContainer = document.getElementById('restoContainer');
+            const localidadSelect = document.getElementById('localidad');
+            const departamentoSelect = document.getElementById('departamento');
+            
+            if (tipo === 'bogota') {
+                bogotaContainer.style.display = 'block';
+                restoContainer.style.display = 'none';
+                localidadSelect.required = true;
+                departamentoSelect.required = false;
+                departamentoSelect.value = '';
+                document.getElementById('capitalContainer').style.display = 'none';
+            } else {
+                bogotaContainer.style.display = 'none';
+                restoContainer.style.display = 'block';
+                localidadSelect.required = false;
+                departamentoSelect.required = true;
+                localidadSelect.value = '';
+            }
+        }
+        
+        // Actualizar capital según departamento seleccionado
+        function actualizarCapital() {
+            const departamento = document.getElementById('departamento').value;
+            const capitalContainer = document.getElementById('capitalContainer');
+            const capitalInput = document.getElementById('capital');
+            
+            if (departamento && capitalesColombia[departamento]) {
+                capitalInput.value = capitalesColombia[departamento];
+                capitalContainer.style.display = 'block';
+            } else {
+                capitalInput.value = '';
+                capitalContainer.style.display = 'none';
+            }
+        }
+        
         let currentLeaderId = null;
         let currentEventId = null;
 
@@ -351,7 +547,21 @@
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim();
             const cedula = document.getElementById('cedula').value.trim();
-            const localidad = document.getElementById('localidad').value;
+            
+            // Determinar ubicación según el tipo seleccionado
+            const ubicacionTipo = document.querySelector('input[name="ubicacionTipo"]:checked').value;
+            let localidad = '';
+            let departamento = '';
+            let capital = '';
+            
+            if (ubicacionTipo === 'bogota') {
+                localidad = document.getElementById('localidad').value;
+            } else {
+                departamento = document.getElementById('departamento').value;
+                capital = document.getElementById('capital').value;
+                localidad = departamento; // Usar departamento como localidad para compatibilidad
+            }
+            
             const votingPlace = document.getElementById('votingPlace').value.trim();
             const votingTable = document.getElementById('votingTable').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -360,7 +570,8 @@
             document.getElementById('errorAlert').classList.remove('show');
 
             // Validation
-            if (!firstName || !lastName || !cedula || !localidad || !votingPlace || !votingTable) {
+            const localidadValida = ubicacionTipo === 'bogota' ? localidad : departamento;
+            if (!firstName || !lastName || !cedula || !localidadValida || !votingPlace || !votingTable) {
                 showError('Por favor completa todos los campos requeridos');
                 return;
             }
@@ -381,6 +592,8 @@
                     cedula,
                     phone: phone || null,
                     localidad,
+                    departamento: departamento || null,
+                    capital: capital || null,
                     votingPlace,
                     votingTable,
                     registeredToVote: true,
