@@ -747,6 +747,7 @@
                                     <th>Email</th>
                                     <th>Teléfono</th>
                                     <th>Registros</th>
+                                    <th>Estado Contraseña</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -1301,13 +1302,27 @@
         }
 
         function loadLeadersTable() {
-            const html = allLeaders.map(leader => `
+            const html = allLeaders.map(leader => {
+                // Determinar estado de contraseña
+                let passwordStatus = '';
+                if (leader.passwordResetRequested) {
+                    passwordStatus = '<span style="background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-exclamation-triangle"></i> Reset Solicitado</span>';
+                } else if (leader.isTemporaryPassword) {
+                    passwordStatus = '<span style="background: #cfe2ff; color: #084298; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-clock"></i> Temporal</span>';
+                } else if (leader.passwordCanBeChanged === false) {
+                    passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-check-circle"></i> Configurada</span>';
+                } else {
+                    passwordStatus = '<span style="background: #f8d7da; color: #842029; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-x-circle"></i> Sin configurar</span>';
+                }
+
+                return `
                 <tr>
                     <td><strong>${leader.name}</strong></td>
                     <td><code style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 13px;">${leader.username || '-'}</code></td>
                     <td>${leader.email || '<span style="color:#ccc;">Sin correo</span>'}</td>
                     <td>${leader.phone || '-'}</td>
                     <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600;">${leader.registrations || 0}</span></td>
+                    <td>${passwordStatus}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" title="Ver QR">
                             <i class="bi bi-qr-code"></i>
@@ -1318,7 +1333,7 @@
                         <button class="btn btn-sm btn-outline-secondary edit-leader-btn" data-leader-id="${leader._id}" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger reset-pass-btn" data-leader-id="${leader._id}" title="Restablecer Contraseña">
+                        <button class="btn btn-sm btn-outline-danger generate-pass-btn" data-leader-id="${leader._id}" title="Generar Nueva Contraseña">
                             <i class="bi bi-key"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}" title="Eliminar">
@@ -1326,8 +1341,9 @@
                         </button>
                     </td>
                 </tr>
-            `).join('');
-            document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="6" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
+            `;
+            }).join('');
+            document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="7" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
 
             document.querySelectorAll('.qr-btn').forEach(btn => {
                 btn.addEventListener('click', () => showQR(btn.dataset.leaderId, btn.dataset.leaderName));
@@ -1338,8 +1354,8 @@
             document.querySelectorAll('.edit-leader-btn').forEach(btn => {
                 btn.addEventListener('click', () => showEditLeader(btn.dataset.leaderId));
             });
-            document.querySelectorAll('.reset-pass-btn').forEach(btn => {
-                btn.addEventListener('click', () => openResetPassModal(btn.dataset.leaderId));
+            document.querySelectorAll('.generate-pass-btn').forEach(btn => {
+                btn.addEventListener('click', () => generateNewPassword(btn.dataset.leaderId));
             });
         }
 
@@ -1429,6 +1445,60 @@
                 }, 2000);
             });
         });
+
+        // ====== GENERATE NEW PASSWORD ======
+        async function generateNewPassword(leaderId) {
+            const leader = allLeaders.find(l => l._id === leaderId);
+            if (!leader) return alert('Líder no encontrado');
+
+            let message = `¿Generar nueva contraseña temporal para ${leader.name}?`;
+            if (leader.passwordResetRequested) {
+                message = `El líder ${leader.name} solicitó un reset de contraseña.\n\n¿Generar nueva contraseña temporal?`;
+            }
+
+            if (!confirm(message)) return;
+
+            try {
+                const res = await apiCall('/api/auth/admin-generate-password', {
+                    method: 'POST',
+                    body: JSON.stringify({ leaderId })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Mostrar contraseña generada en modal
+                    const modal = document.createElement('div');
+                    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+                    modal.innerHTML = `
+                        <div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                            <h4 style="color: #667eea; margin-bottom: 20px;"><i class="bi bi-key-fill"></i> Nueva Contraseña Generada</h4>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                <p style="margin: 5px 0;"><strong>Líder:</strong> ${leader.name}</p>
+                                <p style="margin: 5px 0;"><strong>Usuario:</strong> <code>${data.username || leader.username}</code></p>
+                                <p style="margin: 5px 0;"><strong>Contraseña Temporal:</strong> <code style="background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-size: 14px; color: #856404;">${data.tempPassword}</code></p>
+                            </div>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                                <i class="bi bi-exclamation-triangle"></i> Guarda esta contraseña. El líder debe cambiarla al iniciar sesión.
+                            </p>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="navigator.clipboard.writeText('Usuario: ${data.username || leader.username}\\nContraseña: ${data.tempPassword}'); this.innerHTML='<i class=\\'bi bi-check\\'></i> ¡Copiado!'; this.style.background='#28a745';" class="btn btn-primary" style="flex: 1;">
+                                    <i class="bi bi-clipboard"></i> Copiar
+                                </button>
+                                <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove(); loadDashboard();" class="btn btn-secondary" style="flex: 1;">Cerrar</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                    modal.onclick = (e) => { if (e.target === modal) { modal.remove(); loadDashboard(); } };
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo generar contraseña'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error al generar contraseña');
+            }
+        }
 
         // ====== MIGRATE USERNAMES ======
         document.getElementById('migrateUsernamesBtn').addEventListener('click', async () => {
