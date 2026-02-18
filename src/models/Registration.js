@@ -10,6 +10,8 @@ const registrationSchema = new mongoose.Schema({
   email: String,
   phone: String,
   localidad: String,
+  departamento: String,
+  capital: String,
   registeredToVote: { type: Boolean, default: false },
   votingPlace: String,
   votingTable: String,

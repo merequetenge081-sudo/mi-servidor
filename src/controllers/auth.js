@@ -298,18 +298,38 @@ export async function leaderLoginById(req, res) {
 // Líder solicita reset de contraseña
 export async function requestPasswordReset(req, res) {
   try {
-    const { leaderId } = req.body;
+    const { leaderId, username, email } = req.body;
 
-    if (!leaderId) {
-      return res.status(400).json({ error: "LeaderId requerido" });
+    if (!leaderId && !username && !email) {
+      return res.status(400).json({ error: "Se requiere leaderId, username o email" });
     }
 
-    const leader = await Leader.findOne({ 
-      $or: [{ leaderId }, { _id: leaderId }, { username: leaderId }] 
-    });
+    // Buscar líder por leaderId, _id, username o email
+    const query = { $or: [] };
+    if (leaderId) {
+      query.$or.push({ leaderId }, { _id: leaderId });
+    }
+    if (username) {
+      query.$or.push({ username });
+    }
+    if (email) {
+      query.$or.push({ email });
+    }
+
+    const leader = await Leader.findOne(query);
 
     if (!leader) {
       return res.status(404).json({ error: "Líder no encontrado" });
+    }
+
+    // Verificar si ya hay una solicitud pendiente
+    if (leader.passwordResetRequested) {
+      return res.status(200).json({ 
+        alreadyRequested: true,
+        message: "Ya se solicitó el cambio de contraseña. Por favor espere a que el administrador genere una nueva contraseña temporal.", 
+        leaderId: leader.leaderId,
+        name: leader.name
+      });
     }
 
     // Marcar como solicitando reset
@@ -323,6 +343,7 @@ export async function requestPasswordReset(req, res) {
     logger.info(`Password reset solicitado para líder ${leader.name}`);
 
     res.json({ 
+      alreadyRequested: false,
       message: "Solicitud enviada. El administrador generará una nueva contraseña temporal.", 
       leaderId: leader.leaderId,
       name: leader.name
@@ -356,7 +377,8 @@ export async function adminGenerateNewPassword(req, res) {
         passwordHash: newHash,
         isTemporaryPassword: true,
         passwordResetRequested: false,
-        passwordCanBeChanged: true
+        passwordCanBeChanged: true,
+        tempPasswordPlaintext: tempPassword // Guardar contraseña temporal para referencia del admin
       }
     });
 
@@ -412,6 +434,9 @@ export async function leaderChangePassword(req, res) {
         isTemporaryPassword: false,
         passwordCanBeChanged: false, // Bloquear cambios futuros
         passwordResetRequested: false
+      },
+      $unset: {
+        tempPasswordPlaintext: "" // Borrar contraseña temporal ya que el líder configuró una nueva
       }
     });
 
