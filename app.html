@@ -736,6 +736,9 @@
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leaderModal">
               <i class="bi bi-plus-circle"></i> Nuevo Líder
             </button>
+            <button class="btn btn-outline-primary" onclick="exportToExcel('leaders')">
+              <i class="bi bi-download"></i> Exportar Líderes
+            </button>
             <button class="btn btn-success" onclick="exportToExcel('registrations')">
               <i class="bi bi-file-earmark-spreadsheet"></i> Exportar todos los registros
             </button>
@@ -2900,7 +2903,7 @@ function updateLeadersTable() {
   <tr>
    <td>${i + 1}</td>
    <td>${leader.name}</td>
-   <td>${leader.token}</td>
+  <td>${leader.token || leader._id}</td>
    <td>${registrationsDisplay}</td>
    <td>
     <button class="btn btn-sm btn-outline-primary" onclick="showQRCode('${leader._id}')" title="Ver QR">
@@ -3286,9 +3289,15 @@ function showQRCode(leader) {
   }
   qrContainer.innerHTML = ''; // limpiar el contenedor
 
+  const leaderToken = leader.token || leader._id;
+  if (!leaderToken) {
+    showToast('danger', 'El líder no tiene token de registro');
+    return;
+  }
+
   // Generar QR con qrcodejs
   new QRCode(qrContainer, {
-    text: `${window.location.origin}/?leader=${leader.token}`,
+    text: `${window.location.origin}/registro/${leaderToken}`,
     width: 200,
     height: 200,
     colorDark: '#000000',
@@ -3300,7 +3309,7 @@ function showQRCode(leader) {
   if (titleEl) titleEl.innerText = `QR de ${leader.name}`;
 
   // Rellenar el link del registro en el input
-  const registrationLink = `${window.location.origin}/?leader=${leader.token}`;
+  const registrationLink = `${window.location.origin}/registro/${leaderToken}`;
   const linkInput = document.getElementById('leaderRegistrationLink');
   if (linkInput) {
     linkInput.value = registrationLink;
