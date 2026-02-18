@@ -341,11 +341,37 @@
                 <div class="form-section" id="leaderForm">
                     <div class="error-msg" id="leaderError"></div>
                     <div class="form-group">
-                        <label>ID del Líder</label>
-                        <input type="text" id="leaderId" placeholder="Ej: leader-001">
+                        <label>Usuario o Email</label>
+                        <input type="text" id="leaderUser" placeholder="Usuario o Email">
                     </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="leaderPass" placeholder="•••••••">
+                    </div>
+                    <!-- Legacy ID Login Toggle (Optional, maybe hidden or removed) -->
+                    <!-- <div style="text-align: right; margin-bottom: 10px;">
+                        <a href="#" style="font-size: 12px; color: #667eea;">¿Olvidaste tu contraseña?</a>
+                    </div> -->
+
                     <button class="btn-login" id="leaderBtn">Ingresar</button>
-                    <div class="info-text">Solo necesitas tu ID de líder</div>
+                    <div class="info-text">Ingresa con tus credenciales asignadas</div>
+
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button id="legacyLoginToggle"
+                            style="background:none; border:none; color:#999; text-decoration:underline; font-size:12px; cursor:pointer;">
+                            Ingresar con ID (Legacy)
+                        </button>
+                    </div>
+
+                    <!-- Legacy Form (Hidden by default) -->
+                    <div id="legacyLeaderForm"
+                        style="display:none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+                        <div class="form-group">
+                            <label>ID del Líder</label>
+                            <input type="text" id="leaderId" placeholder="Ej: leader-001">
+                        </div>
+                        <button class="btn-secondary" id="leaderIdBtn">Ingresar con ID</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -489,9 +515,82 @@
 
         // ============== LEADER LOGIN ==============
         document.getElementById('leaderBtn').addEventListener('click', loginLeader);
+
+        // Legacy toggle
+        document.getElementById('legacyLoginToggle').addEventListener('click', () => {
+            const form = document.getElementById('legacyLeaderForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('leaderIdBtn').addEventListener('click', loginLeaderLegacy);
+
         async function loginLeader() {
-            const id = document.getElementById('leaderId').value.trim();
+            const user = document.getElementById('leaderUser').value.trim();
+            const pass = document.getElementById('leaderPass').value;
             const btn = document.getElementById('leaderBtn');
+            const error = document.getElementById('leaderError');
+
+            if (!user || !pass) {
+                error.textContent = 'Por favor ingresa usuario y contraseña';
+                error.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Verificando...';
+            error.classList.remove('show');
+
+            try {
+                const res = await fetch(`${API_URL}/api/auth/leader-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, email: user.includes('@') ? user : undefined, password: pass })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    if (data.requirePasswordChange) {
+                        // Redirect to reset password page with token (simulated session)
+                        // In a real SPA we might show a modal here.
+                        // For now, let's redirect to reset-password.html but we need to pass the token somehow to allow the change
+                        // The reset-password.html currently expects a token in URL.
+                        // We can append it.
+                        // Wait, reset-password.html was designed for "Forgot Password" link.
+                        // But we can reuse it for "Force Change".
+                        // Logic: User logs in -> gets token -> Sees "Change Password" -> Changes it -> Logged in fully.
+
+                        // Let's modify logic:
+                        // Save token to localStorage temporarily
+                        localStorage.setItem('temp_token', data.token);
+                        // Redirect to a "force-change-password" page or show modal? 
+                        // Simple solution: Use reset-password.html?token=... &force=true
+                        window.location.href = `/reset-password.html?token=${data.token}&force=true`;
+                    } else {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('role', 'leader');
+                        localStorage.setItem('leaderId', data.leaderId || '');
+                        setTimeout(() => {
+                            window.location.href = '/leader.html';
+                        }, 500);
+                    }
+                } else {
+                    error.textContent = data.error || 'Credenciales inválidas';
+                    error.classList.add('show');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                error.textContent = 'Error de conexión';
+                error.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Ingresar';
+            }
+        }
+
+        async function loginLeaderLegacy() {
+            const id = document.getElementById('leaderId').value.trim();
+            const btn = document.getElementById('leaderIdBtn');
             const error = document.getElementById('leaderError');
 
             if (!id) {
@@ -530,7 +629,7 @@
                 error.classList.add('show');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'Ingresar';
+                btn.innerHTML = 'Ingresar con ID';
             }
         }
 

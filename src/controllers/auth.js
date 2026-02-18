@@ -56,14 +56,32 @@ export async function adminLogin(req, res) {
 
 export async function leaderLogin(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, username, password } = req.body; // Accept email OR username
 
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email y password requeridos" });
+    if ((!email && !username) || !password) {
+      return res.status(400).json({ error: "Usuario/Email y password requeridos" });
     }
 
+    // Determine query (Email or Username)
+    const query = email ? { email } : { username };
+
     // Intenta obtener líder de MongoDB con fallback a memoria
-    const { data: leader, source } = await findLeaderWithFallback(Leader, email);
+    // NOTE: Fallback logic might need adjustment if it doesn't support username, 
+    // but for now we prioritize MongoDB which has the new fields.
+    // Assuming findLeaderWithFallback handles basic query or we query DB directly first.
+
+    // For security upgrade, let's query DB directly first as memory fallback might be legacy
+    let leader = await Leader.findOne(query);
+    let source = 'mongodb';
+
+    if (!leader) {
+      // Fallback to legacy function if by email, but likely won't have passwordHash if legacy
+      if (email) {
+        const result = await findLeaderWithFallback(Leader, email);
+        leader = result.data;
+        source = result.source;
+      }
+    }
 
     if (!leader || !leader.passwordHash) {
       return res.status(401).json({ error: "Credenciales inválidas" });
@@ -72,6 +90,10 @@ export async function leaderLogin(req, res) {
     const isValid = await bcryptjs.compare(password, leader.passwordHash);
     if (!isValid) {
       return res.status(401).json({ error: "Credenciales inválidas" });
+    }
+
+    if (!leader.active) {
+      return res.status(403).json({ error: "Cuenta inactiva. Contacte al administrador." });
     }
 
     const token = jwt.sign(
@@ -87,11 +109,122 @@ export async function leaderLogin(req, res) {
       { expiresIn: "12h" }
     );
 
-    logger.info(`✅ Leader login exitoso [${source}]`, { email, source });
-    res.json({ token, source });
+    logger.info(`✅ Leader login exitoso [${source}]`, { user: email || username, source });
+
+    // Return flag if password change is required
+    res.json({
+      token,
+      source,
+      leaderId: leader.leaderId || leader._id.toString(),
+      requirePasswordChange: leader.isTemporaryPassword || false,
+      username: leader.username || leader.name
+    });
   } catch (error) {
     logger.error("Leader login error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al iniciar sesión" });
+  }
+}
+
+// --- NEW SECURITY ENDPOINTS ---
+
+export async function changePassword(req, res) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const leaderId = req.user.userId;
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: "La nueva contraseña debe tener al menos 6 caracteres" });
+    }
+
+    const leader = await Leader.findById(leaderId);
+    if (!leader) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    // Verify current (unless it's a force reset flow where we might want to relax this, 
+    // but typically we still ask for current to ensure session validity is manual? 
+    // Actually, if they are logged in with a valid token (which they strictly are to hit this endpoint), 
+    // enforcing current password is good practice but if they forgot it... 
+    // logic: If they are logged in, they know the current (temp) password.
+
+    if (currentPassword) {
+      const isValid = await bcryptjs.compare(currentPassword, leader.passwordHash);
+      if (!isValid) return res.status(401).json({ error: "Contraseña actual incorrecta" });
+    } else if (!leader.isTemporaryPassword) {
+      // If not temporary, we MUST require current password
+      return res.status(400).json({ error: "Se requiere la contraseña actual" });
+    }
+
+    const salt = await bcryptjs.genSalt(10);
+    const newHash = await bcryptjs.hash(newPassword, salt);
+    // Use updateOne to avoid validation issues on legacy documents
+    await Leader.updateOne({ _id: leader._id }, {
+      $set: {
+        passwordHash: newHash,
+        isTemporaryPassword: false
+      }
+    });
+
+    await AuditService.log("UPDATE", "Leader", leader._id.toString(), req.user, {}, `Cambio de contraseña exitoso`);
+
+    res.json({ message: "Contraseña actualizada correctamente" });
+  } catch (error) {
+    logger.error("Change password error:", { error: error.message });
+    res.status(500).json({ error: "Error al cambiar contraseña" });
+  }
+}
+
+export async function adminResetPassword(req, res) {
+  try {
+    const { leaderId, newUsername, newPassword: customPassword } = req.body;
+    const adminUser = req.user;
+
+    // Only Admins (Middleware should already handle this, but double check role if mixed file)
+    if (adminUser.role !== 'admin' && adminUser.role !== 'superadmin') {
+      return res.status(403).json({ error: "No autorizado" });
+    }
+
+    const leader = await Leader.findById(leaderId || req.params.id);
+    if (!leader) return res.status(404).json({ error: "Líder no encontrado" });
+
+    // Update username if admin provided one
+    if (newUsername && newUsername.trim()) {
+      const cleanUsername = newUsername.trim().toLowerCase();
+      // Check uniqueness (excluding this leader)
+      const existing = await Leader.findOne({ username: cleanUsername, _id: { $ne: leader._id } });
+      if (existing) {
+        return res.status(400).json({ error: `El usuario "${cleanUsername}" ya existe` });
+      }
+      leader.username = cleanUsername;
+    }
+
+    // Use custom password or generate one
+    const tempPassword = customPassword && customPassword.trim() ? customPassword.trim() : (Math.random().toString(36).slice(-8) + "Aa1!");
+    const passwordHash = await bcryptjs.hash(tempPassword, 10);
+
+    leader.passwordHash = passwordHash;
+    leader.isTemporaryPassword = true;
+    await leader.save();
+
+    // Log & "Send Email"
+    console.log("\n==================================================");
+    console.log(" 📧 MOCK EMAIL SERVICE - PASSWORD RESET BY ADMIN 📧");
+    console.log(`To: ${leader.email || 'No Email Provided'}`);
+    console.log(`Subject: Restablecimiento de Contraseña`);
+    console.log("--------------------------------------------------");
+    console.log(`Hola ${leader.name},`);
+    console.log(`Un administrador ha restablecido tu contraseña.`);
+    console.log(`Usuario: ${leader.username || 'N/A'}`);
+    console.log(`Nueva Contraseña Temporal: ${tempPassword}`);
+    console.log(`Por favor inicia sesión y cámbiala de inmediato.`);
+    console.log("==================================================\n");
+
+    await AuditService.log("UPDATE", "Leader", leader._id.toString(), adminUser, {}, `Admin restableció contraseña de ${leader.name}`);
+
+    res.json({ message: "Contraseña restablecida", _tempPassword: tempPassword, _username: leader.username || '' });
+
+
+  } catch (error) {
+    logger.error("Admin reset password error:", { error: error.message });
+    res.status(500).json({ error: "Error al restablecer contraseña" });
   }
 }
 

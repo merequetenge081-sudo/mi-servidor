@@ -130,9 +130,17 @@ export async function updateRegistration(req, res) {
     const orgId = req.user.organizationId; // Multi-tenant filter
     const { firstName, lastName, email, phone, localidad, registeredToVote, votingPlace, votingTable } = req.body;
 
+
     const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId });
     if (!registration) {
       return res.status(404).json({ error: "Registro no encontrado" });
+    }
+
+    // Ownership Check: Leaders can only update their own registrations
+    console.log(`[DEBUG] Update Check - User Role: ${user.role}, User LeaderId: ${user.leaderId}, Reg LeaderId: ${registration.leaderId}`);
+
+    if (user.role !== 'admin' && registration.leaderId !== user.leaderId) {
+      return res.status(403).json({ error: `No tienes permiso. Tu ID: ${user.leaderId}, Dueño: ${registration.leaderId}` });
     }
 
     // Check voting data if needed
@@ -197,6 +205,11 @@ export async function deleteRegistration(req, res) {
 
     if (!registration) {
       return res.status(404).json({ error: "Registro no encontrado" });
+    }
+
+    // Ownership Check: Leaders can only delete their own registrations
+    if (user.role !== 'admin' && registration.leaderId !== user.leaderId) {
+      return res.status(403).json({ error: "No tienes permiso para eliminar este registro" });
     }
 
     const leaderId = registration.leaderId;
@@ -305,5 +318,102 @@ export async function getRegistrationsByLeader(req, res) {
   } catch (error) {
     logger.error("Get registrations by leader error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener registros del líder" });
+  }
+}
+
+export async function bulkCreateRegistrations(req, res) {
+  try {
+    const user = req.user;
+    const { leaderId, registrations } = req.body;
+
+    // Validate leader
+    const leader = await Leader.findOne({ leaderId });
+    if (!leader) return res.status(404).json({ error: "Líder no encontrado" });
+    if (!leader.active) return res.status(403).json({ error: "El líder está inactivo" });
+
+    // Use leader's eventId
+    const eventId = leader.eventId;
+    if (!eventId) {
+      return res.status(400).json({ error: "El líder no está asociado a ningún evento. Contacte al administrador." });
+    }
+
+    const errors = [];
+    const validRegistrations = [];
+
+    for (let i = 0; i < registrations.length; i++) {
+      const reg = registrations[i];
+      const rowNum = i + 1;
+      const missing = [];
+
+      // Strict validation as requested
+      if (!reg.firstName) missing.push("Nombre");
+      if (!reg.lastName) missing.push("Apellido");
+      if (!reg.cedula) missing.push("Cédula");
+      if (!reg.email) missing.push("Email");
+      if (!reg.phone) missing.push("Celular");
+      if (!reg.votingTable) missing.push("Mesa");
+
+      if (missing.length > 0) {
+        errors.push({
+          row: rowNum,
+          name: `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || 'Desconocido',
+          error: `Faltan campos: ${missing.join(', ')}`
+        });
+        continue;
+      }
+
+      // Check duplicates (basic check against existing DB)
+      const existing = await Registration.findOne({ cedula: reg.cedula });
+      if (existing) {
+        errors.push({
+          row: rowNum,
+          name: `${reg.firstName} ${reg.lastName}`,
+          error: `Ya existe un registro con cédula ${reg.cedula}`
+        });
+        continue;
+      }
+      validRegistrations.push({
+        leaderId: leader.leaderId,
+        leaderName: leader.name,
+        eventId: eventId, // Assign leader's event
+        firstName: reg.firstName,
+        lastName: reg.lastName,
+        cedula: reg.cedula,
+        email: reg.email,
+        phone: reg.phone,
+        votingPlace: reg.votingPlace || '',
+        votingTable: reg.votingTable,
+        localidad: reg.localidad || '',
+        date: new Date().toISOString(),
+        confirmed: false,
+        organizationId: leader.organizationId
+      });
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({
+        error: "Se encontraron errores en el archivo. Por favor corríjalos antes de importar.",
+        details: errors
+      });
+    }
+
+    if (validRegistrations.length === 0) {
+      return res.status(400).json({ error: "No hay registros válidos para importar." });
+    }
+
+    await Registration.insertMany(validRegistrations);
+
+    // Increment leader count
+    await Leader.updateOne({ leaderId: leader.leaderId }, { $inc: { registrations: validRegistrations.length } });
+
+    res.json({
+      success: true,
+      count: validRegistrations.length,
+      message: `Se importaron ${validRegistrations.length} registros exitosamente.`
+    });
+
+  } catch (error) {
+    logger.error("Bulk import error:", error);
+    res.status(500).json({ error: "Error interno al procesar importación: " + error.message });
   }
 }

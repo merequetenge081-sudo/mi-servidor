@@ -14,11 +14,17 @@ function generateToken() {
 
 export async function createLeader(req, res) {
   try {
-    const { leaderId, name, email, phone, area, eventId, password, token: providedToken } = req.body;
+    const { name, email, phone, area, eventId, token: providedToken, customUsername } = req.body;
+    let { leaderId } = req.body; // Allow modification
     const user = req.user;
 
-    if (!leaderId || !name) {
-      return res.status(400).json({ error: "leaderId y name son requeridos" });
+    // Auto-generate leaderId if not provided
+    if (!leaderId) {
+      leaderId = `LID-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+    }
+
+    if (!name) {
+      return res.status(400).json({ error: "El nombre es requerido" });
     }
 
     const existing = await Leader.findOne({ leaderId });
@@ -36,7 +42,73 @@ export async function createLeader(req, res) {
       tokenExists = await Leader.findOne({ token });
     }
 
-    const passwordHash = password ? await bcryptjs.hash(password, 10) : null;
+    // --- SECURITY UPGRADE START ---
+    // 1. Username: Use custom if provided, otherwise auto-generate
+    const normalize = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    let username;
+
+    if (customUsername && customUsername.trim()) {
+      // Admin provided a custom username
+      username = normalize(customUsername.trim());
+      const existingUser = await Leader.findOne({ username });
+      if (existingUser) {
+        return res.status(400).json({ error: `El usuario "${username}" ya existe. Elige otro.` });
+      }
+    } else {
+      // Auto-generate: first letter of first name + last name
+      const cleanName = name.trim().split(/\s+/);
+      const firstName = cleanName[0] || "user";
+      const lastName = cleanName.length > 1 ? cleanName[1] : "leader";
+
+      let baseUsername = normalize(firstName.charAt(0) + lastName);
+      if (!baseUsername) baseUsername = "user";
+      username = baseUsername;
+
+      // Ensure uniqueness with sequential suffix
+      let counter = 1;
+      while (await Leader.findOne({ username })) {
+        counter++;
+        username = `${baseUsername}${counter}`;
+      }
+    }
+
+    // 2. Generate Temporary Password
+    const tempPassword = Math.random().toString(36).slice(-8) + "Aa1!";
+    const passwordHash = await bcryptjs.hash(tempPassword, 10);
+
+    // 3. Mock Email Service
+    const loginLink = `${process.env.BASE_URL || 'http://localhost:5000'}/`;
+    console.log("\n==================================================");
+    console.log(" ?? MOCK EMAIL SERVICE - WELCOME LEADER ??");
+    console.log(`To: ${email || 'No Email Provided'}`);
+    console.log(`Subject: Bienvenido a Red Política - Tus Credenciales`);
+    console.log("--------------------------------------------------");
+    console.log(`Hola ${name},`);
+    console.log(`Se ha creado tu cuenta de líder.`);
+    console.log(`Usuario: ${username}`);
+    console.log(`Contraseña Temporal: ${tempPassword}`);
+    console.log(`Ingresa aquí: ${loginLink}`);
+    console.log(`(Se te pedirá cambiar la contraseña al ingresar)`);
+    console.log("==================================================\n");
+    // --- SECURITY UPGRADE END ---
+
+    // Fix: Ensure organizationId is set
+    let orgId = req.user.organizationId;
+    if (!orgId) {
+      // Fallback to default organization
+      let defaultOrg = await Organization.findOne({ slug: "default" });
+      if (!defaultOrg) {
+        defaultOrg = new Organization({
+          name: "Default Organization",
+          slug: "default",
+          description: "Organización por defecto",
+          status: "active",
+          plan: "pro"
+        });
+        await defaultOrg.save();
+      }
+      orgId = defaultOrg._id.toString();
+    }
 
     const leader = new Leader({
       leaderId,
@@ -45,23 +117,36 @@ export async function createLeader(req, res) {
       phone,
       area,
       eventId,
+
+      // New Security Fields
+      username,
       passwordHash,
+      isTemporaryPassword: true,
+
       token,
       registrations: 0,
-      organizationId: req.user.organizationId // Multi-tenant: asignar org automáticamente
+      organizationId: orgId // Multi-tenant: asignar org automáticamente o default
     });
 
     await leader.save();
 
-    await AuditService.log("CREATE", "Leader", leader._id.toString(), user, { leaderId, name }, `Líder ${name} creado`);
+    await AuditService.log("CREATE", "Leader", leader._id.toString(), user, { leaderId, name, username }, `Líder ${name} creado`);
 
-    res.status(201).json(leader);
+    // Return the generated credentials in the response for immediate display (Requested in Plan)
+    res.status(201).json({
+      ...leader.toObject(),
+      _tempPassword: tempPassword, // Only returned once upon creation
+      _username: username
+    });
   } catch (error) {
     logger.error("Create leader error:", { error: error.message, stack: error.stack });
 
     // Manejar error de token duplicado (por si acaso)
     if (error.code === 11000 && error.keyPattern?.token) {
       return res.status(500).json({ error: "Error al generar token único, intenta nuevamente" });
+    }
+    if (error.code === 11000 && error.keyPattern?.username) {
+      return res.status(500).json({ error: "Error al generar usuario único, intenta nuevamente" });
     }
 
     res.status(500).json({ error: "Error al crear líder" });
@@ -86,8 +171,20 @@ export async function getLeaders(req, res) {
 
 export async function getLeader(req, res) {
   try {
-    const orgId = req.user.organizationId; // Multi-tenant filter
-    const leader = await Leader.findOne({ _id: req.params.id, organizationId: orgId });
+    const id = req.params.id;
+    let leader = null;
+
+    // Try by MongoDB _id first (if valid ObjectId format)
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+    if (isObjectId) {
+      leader = await Leader.findById(id);
+    }
+
+    // Fallback: try by leaderId field
+    if (!leader) {
+      leader = await Leader.findOne({ leaderId: id });
+    }
+
     if (!leader) {
       return res.status(404).json({ error: "Líder no encontrado" });
     }
@@ -197,7 +294,17 @@ export async function deleteLeader(req, res) {
   try {
     const user = req.user;
     const orgId = req.user.organizationId; // Multi-tenant filter
-    const leader = await Leader.findOne({ _id: req.params.id, organizationId: orgId });
+    // Fix: Allow superadmin/legacy admin to delete
+    let leader;
+    const isSuperAdmin = req.user.role === 'superadmin' ||
+      req.user.role === 'super_admin' ||
+      (req.user.role === 'admin' && !orgId);
+
+    if (isSuperAdmin) {
+      leader = await Leader.findById(req.params.id);
+    } else {
+      leader = await Leader.findOne({ _id: req.params.id, organizationId: orgId });
+    }
 
     if (!leader) {
       return res.status(404).json({ error: "Líder no encontrado" });
@@ -290,11 +397,24 @@ export async function getLeaderByToken(req, res) {
       return res.status(403).json({ error: "Líder inactivo" });
     }
 
-    // Retornar solo datos necesarios para el formulario público
+    // Look up event name if leader has an eventId
+    let eventName = null;
+    if (leader.eventId) {
+      try {
+        const { Event } = await import("../models/Event.js");
+        const event = await Event.findById(leader.eventId).select('name');
+        if (event) eventName = event.name;
+      } catch (e) {
+        // Event lookup is optional, don't fail
+      }
+    }
+
+    // Retornar datos necesarios para el formulario público
     res.json({
       leaderId: leader.leaderId,
       name: leader.name,
-      eventId: leader.eventId
+      eventId: leader.eventId,
+      eventName: eventName
     });
   } catch (error) {
     logger.error("Get leader by token error:", { error: error.message, stack: error.stack });

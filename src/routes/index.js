@@ -1,5 +1,5 @@
 import express from "express";
-import { adminLogin, leaderLogin, leaderLoginById } from "../controllers/auth.js";
+import { adminLogin, leaderLogin, leaderLoginById, changePassword, adminResetPassword } from "../controllers/auth.js";
 import { getTestCredentials } from "../utils/authFallback.js";
 import * as leaderController from "../controllers/leaders.controller.js";
 import * as registrationController from "../controllers/registrations.controller.js";
@@ -35,7 +35,7 @@ router.get("/test-credentials", (req, res) => {
   if (process.env.NODE_ENV === "production") {
     return res.status(403).json({ error: "Not available in production" });
   }
-  
+
   const creds = getTestCredentials();
   res.json({
     message: "Credenciales de prueba (solo disponible en desarrollo)",
@@ -130,7 +130,7 @@ router.post("/migrate", async (req, res) => {
     let registrationCount = 0;
     for (const reg of data.registrations || []) {
       // Evitar duplicados por email y cedula
-      const existing = await Registration.findOne({ 
+      const existing = await Registration.findOne({
         email: reg.email,
         cedula: reg.cedula,
         organizationId: orgId
@@ -179,6 +179,8 @@ router.post("/migrate", async (req, res) => {
 router.post("/auth/admin-login", adminLogin);
 router.post("/auth/leader-login", leaderLogin);
 router.post("/auth/leader-login-id", leaderLoginById);
+router.post("/auth/change-password", authMiddleware, changePassword);
+router.post("/auth/admin-reset-password", authMiddleware, roleMiddleware("admin"), adminResetPassword);
 
 // ==================== ORGANIZACIONES (MULTI-TENANT) ====================
 router.post("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.createOrganization);
@@ -199,11 +201,12 @@ router.delete("/leaders/:id", authMiddleware, roleMiddleware("admin"), leaderCon
 
 // ==================== REGISTRACIONES ====================
 router.post("/registrations", rateLimitMiddleware, registrationController.createRegistration);
+router.post("/registrations/bulk", authMiddleware, registrationController.bulkCreateRegistrations);
 router.get("/registrations", authMiddleware, registrationController.getRegistrations);
 router.get("/registrations/leader/:leaderId", authMiddleware, registrationController.getRegistrationsByLeader);
 router.get("/registrations/:id", authMiddleware, registrationController.getRegistration);
 router.put("/registrations/:id", authMiddleware, registrationController.updateRegistration);
-router.delete("/registrations/:id", authMiddleware, roleMiddleware("admin"), registrationController.deleteRegistration);
+router.delete("/registrations/:id", authMiddleware, registrationController.deleteRegistration);
 router.post("/registrations/:id/confirm", authMiddleware, registrationController.confirmRegistration);
 router.post("/registrations/:id/unconfirm", authMiddleware, roleMiddleware("admin"), registrationController.unconfirmRegistration);
 
@@ -232,6 +235,84 @@ router.get("/audit-stats", authMiddleware, roleMiddleware("admin"), auditControl
 // ==================== WHATSAPP Y QR ====================
 router.post("/send-whatsapp", authMiddleware, roleMiddleware("admin"), whatsappController.sendWhatsApp);
 router.post("/leaders/:id/send-qr", authMiddleware, roleMiddleware("admin"), whatsappController.sendQRCode);
+
+// ==================== MIGRACIÓN DE USUARIOS ====================
+router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async (req, res) => {
+  try {
+    const { Leader } = await import("../models/Leader.js");
+    const bcryptjs = (await import("bcryptjs")).default;
+
+    // Find all leaders without a username
+    const leaders = await Leader.find({ $or: [{ username: { $exists: false } }, { username: null }, { username: "" }] });
+
+    if (leaders.length === 0) {
+      return res.json({ message: "Todos los líderes ya tienen usuario asignado.", migrated: 0, results: [] });
+    }
+
+    const normalize = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const results = [];
+
+    for (const leader of leaders) {
+      const cleanName = (leader.name || "usuario desconocido").trim().split(/\s+/);
+      const firstName = cleanName[0] || "user";
+      const lastName = cleanName.length > 1 ? cleanName[1] : "leader";
+
+      let baseUsername = normalize(firstName.charAt(0) + lastName);
+      if (!baseUsername) baseUsername = "user";
+      let username = baseUsername;
+
+      // Ensure uniqueness (check DB + already assigned in this batch)
+      const usedInBatch = results.map(r => r.username);
+      let counter = 1;
+      while ((await Leader.findOne({ username })) || usedInBatch.includes(username)) {
+        counter++;
+        username = `${baseUsername}${counter}`;
+      }
+
+      // Generate temporary password
+      const tempPassword = Math.random().toString(36).slice(-8) + "Aa1!";
+      const passwordHash = await bcryptjs.hash(tempPassword, 10);
+
+      // Update directly in DB using updateOne to avoid full validation on legacy docs
+      await Leader.updateOne({ _id: leader._id }, {
+        $set: {
+          username: username,
+          passwordHash: passwordHash,
+          isTemporaryPassword: true
+        }
+      });
+
+      results.push({
+        _id: leader._id,
+        name: leader.name,
+        email: leader.email || null,
+        username: username,
+        tempPassword: tempPassword
+      });
+
+      logger.info(`[MIGRATION] ${leader.name} → ${username}`);
+    }
+
+    // Print all to console for easy copy
+    console.log("\n╔══════════════════════════════════════════════════╗");
+    console.log("║     MIGRACIÓN DE USUARIOS - CREDENCIALES        ║");
+    console.log("╠══════════════════════════════════════════════════╣");
+    results.forEach(r => {
+      console.log(`║ ${r.name.padEnd(25)} │ ${r.username.padEnd(12)} │ ${r.tempPassword}`);
+    });
+    console.log("╚══════════════════════════════════════════════════╝\n");
+
+    res.json({
+      message: `${results.length} líderes migrados exitosamente`,
+      migrated: results.length,
+      results
+    });
+
+  } catch (error) {
+    logger.error("Migration error:", { error: error.message, stack: error.stack });
+    res.status(500).json({ error: "Error en migración: " + error.message });
+  }
+});
 
 // ==================== API HOME ====================
 router.get("/", (req, res) => {

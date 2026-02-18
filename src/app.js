@@ -64,16 +64,16 @@ app.use(xss());
 // HPP - Prevenir HTTP Parameter Pollution
 app.use(hpp());
 
-// Rate Limiting - 200 requests por 15 minutos
+// Rate Limiting - Only for API routes (static files & pages are exempt)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 200,
-  message: "Demasiadas solicitudes desde esta IP, intente más tarde.",
+  max: 300,
+  message: { error: "Demasiadas solicitudes desde esta IP, intente más tarde." },
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
-    // No limitar health check
-    return req.path === "/health";
+    // Only rate-limit API calls, not static files/pages
+    return !req.path.startsWith("/api");
   }
 });
 app.use(limiter);
@@ -164,12 +164,12 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   logger.error(`Unhandled error: ${err.message}`, { stack: err.stack });
-  
+
   const status = err.status || 500;
-  const message = process.env.NODE_ENV === "production" 
-    ? "Internal server error" 
+  const message = process.env.NODE_ENV === "production"
+    ? "Internal server error"
     : err.message;
-  
+
   res.status(status).json({ error: message });
 });
 
