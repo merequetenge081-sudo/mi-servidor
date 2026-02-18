@@ -250,9 +250,15 @@
         // Exportar registro individual a Excel
         window.exportReg = async function(id, leaderId, token) {
             try {
-                const res = await fetch(`${API_URL}/api/registrations/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) return showToast('danger', 'Error exportando registro');
-                const reg = await res.json();
+                let reg = currentRegistrations.find(r => r._id === id);
+                if (!reg) {
+                    const res = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    if (!res.ok) return showToast('danger', 'Error exportando registro');
+                    const regs = await res.json();
+                    const regsArray = Array.isArray(regs) ? regs : regs.data || [];
+                    reg = regsArray.find(r => r._id === id);
+                }
+                if (!reg) return showToast('danger', 'Registro no encontrado');
                 // Generar XLSX simple (solo este registro)
                 const headers = ['Nombre', 'Apellido', 'Cédula', 'Email', 'Teléfono', 'Localidad', '¿Inscrito para votar?', 'Puesto de Votación', 'Nº Mesa', 'Confirmado'];
                 const row = [
