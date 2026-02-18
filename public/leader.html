@@ -67,6 +67,99 @@
             opacity: 0.8;
         }
 
+        /* ============== HAMBURGER MENU ============== */
+        .hamburger-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.3s;
+        }
+
+        .hamburger-btn:hover {
+            opacity: 0.8;
+        }
+
+        .hamburger-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .hamburger-menu.active {
+            right: 0;
+        }
+
+        .hamburger-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .hamburger-overlay.active {
+            display: block;
+        }
+
+        .hamburger-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .hamburger-close {
+            background: transparent;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hamburger-menu-item {
+            padding: 15px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .hamburger-menu-item:hover {
+            background: #f8f9fa;
+        }
+
+        .hamburger-menu-item i {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
         /* ============== CONTENT ============== */
         .content {
             padding: 30px;
@@ -359,12 +452,28 @@
         </div>
         <div class="navbar-actions">
             <span id="leaderName">Líder</span>
-            <button class="btn-logout" onclick="openChangePasswordModal()" style="margin-right: 10px;">
-                <i class="bi bi-key"></i> Cambiar Contraseña
+            <button class="hamburger-btn" onclick="toggleHamburgerMenu()">
+                <i class="bi bi-list"></i>
             </button>
-            <button class="btn-logout" onclick="logout()">
-                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-            </button>
+        </div>
+    </div>
+
+    <!-- ============== HAMBURGER OVERLAY ============== -->
+    <div class="hamburger-overlay" id="hamburgerOverlay" onclick="closeHamburgerMenu()"></div>
+
+    <!-- ============== HAMBURGER MENU ============== -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+        <div class="hamburger-header">
+            <h5 style="margin: 0; color: #333;">Menú</h5>
+            <button class="hamburger-close" onclick="closeHamburgerMenu()">×</button>
+        </div>
+        <div class="hamburger-menu-item" onclick="openChangePasswordModal(); closeHamburgerMenu();">
+            <i class="bi bi-key"></i>
+            <span>Cambiar Contraseña</span>
+        </div>
+        <div class="hamburger-menu-item" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Cerrar Sesión</span>
         </div>
     </div>
 
@@ -687,6 +796,21 @@
                 return false;
             }
             return true;
+        }
+
+        // ============== HAMBURGER MENU ==============
+        function toggleHamburgerMenu() {
+            const menu = document.getElementById('hamburgerMenu');
+            const overlay = document.getElementById('hamburgerOverlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeHamburgerMenu() {
+            const menu = document.getElementById('hamburgerMenu');
+            const overlay = document.getElementById('hamburgerOverlay');
+            menu.classList.remove('active');
+            overlay.classList.remove('active');
         }
 
         function logout() {

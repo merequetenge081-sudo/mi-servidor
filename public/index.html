@@ -348,30 +348,12 @@
                         <label>Contraseña</label>
                         <input type="password" id="leaderPass" placeholder="•••••••">
                     </div>
-                    <!-- Legacy ID Login Toggle (Optional, maybe hidden or removed) -->
-                    <!-- <div style="text-align: right; margin-bottom: 10px;">
-                        <a href="#" style="font-size: 12px; color: #667eea;">¿Olvidaste tu contraseña?</a>
-                    </div> -->
+                    <div style="text-align: right; margin-bottom: 10px;">
+                        <a href="#" id="forgotPasswordLink" style="font-size: 12px; color: #667eea; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+                    </div>
 
                     <button class="btn-login" id="leaderBtn">Ingresar</button>
                     <div class="info-text">Ingresa con tus credenciales asignadas</div>
-
-                    <div style="margin-top: 15px; text-align: center;">
-                        <button id="legacyLoginToggle"
-                            style="background:none; border:none; color:#999; text-decoration:underline; font-size:12px; cursor:pointer;">
-                            Ingresar con ID (Legacy)
-                        </button>
-                    </div>
-
-                    <!-- Legacy Form (Hidden by default) -->
-                    <div id="legacyLeaderForm"
-                        style="display:none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
-                        <div class="form-group">
-                            <label>ID del Líder</label>
-                            <input type="text" id="leaderId" placeholder="Ej: leader-001">
-                        </div>
-                        <button class="btn-secondary" id="leaderIdBtn">Ingresar con ID</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -515,14 +497,7 @@
 
         // ============== LEADER LOGIN ==============
         document.getElementById('leaderBtn').addEventListener('click', loginLeader);
-
-        // Legacy toggle
-        document.getElementById('legacyLoginToggle').addEventListener('click', () => {
-            const form = document.getElementById('legacyLeaderForm');
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        });
-
-        document.getElementById('leaderIdBtn').addEventListener('click', loginLeaderLegacy);
+        document.getElementById('forgotPasswordLink').addEventListener('click', openForgotPasswordModal);
 
         async function loginLeader() {
             const user = document.getElementById('leaderUser').value.trim();
@@ -588,49 +563,109 @@
             }
         }
 
-        async function loginLeaderLegacy() {
-            const id = document.getElementById('leaderId').value.trim();
-            const btn = document.getElementById('leaderIdBtn');
-            const error = document.getElementById('leaderError');
+        // ============== FORGOT PASSWORD ==============
+        function openForgotPasswordModal(e) {
+            e.preventDefault();
+            document.getElementById('forgotPasswordModal').style.display = 'flex';
+            const leaderUser = document.getElementById('leaderUser').value.trim();
+            document.getElementById('forgotLeaderUser').value = leaderUser;
+        }
 
-            if (!id) {
-                error.textContent = 'Por favor ingresa tu ID de líder';
-                error.classList.add('show');
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').style.display = 'none';
+            document.getElementById('forgotPasswordError').textContent = '';
+            document.getElementById('forgotPasswordSuccess').textContent = '';
+            document.getElementById('forgotPasswordForm').reset();
+        }
+
+        async function requestPasswordReset(e) {
+            e.preventDefault();
+            const leaderUser = document.getElementById('forgotLeaderUser').value.trim();
+            const btn = document.getElementById('forgotPasswordBtn');
+            const error = document.getElementById('forgotPasswordError');
+            const success = document.getElementById('forgotPasswordSuccess');
+
+            if (!leaderUser) {
+                error.textContent = 'Por favor ingresa tu usuario o email';
+                error.style.display = 'block';
                 return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span> Verificando...';
-            error.classList.remove('show');
+            btn.innerHTML = '<span class="loading-spinner"></span> Enviando...';
+            error.textContent = '';
+            error.style.display = 'none';
+            success.textContent = '';
+            success.style.display = 'none';
 
             try {
-                const res = await fetch(`${API_URL}/api/auth/leader-login-id`, {
+                const res = await fetch(`${API_URL}/api/auth/request-password-reset`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ leaderId: id })
+                    body: JSON.stringify({ username: leaderUser, email: leaderUser.includes('@') ? leaderUser : undefined })
                 });
 
                 const data = await res.json();
 
-                if (res.ok && data.token) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('role', 'leader');
-                    localStorage.setItem('leaderId', id);
+                if (res.ok) {
+                    if (data.alreadyRequested) {
+                        // Ya había una solicitud pendiente
+                        showCustomAlert('⏳ Solicitud Pendiente', 'Ya se solicitó el cambio de contraseña anteriormente. Por favor espere a que el administrador genere una nueva contraseña temporal.', 'warning');
+                    } else {
+                        // Nueva solicitud enviada
+                        showCustomAlert('✓ Solicitud Enviada', 'Tu solicitud ha sido enviada exitosamente. Un administrador generará una nueva contraseña temporal para ti.', 'success');
+                    }
                     setTimeout(() => {
-                        window.location.href = '/leader.html';
-                    }, 500);
+                        closeForgotPasswordModal();
+                    }, 3000);
                 } else {
-                    error.textContent = data.error || 'ID de líder no encontrado';
-                    error.classList.add('show');
+                    error.textContent = data.error || 'Error al solicitar restablecimiento';
+                    error.style.display = 'block';
                 }
             } catch (err) {
                 console.error('Error:', err);
                 error.textContent = 'Error de conexión';
-                error.classList.add('show');
+                error.style.display = 'block';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'Ingresar con ID';
+                btn.innerHTML = 'Solicitar Restablecimiento';
             }
+        }
+
+        // ============== CUSTOM ALERT ==============
+        function showCustomAlert(title, message, type = 'info') {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100000; display: flex; align-items: center; justify-content: center;';
+            
+            const icons = {
+                success: '✓',
+                warning: '⏳',
+                error: '✗',
+                info: 'ℹ'
+            };
+            
+            const colors = {
+                success: '#28a745',
+                warning: '#ffc107',
+                error: '#dc3545',
+                info: '#17a2b8'
+            };
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 35px; border-radius: 20px; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; animation: slideIn 0.3s ease;">
+                    <div style="font-size: 60px; color: ${colors[type]}; margin-bottom: 20px;">${icons[type]}</div>
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 24px;">${title}</h3>
+                    <p style="color: #666; font-size: 16px; line-height: 1.5; margin-bottom: 25px;">${message}</p>
+                    <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove();" style="background: ${colors[type]}; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s;">
+                        Entendido
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            
+            // Auto cerrar después de 5 segundos
+            setTimeout(() => modal.remove(), 5000);
         }
 
         // ============== EVENT SELECTION ==============
@@ -760,6 +795,32 @@
             }
         });
     </script>
+
+    <!-- Modal de Recuperación de Contraseña -->
+    <div id="forgotPasswordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 35px; border-radius: 20px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 style="margin: 0; color: #333; font-size: 22px;"><i class="fas fa-key" style="color: #667eea;"></i> Recuperar Contraseña</h3>
+                <button onclick="closeForgotPasswordModal()" style="background: transparent; border: none; font-size: 32px; cursor: pointer; color: #999; line-height: 1;">×</button>
+            </div>
+            
+            <div id="forgotPasswordError" style="display: none; padding: 12px; background: #fee; color: #c33; border-radius: 8px; margin-bottom: 15px; font-size: 14px;"></div>
+            <div id="forgotPasswordSuccess" style="display: none; padding: 12px; background: #efe; color: #3a3; border-radius: 8px; margin-bottom: 15px; font-size: 14px;"></div>
+            
+            <p style="color: #666; margin-bottom: 25px; font-size: 14px; line-height: 1.6;">Ingresa tu usuario o email para solicitar un restablecimiento de contraseña. Un administrador generará una nueva contraseña temporal para ti.</p>
+            
+            <form id="forgotPasswordForm" onsubmit="requestPasswordReset(event)">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 500;">Usuario o Email</label>
+                    <input type="text" id="forgotLeaderUser" placeholder="Ingresa tu usuario o email" required 
+                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                </div>
+                <button type="submit" id="forgotPasswordBtn" class="btn-login" style="width: 100%; margin-top: 10px;">
+                    Solicitar Restablecimiento
+                </button>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>

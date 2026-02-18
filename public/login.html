@@ -410,20 +410,60 @@
                             <input type="text" id="leaderId" placeholder="Ej: 507f1f77bcf86cd799439011" required>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="leaderPassword"><i class="fas fa-lock"></i> Contraseña</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="leaderPassword" placeholder="Ingrese contraseña" required>
+                        </div>
+                    </div>
                     <button type="submit" class="btn-leader" id="leaderBtn">
                         <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                     </button>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <a href="#" onclick="openForgotPasswordModal(event)" style="color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500;">
+                            <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
                 </form>
 
                 <div class="info-text">
-                    <strong>💡 Sin contraseña:</strong><br>
-                    Ingresa tu ID de líder para acceder instantáneamente
+                    <strong>💡 Acceso con contraseña:</strong><br>
+                    Ingresa tu ID de líder y contraseña para acceder
                 </div>
             </div>
         </div>
 
         <div class="back-link">
             <a href="/">← Volver al inicio</a>
+        </div>
+    </div>
+
+    <!-- Modal de Recuperación de Contraseña -->
+    <div id="forgotPasswordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #333;"><i class="fas fa-key"></i> Recuperar Contraseña</h3>
+                <button onclick="closeForgotPasswordModal()" style="background: transparent; border: none; font-size: 28px; cursor: pointer; color: #999;">×</button>
+            </div>
+            
+            <div id="forgotPasswordError" class="error"></div>
+            <div id="forgotPasswordSuccess" class="success"></div>
+            
+            <p style="color: #666; margin-bottom: 20px;">Ingresa tu ID de líder para solicitar un restablecimiento de contraseña. Un administrador generará una nueva contraseña temporal para ti.</p>
+            
+            <form id="forgotPasswordForm" onsubmit="requestPasswordReset(event)">
+                <div class="form-group">
+                    <label for="forgotLeaderId"><i class="fas fa-id-card"></i> ID de Líder</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="forgotLeaderId" placeholder="Ej: 507f1f77bcf86cd799439011" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-leader" id="forgotPasswordBtn">
+                    <i class="fas fa-paper-plane"></i> Solicitar Restablecimiento
+                </button>
+            </form>
         </div>
     </div>
 
@@ -481,6 +521,7 @@
         async function loginLeader(e) {
             e.preventDefault();
             const leaderId = document.getElementById('leaderId').value;
+            const password = document.getElementById('leaderPassword').value;
             const btn = document.getElementById('leaderBtn');
             const error = document.getElementById('leaderError');
             const success = document.getElementById('leaderSuccess');
@@ -491,16 +532,16 @@
             btn.innerHTML = '<span class="loading"></span> Verificando...';
 
             try {
-                const response = await fetch(`${API_URL}/api/auth/leader-login-id`, {
+                const response = await fetch(`${API_URL}/api/auth/leader-login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ leaderId })
+                    body: JSON.stringify({ leaderId, password })
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    error.textContent = data.error || 'Líder no encontrado';
+                    error.textContent = data.error || 'Credenciales incorrectas';
                     error.style.display = 'block';
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
@@ -522,6 +563,65 @@
                 error.style.display = 'block';
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
+            }
+        }
+
+        // ============== RECUPERACIÓN DE CONTRASEÑA ==============
+        function openForgotPasswordModal(e) {
+            e.preventDefault();
+            document.getElementById('forgotPasswordModal').style.display = 'flex';
+            document.getElementById('forgotLeaderId').value = document.getElementById('leaderId').value || '';
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').style.display = 'none';
+            document.getElementById('forgotPasswordError').style.display = 'none';
+            document.getElementById('forgotPasswordSuccess').style.display = 'none';
+            document.getElementById('forgotPasswordForm').reset();
+        }
+
+        async function requestPasswordReset(e) {
+            e.preventDefault();
+            const leaderId = document.getElementById('forgotLeaderId').value;
+            const btn = document.getElementById('forgotPasswordBtn');
+            const error = document.getElementById('forgotPasswordError');
+            const success = document.getElementById('forgotPasswordSuccess');
+
+            error.style.display = 'none';
+            success.style.display = 'none';
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Enviando...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/request-password-reset`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ leaderId })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    error.textContent = data.error || 'Error al solicitar restablecimiento';
+                    error.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Solicitar Restablecimiento';
+                    return;
+                }
+
+                success.textContent = '✓ Solicitud enviada. Un administrador generará una nueva contraseña temporal para ti.';
+                success.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Solicitar Restablecimiento';
+
+                setTimeout(() => {
+                    closeForgotPasswordModal();
+                }, 3000);
+            } catch (err) {
+                error.textContent = 'Error de conexión: ' + err.message;
+                error.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Solicitar Restablecimiento';
             }
         }
 

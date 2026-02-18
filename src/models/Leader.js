@@ -13,6 +13,7 @@ const leaderSchema = new mongoose.Schema({
   isTemporaryPassword: { type: Boolean, default: false },
   passwordResetRequested: { type: Boolean, default: false },
   passwordCanBeChanged: { type: Boolean, default: true }, // Flag para bloquear cambios después del primer cambio
+  tempPasswordPlaintext: String, // Última contraseña temporal generada por admin (solo para referencia)
 
   token: { type: String, required: true },
   active: { type: Boolean, default: true },

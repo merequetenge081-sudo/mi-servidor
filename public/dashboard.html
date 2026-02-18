@@ -84,6 +84,453 @@
             transform: translateY(-1px);
         }
 
+        /* ============== HAMBURGER MENU ============== */
+        .hamburger-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 24px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .hamburger-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .hamburger-menu {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 15px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .hamburger-menu.active {
+            right: 0;
+        }
+
+        .hamburger-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .hamburger-overlay.active {
+            display: block;
+        }
+
+        .hamburger-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .hamburger-close {
+            background: transparent;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hamburger-menu-item {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #333;
+            font-size: 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .hamburger-menu-item:hover {
+            background: #f8f9fa;
+        }
+
+        .hamburger-menu-item i {
+            font-size: 20px;
+            color: #667eea;
+            width: 24px;
+            text-align: center;
+        }
+
+        .dark-mode-toggle {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dark-mode-toggle label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* ============== DARK MODE ============== */
+        body.dark-mode {
+            background: #1a1a2e !important;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .sidebar {
+            background: #16213e;
+            border-right: 1px solid #2d3748;
+        }
+
+        body.dark-mode .content {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .card,
+        body.dark-mode .stat-card,
+        body.dark-mode .table,
+        body.dark-mode .modal-content {
+            background: #16213e !important;
+            color: #e0e0e0;
+            border-color: #2d3748 !important;
+        }
+
+        body.dark-mode .page-title,
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3,
+        body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+            border-color: #4a5568 !important;
+        }
+
+        body.dark-mode .table {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .table th {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+            border-color: #4a5568 !important;
+        }
+
+        body.dark-mode .table td {
+            background: #16213e !important;
+            border-color: #2d3748 !important;
+        }
+
+        body.dark-mode .filters,
+        body.dark-mode .stats-grid {
+            background: transparent;
+        }
+
+        body.dark-mode .nav-link {
+            color: #cbd5e0;
+        }
+
+        body.dark-mode .nav-link:hover {
+            background: #2d3748;
+        }
+
+        body.dark-mode .nav-link.active {
+            background: #667eea;
+            color: white;
+        }
+
+        body.dark-mode .hamburger-menu {
+            background: #16213e;
+        }
+
+        body.dark-mode .hamburger-menu-item {
+            color: #e0e0e0;
+            border-bottom-color: #2d3748;
+        }
+
+        body.dark-mode .hamburger-menu-item:hover {
+            background: #2d3748;
+        }
+
+        body.dark-mode .hamburger-header {
+            border-bottom-color: #2d3748;
+        }
+
+        body.dark-mode .hamburger-close {
+            color: #cbd5e0;
+        }
+
+        body.dark-mode .dark-mode-toggle {
+            background: #2d3748;
+        }
+
+        body.dark-mode .dark-mode-toggle label {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode label,
+        body.dark-mode span,
+        body.dark-mode p,
+        body.dark-mode div,
+        body.dark-mode td,
+        body.dark-mode th,
+        body.dark-mode strong,
+        body.dark-mode b {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode code {
+            background: #2d3748 !important;
+            color: #ffd700 !important;
+        }
+
+        body.dark-mode .table td span {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .table td {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .btn-outline-secondary,
+        body.dark-mode .btn-outline-danger,
+        body.dark-mode .btn-outline-info {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: #cbd5e0 !important;
+        }
+
+        body.dark-mode .btn-outline-secondary:hover,
+        body.dark-mode .btn-outline-danger:hover,
+        body.dark-mode .btn-outline-info:hover {
+            background: #4a5568;
+            color: #fff !important;
+        }
+
+        body.dark-mode .stat-card h3,
+        body.dark-mode .stat-card p {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .badge-confirmed,
+        body.dark-mode .badge-pending {
+            color: #fff !important;
+        }
+
+        body.dark-mode .error-msg,
+        body.dark-mode .success-msg {
+            color: #fff !important;
+        }
+
+        body.dark-mode .modal {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        body.dark-mode .info-text {
+            color: #cbd5e0 !important;
+        }
+
+        body.dark-mode .card-body,
+        body.dark-mode .card-header {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode a {
+            color: #88a0ff !important;
+        }
+
+        body.dark-mode .form-group label {
+            color: #cbd5e0 !important;
+        }
+
+        body.dark-mode .text-center {
+            color: #cbd5e0 !important;
+        }
+
+        /* Additional dark mode fixes */
+        body.dark-mode .btn-primary,
+        body.dark-mode .btn-danger,
+        body.dark-mode .btn-secondary,
+        body.dark-mode .btn-success,
+        body.dark-mode .btn-warning,
+        body.dark-mode .btn-info {
+            color: #fff !important;
+        }
+
+        body.dark-mode .list-group-item {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+            border-color: #4a5568 !important;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background: #2d3748 !important;
+        }
+
+        body.dark-mode .dropdown-menu .dropdown-item {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .dropdown-menu .dropdown-item:hover {
+            background: #4a5568 !important;
+            color: #fff !important;
+        }
+
+        body.dark-mode .table-responsive {
+            background: #16213e !important;
+        }
+
+        body.dark-mode .form-control::placeholder {
+            color: #999 !important;
+        }
+
+        body.dark-mode .custom-select {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .alert {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+            border-color: #4a5568 !important;
+        }
+
+        body.dark-mode .close,
+        body.dark-mode .btn-close {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode hr {
+            border-color: #2d3748 !important;
+        }
+
+        body.dark-mode .section {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .table tbody tr:hover {
+            background: #2d3748 !important;
+        }
+
+        body.dark-mode .badge {
+            background: #4a5568 !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: #999 !important;
+        }
+
+        body.dark-mode .text-danger {
+            color: #ff6b6b !important;
+        }
+
+        body.dark-mode .text-success {
+            color: #51cf66 !important;
+        }
+
+        body.dark-mode .text-warning {
+            color: #ffd93d !important;
+        }
+
+        body.dark-mode .text-info {
+            color: #74c0fc !important;
+        }
+
+        body.dark-mode .small {
+            color: #cbd5e0 !important;
+        }
+
+        body.dark-mode .form-text {
+            color: #999 !important;
+        }
+
+        body.dark-mode input[type="checkbox"],
+        body.dark-mode input[type="radio"] {
+            background: #2d3748 !important;
+            border-color: #4a5568 !important;
+        }
+
         /* ============== SIDEBAR ============== */
         .sidebar {
             position: fixed;
@@ -591,24 +1038,73 @@
             Dashboard - <span id="eventNameDisplay" style="font-weight: 600;">Evento</span>
         </div>
         <div class="navbar-actions">
-            <button class="btn-logout" id="newRegistrationBtn" title="Nuevo Registro">
-                <i class="bi bi-plus-circle"></i> Nuevo Registro
+            <span id="adminUsername" style="opacity: 0.9; font-size: 13px; margin-right: 10px;">Admin</span>
+            <button class="hamburger-btn" onclick="toggleHamburgerMenu()">
+                <i class="bi bi-list"></i>
             </button>
-            <button class="btn-logout" id="updateEventBtn" title="Actualizar Evento">
-                <i class="bi bi-arrow-clockwise"></i> Actualizar Evento
-            </button>
-            <button class="btn-logout" id="changeEventBtn" title="Cambiar Evento">
-                <i class="bi bi-calendar-event"></i> Cambiar Evento
-            </button>
-            <span id="adminUsername" style="opacity: 0.8; font-size: 13px;">Admin</span>
-            <button class="btn-logout" id="logoutBtn" title="Cerrar sesión">
-                <i class="bi bi-box-arrow-right"></i> Salir
-            </button>
+        </div>
+    </div>
+
+    <!-- HAMBURGER OVERLAY -->
+    <div class="hamburger-overlay" id="hamburgerOverlay" onclick="closeHamburgerMenu()"></div>
+
+    <!-- HAMBURGER MENU -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+        <div class="hamburger-header">
+            <h5 style="margin: 0; color: #333;">Menú</h5>
+            <button class="hamburger-close" onclick="closeHamburgerMenu()">×</button>
+        </div>
+        
+        <div class="hamburger-menu-item" onclick="document.getElementById('newRegistrationBtn').click(); closeHamburgerMenu();">
+            <i class="bi bi-plus-circle"></i>
+            <span>Nuevo Registro</span>
+        </div>
+        
+        <div class="hamburger-menu-item" onclick="document.getElementById('updateEventBtn').click(); closeHamburgerMenu();">
+            <i class="bi bi-arrow-clockwise"></i>
+            <span>Actualizar Evento</span>
+        </div>
+        
+        <div class="hamburger-menu-item" onclick="document.getElementById('notificationsBtn').click(); closeHamburgerMenu();" style="position: relative;">
+            <i class="bi bi-bell"></i>
+            <span>Notificaciones</span>
+            <span id="notificationsBadgeMenu" style="display: none; position: absolute; top: 12px; left: 36px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center;">0</span>
+        </div>
+        
+        <div class="hamburger-menu-item" onclick="document.getElementById('changeEventBtn').click(); closeHamburgerMenu();">
+            <i class="bi bi-calendar-event"></i>
+            <span>Cambiar Evento</span>
+        </div>
+
+        <div style="border-top: 2px solid #e0e0e0; margin: 15px 0;"></div>
+        
+        <div class="dark-mode-toggle">
+            <label>
+                <i class="bi bi-moon-stars-fill"></i>
+                Modo Oscuro
+            </label>
+            <label class="switch">
+                <input type="checkbox" id="darkModeSwitch" onchange="toggleDarkMode()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div style="border-top: 2px solid #e0e0e0; margin: 15px 0;"></div>
+        
+        <div class="hamburger-menu-item" onclick="document.getElementById('logoutBtn').click();">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Cerrar Sesión</span>
         </div>
     </div>
 
     <!-- SIDEBAR -->
     <div class="sidebar">
+        <div style="padding: 28px 20px; text-align: center; border-bottom: 2px solid rgba(102, 126, 234, 0.3); margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: 1px; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;">
+                <i class="bi bi-diagram-3" style="color: #667eea; margin-right: 10px; font-size: 22px;"></i>PANEL ADMIN
+            </h3>
+            <p style="margin: 10px 0 0 0; font-size: 11px; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 500;\">Sistema de Gestión</p>
+        </div>
         <div class="nav-link active" data-section="dashboard">
             <i class="bi bi-speedometer2"></i> Dashboard
         </div>
@@ -743,17 +1239,17 @@
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
-                                    <th>Usuario</th>
                                     <th>Email</th>
                                     <th>Teléfono</th>
                                     <th>Registros</th>
                                     <th>Estado Contraseña</th>
+                                    <th>Credenciales</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="leadersTable">
                                 <tr>
-                                    <td colspan="6" class="text-center" style="padding: 40px;"><span
+                                    <td colspan="8" class="text-center" style="padding: 40px;"><span
                                             class="loading"></span>Cargando...</td>
                                 </tr>
                             </tbody>
@@ -788,11 +1284,21 @@
                 </div>
             </div>
 
-            <div class="card">
+            <!-- TABS FOR BOGOTA AND RESTO DEL PAIS -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
+                <button class="btn btn-sm" id="bogotaTab" onclick="showRegistrationTab('bogota')" style="background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 0; font-weight: 600; border-bottom: 3px solid #667eea; margin-bottom: -2px;">
+                    <i class="bi bi-buildings"></i> Bogotá D.C.
+                </button>
+                <button class="btn btn-sm" id="restoTab" onclick="showRegistrationTab('resto')" style="background: transparent; color: #999; border: none; padding: 12px 25px; border-radius: 0; font-weight: 600;">
+                    <i class="bi bi-geo-alt"></i> Resto del País
+                </button>
+            </div>
+
+            <!-- BOGOTA REGISTRATIONS -->
+            <div id="bogotaRegistrations" class="card">
                 <div class="card-header">
-                    <span style="display: flex; align-items: center; gap: 10px;"><i class="bi bi-table"></i> Tabla de
-                        Registros</span>
-                    <button class="btn btn-sm btn-light" id="exportRegsMainBtn" title="Descargar Excel"
+                    <span style="display: flex; align-items: center; gap: 10px;"><i class="bi bi-buildings"></i> Registros Bogotá D.C.</span>
+                    <button class="btn btn-sm btn-light" id="exportBogotaBtn" title="Descargar Excel"
                         style="position: absolute; right: 20px; color: #667eea; font-weight: 600;">
                         <i class="bi bi-download"></i> Excel
                     </button>
@@ -812,7 +1318,7 @@
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="registrationsTable">
+                            <tbody id="bogotaTable">
                                 <tr>
                                     <td colspan="8" class="text-center" style="padding: 40px;"><span
                                             class="loading"></span>Cargando...</td>
@@ -820,17 +1326,39 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- PAGINATION CONTROLS -->
-                    <div class="pagination-controls"
-                        style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
-                        <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" disabled>
-                            <i class="bi bi-chevron-left"></i> Anterior
-                        </button>
-                        <span id="pageIndicator" style="font-size: 14px; font-weight: 600; color: #666;">Página 1 de
-                            1</span>
-                        <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn" disabled>
-                            Siguiente <i class="bi bi-chevron-right"></i>
-                        </button>
+                </div>
+            </div>
+
+            <!-- RESTO DEL PAIS REGISTRATIONS -->
+            <div id="restoRegistrations" class="card" style="display: none;">
+                <div class="card-header">
+                    <span style="display: flex; align-items: center; gap: 10px;"><i class="bi bi-geo-alt"></i> Registros Resto del País</span>
+                    <button class="btn btn-sm btn-light" id="exportRestoBtn" title="Descargar Excel"
+                        style="position: absolute; right: 20px; color: #667eea; font-weight: 600;">
+                        <i class="bi bi-download"></i> Excel
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Cédula</th>
+                                    <th>Departamento</th>
+                                    <th>Líder</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="restoTable">
+                                <tr>
+                                    <td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1189,6 +1717,19 @@
         </div>
     </div>
 
+    <!-- NOTIFICATIONS MODAL -->
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="modal-close" id="closeNotificationsModal">&times;</button>
+            <div class="modal-header"><i class="bi bi-bell"></i> Solicitudes de Restablecimiento de Contraseña</div>
+            <div id="notificationsContent" style="max-height: 400px; overflow-y: auto;">
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    <span class="loading"></span> Cargando notificaciones...
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_URL = window.location.origin;
@@ -1260,6 +1801,7 @@
                 updateStats();
                 loadLeadersTable();
                 loadRecentRegistrations();
+                loadRegistrationsTabbed();
                 populateLeaderFilter();
                 populateExportLeader();
                 // Defer heavy work - charts only render when visible
@@ -1269,8 +1811,87 @@
                 if (document.getElementById('dashboard').classList.contains('active')) {
                     requestAnimationFrame(() => { loadCharts(); chartsLoaded = true; });
                 }
+                // Actualizar badge de notificaciones
+                updateNotificationsBadge();
             } catch (err) {
                 console.error('Error cargando dashboard:', err);
+            }
+        }
+
+        // ====== NOTIFICACIONES ======
+        async function updateNotificationsBadge() {
+            try {
+                const leadersWithRequests = allLeaders.filter(l => l.passwordResetRequested);
+                const count = leadersWithRequests.length;
+                
+                // Actualizar badge en navbar (si existe)
+                const badge = document.getElementById('notificationsBadge');
+                if (badge) {
+                    if (count > 0) {
+                        badge.textContent = count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+                
+                // Actualizar badge en menú hamburguesa
+                const badgeMenu = document.getElementById('notificationsBadgeMenu');
+                if (badgeMenu) {
+                    if (count > 0) {
+                        badgeMenu.textContent = count;
+                        badgeMenu.style.display = 'flex';
+                    } else {
+                        badgeMenu.style.display = 'none';
+                    }
+                }
+            } catch (err) {
+                console.error('Error actualizando notificaciones:', err);
+            }
+        }
+
+        async function loadNotifications() {
+            try {
+                const content = document.getElementById('notificationsContent');
+                const leadersWithRequests = allLeaders.filter(l => l.passwordResetRequested);
+
+                if (leadersWithRequests.length === 0) {
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 60px 20px; color: #999;">
+                            <i class="bi bi-bell-slash" style="font-size: 60px; opacity: 0.3; margin-bottom: 15px;"></i>
+                            <p style="font-size: 16px;">No hay solicitudes de restablecimiento</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const html = leadersWithRequests.map(leader => `
+                    <div style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
+                                <i class="bi bi-person-fill" style="color: #667eea;"></i> ${leader.name}
+                            </div>
+                            <div style="font-size: 13px; color: #666;">
+                                Usuario: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">${leader.username || '-'}</code>
+                            </div>
+                            <div style="font-size: 12px; color: #999; margin-top: 3px;">
+                                <i class="bi bi-clock"></i> Solicitud pendiente
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="generateNewPassword('${leader._id}'); document.getElementById('notificationsModal').classList.remove('active');" style="white-space: nowrap;">
+                            <i class="bi bi-key"></i> Generar Contraseña
+                        </button>
+                    </div>
+                `).join('');
+
+                content.innerHTML = html;
+            } catch (err) {
+                console.error('Error cargando notificaciones:', err);
+                document.getElementById('notificationsContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #dc3545;">
+                        <i class="bi bi-exclamation-circle"></i> Error al cargar notificaciones
+                    </div>
+                `;
             }
         }
 
@@ -1318,11 +1939,17 @@
                 return `
                 <tr>
                     <td><strong>${leader.name}</strong></td>
-                    <td><code style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 13px;">${leader.username || '-'}</code></td>
                     <td>${leader.email || '<span style="color:#ccc;">Sin correo</span>'}</td>
                     <td>${leader.phone || '-'}</td>
-                    <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600;">${leader.registrations || 0}</span></td>
+                    <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${leader.registrations || 0}</span></td>
                     <td>${passwordStatus}</td>
+                    <td>
+                        ${leader.username ? 
+                            `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" data-username="${leader.username}" data-password="${leader.tempPasswordPlaintext || '-'}" title="Ver Credenciales (Usuario y Contraseña)">
+                                <i class="bi bi-eye"></i> Ver Credenciales
+                            </button>` 
+                            : '<span style="color: #999; font-size: 12px;">Sin usuario</span>'}
+                    </td>
                     <td>
                         <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" title="Ver QR">
                             <i class="bi bi-qr-code"></i>
@@ -1343,7 +1970,7 @@
                 </tr>
             `;
             }).join('');
-            document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="7" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
+            document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
 
             document.querySelectorAll('.qr-btn').forEach(btn => {
                 btn.addEventListener('click', () => showQR(btn.dataset.leaderId, btn.dataset.leaderName));
@@ -1356,6 +1983,9 @@
             });
             document.querySelectorAll('.generate-pass-btn').forEach(btn => {
                 btn.addEventListener('click', () => generateNewPassword(btn.dataset.leaderId));
+            });
+            document.querySelectorAll('.view-credentials-btn').forEach(btn => {
+                btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId, btn.dataset.username, btn.dataset.password));
             });
         }
 
@@ -1500,6 +2130,36 @@
             }
         }
 
+        // ====== MOSTRAR CREDENCIALES ======
+        function showCredentials(leaderId, username, password) {
+            const leader = allLeaders.find(l => l._id === leaderId);
+            if (!leader) return alert('Líder no encontrado');
+
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                    <h4 style="color: #667eea; margin-bottom: 20px;"><i class="bi bi-person-badge"></i> Credenciales del Líder</h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p style="margin: 5px 0;"><strong>Líder:</strong> ${leader.name}</p>
+                        <p style="margin: 5px 0;"><strong>Usuario:</strong> <code style="background: #e7f3ff; padding: 4px 8px; border-radius: 4px;">${username}</code></p>
+                        <p style="margin: 5px 0;"><strong>Contraseña Temporal:</strong> <code style="background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-size: 14px; color: #856404;">${password}</code></p>
+                    </div>
+                    <p style="color: #666; font-size: 13px; margin-bottom: 20px;">
+                        <i class="bi bi-info-circle"></i> Esta es la última contraseña temporal generada por el administrador.
+                    </p>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="navigator.clipboard.writeText('Usuario: ${username}\\nContraseña: ${password}'); this.innerHTML='<i class=\\'bi bi-check\\'></i> ¡Copiado!'; this.style.background='#28a745';" class="btn btn-primary" style="flex: 1;">
+                            <i class="bi bi-clipboard"></i> Copiar
+                        </button>
+                        <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove();" class="btn btn-secondary" style="flex: 1;">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        }
+
         // ====== MIGRATE USERNAMES ======
         document.getElementById('migrateUsernamesBtn').addEventListener('click', async () => {
             if (!confirm('¿Deseas generar usuarios y contraseñas temporales para TODOS los líderes que aún no tienen usuario?\n\nEsto actualiza la base de datos directamente.')) return;
@@ -1580,13 +2240,17 @@
                 return matchSearch && matchLeader && matchStatus;
             });
 
-            // Update Pagination
+            // Update Pagination (solo si existen los elementos)
             const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
             if (currentPage > totalPages) currentPage = 1;
 
-            document.getElementById('pageIndicator').textContent = `Página ${currentPage} de ${totalPages}`;
-            document.getElementById('prevPageBtn').disabled = currentPage === 1;
-            document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+            const pageIndicator = document.getElementById('pageIndicator');
+            const prevPageBtn = document.getElementById('prevPageBtn');
+            const nextPageBtn = document.getElementById('nextPageBtn');
+            
+            if (pageIndicator) pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+            if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
+            if (nextPageBtn) nextPageBtn.disabled = currentPage === totalPages;
 
             // Slice data
             const start = (currentPage - 1) * itemsPerPage;
@@ -1864,12 +2528,81 @@
             });
         });
 
+        // ============== HAMBURGER MENU ==============
+        function toggleHamburgerMenu() {
+            const menu = document.getElementById('hamburgerMenu');
+            const overlay = document.getElementById('hamburgerOverlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeHamburgerMenu() {
+            const menu = document.getElementById('hamburgerMenu');
+            const overlay = document.getElementById('hamburgerOverlay');
+            menu.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        // ============== DARK MODE ==============
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Cargar preferencia de modo oscuro
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeSwitch').checked = true;
+            }
+        }
+
+        // Cargar modo oscuro al iniciar
+        loadDarkMode();
+
+        // BUTTONS
+        // Crear botones virtuales para las acciones del menú hamburguesa
+        const newRegistrationBtn = document.createElement('button');
+        newRegistrationBtn.id = 'newRegistrationBtn';
+        newRegistrationBtn.style.display = 'none';
+        document.body.appendChild(newRegistrationBtn);
+
+        const updateEventBtn = document.createElement('button');
+        updateEventBtn.id = 'updateEventBtn';
+        updateEventBtn.style.display = 'none';
+        document.body.appendChild(updateEventBtn);
+
+        const notificationsBtn = document.createElement('button');
+        notificationsBtn.id = 'notificationsBtn';
+        notificationsBtn.style.display = 'none';
+        document.body.appendChild(notificationsBtn);
+
+        const changeEventBtn = document.createElement('button');
+        changeEventBtn.id = 'changeEventBtn';
+        changeEventBtn.style.display = 'none';
+        document.body.appendChild(changeEventBtn);
+
+        const logoutBtn = document.createElement('button');
+        logoutBtn.id = 'logoutBtn';
+        logoutBtn.style.display = 'none';
+        document.body.appendChild(logoutBtn);
+
         // BUTTONS
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('token');
             localStorage.removeItem('role');
             localStorage.removeItem('eventId');
             window.location.href = '/';
+        });
+
+        document.getElementById('notificationsBtn').addEventListener('click', async () => {
+            await loadNotifications();
+            document.getElementById('notificationsModal').classList.add('active');
+        });
+
+        document.getElementById('closeNotificationsModal').addEventListener('click', () => {
+            document.getElementById('notificationsModal').classList.remove('active');
         });
 
         document.getElementById('newLeaderBtn').addEventListener('click', () => {
@@ -2050,20 +2783,24 @@
             exportToExcel(data, `lideres_${new Date().toISOString().slice(0, 10)}.xlsx`);
         });
 
-        document.getElementById('exportRegsMainBtn').addEventListener('click', () => {
-            const data = allRegistrations.map(r => ({
-                Nombre: `${r.firstName} ${r.lastName}`,
-                Email: r.email || '',
-                Cédula: r.cedula || '',
-                Localidad: r.localidad || '',
-                Líder: r.leaderName || '',
-                Puesto: r.votingPlace || '',
-                Mesa: r.votingTable || '',
-                Fecha: new Date(r.date).toLocaleDateString('es-CO'),
-                Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
-            }));
-            exportToExcel(data, `registros_${new Date().toISOString().slice(0, 10)}.xlsx`);
-        });
+        // Export buttons - verificar si existen
+        const exportRegsMainBtn = document.getElementById('exportRegsMainBtn');
+        if (exportRegsMainBtn) {
+            exportRegsMainBtn.addEventListener('click', () => {
+                const data = allRegistrations.map(r => ({
+                    Nombre: `${r.firstName} ${r.lastName}`,
+                    Email: r.email || '',
+                    Cédula: r.cedula || '',
+                    Localidad: r.localidad || '',
+                    Líder: r.leaderName || '',
+                    Puesto: r.votingPlace || '',
+                    Mesa: r.votingTable || '',
+                    Fecha: new Date(r.date).toLocaleDateString('es-CO'),
+                    Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
+                }));
+                exportToExcel(data, `registros_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            });
+        }
 
         // === ACTUALIZAR EVENTO ===
         document.getElementById('updateEventBtn').addEventListener('click', () => {
@@ -2192,19 +2929,129 @@
             }
         });
 
-        document.getElementById('prevPageBtn').addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                filterRegistrations();
-                document.getElementById('registrations').scrollIntoView({ behavior: 'smooth' });
-            }
-        });
+        // ====== SEPARACION DE REGISTROS BOGOTA VS RESTO DEL PAIS ======
+        const bogotaLocalidades = ['Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'];
 
-        document.getElementById('nextPageBtn').addEventListener('click', () => {
-            currentPage++;
-            filterRegistrations();
-            document.getElementById('registrations').scrollIntoView({ behavior: 'smooth' });
-        });
+        function isBogotaRegistration(reg) {
+            return bogotaLocalidades.includes(reg.localidad);
+        }
+
+        function loadRegistrationsTabbed() {
+            const bogota = allRegistrations.filter(r => isBogotaRegistration(r));
+            const resto = allRegistrations.filter(r => !isBogotaRegistration(r) && r.departamento);
+
+            // Load Bogota registrations
+            const bogotaHtml = bogota.map(reg => `
+                <tr>
+                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
+                    <td>${reg.email || '-'}</td>
+                    <td>${reg.cedula || '-'}</td>
+                    <td>${reg.localidad || '-'}</td>
+                    <td>${reg.leaderName || '-'}</td>
+                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
+                    <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${reg.confirmed}">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('bogotaTable').innerHTML = bogotaHtml ||
+                '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogotá</td></tr>';
+
+            // Load Resto del País registrations
+            const restoHtml = resto.map(reg => `
+                <tr>
+                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
+                    <td>${reg.email || '-'}</td>
+                    <td>${reg.cedula || '-'}</td>
+                    <td>${reg.departamento || '-'}</td>
+                    <td>${reg.leaderName || '-'}</td>
+                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
+                    <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${reg.confirmed}">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('restoTable').innerHTML = restoHtml ||
+                '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td></tr>';
+
+            // Agregar event listeners
+            document.querySelectorAll('.toggle-confirm-btn').forEach(btn => {
+                btn.addEventListener('click', () => toggleConfirm(btn.dataset.regId, btn.dataset.confirmed === 'true'));
+            });
+        }
+
+        function showRegistrationTab(tab) {
+            const bogotaTab = document.getElementById('bogotaTab');
+            const restoTab = document.getElementById('restoTab');
+            const bogotaRegs = document.getElementById('bogotaRegistrations');
+            const restoRegs = document.getElementById('restoRegistrations');
+
+            if (tab === 'bogota') {
+                bogotaTab.style.background = '#667eea';
+                bogotaTab.style.color = 'white';
+                bogotaTab.style.borderBottom = '3px solid #667eea';
+                restoTab.style.background = 'transparent';
+                restoTab.style.color = '#999';
+                restoTab.style.borderBottom = 'none';
+                bogotaRegs.style.display = 'block';
+                restoRegs.style.display = 'none';
+            } else {
+                restoTab.style.background = '#667eea';
+                restoTab.style.color = 'white';
+                restoTab.style.borderBottom = '3px solid #667eea';
+                bogotaTab.style.background = 'transparent';
+                bogotaTab.style.color = '#999';
+                bogotaTab.style.borderBottom = 'none';
+                bogotaRegs.style.display = 'none';
+                restoRegs.style.display = 'block';
+            }
+        }
+
+        // Export buttons for registration tabs
+        const exportBogotaBtn = document.getElementById('exportBogotaBtn');
+        if (exportBogotaBtn) {
+            exportBogotaBtn.addEventListener('click', () => {
+                const bogotaLocalidades = ['Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'];
+                const bogota = allRegistrations.filter(r => bogotaLocalidades.includes(r.localidad));
+                const data = bogota.map(r => ({
+                    Nombre: `${r.firstName} ${r.lastName}`,
+                    Email: r.email || '',
+                    Cédula: r.cedula || '',
+                    Localidad: r.localidad || '',
+                    Líder: r.leaderName || '',
+                    Puesto: r.votingPlace || '',
+                    Mesa: r.votingTable || '',
+                    Fecha: new Date(r.date).toLocaleDateString('es-CO'),
+                    Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
+                }));
+                exportToExcel(data, `registros_bogota_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            });
+        }
+
+        const exportRestoBtn = document.getElementById('exportRestoBtn');
+        if (exportRestoBtn) {
+            exportRestoBtn.addEventListener('click', () => {
+                const resto = allRegistrations.filter(r => r.departamento && !r.localidad);
+                const data = resto.map(r => ({
+                    Nombre: `${r.firstName} ${r.lastName}`,
+                    Email: r.email || '',
+                    Cédula: r.cedula || '',
+                    Departamento: r.departamento || '',
+                    Líder: r.leaderName || '',
+                    Puesto: r.votingPlace || '',
+                    Mesa: r.votingTable || '',
+                    Fecha: new Date(r.date).toLocaleDateString('es-CO'),
+                    Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
+                }));
+                exportToExcel(data, `registros_resto_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            });
+        }
 
         // Initialize init
         // Inicializar: verificar auth, cargar evento si falta, luego cargar dashboard
