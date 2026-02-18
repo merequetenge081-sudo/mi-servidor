@@ -1058,3 +1058,14 @@
 {"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-18 14:40:22"}
 {"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-18 14:40:23"}
 {"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-18 14:40:23"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-18 14:41:36"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 3ms","service":"mi-servidor","timestamp":"2026-02-18 14:41:36"}
+{"level":"info","message":"GET /leaders 200 118ms","service":"mi-servidor","timestamp":"2026-02-18 14:41:37"}
+{"level":"info","message":"GET /registrations 200 2571ms","service":"mi-servidor","timestamp":"2026-02-18 14:41:39"}
+{"level":"info","message":"Nueva contraseña temporal generada para Cristian García: 3n0i7ehcAa1!","service":"mi-servidor","timestamp":"2026-02-18 14:42:13"}
+{"level":"info","message":"POST /auth/admin-generate-password 200 390ms","service":"mi-servidor","timestamp":"2026-02-18 14:42:13"}
+{"level":"info","message":"GET /leaders 200 100ms","service":"mi-servidor","timestamp":"2026-02-18 14:42:15"}
+{"level":"info","message":"GET /registrations 200 922ms","service":"mi-servidor","timestamp":"2026-02-18 14:42:16"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-18 14:51:35"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-18 14:51:36"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-18 14:51:36"}

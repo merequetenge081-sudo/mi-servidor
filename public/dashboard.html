@@ -423,6 +423,30 @@
             color: #cbd5e0 !important;
         }
 
+        /* DARK MODE: Fix table cell colors and spans */
+        body.dark-mode .table td span[style*="color"] {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .table td span[style*="background"] {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .table td strong {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode #leaderSearchInput {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+            border-color: #4a5568 !important;
+        }
+
+        body.dark-mode #leaderSearchInput::placeholder {
+            color: #a0aec0 !important;
+        }
+
         body.dark-mode .text-center {
             color: #cbd5e0 !important;
         }
@@ -1033,9 +1057,8 @@
 <body>
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="navbar-brand">
-            <i class="bi bi-speedometer2"></i>
-            Dashboard - <span id="eventNameDisplay" style="font-weight: 600;">Evento</span>
+        <div class="navbar-brand" style="flex: 1; text-align: center; font-size: 22px; font-weight: 700; letter-spacing: 0.5px;">
+            <span id="eventNameDisplay" style="font-weight: 700;">Evento</span>
         </div>
         <div class="navbar-actions">
             <span id="adminUsername" style="opacity: 0.9; font-size: 13px; margin-right: 10px;">Admin</span>
@@ -1214,7 +1237,8 @@
                 <div class="page-title" style="margin-bottom: 0;">
                     <i class="bi bi-people-fill"></i> Gestión de Líderes
                 </div>
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <input type="text" id="leaderSearchInput" placeholder="🔍 Buscar líder por nombre..." style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; width: 220px;">
                     <button class="btn btn-primary" id="newLeaderBtn">
                         <i class="bi bi-plus-circle"></i> Nuevo Líder
                     </button>
@@ -1742,6 +1766,78 @@
         // Paginación
         let currentPage = 1;
         const itemsPerPage = 50;
+
+        function filterLeadersByName(searchTerm) {
+            const filtered = searchTerm.trim() === '' ? allLeaders : 
+                allLeaders.filter(leader => leader.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            
+            // Create filtered table using existing renderLeadersTable logic
+            const html = filtered.map(leader => {
+                let passwordStatus = '';
+                if (leader.passwordResetRequested) {
+                    passwordStatus = '<span style="background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-exclamation-triangle"></i> Reset Solicitado</span>';
+                } else if (leader.isTemporaryPassword) {
+                    passwordStatus = '<span style="background: #cfe2ff; color: #084298; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-clock"></i> Temporal</span>';
+                } else if (leader.passwordCanBeChanged === false) {
+                    passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-check-circle"></i> Configurada</span>';
+                } else {
+                    passwordStatus = '<span style="background: #f8d7da; color: #842029; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-x-circle"></i> Sin configurar</span>';
+                }
+
+                return `
+                <tr>
+                    <td><strong>${leader.name}</strong></td>
+                    <td>${leader.email || '<span style="color:#ccc;">Sin correo</span>'}</td>
+                    <td>${leader.phone || '-'}</td>
+                    <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${leader.registrations || 0}</span></td>
+                    <td>${passwordStatus}</td>
+                    <td>
+                        ${leader.username ? 
+                            `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" data-username="${leader.username}" data-password="${leader.tempPasswordPlaintext || '-'}" title="Ver Credenciales (Usuario y Contraseña)">
+                                <i class="bi bi-eye"></i> Ver Credenciales
+                            </button>` 
+                            : '<span style="color: #999; font-size: 12px;">Sin usuario</span>'}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" title="Ver QR">
+                            <i class="bi bi-qr-code"></i>
+                        </button>
+                        <a href="/form.html?token=${leader.token || leader.leaderId || leader._id}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Ver Formulario">
+                            <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                        <button class="btn btn-sm btn-outline-secondary edit-leader-btn" data-leader-id="${leader._id}" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger generate-pass-btn" data-leader-id="${leader._id}" title="Generar Nueva Contraseña">
+                            <i class="bi bi-key"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            }).join('');
+            
+            document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
+            
+            // Reattach event listeners
+            document.querySelectorAll('.qr-btn').forEach(btn => {
+                btn.addEventListener('click', () => showQR(btn.dataset.leaderId, btn.dataset.leaderName));
+            });
+            document.querySelectorAll('.delete-leader-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteLeader(btn.dataset.leaderId));
+            });
+            document.querySelectorAll('.edit-leader-btn').forEach(btn => {
+                btn.addEventListener('click', () => showEditLeader(btn.dataset.leaderId));
+            });
+            document.querySelectorAll('.generate-pass-btn').forEach(btn => {
+                btn.addEventListener('click', () => generateNewPassword(btn.dataset.leaderId));
+            });
+            document.querySelectorAll('.view-credentials-btn').forEach(btn => {
+                btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId, btn.dataset.username, btn.dataset.password));
+            });
+        }
 
         async function checkAuth() {
             if (!currentToken) {
@@ -2306,7 +2402,12 @@
         }
 
         function loadCharts() {
-            // Confirmation Pie Chart
+            // Bogotá vs Resto del País
+            const bogotaLocalidades = ['Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'];
+            const bogotaRegs = allRegistrations.filter(r => bogotaLocalidades.includes(r.localidad));
+            const restoRegs = allRegistrations.filter(r => !bogotaLocalidades.includes(r.localidad));
+            
+            // Confirmation Pie Chart (Overall)
             const confirmed = allRegistrations.filter(r => r.confirmed).length;
             const pending = allRegistrations.length - confirmed;
 
@@ -2363,6 +2464,11 @@
         }
 
         function loadAnalytics() {
+            // Bogotá vs Resto del País
+            const bogotaLocalidades = ['Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'];
+            const bogotaRegs = allRegistrations.filter(r => bogotaLocalidades.includes(r.localidad));
+            const restoRegs = allRegistrations.filter(r => !bogotaLocalidades.includes(r.localidad));
+            
             const total = allRegistrations.length;
             const confirmed = allRegistrations.filter(r => r.confirmed).length;
             const rate = total > 0 ? ((confirmed / total) * 100).toFixed(1) : 0;
@@ -2524,6 +2630,13 @@
                     if (section === 'registrations') filterRegistrations();
                     if (section === 'dashboard' && !chartsLoaded) { loadCharts(); chartsLoaded = true; }
                     if (section === 'analytics' && !analyticsLoaded) { loadAnalytics(); analyticsLoaded = true; }
+                    
+                    // Attach leader search listener
+                    const leaderSearchInput = document.getElementById('leaderSearchInput');
+                    if (leaderSearchInput && section === 'leaders' && !leaderSearchInput.hasListener) {
+                        leaderSearchInput.addEventListener('input', (e) => filterLeadersByName(e.target.value));
+                        leaderSearchInput.hasListener = true;
+                    }
                 });
             });
         });
