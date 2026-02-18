@@ -671,9 +671,9 @@ app.delete("/api/registrations/:id", verifyToken, requireOwnerOrAdmin(async (req
 });
 
 // Ruta pública de registro por token
-// Sirve el formulario público de registro
+// Sirve el formulario público completo dentro de app.html
 app.get("/registro/:token", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "form.html"));
+  res.sendFile(path.join(__dirname, "app.html"));
 });
 
 // Exportar a Excel (genérico: /api/export/leaders o /api/export/registrations)
