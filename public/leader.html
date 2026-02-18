@@ -160,7 +160,6 @@
                                         <td><span class="badge ${reg.confirmed ? 'bg-success' : 'bg-secondary'}">${reg.confirmed ? '✓ Confirmado' : 'Pendiente'}</span></td>
                                         <td>
                                                 <button class="btn btn-sm btn-outline-primary" onclick="editReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-pencil"></i> Editar</button>
-                                                <button class="btn btn-sm btn-outline-secondary" onclick="exportReg('${reg._id}', '${leaderId}', '${token}')"><i class="bi bi-download"></i></button>
                                         </td>
                                 `;
                                 tbody.appendChild(row);
@@ -247,36 +246,7 @@
 
         // (Eliminado: edición simple, solo queda la avanzada con modal y notificaciones visuales)
 
-        // Exportar registro individual a Excel
-        window.exportReg = async function(id, leaderId, token) {
-            try {
-                let reg = currentRegistrations.find(r => r._id === id);
-                if (!reg) {
-                    const res = await fetch(`${API_URL}/api/registrations?leaderId=${leaderId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                    if (!res.ok) return showToast('danger', 'Error exportando registro');
-                    const regs = await res.json();
-                    const regsArray = Array.isArray(regs) ? regs : regs.data || [];
-                    reg = regsArray.find(r => r._id === id);
-                }
-                if (!reg) return showToast('danger', 'Registro no encontrado');
-                // Generar XLSX simple (solo este registro)
-                const headers = ['Nombre', 'Apellido', 'Cédula', 'Email', 'Teléfono', 'Localidad', '¿Inscrito para votar?', 'Puesto de Votación', 'Nº Mesa', 'Confirmado'];
-                const row = [
-                    reg.firstName||'', reg.lastName||'', reg.cedula||'', reg.email||'', reg.phone||'', reg.localidad||'',
-                    reg.registeredToVote ? 'Sí' : 'No', reg.votingPlace||'', reg.votingTable||'', reg.confirmed ? 'Sí' : 'No'
-                ];
-                const csv = [headers.join(','), row.map(v=>`"${(v||'').toString().replace(/"/g,'""')}` ).join(',')].join('\n');
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `registro_${reg.cedula||reg._id}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                showToast('success', 'Registro exportado correctamente');
-            } catch (e) { showToast('danger', 'Error exportando registro'); }
-        }
+
 
         // Notificaciones visuales modernas
         function showToast(type, message) {
