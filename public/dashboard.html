@@ -1243,7 +1243,7 @@
                         <i class="bi bi-plus-circle"></i> Nuevo Líder
                     </button>
                     <button class="btn btn-outline-primary" id="migrateUsernamesBtn">
-                        <i class="bi bi-arrow-repeat"></i> Asignar Usuarios
+                        <i class="bi bi-plus-circle"></i> Agregar Usuarios y Contraseñas
                     </button>
                 </div>
             </div>
@@ -1779,7 +1779,7 @@
                 } else if (leader.isTemporaryPassword) {
                     passwordStatus = '<span style="background: #cfe2ff; color: #084298; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-clock"></i> Temporal</span>';
                 } else if (leader.passwordCanBeChanged === false) {
-                    passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-check-circle"></i> Configurada</span>';
+                    passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-lock"></i> Fija</span>';
                 } else {
                     passwordStatus = '<span style="background: #f8d7da; color: #842029; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-x-circle"></i> Sin configurar</span>';
                 }
@@ -2027,7 +2027,7 @@
                 } else if (leader.isTemporaryPassword) {
                     passwordStatus = '<span style="background: #cfe2ff; color: #084298; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-clock"></i> Temporal</span>';
                 } else if (leader.passwordCanBeChanged === false) {
-                    passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-check-circle"></i> Configurada</span>';
+                    passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-lock"></i> Fija</span>';
                 } else {
                     passwordStatus = '<span style="background: #f8d7da; color: #842029; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-x-circle"></i> Sin configurar</span>';
                 }
@@ -2231,24 +2231,32 @@
             const leader = allLeaders.find(l => l._id === leaderId);
             if (!leader) return alert('Líder no encontrado');
 
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const bgColor = isDarkMode ? '#16213e' : 'white';
+            const textColor = isDarkMode ? '#e0e0e0' : '#333';
+            const labelColor = isDarkMode ? '#cbd5e0' : '#555';
+            const codeBg = isDarkMode ? '#2d3748' : '#e7f3ff';
+            const codeColor = isDarkMode ? '#ffd700' : '#333';
+            const btnBg = isDarkMode ? '#4a5568' : '#6c757d';
+
             const modal = document.createElement('div');
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
             modal.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                <div style="background: ${bgColor}; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid ${isDarkMode ? '#2d3748' : '#ddd'};">
                     <h4 style="color: #667eea; margin-bottom: 20px;"><i class="bi bi-person-badge"></i> Credenciales del Líder</h4>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <p style="margin: 5px 0;"><strong>Líder:</strong> ${leader.name}</p>
-                        <p style="margin: 5px 0;"><strong>Usuario:</strong> <code style="background: #e7f3ff; padding: 4px 8px; border-radius: 4px;">${username}</code></p>
-                        <p style="margin: 5px 0;"><strong>Contraseña Temporal:</strong> <code style="background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-size: 14px; color: #856404;">${password}</code></p>
+                    <div style="background: ${isDarkMode ? '#2d3748' : '#f8f9fa'}; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid ${isDarkMode ? '#4a5568' : '#ddd'};">
+                        <p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Líder:</strong> ${leader.name}</p>
+                        <p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Usuario:</strong> <code style="background: ${codeBg}; color: ${codeColor}; padding: 4px 8px; border-radius: 4px; font-weight: 600;">${username}</code></p>
+                        <p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Contraseña Temporal:</strong> <code style="background: ${codeBg}; color: ${codeColor}; padding: 4px 8px; border-radius: 4px; font-size: 14px; font-weight: 600;">${password}</code></p>
                     </div>
-                    <p style="color: #666; font-size: 13px; margin-bottom: 20px;">
+                    <p style="color: ${labelColor}; font-size: 13px; margin-bottom: 20px;">
                         <i class="bi bi-info-circle"></i> Esta es la última contraseña temporal generada por el administrador.
                     </p>
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="navigator.clipboard.writeText('Usuario: ${username}\\nContraseña: ${password}'); this.innerHTML='<i class=\\'bi bi-check\\'></i> ¡Copiado!'; this.style.background='#28a745';" class="btn btn-primary" style="flex: 1;">
+                        <button onclick="navigator.clipboard.writeText('Usuario: ${username}\\nContraseña: ${password}'); this.innerHTML='<i class=\\'bi bi-check\\'></i> ¡Copiado!'; this.style.background='#28a745'; this.style.color='white';" class="btn btn-primary" style="flex: 1; background: #667eea; color: white; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-weight: 600;">
                             <i class="bi bi-clipboard"></i> Copiar
                         </button>
-                        <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove();" class="btn btn-secondary" style="flex: 1;">Cerrar</button>
+                        <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove();" class="btn btn-secondary" style="flex: 1; background: ${btnBg}; color: white; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-weight: 600;">Cerrar</button>
                     </div>
                 </div>
             `;
@@ -2258,7 +2266,7 @@
 
         // ====== MIGRATE USERNAMES ======
         document.getElementById('migrateUsernamesBtn').addEventListener('click', async () => {
-            if (!confirm('¿Deseas generar usuarios y contraseñas temporales para TODOS los líderes que aún no tienen usuario?\n\nEsto actualiza la base de datos directamente.')) return;
+            if (!confirm('¿Deseas agregar usuarios y contraseñas temporales para los líderes que aún no las configuran?\n\nLos líderes con contraseña fija no serán modificados.\n\nEsto actualiza la base de datos directamente.')) return;
 
             const btn = document.getElementById('migrateUsernamesBtn');
             btn.disabled = true;
@@ -2307,7 +2315,7 @@
             }
 
             btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Asignar Usuarios';
+            btn.innerHTML = '<i class="bi bi-plus-circle"></i> Agregar Usuarios y Contraseñas';
         });
 
         function populateLeaderFilter() {
@@ -2479,12 +2487,14 @@
 
             document.getElementById('avgConfirmRate').textContent = rate + '%';
             document.getElementById('avgRegsPerLeader').textContent = avgRegs;
-            document.getElementById('localidadesCount').textContent = localidades.size;
+            document.getElementById('localidadesCount').textContent = bogotaRegs.length + ' Bogotá / ' + restoRegs.length + ' Resto';
 
             // Leader Registrations Chart
             const leaderStats = allLeaders.map(l => ({
                 name: l.name.split(' ')[0],
-                registros: allRegistrations.filter(r => r.leaderId === l._id).length
+                registros: allRegistrations.filter(r => r.leaderId === l._id).length,
+                bogota: bogotaRegs.filter(r => r.leaderId === l._id).length,
+                resto: restoRegs.filter(r => r.leaderId === l._id).length
             })).sort((a, b) => b.registros - a.registros);
 
             if (charts.leaderRegs) charts.leaderRegs.destroy();
@@ -2494,16 +2504,21 @@
                 data: {
                     labels: leaderStats.map(l => l.name),
                     datasets: [{
-                        label: 'Registros',
-                        data: leaderStats.map(l => l.registros),
+                        label: 'Bogotá',
+                        data: leaderStats.map(l => l.bogota),
                         backgroundColor: '#667eea',
+                        borderRadius: 8
+                    }, {
+                        label: 'Resto del País',
+                        data: leaderStats.map(l => l.resto),
+                        backgroundColor: '#764ba2',
                         borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { legend: { display: true } },
                     scales: { y: { beginAtZero: true } }
                 }
             });

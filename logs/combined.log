@@ -1069,3 +1069,6 @@
 {"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-18 14:51:35"}
 {"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-18 14:51:36"}
 {"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-18 14:51:36"}
+{"level":"info","message":"GET /leaders 200 97ms","service":"mi-servidor","timestamp":"2026-02-18 14:53:19"}
+{"level":"info","message":"GET /registrations 200 426ms","service":"mi-servidor","timestamp":"2026-02-18 14:53:19"}
+{"level":"info","message":"POST /migrate-usernames 200 70ms","service":"mi-servidor","timestamp":"2026-02-18 14:54:45"}
