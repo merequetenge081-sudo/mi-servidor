@@ -17,7 +17,7 @@ export async function adminLogin(req, res) {
 
     // Intenta obtener admin de MongoDB con fallback a memoria
     const { data: admin, source } = await findAdminWithFallback(Admin, username);
-    
+
     if (!admin) {
       return res.status(401).json({ error: "Credenciales inválidas" });
     }
@@ -28,9 +28,9 @@ export async function adminLogin(req, res) {
     }
 
     const token = jwt.sign(
-      { 
-        userId: admin._id, 
-        role: "admin", 
+      {
+        userId: admin._id,
+        role: "admin",
         username: admin.username,
         organizationId: admin.organizationId || null, // Multi-tenant context
         source // Indica si proviene de MongoDB o memoria
@@ -75,10 +75,10 @@ export async function leaderLogin(req, res) {
     }
 
     const token = jwt.sign(
-      { 
-        userId: leader._id, 
-        leaderId: leader.leaderId, 
-        role: "leader", 
+      {
+        userId: leader._id,
+        leaderId: leader.leaderId,
+        role: "leader",
         name: leader.name,
         organizationId: leader.organizationId, // Multi-tenant context
         source // Indica si proviene de MongoDB o memoria
@@ -103,10 +103,19 @@ export async function leaderLoginById(req, res) {
       return res.status(400).json({ error: "LeaderId requerido" });
     }
 
+    console.log("👉 Login attempt with:", leaderId); // DEBUG LOG
+
+    let query = { leaderId };
+
+    // Si es un ObjectId válido, permitir búsqueda por _id también
+    if (leaderId.match(/^[0-9a-fA-F]{24}$/)) {
+      query = { $or: [{ leaderId }, { _id: leaderId }] };
+    }
+
     let leader;
     let source = "unknown";
     try {
-      leader = await Leader.findOne({ leaderId });
+      leader = await Leader.findOne(query);
       if (leader) source = "mongodb";
     } catch (mongoError) {
       logger.warn("MongoDB no disponible, usando fallback en memoria", {
@@ -117,7 +126,7 @@ export async function leaderLoginById(req, res) {
         { _id: "leader-001", leaderId: "L001", name: "Líder Prueba", cedula: "1000000001" },
         { _id: "leader-002", leaderId: "L002", name: "Segundo Líder", cedula: "1000000002" }
       ];
-      leader = leaders.find(l => l.leaderId === leaderId);
+      leader = leaders.find(l => l.leaderId === leaderId || l._id === leaderId);
       if (leader) source = "memory";
     }
 
@@ -127,10 +136,10 @@ export async function leaderLoginById(req, res) {
 
     // Passwordless login: solo verificamos que el líder existe
     const token = jwt.sign(
-      { 
-        userId: leader._id, 
-        leaderId: leader.leaderId || leaderId, 
-        role: "leader", 
+      {
+        userId: leader._id,
+        leaderId: leader.leaderId,
+        role: "leader",
         name: leader.name,
         organizationId: leader.organizationId, // Multi-tenant context
         source

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #f5f7fb 0%, #e9ecef 100%);
             min-height: 100vh;
         }
@@ -22,7 +27,7 @@
         .navbar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px 30px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -31,38 +36,52 @@
             width: 100%;
             top: 0;
             z-index: 100;
+            gap: 12px;
         }
 
-        .navbar-brand { 
-            font-weight: 700; 
-            font-size: 18px;
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            min-width: 0;
+            flex-shrink: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .navbar-brand span {
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .navbar-actions {
             display: flex;
-            gap: 20px;
+            gap: 6px;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .btn-logout {
-            background: transparent;
-            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
-            padding: 8px 15px;
+            gap: 5px;
+            font-size: 12px;
+            transition: all 0.2s;
+            padding: 6px 12px;
             border-radius: 8px;
+            white-space: nowrap;
         }
 
         .btn-logout:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
         }
 
         /* ============== SIDEBAR ============== */
@@ -76,7 +95,7 @@
             color: white;
             padding: 20px 0;
             overflow-y: auto;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar::-webkit-scrollbar {
@@ -89,26 +108,33 @@
         }
 
         .nav-link {
-            padding: 15px 20px;
+            padding: 14px 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            color: #aaa;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.6);
             font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             border-left: 3px solid transparent;
+            letter-spacing: 0.2px;
+        }
+
+        .nav-link i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
         }
 
         .nav-link:hover {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
+            background: rgba(102, 126, 234, 0.15);
+            color: rgba(255, 255, 255, 0.9);
             border-left-color: #667eea;
         }
 
         .nav-link.active {
-            background: linear-gradient(90deg, #667eea 0%, rgba(102, 126, 234, 0.2) 100%);
-            color: #667eea;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.3) 0%, rgba(102, 126, 234, 0.08) 100%);
+            color: #ffffff;
             border-left-color: #667eea;
             font-weight: 600;
         }
@@ -122,7 +148,8 @@
 
         .section {
             display: none;
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.3s ease-out;
+            will-change: opacity, transform;
         }
 
         .section.active {
@@ -130,8 +157,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .page-title {
@@ -162,7 +196,7 @@
             border-radius: 16px;
             padding: 28px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -192,8 +226,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         .stat-value {
@@ -215,14 +256,14 @@
         .card {
             border: none;
             border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
             margin-bottom: 30px;
             overflow: hidden;
             transition: all 0.3s ease;
         }
 
         .card:hover {
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .card-header {
@@ -264,13 +305,8 @@
             vertical-align: middle;
         }
 
-        .table tbody tr {
-            transition: all 0.3s ease;
-        }
-
         .table tbody tr:hover {
             background: #f8f9ff;
-            transform: scale(1.01);
         }
 
         /* ============== BUTTONS ============== */
@@ -278,7 +314,7 @@
             border-radius: 10px;
             font-weight: 600;
             padding: 11px 22px;
-            transition: all 0.3s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
             border: none;
             cursor: pointer;
             font-size: 14px;
@@ -303,7 +339,7 @@
         .btn-outline-secondary {
             border: 1px solid #ddd;
             color: #666;
-            transition: all 0.3s;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
         }
 
         .btn-outline-secondary:hover {
@@ -321,7 +357,7 @@
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
         }
 
         .filter-group {
@@ -337,16 +373,18 @@
             font-size: 13px;
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 10px 14px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 14px;
-            transition: all 0.3s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #667eea;
             background: #f8f9ff;
@@ -379,11 +417,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.6);
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            backdrop-filter: blur(4px);
         }
 
         .modal.active {
@@ -392,8 +429,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-content {
@@ -402,7 +446,7 @@
             padding: 32px;
             max-width: 500px;
             width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             position: relative;
         }
 
@@ -415,12 +459,11 @@
             font-size: 28px;
             cursor: pointer;
             color: #999;
-            transition: all 0.3s;
+            transition: color 0.2s;
         }
 
         .modal-close:hover {
             color: #667eea;
-            transform: rotate(90deg);
         }
 
         .modal-header {
@@ -441,7 +484,8 @@
             margin-bottom: 8px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 11px;
             border: 2px solid #e0e0e0;
@@ -513,11 +557,20 @@
         }
 
         @keyframes bounce {
-            0%, 80%, 100% { opacity: 0.3; }
-            40% { opacity: 1; }
+
+            0%,
+            80%,
+            100% {
+                opacity: 0.3;
+            }
+
+            40% {
+                opacity: 1;
+            }
         }
     </style>
 </head>
+
 <body>
     <!-- NAVBAR -->
     <div class="navbar">
@@ -526,7 +579,16 @@
             Dashboard - <span id="eventNameDisplay" style="font-weight: 600;">Evento</span>
         </div>
         <div class="navbar-actions">
-            <span id="adminUsername">Admin</span>
+            <button class="btn-logout" id="newRegistrationBtn" title="Nuevo Registro">
+                <i class="bi bi-plus-circle"></i> Nuevo Registro
+            </button>
+            <button class="btn-logout" id="updateEventBtn" title="Actualizar Evento">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar Evento
+            </button>
+            <button class="btn-logout" id="changeEventBtn" title="Cambiar Evento">
+                <i class="bi bi-calendar-event"></i> Cambiar Evento
+            </button>
+            <span id="adminUsername" style="opacity: 0.8; font-size: 13px;">Admin</span>
             <button class="btn-logout" id="logoutBtn" title="Cerrar sesión">
                 <i class="bi bi-box-arrow-right"></i> Salir
             </button>
@@ -610,7 +672,7 @@
 
             <div class="card">
                 <div class="card-header">
-                    <i class="bi bi-clock-history"></i> Últimos Registros (Top 10)
+                    <i class="bi bi-clock-history"></i> Actividad Reciente
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -626,7 +688,10 @@
                                 </tr>
                             </thead>
                             <tbody id="recentRegistrations">
-                                <tr><td colspan="6" class="text-center" style="padding: 40px;"><span class="loading"></span>Cargando...</td></tr>
+                                <tr>
+                                    <td colspan="6" class="text-center" style="padding: 40px;"><span
+                                            class="loading"></span>Cargando...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -662,7 +727,10 @@
                                 </tr>
                             </thead>
                             <tbody id="leadersTable">
-                                <tr><td colspan="5" class="text-center" style="padding: 40px;"><span class="loading"></span>Cargando...</td></tr>
+                                <tr>
+                                    <td colspan="5" class="text-center" style="padding: 40px;"><span
+                                            class="loading"></span>Cargando...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -715,9 +783,24 @@
                                 </tr>
                             </thead>
                             <tbody id="registrationsTable">
-                                <tr><td colspan="8" class="text-center" style="padding: 40px;"><span class="loading"></span>Cargando...</td></tr>
+                                <tr>
+                                    <td colspan="8" class="text-center" style="padding: 40px;"><span
+                                            class="loading"></span>Cargando...</td>
+                                </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <!-- PAGINATION CONTROLS -->
+                    <div class="pagination-controls"
+                        style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
+                        <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" disabled>
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </button>
+                        <span id="pageIndicator" style="font-size: 14px; font-weight: 600; color: #666;">Página 1 de
+                            1</span>
+                        <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn" disabled>
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -788,9 +871,24 @@
                                 </tr>
                             </thead>
                             <tbody id="leaderDetailTable">
-                                <tr><td colspan="5" class="text-center" style="padding: 40px;"><span class="loading"></span>Cargando...</td></tr>
+                                <tr>
+                                    <td colspan="5" class="text-center" style="padding: 40px;"><span
+                                            class="loading"></span>Cargando...</td>
+                                </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <!-- LEADER ANALYTICS PAGINATION -->
+                    <div class="pagination-controls"
+                        style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
+                        <button class="btn btn-sm btn-outline-secondary" id="prevLeaderPageBtn" disabled>
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </button>
+                        <span id="leaderPageIndicator" style="font-size: 14px; font-weight: 600; color: #666;">Página 1
+                            de 1</span>
+                        <button class="btn btn-sm btn-outline-secondary" id="nextLeaderPageBtn" disabled>
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -809,28 +907,35 @@
                 <div class="card-body">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                         <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
-                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-clipboard-check"></i> Todos los Registros</h6>
+                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-clipboard-check"></i> Todos
+                                los Registros</h6>
                             <button class="btn btn-primary" id="exportRegsBtn" style="width: 100%;">
                                 <i class="bi bi-download"></i> Descargar Excel
                             </button>
-                            <small style="color: #999; display: block; margin-top: 10px;">Exporta todos los registros del evento actual</small>
+                            <small style="color: #999; display: block; margin-top: 10px;">Exporta todos los registros
+                                del evento actual</small>
                         </div>
 
                         <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
-                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-people"></i> Todos los Líderes</h6>
+                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-people"></i> Todos los
+                                Líderes</h6>
                             <button class="btn btn-primary" id="exportLeadersBtn" style="width: 100%;">
                                 <i class="bi bi-download"></i> Descargar Excel
                             </button>
-                            <small style="color: #999; display: block; margin-top: 10px;">Exporta lista de líderes con estadísticas</small>
+                            <small style="color: #999; display: block; margin-top: 10px;">Exporta lista de líderes con
+                                estadísticas</small>
                         </div>
 
                         <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
-                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-person"></i> Registros por Líder</h6>
-                            <select id="exportLeaderSelect" style="margin-bottom: 10px; width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;"></select>
+                            <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-person"></i> Registros por
+                                Líder</h6>
+                            <select id="exportLeaderSelect"
+                                style="margin-bottom: 10px; width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;"></select>
                             <button class="btn btn-primary" id="exportByLeaderBtn" style="width: 100%;">
                                 <i class="bi bi-download"></i> Descargar
                             </button>
-                            <small style="color: #999; display: block; margin-top: 10px;">Exporta registros de un líder específico</small>
+                            <small style="color: #999; display: block; margin-top: 10px;">Exporta registros de un líder
+                                específico</small>
                         </div>
                     </div>
                 </div>
@@ -865,13 +970,100 @@
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" id="closeQrModal">&times;</button>
             <div class="modal-header" style="text-align: center;"><i class="bi bi-qr-code"></i> Código QR</div>
-            <div style="text-align: center; padding: 20px; background: #f8f9ff; border-radius: 12px; margin-bottom: 20px;">
+            <div
+                style="text-align: center; padding: 20px; background: #f8f9ff; border-radius: 12px; margin-bottom: 20px;">
                 <div id="qrCode" style="display: inline-block;"></div>
             </div>
-            <label style="font-weight: 600; color: #1a1a2e; margin-bottom: 8px; display: block;">Link de Registro</label>
+            <label style="font-weight: 600; color: #1a1a2e; margin-bottom: 8px; display: block;">Link de
+                Registro</label>
             <input type="text" id="qrLink" readonly style="margin-bottom: 15px;">
             <button class="btn btn-primary" id="copyQrBtn" style="width: 100%;">
                 <i class="bi bi-clipboard"></i> Copiar Link
+            </button>
+        </div>
+    </div>
+
+    <!-- CHANGE EVENT MODAL -->
+    <div id="changeEventModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeChangeEventModal">&times;</button>
+            <div class="modal-header"><i class="bi bi-calendar-event"></i> Cambiar Evento</div>
+            <div class="form-group">
+                <label>Seleccionar Evento</label>
+                <select id="eventSelect"
+                    style="width: 100%; padding: 11px; border: 2px solid #e0e0e0; border-radius: 10px;"></select>
+            </div>
+            <button class="btn btn-primary" id="confirmChangeEventBtn" style="width: 100%; margin-top: 15px;">
+                <i class="bi bi-check-circle"></i> Cambiar a este Evento
+            </button>
+        </div>
+    </div>
+
+    <!-- NEW REGISTRATION MODAL -->
+    <div id="newRegModal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <button class="modal-close" id="closeNewRegModal">&times;</button>
+            <div class="modal-header"><i class="bi bi-person-plus"></i> Nuevo Registro</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" id="regFirstName" placeholder="Nombre">
+                </div>
+                <div class="form-group">
+                    <label>Apellido</label>
+                    <input type="text" id="regLastName" placeholder="Apellido">
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Cédula</label>
+                    <input type="text" id="regCedula" placeholder="Número de cédula">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="text" id="regPhone" placeholder="+57 ...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="correo@ejemplo.com">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Localidad</label>
+                    <input type="text" id="regLocalidad" placeholder="Localidad">
+                </div>
+                <div class="form-group">
+                    <label>Líder</label>
+                    <select id="regLeaderSelect"></select>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="saveRegBtn" style="width: 100%; margin-top: 15px;">
+                <i class="bi bi-check-circle"></i> Guardar Registro
+            </button>
+        </div>
+    </div>
+
+    <!-- EDIT LEADER MODAL -->
+    <div id="editLeaderModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="modal-close" id="closeEditLeaderModal">&times;</button>
+            <div class="modal-header"><i class="bi bi-pencil-square"></i> Editar Líder</div>
+            <input type="hidden" id="editLeaderId">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="editLeaderName" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="editLeaderEmail" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" id="editLeaderPhone" class="form-control">
+            </div>
+            <button class="btn btn-primary" id="saveEditLeaderBtn" style="width: 100%; margin-top: 15px;">
+                <i class="bi bi-save"></i> Guardar Cambios
             </button>
         </div>
     </div>
@@ -885,10 +1077,32 @@
         let allRegistrations = [];
         let charts = {};
 
-        function checkAuth() {
-            if (!currentToken || !currentEventId) {
+        // Paginación
+        let currentPage = 1;
+        const itemsPerPage = 50;
+
+        async function checkAuth() {
+            if (!currentToken) {
                 window.location.href = '/';
+                return false;
             }
+            // Si no hay eventId, cargar el evento activo automáticamente
+            if (!currentEventId) {
+                try {
+                    const evRes = await apiCall('/api/events');
+                    const events = await evRes.json();
+                    const evList = Array.isArray(events) ? events : (events.data || []);
+                    const active = evList.find(e => e.active) || evList[0];
+                    if (active) {
+                        currentEventId = active._id;
+                        localStorage.setItem('eventId', active._id);
+                        localStorage.setItem('eventName', active.name);
+                    }
+                } catch (err) {
+                    console.error('Error cargando eventos:', err);
+                }
+            }
+            return true;
         }
 
         async function apiCall(endpoint, options = {}) {
@@ -911,12 +1125,14 @@
         async function loadDashboard() {
             try {
                 document.getElementById('eventNameDisplay').textContent = localStorage.getItem('eventName') || 'Evento';
+                document.getElementById('adminUsername').textContent = localStorage.getItem('username') || 'Admin';
 
-                const leadersRes = await apiCall('/api/leaders');
+                const leadersRes = await apiCall(`/api/leaders${currentEventId ? '?eventId=' + currentEventId : ''}`);
                 const leadersData = await leadersRes.json();
-                allLeaders = Array.isArray(leadersData) ? leadersData : (leadersData.data || []);
+                const rawLeaders = Array.isArray(leadersData) ? leadersData : (leadersData.data || []);
+                allLeaders = processLeaders(rawLeaders);
 
-                const regsRes = await apiCall(`/api/registrations?eventId=${currentEventId}`);
+                const regsRes = await apiCall(`/api/registrations${currentEventId ? '?eventId=' + currentEventId + '&' : '?'}limit=1000`);
                 const regsData = await regsRes.json();
                 allRegistrations = Array.isArray(regsData) ? regsData : (regsData.data || []);
 
@@ -925,10 +1141,15 @@
                 loadRecentRegistrations();
                 populateLeaderFilter();
                 populateExportLeader();
-                loadCharts();
-                loadAnalytics();
+                // Defer heavy work - charts only render when visible
+                chartsLoaded = false;
+                analyticsLoaded = false;
+                // Pre-render charts if dashboard section is active
+                if (document.getElementById('dashboard').classList.contains('active')) {
+                    requestAnimationFrame(() => { loadCharts(); chartsLoaded = true; });
+                }
             } catch (err) {
-                console.error('Error:', err);
+                console.error('Error cargando dashboard:', err);
             }
         }
 
@@ -940,6 +1161,9 @@
             document.getElementById('confirmedCount').textContent = confirmed;
             document.getElementById('confirmRate').textContent = rate + '%';
         }
+
+        // processLeaders removed - strict event filtering handles duplicates now
+        function processLeaders(leaders) { return leaders; }
 
         function loadRecentRegistrations() {
             const recent = allRegistrations.slice(0, 10);
@@ -967,6 +1191,12 @@
                         <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}">
                             <i class="bi bi-qr-code"></i> QR
                         </button>
+                        <a href="/form.html?token=${leader.token || leader.leaderId || leader._id}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Ver Formulario">
+                            <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                        <button class="btn btn-sm btn-outline-secondary edit-leader-btn" data-leader-id="${leader._id}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
                         <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -981,11 +1211,14 @@
             document.querySelectorAll('.delete-leader-btn').forEach(btn => {
                 btn.addEventListener('click', () => deleteLeader(btn.dataset.leaderId));
             });
+            document.querySelectorAll('.edit-leader-btn').forEach(btn => {
+                btn.addEventListener('click', () => showEditLeader(btn.dataset.leaderId));
+            });
         }
 
         function populateLeaderFilter() {
             const select = document.getElementById('leaderFilter');
-            select.innerHTML = '<option value="">-- Todos los Líderes --</option>' + 
+            select.innerHTML = '<option value="">-- Todos los Líderes --</option>' +
                 allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
         }
 
@@ -1000,7 +1233,7 @@
             const status = document.getElementById('statusFilter').value;
 
             const filtered = allRegistrations.filter(r => {
-                const matchSearch = !search || 
+                const matchSearch = !search ||
                     `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
                     r.email.toLowerCase().includes(search) ||
                     r.cedula.includes(search);
@@ -1009,7 +1242,19 @@
                 return matchSearch && matchLeader && matchStatus;
             });
 
-            const html = filtered.map(reg => `
+            // Update Pagination
+            const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = 1;
+
+            document.getElementById('pageIndicator').textContent = `Página ${currentPage} de ${totalPages}`;
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+
+            // Slice data
+            const start = (currentPage - 1) * itemsPerPage;
+            const paginated = filtered.slice(start, start + itemsPerPage);
+
+            const html = paginated.map(reg => `
                 <tr>
                     <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
                     <td>${reg.email || '-'}</td>
@@ -1025,7 +1270,7 @@
                     </td>
                 </tr>
             `).join('');
-            document.getElementById('registrationsTable').innerHTML = html || 
+            document.getElementById('registrationsTable').innerHTML = html ||
                 '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros</td></tr>';
 
             document.querySelectorAll('.toggle-confirm-btn').forEach(btn => {
@@ -1036,7 +1281,12 @@
         async function showQR(leaderId, leaderName) {
             const qrContainer = document.getElementById('qrCode');
             qrContainer.innerHTML = '';
-            const link = `${API_URL}/registro/${leaderId}`;
+
+            // Find leader to get token
+            const leader = allLeaders.find(l => l._id === leaderId);
+            const token = leader ? (leader.token || leader.leaderId || leaderId) : leaderId;
+
+            const link = `${API_URL}/form.html?token=${token}`;
             document.getElementById('qrLink').value = link;
             new QRCode(qrContainer, { text: link, width: 250, height: 250 });
             document.getElementById('qrModal').classList.add('active');
@@ -1071,7 +1321,7 @@
                     datasets: [{
                         data: [confirmed, pending],
                         backgroundColor: ['#4CAF50', '#FFB74D'],
-                        borderColor: white,
+                        borderColor: '#ffffff',
                         borderWidth: 3
                     }]
                 },
@@ -1120,7 +1370,7 @@
             const rate = total > 0 ? ((confirmed / total) * 100).toFixed(1) : 0;
             const leadersCount = allLeaders.length;
             const avgRegs = leadersCount > 0 ? (total / leadersCount).toFixed(1) : 0;
-            
+
             const localidades = new Set(allRegistrations.map(r => r.localidad).filter(l => l));
 
             document.getElementById('avgConfirmRate').textContent = rate + '%';
@@ -1142,7 +1392,7 @@
                     datasets: [{
                         label: 'Registros',
                         data: leaderStats.map(l => l.registros),
-                        backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        backgroundColor: '#667eea',
                         borderRadius: 8
                     }]
                 },
@@ -1187,8 +1437,8 @@
                 }
             });
 
-            // Leader Details Table
-            const leaderDetails = allLeaders.map(l => {
+            // Leader Details Table - Prepare Data
+            leaderAnalyticsData = allLeaders.map(l => {
                 const leaderRegs = allRegistrations.filter(r => r.leaderId === l._id);
                 const leaderConfirmed = leaderRegs.filter(r => r.confirmed).length;
                 return {
@@ -1200,7 +1450,26 @@
                 };
             }).sort((a, b) => b.total - a.total);
 
-            const tableHtml = leaderDetails.map(l => `
+            // Render first page
+            currentAnalyticsPage = 1;
+            renderLeaderAnalyticsTable();
+        }
+
+        let leaderAnalyticsData = [];
+        let currentAnalyticsPage = 1;
+        const analyticsItemsPerPage = 5;
+
+        function renderLeaderAnalyticsTable() {
+            const totalPages = Math.ceil(leaderAnalyticsData.length / analyticsItemsPerPage) || 1;
+
+            if (currentAnalyticsPage > totalPages) currentAnalyticsPage = 1;
+            if (currentAnalyticsPage < 1) currentAnalyticsPage = 1;
+
+            const start = (currentAnalyticsPage - 1) * analyticsItemsPerPage;
+            const end = start + analyticsItemsPerPage;
+            const pageData = leaderAnalyticsData.slice(start, end);
+
+            const tableHtml = pageData.map(l => `
                 <tr>
                     <td><strong>${l.name}</strong></td>
                     <td><span style="background: #e3f2fd; padding: 6px 12px; border-radius: 20px; color: #667eea; font-weight: 600;">${l.total}</span></td>
@@ -1209,8 +1478,30 @@
                     <td><strong style="color: #667eea;">${l.rate}%</strong></td>
                 </tr>
             `).join('');
-            document.getElementById('leaderDetailTable').innerHTML = tableHtml;
+
+            document.getElementById('leaderDetailTable').innerHTML = tableHtml || '<tr><td colspan="5" class="text-center text-muted">Sin datos</td></tr>';
+
+            // Update Controls
+            document.getElementById('leaderPageIndicator').textContent = `Página ${currentAnalyticsPage} de ${totalPages}`;
+            document.getElementById('prevLeaderPageBtn').disabled = currentAnalyticsPage === 1;
+            document.getElementById('nextLeaderPageBtn').disabled = currentAnalyticsPage === totalPages;
         }
+
+        // Analytics Pagination Listeners
+        document.getElementById('prevLeaderPageBtn').addEventListener('click', () => {
+            if (currentAnalyticsPage > 1) {
+                currentAnalyticsPage--;
+                renderLeaderAnalyticsTable();
+            }
+        });
+
+        document.getElementById('nextLeaderPageBtn').addEventListener('click', () => {
+            const totalPages = Math.ceil(leaderAnalyticsData.length / analyticsItemsPerPage) || 1;
+            if (currentAnalyticsPage < totalPages) {
+                currentAnalyticsPage++;
+                renderLeaderAnalyticsTable();
+            }
+        });
 
         function exportToExcel(data, filename) {
             const ws = XLSX.utils.json_to_sheet(data);
@@ -1218,6 +1509,9 @@
             XLSX.utils.book_append_sheet(wb, ws, 'Datos');
             XLSX.writeFile(wb, filename);
         }
+
+        let chartsLoaded = false;
+        let analyticsLoaded = false;
 
         // NAV LINKS
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -1227,7 +1521,12 @@
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 document.getElementById(section).classList.add('active');
                 link.classList.add('active');
-                if (section === 'registrations') filterRegistrations();
+                // Lazy-load heavy sections
+                requestAnimationFrame(() => {
+                    if (section === 'registrations') filterRegistrations();
+                    if (section === 'dashboard' && !chartsLoaded) { loadCharts(); chartsLoaded = true; }
+                    if (section === 'analytics' && !analyticsLoaded) { loadAnalytics(); analyticsLoaded = true; }
+                });
             });
         });
 
@@ -1291,7 +1590,7 @@
                 Fecha: new Date(r.date).toLocaleDateString('es-CO'),
                 Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
             }));
-            exportToExcel(data, `registros_${new Date().toISOString().slice(0,10)}.xlsx`);
+            exportToExcel(data, `registros_${new Date().toISOString().slice(0, 10)}.xlsx`);
         });
 
         document.getElementById('exportLeadersBtn').addEventListener('click', () => {
@@ -1302,7 +1601,7 @@
                 Registros: l.registrations || 0,
                 Activo: l.active ? 'Sí' : 'No'
             }));
-            exportToExcel(data, `lideres_${new Date().toISOString().slice(0,10)}.xlsx`);
+            exportToExcel(data, `lideres_${new Date().toISOString().slice(0, 10)}.xlsx`);
         });
 
         document.getElementById('exportByLeaderBtn').addEventListener('click', () => {
@@ -1320,11 +1619,156 @@
                 Fecha: new Date(r.date).toLocaleDateString('es-CO'),
                 Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
             }));
-            exportToExcel(data, `registros_${leader.name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            exportToExcel(data, `registros_${leader.name}_${new Date().toISOString().slice(0, 10)}.xlsx`);
         });
 
-        checkAuth();
-        window.addEventListener('DOMContentLoaded', loadDashboard);
+        // === ACTUALIZAR EVENTO ===
+        document.getElementById('updateEventBtn').addEventListener('click', () => {
+            loadDashboard();
+            alert('✓ Dashboard actualizado');
+        });
+
+        // === CAMBIAR EVENTO ===
+        document.getElementById('changeEventBtn').addEventListener('click', async () => {
+            try {
+                const evRes = await apiCall('/api/events');
+                const events = await evRes.json();
+                const evList = Array.isArray(events) ? events : (events.data || []);
+                const select = document.getElementById('eventSelect');
+                select.innerHTML = evList.map(e =>
+                    `<option value="${e._id}" ${e._id === currentEventId ? 'selected' : ''}>${e.name}${e.active ? ' (Activo)' : ''}</option>`
+                ).join('');
+                document.getElementById('changeEventModal').classList.add('active');
+            } catch (err) {
+                alert('Error cargando eventos: ' + err.message);
+            }
+        });
+
+        document.getElementById('closeChangeEventModal').addEventListener('click', () => {
+            document.getElementById('changeEventModal').classList.remove('active');
+        });
+
+        document.getElementById('confirmChangeEventBtn').addEventListener('click', () => {
+            const select = document.getElementById('eventSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            currentEventId = select.value;
+            localStorage.setItem('eventId', currentEventId);
+            localStorage.setItem('eventName', selectedOption.textContent.replace(' (Activo)', ''));
+            document.getElementById('changeEventModal').classList.remove('active');
+            loadDashboard();
+        });
+
+        // === NUEVO REGISTRO ===
+        document.getElementById('newRegistrationBtn').addEventListener('click', () => {
+            const regLeaderSelect = document.getElementById('regLeaderSelect');
+            regLeaderSelect.innerHTML = '<option value="">-- Seleccionar Líder --</option>' +
+                allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+            document.getElementById('newRegModal').classList.add('active');
+        });
+
+        document.getElementById('closeNewRegModal').addEventListener('click', () => {
+            document.getElementById('newRegModal').classList.remove('active');
+        });
+
+        // === EDIT LEADER ===
+        function showEditLeader(id) {
+            const leader = allLeaders.find(l => l._id === id);
+            if (!leader) return;
+            document.getElementById('editLeaderId').value = leader._id;
+            document.getElementById('editLeaderName').value = leader.name;
+            document.getElementById('editLeaderEmail').value = (!leader.email || leader.email === 'na') ? '' : leader.email;
+            document.getElementById('editLeaderPhone').value = (!leader.phone || leader.phone === 'na') ? '' : leader.phone;
+            document.getElementById('editLeaderModal').classList.add('active');
+        }
+
+        document.getElementById('closeEditLeaderModal').addEventListener('click', () => {
+            document.getElementById('editLeaderModal').classList.remove('active');
+        });
+
+        document.getElementById('saveEditLeaderBtn').addEventListener('click', async () => {
+            const id = document.getElementById('editLeaderId').value;
+            const name = document.getElementById('editLeaderName').value;
+            const email = document.getElementById('editLeaderEmail').value;
+            const phone = document.getElementById('editLeaderPhone').value;
+
+            if (!name) return alert('El nombre es obligatorio');
+
+            try {
+                const res = await apiCall(`/api/leaders/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ name, email, phone })
+                });
+
+                if (res.ok) {
+                    document.getElementById('editLeaderModal').classList.remove('active');
+                    loadDashboard();
+                } else {
+                    alert('Error al actualizar líder');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error de conexión');
+            }
+        });
+
+        document.getElementById('saveRegBtn').addEventListener('click', async () => {
+            const firstName = document.getElementById('regFirstName').value;
+            const lastName = document.getElementById('regLastName').value;
+            const cedula = document.getElementById('regCedula').value;
+            const phone = document.getElementById('regPhone').value;
+            const email = document.getElementById('regEmail').value;
+            const localidad = document.getElementById('regLocalidad').value;
+            const leaderId = document.getElementById('regLeaderSelect').value;
+
+            if (!firstName || !lastName) return alert('Nombre y Apellido son obligatorios');
+            if (!cedula) return alert('Cédula es obligatoria');
+
+            try {
+                const body = { firstName, lastName, cedula, phone, email, localidad, leaderId };
+                if (currentEventId) body.eventId = currentEventId;
+
+                const res = await apiCall('/api/registrations', {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+
+                if (res.ok) {
+                    document.getElementById('newRegModal').classList.remove('active');
+                    ['regFirstName', 'regLastName', 'regCedula', 'regPhone', 'regEmail', 'regLocalidad'].forEach(
+                        id => document.getElementById(id).value = ''
+                    );
+                    alert('✓ Registro creado exitosamente');
+                    loadDashboard();
+                } else {
+                    const err = await res.json();
+                    alert('Error: ' + (err.error || 'No se pudo crear el registro'));
+                }
+            } catch (err) {
+                alert('Error de conexión: ' + err.message);
+            }
+        });
+
+        document.getElementById('prevPageBtn').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                filterRegistrations();
+                document.getElementById('registrations').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        document.getElementById('nextPageBtn').addEventListener('click', () => {
+            currentPage++;
+            filterRegistrations();
+            document.getElementById('registrations').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Initialize init
+        // Inicializar: verificar auth, cargar evento si falta, luego cargar dashboard
+        (async function init() {
+            const authed = await checkAuth();
+            if (authed) loadDashboard();
+        })();
     </script>
 </body>
+
 </html>

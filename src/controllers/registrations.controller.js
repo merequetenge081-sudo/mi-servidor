@@ -87,7 +87,7 @@ export async function getRegistrations(req, res) {
 
     // Force maximum limit of 100
     let parsedLimit = parseInt(limit) || 50;
-    parsedLimit = Math.min(parsedLimit, 100);
+    parsedLimit = Math.min(parsedLimit, 2000);
 
     const skip = (page - 1) * parsedLimit;
     const registrations = await Registration.find(filter)
