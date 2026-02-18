@@ -1585,10 +1585,21 @@ async function apiCall(endpoint, options = {}) {
  return response;
 }
 
+function getPublicLeaderTokenFromUrl() {
+ const urlParams = new URLSearchParams(window.location.search);
+ let leaderToken = urlParams.get('leader');
+ if (!leaderToken) {
+  const pathMatch = window.location.pathname.match(/\/registro\/([^/]+)/);
+  if (pathMatch && pathMatch[1]) {
+   leaderToken = decodeURIComponent(pathMatch[1]);
+  }
+ }
+ return leaderToken;
+}
+
 // 🔐 Verificar autenticación al cargar la página
 (function checkAuth() {
- const urlParams = new URLSearchParams(window.location.search);
- const isPublicForm = urlParams.get('leader'); // Si es formulario público
+ const isPublicForm = !!getPublicLeaderTokenFromUrl();
  const token = localStorage.getItem('token');
  
  if (!token && !isPublicForm && window.location.pathname !== '/login' && window.location.pathname !== '/') {
@@ -3147,8 +3158,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
   } catch (e) { /* ignorar si localStorage no está disponible */ }
 
   if (!leaderToken) {
-    const urlParams = new URLSearchParams(window.location.search);
-    leaderToken = urlParams.get('leader') || null;
+    leaderToken = getPublicLeaderTokenFromUrl();
     if (leaderToken) {
       try { localStorage.setItem('publicLeaderToken', leaderToken); } catch (e) { /* ignore */ }
     }
@@ -3156,7 +3166,7 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
 
   const resLeader = await apiCall("/leaders");
   const leaders = await resLeader.json();
-  const leader = leaderToken ? leaders.find(l => l.token === leaderToken) : null;
+  const leader = leaderToken ? leaders.find(l => l.token === leaderToken || String(l._id) === leaderToken) : null;
   const leaderId = leader ? leader._id : null;
  
   const formData = new FormData(this);
@@ -3165,6 +3175,14 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
   // Si seleccioná 'Otra' en localidad, obtener el texto especificado
   if (data.localidad === 'Otra') {
     data.localidad = document.getElementById('localidadOtra').value || '';
+  }
+
+  const registeredToVote = data.registeredToVote === 'true' || data.registeredToVote === true;
+  if (registeredToVote) {
+    if (!data.votingPlace || !data.votingTable) {
+      showToast('danger', 'Puesto de votación y número de mesa son obligatorios si está inscrito para votar.');
+      return;
+    }
   }
 
   // Asegurar que el leaderId se asigne. Si no está disponible, enviar token para que el servidor lo resuelva
@@ -3581,6 +3599,10 @@ function toggleVotingPlace(show) {
   const group = document.getElementById('votingPlaceGroup');
   if (!group) return;
   group.style.display = show ? 'block' : 'none';
+  const votingPlace = document.getElementById('votingPlace');
+  const votingTable = document.getElementById('votingTable');
+  if (votingPlace) votingPlace.required = !!show;
+  if (votingTable) votingTable.required = !!show;
 }
 
 // Mostrar / ocultar el campo de puesto de votacián en el modal admin
@@ -3673,8 +3695,7 @@ let isPublicRegistrationMode = false;
 
 // Detectar si es una vista publica del formulario
 window.addEventListener("DOMContentLoaded", async () => {
- const urlParams = new URLSearchParams(window.location.search);
- const leaderToken = urlParams.get("leader");
+ const leaderToken = getPublicLeaderTokenFromUrl();
  
  // IMPORTANTE: Verificar autenticación PRIMERO
  const token = localStorage.getItem('token');
