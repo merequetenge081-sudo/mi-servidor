@@ -1,6 +1,7 @@
 import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
+import { Organization } from "../models/Organization.js";
 import { AuditService } from "../services/audit.service.js";
 import { ValidationService } from "../services/validation.service.js";
 import logger from "../config/logger.js";
@@ -9,39 +10,84 @@ import { buildOrgFilter } from "../middleware/organization.middleware.js";
 export async function createRegistration(req, res) {
   try {
     const user = req.user;
-    const { leaderId, leaderName, eventId, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace, votingTable, date } = req.body;
+    const { leaderId, leaderToken, leaderName, eventId, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace, votingTable, date } = req.body;
 
-    // Validate
-    const validation = ValidationService.validateRegistration({ leaderId, eventId, firstName, lastName, cedula, registeredToVote, votingPlace, votingTable });
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.error });
+    let leader = null;
+    if (leaderId) {
+      leader = await Leader.findOne({ leaderId });
     }
 
-    // Validate leader is active
-    const leader = await Leader.findOne({ leaderId });
+    if (!leader && leaderToken) {
+      leader = await Leader.findOne({ $or: [{ token: leaderToken }, { leaderId: leaderToken }] });
+    }
+
     if (!leader) {
       return res.status(404).json({ error: "Líder no encontrado" });
     }
+
     if (!leader.active) {
       return res.status(403).json({ error: "El líder está inactivo" });
     }
 
+    const resolvedLeaderId = leader.leaderId || leader._id?.toString();
+    if (!resolvedLeaderId) {
+      return res.status(400).json({ error: "leaderId es requerido" });
+    }
+
+    let orgId = leader.organizationId;
+    if (!orgId) {
+      let defaultOrg = await Organization.findOne({ slug: "default" });
+      if (!defaultOrg) {
+        defaultOrg = new Organization({
+          name: "Default Organization",
+          slug: "default",
+          description: "Organización por defecto",
+          status: "active",
+          plan: "pro"
+        });
+        await defaultOrg.save();
+      }
+      orgId = defaultOrg._id.toString();
+      await Leader.updateOne({ _id: leader._id }, { $set: { organizationId: orgId } });
+    }
+
+    let resolvedEventId = eventId || leader.eventId;
+    if (!resolvedEventId) {
+      const fallbackEvent = await Event.findOne({ organizationId: orgId, active: true }).select("_id");
+      resolvedEventId = fallbackEvent?._id?.toString();
+    }
+
+    // Validate
+    const validation = ValidationService.validateRegistration({ leaderId: resolvedLeaderId, eventId: resolvedEventId, firstName, lastName, cedula, registeredToVote, votingPlace, votingTable });
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
     // Get event to inherit organizationId
-    const event = await Event.findById(eventId);
+    const event = await Event.findById(resolvedEventId);
     if (!event) {
       return res.status(404).json({ error: "Evento no encontrado" });
     }
 
+    if (!event.organizationId && orgId) {
+      await Event.updateOne({ _id: event._id }, { $set: { organizationId: orgId } });
+    }
+
     // Check duplicate by cedula + eventId
-    const duplicate = await ValidationService.checkDuplicate(cedula, eventId);
+    const duplicate = await ValidationService.checkDuplicate(cedula, resolvedEventId);
     if (duplicate) {
       return res.status(400).json({ error: `Persona con cédula ${cedula} ya registrada en este evento` });
     }
 
+    const organizationId = leader.organizationId || event.organizationId || orgId;
+    if (!organizationId) {
+      return res.status(400).json({ error: "organizationId es requerido" });
+    }
+
     const registration = new Registration({
-      leaderId,
-      leaderName,
-      eventId,
+      leaderId: resolvedLeaderId,
+      leaderName: leaderName || leader.name,
+      eventId: resolvedEventId,
       firstName,
       lastName,
       cedula,
@@ -58,15 +104,15 @@ export async function createRegistration(req, res) {
         whatsappSent: false
       },
       confirmed: false,
-      organizationId: leader.organizationId // Multi-tenant: Heredar organizationId del líder
+      organizationId: organizationId // Multi-tenant: Heredar organizationId del líder o evento
     });
 
     await registration.save();
 
     // Increment leader registration count
-    await Leader.updateOne({ leaderId }, { $inc: { registrations: 1 } });
+    await Leader.updateOne({ _id: leader._id }, { $inc: { registrations: 1 } });
 
-    await AuditService.log("CREATE", "Registration", registration._id.toString(), user, { cedula, leaderId }, `Registro de ${firstName} ${lastName} creado`);
+    await AuditService.log("CREATE", "Registration", registration._id.toString(), user, { cedula, leaderId: resolvedLeaderId }, `Registro de ${firstName} ${lastName} creado`);
 
     res.status(201).json(registration);
   } catch (error) {

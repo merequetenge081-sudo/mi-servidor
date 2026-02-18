@@ -36,7 +36,7 @@ export async function adminLogin(req, res) {
         source // Indica si proviene de MongoDB o memoria
       },
       config.jwtSecret,
-      { expiresIn: "12h" }
+      { expiresIn: "1h" }
     );
 
     // Log de auditoría (solo si MongoDB está disponible)
@@ -106,7 +106,7 @@ export async function leaderLogin(req, res) {
         source // Indica si proviene de MongoDB o memoria
       },
       config.jwtSecret,
-      { expiresIn: "12h" }
+      { expiresIn: "1h" }
     );
 
     logger.info(`✅ Leader login exitoso [${source}]`, { user: email || username, source });
@@ -278,7 +278,7 @@ export async function leaderLoginById(req, res) {
         source
       },
       config.jwtSecret,
-      { expiresIn: "12h" }
+      { expiresIn: "1h" }
     );
 
     try {
@@ -366,6 +366,10 @@ export async function adminGenerateNewPassword(req, res) {
 
     const leader = await Leader.findById(leaderId);
     if (!leader) return res.status(404).json({ error: "Líder no encontrado" });
+
+    if (!leader.passwordResetRequested) {
+      return res.status(400).json({ error: "El líder no ha solicitado un reset de contraseña" });
+    }
 
     // Generar nueva contraseña temporal
     const tempPassword = Math.random().toString(36).slice(-8) + "Aa1!";

@@ -785,6 +785,37 @@
         let currentPage = 1;
         const itemsPerPage = 10;
 
+        const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+        const LAST_ACTIVITY_KEY = 'lastActivity';
+
+        function touchActivity() {
+            localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+        }
+
+        function isSessionExpired() {
+            const last = parseInt(localStorage.getItem(LAST_ACTIVITY_KEY) || '0', 10);
+            if (!last) return false;
+            return Date.now() - last > SESSION_TIMEOUT_MS;
+        }
+
+        function enforceSessionTimeout() {
+            if (!currentToken) return false;
+            if (isSessionExpired()) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('leaderId');
+                window.location.href = '/';
+                return true;
+            }
+            return false;
+        }
+
+        function bindSessionActivity() {
+            ['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt => {
+                document.addEventListener(evt, touchActivity, { passive: true });
+            });
+        }
+
         let isRedirecting = false;
 
         // ============== AUTHENTICATION ==============
@@ -1072,6 +1103,9 @@
 
         // ============== INIT ==============
         window.addEventListener('DOMContentLoaded', () => {
+            if (enforceSessionTimeout()) return;
+            touchActivity();
+            bindSessionActivity();
             if (checkAuth()) {
                 loadLeaderPanel();
             }
