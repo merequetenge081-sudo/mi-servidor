@@ -1,5 +1,5 @@
 import express from "express";
-import { adminLogin, leaderLogin, leaderLoginById, changePassword, adminResetPassword } from "../controllers/auth.js";
+import { adminLogin, leaderLogin, leaderLoginById, changePassword, adminResetPassword, requestPasswordReset, adminGenerateNewPassword, leaderChangePassword } from "../controllers/auth.js";
 import { getTestCredentials } from "../utils/authFallback.js";
 import * as leaderController from "../controllers/leaders.controller.js";
 import * as registrationController from "../controllers/registrations.controller.js";
@@ -181,6 +181,9 @@ router.post("/auth/leader-login", leaderLogin);
 router.post("/auth/leader-login-id", leaderLoginById);
 router.post("/auth/change-password", authMiddleware, changePassword);
 router.post("/auth/admin-reset-password", authMiddleware, roleMiddleware("admin"), adminResetPassword);
+router.post("/auth/request-password-reset", requestPasswordReset); // Líder solicita reset (sin auth)
+router.post("/auth/admin-generate-password", authMiddleware, roleMiddleware("admin"), adminGenerateNewPassword); // Admin genera nueva temp
+router.post("/auth/leader-change-password", authMiddleware, leaderChangePassword); // Líder cambia su contraseña
 
 // ==================== ORGANIZACIONES (MULTI-TENANT) ====================
 router.post("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.createOrganization);

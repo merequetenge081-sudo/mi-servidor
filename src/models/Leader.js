@@ -11,6 +11,8 @@ const leaderSchema = new mongoose.Schema({
   username: { type: String, unique: true, sparse: true }, // Auto-generated
   passwordHash: String,
   isTemporaryPassword: { type: Boolean, default: false },
+  passwordResetRequested: { type: Boolean, default: false },
+  passwordCanBeChanged: { type: Boolean, default: true }, // Flag para bloquear cambios después del primer cambio
 
   token: { type: String, required: true },
   active: { type: Boolean, default: true },
