@@ -295,3 +295,131 @@ export async function leaderLoginById(req, res) {
   }
 }
 
+// Líder solicita reset de contraseña
+export async function requestPasswordReset(req, res) {
+  try {
+    const { leaderId } = req.body;
+
+    if (!leaderId) {
+      return res.status(400).json({ error: "LeaderId requerido" });
+    }
+
+    const leader = await Leader.findOne({ 
+      $or: [{ leaderId }, { _id: leaderId }, { username: leaderId }] 
+    });
+
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+
+    // Marcar como solicitando reset
+    await Leader.updateOne({ _id: leader._id }, {
+      $set: {
+        passwordResetRequested: true,
+        passwordCanBeChanged: true
+      }
+    });
+
+    logger.info(`Password reset solicitado para líder ${leader.name}`);
+
+    res.json({ 
+      message: "Solicitud enviada. El administrador generará una nueva contraseña temporal.", 
+      leaderId: leader.leaderId,
+      name: leader.name
+    });
+  } catch (error) {
+    logger.error("Request password reset error:", { error: error.message });
+    res.status(500).json({ error: "Error al solicitar reset de contraseña" });
+  }
+}
+
+// Admin genera nueva contraseña temporal para líder que la solicitó
+export async function adminGenerateNewPassword(req, res) {
+  try {
+    const { leaderId } = req.body;
+    const adminUser = req.user;
+
+    if (adminUser.role !== 'admin' && adminUser.role !== 'superadmin') {
+      return res.status(403).json({ error: "No autorizado" });
+    }
+
+    const leader = await Leader.findById(leaderId);
+    if (!leader) return res.status(404).json({ error: "Líder no encontrado" });
+
+    // Generar nueva contraseña temporal
+    const tempPassword = Math.random().toString(36).slice(-8) + "Aa1!";
+    const salt = await bcryptjs.genSalt(10);
+    const newHash = await bcryptjs.hash(tempPassword, salt);
+
+    await Leader.updateOne({ _id: leader._id }, {
+      $set: {
+        passwordHash: newHash,
+        isTemporaryPassword: true,
+        passwordResetRequested: false,
+        passwordCanBeChanged: true
+      }
+    });
+
+    await AuditService.log("UPDATE", "Leader", leader._id.toString(), adminUser, {}, `Admin generó nueva contraseña temporal para ${leader.name}`);
+
+    logger.info(`Nueva contraseña temporal generada para ${leader.name}: ${tempPassword}`);
+
+    res.json({ 
+      message: "Nueva contraseña generada", 
+      tempPassword,
+      username: leader.username || leader.name
+    });
+  } catch (error) {
+    logger.error("Admin generate new password error:", { error: error.message });
+    res.status(500).json({ error: "Error al generar nueva contraseña" });
+  }
+}
+
+// Líder cambia su contraseña (solo si passwordCanBeChanged es true)
+export async function leaderChangePassword(req, res) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const leaderId = req.user.userId;
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: "La nueva contraseña debe tener al menos 6 caracteres" });
+    }
+
+    const leader = await Leader.findById(leaderId);
+    if (!leader) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    // Verificar si puede cambiar contraseña
+    if (!leader.passwordCanBeChanged && !leader.isTemporaryPassword) {
+      return res.status(403).json({ 
+        error: "No puedes cambiar tu contraseña. Solicita un reset al administrador." 
+      });
+    }
+
+    // Verificar contraseña actual
+    if (currentPassword) {
+      const isValid = await bcryptjs.compare(currentPassword, leader.passwordHash);
+      if (!isValid) return res.status(401).json({ error: "Contraseña actual incorrecta" });
+    } else if (!leader.isTemporaryPassword) {
+      return res.status(400).json({ error: "Se requiere la contraseña actual" });
+    }
+
+    const salt = await bcryptjs.genSalt(10);
+    const newHash = await bcryptjs.hash(newPassword, salt);
+
+    await Leader.updateOne({ _id: leader._id }, {
+      $set: {
+        passwordHash: newHash,
+        isTemporaryPassword: false,
+        passwordCanBeChanged: false, // Bloquear cambios futuros
+        passwordResetRequested: false
+      }
+    });
+
+    await AuditService.log("UPDATE", "Leader", leader._id.toString(), req.user, {}, `Líder ${leader.name} cambió su contraseña`);
+
+    res.json({ message: "Contraseña actualizada correctamente. No podrás cambiarla nuevamente sin solicitar un reset." });
+  } catch (error) {
+    logger.error("Leader change password error:", { error: error.message });
+    res.status(500).json({ error: "Error al cambiar contraseña" });
+  }
+}

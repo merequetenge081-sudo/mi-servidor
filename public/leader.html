@@ -359,6 +359,9 @@
         </div>
         <div class="navbar-actions">
             <span id="leaderName">Líder</span>
+            <button class="btn-logout" onclick="openChangePasswordModal()" style="margin-right: 10px;">
+                <i class="bi bi-key"></i> Cambiar Contraseña
+            </button>
             <button class="btn-logout" onclick="logout()">
                 <i class="bi bi-box-arrow-right"></i> Cerrar sesión
             </button>
@@ -614,6 +617,48 @@
             <h4 style="margin-bottom: 20px;">Tu Código QR</h4>
             <div id="qrCodeContainer" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
             <p class="text-muted" style="font-size: 14px;">Escanea este código para ir directamente a tu formulario.</p>
+        </div>
+    </div>
+
+    <!-- CHANGE PASSWORD MODAL -->
+    <div id="changePasswordModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 450px;">
+            <button class="modal-close" onclick="closeChangePasswordModal()">&times;</button>
+            <h4 style="margin-bottom: 20px; color: var(--primary);"><i class="bi bi-key"></i> Cambiar Contraseña</h4>
+            
+            <div id="passwordChangeAlert" style="display: none; padding: 12px; margin-bottom: 15px; border-radius: 8px;"></div>
+            
+            <div id="passwordChangeForm">
+                <div class="mb-3">
+                    <label for="currentPassword" class="form-label">Contraseña Actual</label>
+                    <input type="password" class="form-control" id="currentPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                    <input type="password" class="form-control" id="newPassword" minlength="6" required>
+                    <small class="text-muted">Mínimo 6 caracteres</small>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                    <input type="password" class="form-control" id="confirmPassword" minlength="6" required>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="closeChangePasswordModal()" style="flex: 1;">Cancelar</button>
+                    <button class="btn btn-primary" onclick="changePassword()" style="flex: 1;">
+                        <i class="bi bi-check-lg"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </div>
+
+            <div id="passwordBlocked" style="display: none; text-align: center; padding: 20px;">
+                <i class="bi bi-lock-fill" style="font-size: 48px; color: #ffc107; margin-bottom: 15px;"></i>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Ya cambiaste tu contraseña. Para cambiarla nuevamente debes solicitar un reset al administrador.
+                </p>
+                <button class="btn btn-warning" onclick="requestPasswordReset()" style="width: 100%;">
+                    <i class="bi bi-key"></i> Solicitar Nueva Contraseña
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1166,6 +1211,124 @@
             if (event.target == document.getElementById('genericErrorModal')) {
                 closeGenericErrorModal();
             }
+            if (event.target == document.getElementById('changePasswordModal')) {
+                closeChangePasswordModal();
+            }
+        }
+
+        // ============== PASSWORD MANAGEMENT ==============
+        function openChangePasswordModal() {
+            // Verificar si el líder puede cambiar contraseña
+            fetch(`${API_URL}/api/leaders/${currentLeaderId}`, {
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.passwordCanBeChanged === false && !data.isTemporaryPassword) {
+                        document.getElementById('passwordChangeForm').style.display = 'none';
+                        document.getElementById('passwordBlocked').style.display = 'block';
+                    } else {
+                        document.getElementById('passwordChangeForm').style.display = 'block';
+                        document.getElementById('passwordBlocked').style.display = 'none';
+                    }
+                    document.getElementById('changePasswordModal').style.display = 'flex';
+                })
+                .catch(err => {
+                    console.error(err);
+                    showGenericErrorModal('Error al verificar estado de contraseña');
+                });
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').style.display = 'none';
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passwordChangeAlert').style.display = 'none';
+        }
+
+        function showPasswordAlert(message, type) {
+            const alert = document.getElementById('passwordChangeAlert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            alert.style.background = type === 'success' ? '#d1e7dd' : '#f8d7da';
+            alert.style.color = type === 'success' ? '#0f5132' : '#842029';
+            alert.style.border = `1px solid ${type === 'success' ? '#badbcc' : '#f5c2c7'}`;
+        }
+
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showPasswordAlert('Por favor completa todos los campos', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showPasswordAlert('La nueva contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showPasswordAlert('Las contraseñas no coinciden', 'error');
+                return;
+            }
+
+            fetch(`${API_URL}/api/auth/leader-change-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentToken}`
+                },
+                body: JSON.stringify({ currentPassword, newPassword })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showPasswordAlert(data.error, 'error');
+                    } else {
+                        showPasswordAlert(data.message, 'success');
+                        setTimeout(() => {
+                            closeChangePasswordModal();
+                            showSuccessModal('¡Contraseña actualizada!', 'Tu contraseña ha sido cambiada exitosamente. No podrás cambiarla nuevamente sin solicitar un reset al administrador.');
+                        }, 1500);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showPasswordAlert('Error al cambiar contraseña', 'error');
+                });
+        }
+
+        function requestPasswordReset() {
+            if (!confirm('¿Estás seguro de que deseas solicitar un reset de contraseña? El administrador te generará una nueva contraseña temporal.')) {
+                return;
+            }
+
+            fetch(`${API_URL}/api/auth/request-password-reset`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ leaderId: currentLeaderId })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showGenericErrorModal(data.error);
+                    } else {
+                        closeChangePasswordModal();
+                        showSuccessModal('¡Solicitud enviada!', 'El administrador ha sido notificado. Pronto recibirás una nueva contraseña temporal.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showGenericErrorModal('Error al solicitar reset de contraseña');
+                });
         }
     </script>
 </body>
