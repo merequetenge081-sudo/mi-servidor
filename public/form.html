@@ -58,20 +58,24 @@
 
       // Buscar el leaderId a partir del token
       let leaderId = null;
+      let leaderToken = null;
       if (token) {
         try {
           const res = await fetch('/api/leaders');
           if (res.ok) {
             const leaders = await res.json();
-            const leader = leaders.find(l => l.token === token);
-            if (leader) leaderId = leader._id;
+            const leader = leaders.find(l => l.token === token || String(l._id) === token);
+            if (leader) {
+              leaderId = leader._id;
+              leaderToken = leader.token || null;
+            }
           }
         } catch (err) {
           console.error('Error buscando líder por token:', err);
         }
       }
 
-      const payload = { leaderId, firstName, lastName, cedula, email, phone };
+      const payload = { leaderId, leaderToken, firstName, lastName, cedula, email, phone };
 
       try {
         const r = await fetch('/api/registrations', {

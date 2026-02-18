@@ -969,7 +969,7 @@
                     <td>${leader.phone || '-'}</td>
                     <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600;">${leader.registrations || 0}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-token="${leader.token}" data-leader-name="${leader.name}">
+                        <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-token="${leader.token || leader._id}" data-leader-name="${leader.name}">
                             <i class="bi bi-qr-code"></i> QR
                         </button>
                         <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}">
@@ -1041,6 +1041,10 @@
         async function showQR(leaderToken, leaderName) {
             const qrContainer = document.getElementById('qrCode');
             qrContainer.innerHTML = '';
+            if (!leaderToken) {
+                alert('Este líder no tiene token de registro asignado.');
+                return;
+            }
             const link = `${API_URL}/registro/${leaderToken}`;
             document.getElementById('qrLink').value = link;
             new QRCode(qrContainer, { text: link, width: 250, height: 250 });
