@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="/js/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -175,7 +175,10 @@
             margin-bottom: 30px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            /* Center page titles */
             gap: 15px;
+            text-align: center;
         }
 
         .page-title i {
@@ -275,6 +278,10 @@
             font-size: 16px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            /* Center card headers */
+            position: relative;
+            /* For absolute positioning of buttons */
             gap: 12px;
         }
 
@@ -410,60 +417,65 @@
         }
 
         /* ============== MODALS ============== */
+        /* MODAL STYLES */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 1000;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
             align-items: center;
             justify-content: center;
-            z-index: 1000;
         }
 
         .modal.active {
-            display: flex;
-            animation: slideUp 0.3s ease;
+            display: flex !important;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUp 0.3s ease-out;
+            text-align: center;
         }
 
         @keyframes slideUp {
             from {
+                transform: translateY(50px);
                 opacity: 0;
-                transform: translateY(30px);
             }
 
             to {
-                opacity: 1;
                 transform: translateY(0);
+                opacity: 1;
             }
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            position: relative;
         }
 
         .modal-close {
             position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
+            top: 15px;
+            right: 20px;
             color: #999;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
             transition: color 0.2s;
         }
 
         .modal-close:hover {
-            color: #667eea;
+            color: #333;
         }
 
         .modal-header {
@@ -701,18 +713,29 @@
 
         <!-- LEADERS SECTION -->
         <div id="leaders" class="section">
-            <div class="action-bar">
+            <div class="action-bar"
+                style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                 <div class="page-title" style="margin-bottom: 0;">
                     <i class="bi bi-people-fill"></i> Gestión de Líderes
                 </div>
-                <button class="btn btn-primary" id="newLeaderBtn">
-                    <i class="bi bi-plus-circle"></i> Nuevo Líder
-                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary" id="newLeaderBtn">
+                        <i class="bi bi-plus-circle"></i> Nuevo Líder
+                    </button>
+                    <button class="btn btn-outline-primary" id="migrateUsernamesBtn">
+                        <i class="bi bi-arrow-repeat"></i> Asignar Usuarios
+                    </button>
+                </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <i class="bi bi-list"></i> Lista de Líderes
+                    <span style="display: flex; align-items: center; gap: 10px;"><i class="bi bi-list"></i> Lista de
+                        Líderes</span>
+                    <button class="btn btn-sm btn-light" id="exportLeadersMainBtn" title="Descargar Excel"
+                        style="position: absolute; right: 20px; color: #667eea; font-weight: 600;">
+                        <i class="bi bi-download"></i> Excel
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -720,6 +743,7 @@
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
+                                    <th>Usuario</th>
                                     <th>Email</th>
                                     <th>Teléfono</th>
                                     <th>Registros</th>
@@ -728,7 +752,7 @@
                             </thead>
                             <tbody id="leadersTable">
                                 <tr>
-                                    <td colspan="5" class="text-center" style="padding: 40px;"><span
+                                    <td colspan="6" class="text-center" style="padding: 40px;"><span
                                             class="loading"></span>Cargando...</td>
                                 </tr>
                             </tbody>
@@ -765,7 +789,12 @@
 
             <div class="card">
                 <div class="card-header">
-                    <i class="bi bi-table"></i> Tabla de Registros
+                    <span style="display: flex; align-items: center; gap: 10px;"><i class="bi bi-table"></i> Tabla de
+                        Registros</span>
+                    <button class="btn btn-sm btn-light" id="exportRegsMainBtn" title="Descargar Excel"
+                        style="position: absolute; right: 20px; color: #667eea; font-weight: 600;">
+                        <i class="bi bi-download"></i> Excel
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -856,7 +885,12 @@
 
             <div class="card">
                 <div class="card-header">
-                    <i class="bi bi-table"></i> Detalles por Líder
+                    <span style="display: flex; align-items: center; gap: 10px;"><i class="bi bi-table"></i> Detalles
+                        por Líder</span>
+                    <button class="btn btn-sm btn-light" id="exportLeaderStatsBtn" title="Descargar Excel"
+                        style="position: absolute; right: 20px; color: #667eea; font-weight: 600;">
+                        <i class="bi bi-download"></i> Excel
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -906,31 +940,35 @@
                 </div>
                 <div class="card-body">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                        <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
+                        <div
+                            style="padding: 20px; background: #f8f9ff; border-radius: 12px; display: flex; flex-direction: column; height: 100%; text-align: center;">
                             <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-clipboard-check"></i> Todos
                                 los Registros</h6>
-                            <button class="btn btn-primary" id="exportRegsBtn" style="width: 100%;">
+                            <button class="btn btn-primary" id="exportRegsBtn" style="width: 100%; margin-top: auto;">
                                 <i class="bi bi-download"></i> Descargar Excel
                             </button>
                             <small style="color: #999; display: block; margin-top: 10px;">Exporta todos los registros
                                 del evento actual</small>
                         </div>
 
-                        <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
+                        <div
+                            style="padding: 20px; background: #f8f9ff; border-radius: 12px; display: flex; flex-direction: column; height: 100%; text-align: center;">
                             <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-people"></i> Todos los
                                 Líderes</h6>
-                            <button class="btn btn-primary" id="exportLeadersBtn" style="width: 100%;">
+                            <button class="btn btn-primary" id="exportLeadersBtn"
+                                style="width: 100%; margin-top: auto;">
                                 <i class="bi bi-download"></i> Descargar Excel
                             </button>
                             <small style="color: #999; display: block; margin-top: 10px;">Exporta lista de líderes con
                                 estadísticas</small>
                         </div>
 
-                        <div style="padding: 20px; background: #f8f9ff; border-radius: 12px;">
+                        <div
+                            style="padding: 20px; background: #f8f9ff; border-radius: 12px; display: flex; flex-direction: column; height: 100%; text-align: center;">
                             <h6 style="margin-bottom: 15px; color: #667eea;"><i class="bi bi-person"></i> Registros por
                                 Líder</h6>
                             <select id="exportLeaderSelect"
-                                style="margin-bottom: 10px; width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;"></select>
+                                style="margin-bottom: 10px; width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; margin-top: auto;"></select>
                             <button class="btn btn-primary" id="exportByLeaderBtn" style="width: 100%;">
                                 <i class="bi bi-download"></i> Descargar
                             </button>
@@ -950,7 +988,12 @@
             <div class="modal-header"><i class="bi bi-person-plus"></i> Crear Nuevo Líder</div>
             <div class="form-group">
                 <label><i class="bi bi-person"></i> Nombre Completo</label>
-                <input type="text" id="leaderName" placeholder="Ej: Juan Pérez">
+                <input type="text" id="leaderName" placeholder="Ej: Jeisson Mendez">
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-person-badge"></i> Usuario <span style="font-size: 11px; color: #999;">(opcional
+                        - se genera automáticamente)</span></label>
+                <input type="text" id="leaderUsername" placeholder="ej: jmendez (se genera si lo dejas vacío)">
             </div>
             <div class="form-group">
                 <label><i class="bi bi-envelope"></i> Correo Electrónico</label>
@@ -969,7 +1012,6 @@
     <div id="qrModal" class="modal">
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" id="closeQrModal">&times;</button>
-            <div class="modal-header" style="text-align: center;"><i class="bi bi-qr-code"></i> Código QR</div>
             <div
                 style="text-align: center; padding: 20px; background: #f8f9ff; border-radius: 12px; margin-bottom: 20px;">
                 <div id="qrCode" style="display: inline-block;"></div>
@@ -980,6 +1022,34 @@
             <button class="btn btn-primary" id="copyQrBtn" style="width: 100%;">
                 <i class="bi bi-clipboard"></i> Copiar Link
             </button>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="deleteConfirmModal" class="modal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="modal-content" style="max-width: 400px; text-align: center; border-radius: 15px; padding: 30px;">
+            <div style="margin-bottom: 20px;">
+                <i class="bi bi-exclamation-circle-fill" style="font-size: 50px; color: #dc3545;"></i>
+            </div>
+            <h4 style="color: #333; margin-bottom: 15px;">¿Estás seguro?</h4>
+            <p style="color: #666; margin-bottom: 25px;">¿Realmente deseas eliminar a este líder? Esta acción no se
+                puede deshacer.</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn btn-secondary" id="cancelDeleteBtn" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" style="flex: 1;">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div id="successModal" class="modal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="modal-content" style="max-width: 600px; text-align: center; border-radius: 15px; padding: 30px;">
+            <div style="margin-bottom: 20px;">
+                <i class="bi bi-check-circle-fill" style="font-size: 50px; color: #28a745;"></i>
+            </div>
+            <h4 id="successTitle" style="color: #333; margin-bottom: 15px;">¡Éxito!</h4>
+            <p id="successMessage" style="color: #666; margin-bottom: 25px;">Operación completada correctamente.</p>
+            <button class="btn btn-primary" id="closeSuccessModalBtn" style="width: 100%;">Aceptar</button>
         </div>
     </div>
 
@@ -1041,6 +1111,56 @@
             <button class="btn btn-primary" id="saveRegBtn" style="width: 100%; margin-top: 15px;">
                 <i class="bi bi-check-circle"></i> Guardar Registro
             </button>
+        </div>
+    </div>
+
+    <!-- RESET PASSWORD MODAL -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="modal-close" id="closeResetPassModal">&times;</button>
+            <div class="modal-header"><i class="bi bi-key-fill"></i> Restablecer Credenciales</div>
+            <input type="hidden" id="resetPassLeaderId">
+            <div
+                style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: #856404;">
+                <i class="bi bi-exclamation-triangle"></i> Puedes personalizar el usuario y la contraseña antes de
+                guardar. Estos datos se los debes compartir manualmente al líder.
+            </div>
+            <div class="form-group">
+                <label>Nombre del Líder</label>
+                <input type="text" id="resetPassLeaderName" class="form-control" disabled style="background: #f5f5f5;">
+            </div>
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" id="resetPassUsername" class="form-control" placeholder="ej: jmendez">
+            </div>
+            <div class="form-group">
+                <label>Nueva Contraseña Temporal</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="resetPassPassword" class="form-control"
+                        placeholder="Se genera automáticamente">
+                    <button class="btn btn-sm btn-outline-secondary" id="generatePassBtn" title="Generar contraseña"
+                        style="white-space: nowrap;">
+                        <i class="bi bi-shuffle"></i> Generar
+                    </button>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="confirmResetPassBtn" style="width: 100%; margin-top: 15px;">
+                <i class="bi bi-check-circle"></i> Guardar y Restablecer
+            </button>
+            <div id="resetPassResult"
+                style="display:none; margin-top: 15px; padding: 15px; border-radius: 10px; background: #e8f5e9; border: 1px solid #a5d6a7;">
+                <div style="font-weight: 700; color: #2e7d32; margin-bottom: 10px;"><i
+                        class="bi bi-clipboard-check"></i> Credenciales listas para compartir:</div>
+                <div
+                    style="font-family: monospace; font-size: 14px; background: #fff; padding: 10px; border-radius: 6px; border: 1px dashed #ccc;">
+                    <div>👤 Usuario: <strong id="resultUsername"></strong></div>
+                    <div>🔑 Contraseña: <strong id="resultPassword"></strong></div>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" id="copyCredsBtn"
+                    style="margin-top: 10px; width: 100%;">
+                    <i class="bi bi-clipboard"></i> Copiar credenciales
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1184,26 +1304,30 @@
             const html = allLeaders.map(leader => `
                 <tr>
                     <td><strong>${leader.name}</strong></td>
-                    <td>${leader.email || '-'}</td>
+                    <td><code style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 13px;">${leader.username || '-'}</code></td>
+                    <td>${leader.email || '<span style="color:#ccc;">Sin correo</span>'}</td>
                     <td>${leader.phone || '-'}</td>
                     <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600;">${leader.registrations || 0}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}">
-                            <i class="bi bi-qr-code"></i> QR
+                        <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" title="Ver QR">
+                            <i class="bi bi-qr-code"></i>
                         </button>
                         <a href="/form.html?token=${leader.token || leader.leaderId || leader._id}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Ver Formulario">
                             <i class="bi bi-box-arrow-up-right"></i>
                         </a>
-                        <button class="btn btn-sm btn-outline-secondary edit-leader-btn" data-leader-id="${leader._id}">
+                        <button class="btn btn-sm btn-outline-secondary edit-leader-btn" data-leader-id="${leader._id}" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}">
+                        <button class="btn btn-sm btn-outline-danger reset-pass-btn" data-leader-id="${leader._id}" title="Restablecer Contraseña">
+                            <i class="bi bi-key"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}" title="Eliminar">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
                 </tr>
             `).join('');
-            document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="5" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
+            document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="6" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
 
             document.querySelectorAll('.qr-btn').forEach(btn => {
                 btn.addEventListener('click', () => showQR(btn.dataset.leaderId, btn.dataset.leaderName));
@@ -1214,7 +1338,151 @@
             document.querySelectorAll('.edit-leader-btn').forEach(btn => {
                 btn.addEventListener('click', () => showEditLeader(btn.dataset.leaderId));
             });
+            document.querySelectorAll('.reset-pass-btn').forEach(btn => {
+                btn.addEventListener('click', () => openResetPassModal(btn.dataset.leaderId));
+            });
         }
+
+        // ====== RESET PASSWORD MODAL ======
+        function openResetPassModal(leaderId) {
+            const leader = allLeaders.find(l => l._id === leaderId);
+            if (!leader) return alert('Líder no encontrado');
+
+            document.getElementById('resetPassLeaderId').value = leaderId;
+            document.getElementById('resetPassLeaderName').value = leader.name;
+            document.getElementById('resetPassUsername').value = leader.username || '';
+
+            // Auto-generate temp password
+            const tempPass = Math.random().toString(36).slice(-8) + 'Aa1!';
+            document.getElementById('resetPassPassword').value = tempPass;
+
+            // Reset result area
+            document.getElementById('resetPassResult').style.display = 'none';
+            document.getElementById('confirmResetPassBtn').disabled = false;
+            document.getElementById('confirmResetPassBtn').style.display = '';
+            document.getElementById('confirmResetPassBtn').classList.remove('btn-success');
+            document.getElementById('confirmResetPassBtn').classList.add('btn-primary');
+            document.getElementById('confirmResetPassBtn').innerHTML = '<i class="bi bi-check-circle"></i> Guardar y Restablecer';
+
+            document.getElementById('resetPasswordModal').classList.add('active');
+        }
+
+        document.getElementById('closeResetPassModal').addEventListener('click', () => {
+            document.getElementById('resetPasswordModal').classList.remove('active');
+        });
+
+        document.getElementById('generatePassBtn').addEventListener('click', () => {
+            document.getElementById('resetPassPassword').value = Math.random().toString(36).slice(-8) + 'Aa1!';
+        });
+
+        document.getElementById('confirmResetPassBtn').addEventListener('click', async () => {
+            const leaderId = document.getElementById('resetPassLeaderId').value;
+            const newUsername = document.getElementById('resetPassUsername').value.trim();
+            const newPassword = document.getElementById('resetPassPassword').value.trim();
+            const btn = document.getElementById('confirmResetPassBtn');
+
+            if (!newPassword || newPassword.length < 6) {
+                return alert('La contraseña debe tener al menos 6 caracteres');
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Guardando...';
+
+            try {
+                const res = await apiCall('/api/auth/admin-reset-password', {
+                    method: 'POST',
+                    body: JSON.stringify({ leaderId, newUsername: newUsername || undefined, newPassword: newPassword || undefined })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Show result
+                    document.getElementById('resultUsername').textContent = data._username || newUsername;
+                    document.getElementById('resultPassword').textContent = data._tempPassword;
+                    document.getElementById('resetPassResult').style.display = 'block';
+                    btn.innerHTML = '<i class="bi bi-check-circle"></i> ¡Listo!';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-success');
+                    loadDashboard(); // Refresh table to show updated username
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo restablecer'));
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-circle"></i> Guardar y Restablecer';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error de conexión');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle"></i> Guardar y Restablecer';
+            }
+        });
+
+        document.getElementById('copyCredsBtn').addEventListener('click', () => {
+            const user = document.getElementById('resultUsername').textContent;
+            const pass = document.getElementById('resultPassword').textContent;
+            const text = `Usuario: ${user}\nContraseña: ${pass}`;
+            navigator.clipboard.writeText(text).then(() => {
+                document.getElementById('copyCredsBtn').innerHTML = '<i class="bi bi-check"></i> ¡Copiado!';
+                setTimeout(() => {
+                    document.getElementById('copyCredsBtn').innerHTML = '<i class="bi bi-clipboard"></i> Copiar credenciales';
+                }, 2000);
+            });
+        });
+
+        // ====== MIGRATE USERNAMES ======
+        document.getElementById('migrateUsernamesBtn').addEventListener('click', async () => {
+            if (!confirm('¿Deseas generar usuarios y contraseñas temporales para TODOS los líderes que aún no tienen usuario?\n\nEsto actualiza la base de datos directamente.')) return;
+
+            const btn = document.getElementById('migrateUsernamesBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Migrando...';
+
+            try {
+                const res = await apiCall('/api/migrate-usernames', { method: 'POST' });
+                const data = await res.json();
+
+                if (res.ok && data.results && data.results.length > 0) {
+                    // Build a table with all credentials
+                    let tableRows = data.results.map(r =>
+                        `<tr><td>${r.name}</td><td><code>${r.username}</code></td><td><code>${r.tempPassword}</code></td><td>${r.email || '<span style="color:#ccc">Sin correo</span>'}</td></tr>`
+                    ).join('');
+
+                    let copyText = data.results.map(r => `${r.name} | Usuario: ${r.username} | Contraseña: ${r.tempPassword}`).join('\n');
+
+                    // Show in a success modal with a table
+                    const modalHtml = `
+                        <div style="max-height: 400px; overflow-y: auto; margin: 10px 0;">
+                            <table class="table" style="font-size: 13px;">
+                                <thead style="position: sticky; top: 0; background: white;">
+                                    <tr><th>Nombre</th><th>Usuario</th><th>Contraseña</th><th>Email</th></tr>
+                                </thead>
+                                <tbody>${tableRows}</tbody>
+                            </table>
+                        </div>
+                        <button class="btn btn-outline-primary" style="width:100%" onclick="navigator.clipboard.writeText(\`${copyText.replace(/`/g, '\\`')}\`).then(()=>this.innerHTML='<i class=\'bi bi-check\'></i> ¡Copiado!');">
+                            <i class="bi bi-clipboard"></i> Copiar todas las credenciales
+                        </button>
+                    `;
+
+                    document.getElementById('successTitle').textContent = `¡${data.migrated} líderes migrados!`;
+                    document.getElementById('successMessage').innerHTML = modalHtml;
+                    document.getElementById('successModal').style.display = 'flex';
+
+                    loadDashboard(); // Refresh table
+                } else if (res.ok) {
+                    alert(data.message || 'Todos los líderes ya tienen usuario.');
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo migrar'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error de conexión');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Asignar Usuarios';
+        });
 
         function populateLeaderFilter() {
             const select = document.getElementById('leaderFilter');
@@ -1293,12 +1561,8 @@
         }
 
         async function deleteLeader(leaderId) {
-            if (confirm('¿Eliminar este líder?')) {
-                const res = await apiCall(`/api/leaders/${leaderId}`, { method: 'DELETE' });
-                if (res.ok) {
-                    loadDashboard();
-                }
-            }
+            leaderToDeleteId = leaderId;
+            document.getElementById('deleteConfirmModal').style.display = 'flex';
         }
 
         async function toggleConfirm(regId, isConfirmed) {
@@ -1550,21 +1814,91 @@
             document.getElementById('qrModal').classList.remove('active');
         });
 
+        // Show Success Modal Helper
+        function showSuccessModal(title, message) {
+            document.getElementById('successTitle').textContent = title || '¡Éxito!';
+            document.getElementById('successMessage').textContent = message || 'Operación completada correctamente.';
+            document.getElementById('successModal').style.display = 'flex'; // Use flex directly for styled modals
+        }
+
+        document.getElementById('closeSuccessModalBtn').addEventListener('click', () => {
+            document.getElementById('successModal').style.display = 'none';
+        });
+
+        // Delete Leader Logic
+        let leaderToDeleteId = null;
+
+        function deleteLeader(id) {
+            leaderToDeleteId = id;
+            document.getElementById('deleteConfirmModal').style.display = 'flex'; // Open custom modal
+        }
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+            leaderToDeleteId = null;
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            if (!leaderToDeleteId) return;
+            try {
+                const res = await apiCall(`/api/leaders/${leaderToDeleteId}`, { method: 'DELETE' });
+                if (res.ok) {
+                    document.getElementById('deleteConfirmModal').style.display = 'none';
+                    loadDashboard();
+                    showSuccessModal('¡Eliminado!', 'El líder ha sido eliminado permanentemente.');
+                } else {
+                    alert('Error eliminando líder');
+                }
+            } catch (error) {
+                console.error('Error deleting leader:', error);
+                alert('Error de conexión');
+            }
+        });
+
+        // Update Create Leader Success
         document.getElementById('saveLiderBtn').addEventListener('click', async () => {
             const name = document.getElementById('leaderName').value;
             const email = document.getElementById('leaderEmail').value;
             const phone = document.getElementById('leaderPhone').value;
+            const customUsername = document.getElementById('leaderUsername').value.trim();
             if (!name) return alert('Ingresa el nombre');
-            const res = await apiCall('/api/leaders', {
-                method: 'POST',
-                body: JSON.stringify({ name, email, phone })
-            });
-            if (res.ok) {
-                document.getElementById('leaderModal').classList.remove('active');
-                document.getElementById('leaderName').value = '';
-                document.getElementById('leaderEmail').value = '';
-                document.getElementById('leaderPhone').value = '';
-                loadDashboard();
+
+            try {
+                const res = await apiCall('/api/leaders', {
+                    method: 'POST',
+                    body: JSON.stringify({ name, email, phone, eventId: currentEventId, customUsername: customUsername || undefined })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    document.getElementById('leaderModal').classList.remove('active');
+                    document.getElementById('leaderName').value = '';
+                    document.getElementById('leaderEmail').value = '';
+                    document.getElementById('leaderPhone').value = '';
+                    document.getElementById('leaderUsername').value = '';
+                    loadDashboard();
+
+                    // Show credentials in the reset modal (read-only mode)
+                    if (data._username && data._tempPassword) {
+                        document.getElementById('resetPassLeaderId').value = '';
+                        document.getElementById('resetPassLeaderName').value = data.name || name;
+                        document.getElementById('resetPassUsername').value = data._username;
+                        document.getElementById('resetPassPassword').value = data._tempPassword;
+                        document.getElementById('resultUsername').textContent = data._username;
+                        document.getElementById('resultPassword').textContent = data._tempPassword;
+                        document.getElementById('resetPassResult').style.display = 'block';
+                        document.getElementById('confirmResetPassBtn').style.display = 'none';
+                        document.getElementById('resetPasswordModal').classList.add('active');
+                    } else {
+                        showSuccessModal('¡Creado!', 'Líder creado correctamente.');
+                    }
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo crear el líder'));
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error creando líder');
             }
         });
 
@@ -1620,6 +1954,45 @@
                 Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
             }));
             exportToExcel(data, `registros_${leader.name}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        });
+
+        document.getElementById('exportLeaderStatsBtn').addEventListener('click', () => {
+            if (!leaderAnalyticsData || leaderAnalyticsData.length === 0) return alert('No hay datos para exportar');
+            const data = leaderAnalyticsData.map(l => ({
+                Líder: l.name,
+                Total: l.total,
+                Confirmados: l.confirmed,
+                Pendientes: l.pending,
+                'Tasa de Confirmación': l.rate + '%'
+            }));
+            exportToExcel(data, `detalles_lideres_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        });
+
+        // Duplicate logic for main buttons - DIRECT IMPLEMENTATION
+        document.getElementById('exportLeadersMainBtn').addEventListener('click', () => {
+            const data = allLeaders.map(l => ({
+                Nombre: l.name,
+                Email: l.email || '',
+                Teléfono: l.phone || '',
+                Registros: l.registrations || 0,
+                Activo: l.active ? 'Sí' : 'No'
+            }));
+            exportToExcel(data, `lideres_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        });
+
+        document.getElementById('exportRegsMainBtn').addEventListener('click', () => {
+            const data = allRegistrations.map(r => ({
+                Nombre: `${r.firstName} ${r.lastName}`,
+                Email: r.email || '',
+                Cédula: r.cedula || '',
+                Localidad: r.localidad || '',
+                Líder: r.leaderName || '',
+                Puesto: r.votingPlace || '',
+                Mesa: r.votingTable || '',
+                Fecha: new Date(r.date).toLocaleDateString('es-CO'),
+                Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
+            }));
+            exportToExcel(data, `registros_${new Date().toISOString().slice(0, 10)}.xlsx`);
         });
 
         // === ACTUALIZAR EVENTO ===
@@ -1702,8 +2075,9 @@
                 if (res.ok) {
                     document.getElementById('editLeaderModal').classList.remove('active');
                     loadDashboard();
+                    showSuccessModal('¡Actualizado!', 'Información del líder actualizada.');
                 } else {
-                    alert('Error al actualizar líder');
+                    alert('Error actualizando líder');
                 }
             } catch (error) {
                 console.error(error);

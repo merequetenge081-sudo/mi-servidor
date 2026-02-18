@@ -14,7 +14,8 @@ export function authMiddleware(req, res, next) {
       userId: decoded.userId,
       email: decoded.email,
       role: decoded.role || 'super_admin', // Default to super_admin for BC
-      organizationId: decoded.organizationId || null // Multi-tenant org context
+      organizationId: decoded.organizationId || null, // Multi-tenant org context
+      leaderId: decoded.leaderId // Pass leaderId from token
     };
     next();
   } catch (error) {

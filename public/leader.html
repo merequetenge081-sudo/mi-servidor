@@ -250,6 +250,23 @@
             flex: 1;
         }
 
+        /* ============== ACTION BUTTONS ============== */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            /* Increased gap */
+            justify-content: center;
+        }
+
+        .action-buttons button {
+            transition: transform 0.2s;
+        }
+
+        .action-buttons button:hover {
+            transform: scale(1.1);
+        }
+
+
         .btn-copy {
             background: var(--primary);
             color: white;
@@ -262,6 +279,74 @@
 
         .btn-copy:hover {
             opacity: 0.8;
+        }
+
+        .btn-copy:hover {
+            opacity: 0.8;
+        }
+
+        /* ============== MODAL ============== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.3);
+            /* Lighter background, no blur */
+            /* Flexbox for centering */
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Show modal when style is display: block (override by JS) */
+        .modal[style*="display: block"] {
+            display: flex !important;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUp 0.3s ease-out;
+            text-align: center;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #999;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            color: #333;
         }
     </style>
 </head>
@@ -309,18 +394,21 @@
         <!-- QR Code Section -->
         <div class="qr-section">
             <h4>
-                <i class="bi bi-qr-code"></i> Tu Link de Registro
+                <i class="bi bi-link-45deg"></i> Tu Link de Registro
             </h4>
-            <div id="qrCode" style="display: inline-block;"></div>
             <div class="link-section">
-                <label>Comparte este link para que otros se registren:</label>
-                <div class="link-input">
+                <label style="margin-bottom: 15px; display: block; color: #666;">Comparte este link para que se
+                    registren contigo:</label>
+                <div class="link-input" style="flex-wrap: wrap;">
                     <input type="text" id="registrationLink" readonly>
                     <button class="btn-copy" onclick="copyLink()">
-                        <i class="bi bi-clipboard"></i> Copiar Link
+                        <i class="bi bi-clipboard"></i> Copiar
                     </button>
-                    <button class="btn-copy" onclick="openForm()" style="background: #764ba2; margin-left: 10px;">
-                        <i class="bi bi-box-arrow-up-right"></i> Ver Formulario
+                    <button class="btn-copy" onclick="openQrModal()" style="background: #1a1a2e;">
+                        <i class="bi bi-qr-code"></i> Ver QR
+                    </button>
+                    <button class="btn-copy" onclick="openForm()" style="background: #764ba2;">
+                        <i class="bi bi-box-arrow-up-right"></i> Llenar Formulario
                     </button>
                 </div>
             </div>
@@ -344,8 +432,28 @@
 
         <!-- Registrations Table -->
         <div class="card">
-            <div class="card-header">
-                <i class="bi bi-table"></i> Mis Registros
+            <div class="card-header"
+                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <span><i class="bi bi-table"></i> Mis Registros</span>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn btn-sm" onclick="loadLeaderPanel()" title="Actualizar"
+                        style="background: white; color: #333; font-weight: bold; border: none;">
+                        <i class="bi bi-arrow-clockwise"></i> Actualizar
+                    </button>
+                    <button class="btn btn-sm btn-primary" onclick="downloadTemplate()"
+                        style="color: white; background-color: #2780F5 !important; border-color: #2780F5 !important; background-image: none !important;">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Plantilla
+                    </button>
+                    <button class="btn btn-sm btn-success" onclick="document.getElementById('importFile').click()">
+                        <i class="bi bi-upload"></i> Importar
+                    </button>
+                    <input type="file" id="importFile" accept=".xlsx, .xls" style="display: none;"
+                        onchange="handleImport(this)">
+                    <button class="btn btn-sm btn-light" onclick="exportMyRegistrations()"
+                        style="color: var(--primary); font-weight: bold; border: 1px solid #ddd;">
+                        <i class="bi bi-download"></i> Exportar
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -370,25 +478,148 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- PAGINATION CONTROLS -->
+                <div class="pagination-controls"
+                    style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
+                    <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" onclick="changePage(-1)" disabled>
+                        <i class="bi bi-chevron-left"></i> Anterior
+                    </button>
+                    <span id="pageIndicator" style="font-size: 14px; font-weight: 600; color: #666;">Página 1 de
+                        1</span>
+                    <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn" onclick="changePage(1)" disabled>
+                        Siguiente <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Export Section -->
-        <div class="card">
-            <div class="card-header">
-                <i class="bi bi-download"></i> Descargar Mis Registros
+
+    </div>
+
+    <!-- QR MODAL -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeQrModal()">&times;</button>
+            <h4 style="margin-bottom: 20px; color: var(--primary);">Tu Código QR</h4>
+            <div id="qrCodeContainer" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+            <p style="color: #666; font-size: 14px;">Escanea este código para abrir el formulario de registro
+                automáticamente vinculado a tu cuenta.</p>
+        </div>
+    </div>
+
+    <!-- IMPORT ERROR MODAL -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="modal-close"
+                onclick="document.getElementById('errorModal').style.display='none'">&times;</button>
+            <h4 style="margin-bottom: 20px; color: #dc3545;"><i class="bi bi-exclamation-triangle"></i> Errores de
+                Importación</h4>
+            <p style="margin-bottom: 15px;">Se encontraron los siguientes problemas en el archivo Excel. Por favor
+                corríjalos e intente de nuevo.</p>
+            <div
+                style="max-height: 300px; overflow-y: auto; background: #f8d7da; padding: 10px; border-radius: 5px; border: 1px solid #f5c6cb;">
+                <ul id="errorList" style="margin: 0; padding-left: 20px; color: #721c24;"></ul>
             </div>
-            <div class="card-body">
-                <button class="btn btn-primary" onclick="exportMyRegistrations()">
-                    <i class="bi bi-download"></i> Descargar Excel
-                </button>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="btn btn-secondary"
+                    onclick="document.getElementById('errorModal').style.display='none'">Cerrar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- EDIT REGISTRATION MODAL -->
+    <div id="editModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            <h4 style="margin-bottom: 20px; color: var(--primary);"><i class="bi bi-pencil-square"></i> Editar Registro
+            </h4>
+            <form id="editForm" onsubmit="saveEditRegistration(event)">
+                <input type="hidden" id="editId">
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="editFirstName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Apellido</label>
+                    <input type="text" class="form-control" id="editLastName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="editEmail">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Celular</label>
+                    <input type="text" class="form-control" id="editPhone">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Puesto de Votación</label>
+                    <input type="text" class="form-control" id="editVotingPlace">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mesa</label>
+                    <input type="text" class="form-control" id="editVotingTable">
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div id="successModal" class="modal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="modal-content" style="max-width: 400px; text-align: center; border-radius: 15px; padding: 30px;">
+            <div style="margin-bottom: 20px;">
+                <i class="bi bi-check-circle-fill" style="font-size: 50px; color: #28a745;"></i>
+            </div>
+            <h4 id="successTitle" style="color: #333; margin-bottom: 15px;">¡Éxito!</h4>
+            <p id="successMessage" style="color: #666; margin-bottom: 25px;">Operación completada correctamente.</p>
+            <button class="btn btn-primary" onclick="closeSuccessModal()" style="width: 100%;">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- GENERIC ERROR MODAL -->
+    <div id="genericErrorModal" class="modal" style="display: none;">
+        <div class="modal-content" style="text-align: center; padding: 30px;">
+            <div style="margin-bottom: 20px;">
+                <i class="bi bi-x-circle-fill" style="font-size: 50px; color: #dc3545;"></i>
+            </div>
+            <h4 style="color: #333; margin-bottom: 15px;">Error</h4>
+            <p id="genericErrorMessage" style="color: #666; margin-bottom: 25px;">Ha ocurrido un error.</p>
+            <button class="btn btn-secondary" onclick="closeGenericErrorModal()" style="width: 100%;">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="deleteConfirmModal" class="modal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="modal-content" style="max-width: 400px; text-align: center; border-radius: 15px; padding: 30px;">
+            <div style="margin-bottom: 20px;">
+                <i class="bi bi-exclamation-circle-fill" style="font-size: 50px; color: #dc3545;"></i>
+            </div>
+            <h4 style="color: #333; margin-bottom: 15px;">¿Estás seguro?</h4>
+            <p style="color: #666; margin-bottom: 25px;">¿Realmente deseas eliminar a esta persona? Esta acción no se
+                puede deshacer.</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn btn-secondary" onclick="closeDeleteConfirmModal()" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" style="flex: 1;">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR MODAL -->
+    <div id="qrModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 350px;">
+            <button class="modal-close" onclick="closeQrModal()">&times;</button>
+            <h4 style="margin-bottom: 20px;">Tu Código QR</h4>
+            <div id="qrCodeContainer" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+            <p class="text-muted" style="font-size: 14px;">Escanea este código para ir directamente a tu formulario.</p>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="/js/xlsx.full.min.js"></script>
 
     <script>
         const API_URL = window.location.origin;
@@ -396,13 +627,21 @@
         let currentLeaderId = localStorage.getItem('leaderId');
         let leaderData = null;
         let myRegistrations = [];
+        let filteredRegistrations = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        let isRedirecting = false;
 
         // ============== AUTHENTICATION ==============
         function checkAuth() {
+            if (isRedirecting) return false;
             if (!currentToken || !currentLeaderId) {
+                isRedirecting = true;
                 window.location.href = '/';
-                return;
+                return false;
             }
+            return true;
         }
 
         function logout() {
@@ -427,9 +666,12 @@
                 headers
             });
 
-            if (response.status === 401) {
+            if (response.status === 401 && !isRedirecting) {
+                isRedirecting = true;
                 localStorage.removeItem('token');
+                localStorage.removeItem('leaderId');
                 window.location.href = '/';
+                throw new Error('Session expired');
             }
 
             return response;
@@ -440,31 +682,42 @@
             try {
                 // Load leader data
                 const leaderRes = await apiCall(`/api/leaders/${currentLeaderId}`);
+                if (!leaderRes.ok) throw new Error('Error cargando información del líder');
+
                 leaderData = await leaderRes.json();
                 document.getElementById('leaderName').textContent = leaderData.name || 'Líder';
 
-                // Generate QR Code
-                // Usar form.html?token=... para consistencia
-                const registrationLink = `${API_URL}/form.html?token=${leaderData.token}`;
+                // Setup Link
+                const registrationLink = `${API_URL}/form.html?token=${leaderData.token || leaderData.leaderId}`;
                 document.getElementById('registrationLink').value = registrationLink;
 
-                const qrContainer = document.getElementById('qrCode');
-                qrContainer.innerHTML = '';
-                new QRCode(qrContainer, {
-                    text: registrationLink,
-                    width: 250,
-                    height: 250
-                });
-
                 // Load registrations
-                const regsRes = await apiCall('/api/registrations');
-                const allRegistrations = await regsRes.json();
-                myRegistrations = allRegistrations.filter(r => r.leaderId === currentLeaderId);
+                // Fix: Fetch specific registrations for this leader with high limit
+                const regsRes = await apiCall(`/api/registrations?leaderId=${currentLeaderId}&limit=1000`);
+                if (regsRes.ok) {
+                    const allRegistrations = await regsRes.json();
 
+                    if (Array.isArray(allRegistrations)) {
+                        myRegistrations = allRegistrations.filter(r => r.leaderId === currentLeaderId);
+                    } else if (allRegistrations.data && Array.isArray(allRegistrations.data)) {
+                        myRegistrations = allRegistrations.data.filter(r => r.leaderId === currentLeaderId);
+                    } else {
+                        console.warn('Formato de registros inesperado', allRegistrations);
+                        myRegistrations = [];
+                    }
+                } else {
+                    console.error('Error cargando registros:', await regsRes.text());
+                    myRegistrations = [];
+                }
+
+                // Init with all data
+                filteredRegistrations = [...myRegistrations];
                 updateStats();
-                loadRegistrationsTable();
+                currentPage = 1;
+                renderRegistrationsTable(); // Use new render function
             } catch (err) {
                 console.error('Error loading panel:', err);
+                document.getElementById('registrationsTable').innerHTML = `<tr><td colspan="9" class="text-center text-danger">Error de conexión: ${err.message}</td></tr>`;
             }
         }
 
@@ -485,8 +738,19 @@
             document.getElementById('confirmationRate').textContent = rate + '%';
         }
 
-        function loadRegistrationsTable() {
-            const html = myRegistrations.map(reg => `
+        // ============== PAGINATION & RENDERING ==============
+        function renderRegistrationsTable() {
+            const totalPages = Math.ceil(filteredRegistrations.length / itemsPerPage) || 1;
+
+            // Validate page bounds
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredRegistrations.slice(start, end);
+
+            const html = pageData.map(reg => `
                 <tr>
                     <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
                     <td>${reg.email || '-'}</td>
@@ -501,14 +765,32 @@
                         </span>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleConfirm('${reg._id}', ${reg.confirmed})">
-                            <i class="bi bi-check-circle"></i>
-                        </button>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-outline-secondary" title="${reg.confirmed ? 'Desconfirmar' : 'Confirmar'}" onclick="toggleConfirm('${reg._id}', ${reg.confirmed})">
+                                <i class="bi bi-check-circle"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" title="Editar" onclick="openEditModal('${reg._id}', '${reg.firstName}', '${reg.lastName}' , '${reg.email || ''}', '${reg.phone || ''}', '${reg.votingPlace || ''}', '${reg.votingTable || ''}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="deleteRegistration('${reg._id}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
 
             document.getElementById('registrationsTable').innerHTML = html || '<tr><td colspan="9" class="text-center text-muted">Sin registros</td></tr>';
+
+            // Update Pagination Controls
+            document.getElementById('pageIndicator').textContent = `Página ${currentPage} de ${totalPages}`;
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            renderRegistrationsTable();
         }
 
         // ============== FILTERS ==============
@@ -519,7 +801,7 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const status = document.getElementById('filterStatus').value;
 
-            const filtered = myRegistrations.filter(r => {
+            filteredRegistrations = myRegistrations.filter(r => {
                 const matchSearch = !search ||
                     r.firstName.toLowerCase().includes(search) ||
                     r.lastName.toLowerCase().includes(search) ||
@@ -530,29 +812,9 @@
                 return matchSearch && matchStatus;
             });
 
-            const html = filtered.map(reg => `
-                <tr>
-                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
-                    <td>${reg.email || '-'}</td>
-                    <td>${reg.cedula || '-'}</td>
-                    <td>${reg.localidad || '-'}</td>
-                    <td>${reg.votingPlace || '-'}</td>
-                    <td>${reg.votingTable || '-'}</td>
-                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
-                    <td>
-                        <span class="badge ${reg.confirmed ? 'bg-success' : 'bg-warning'}">
-                            ${reg.confirmed ? 'Confirmado' : 'Pendiente'}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleConfirm('${reg._id}', ${reg.confirmed})">
-                            <i class="bi bi-check-circle"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-
-            document.getElementById('registrationsTable').innerHTML = html || '<tr><td colspan="9" class="text-center text-muted">Sin resultados</td></tr>';
+            // Reset to page 1 when filtering
+            currentPage = 1;
+            renderRegistrationsTable();
         }
 
         // ============== ACTIONS ==============
@@ -581,29 +843,330 @@
         }
 
         function exportMyRegistrations() {
-            const data = myRegistrations.map(r => ({
-                'Nombre': `${r.firstName} ${r.lastName}`,
-                'Email': r.email || '',
-                'Cédula': r.cedula || '',
-                'Localidad': r.localidad || '',
-                'Puesto Votación': r.votingPlace || '',
-                'Mesa': r.votingTable || '',
-                'Teléfono': r.phone || '',
-                'Fecha': new Date(r.date).toLocaleDateString('es-CO'),
-                'Estado': r.confirmed ? 'Confirmado' : 'Pendiente'
-            }));
+            try {
+                if (!myRegistrations || myRegistrations.length === 0) {
+                    alert('No hay registros para exportar. La tabla está vacía.');
+                    return;
+                }
 
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Mis Registros');
-            XLSX.writeFile(wb, `mis_registros_${leaderData.name}.xlsx`);
+                if (typeof XLSX === 'undefined') {
+                    alert('Error: La librería de Excel no se ha cargado. Por favor revisa tu conexión a internet y recarga la página.');
+                    return;
+                }
+
+                const data = myRegistrations.map(r => ({
+                    'Nombre': `${r.firstName} ${r.lastName}`,
+                    'Email': r.email || '',
+                    'Cédula': r.cedula || '',
+                    'Localidad': r.localidad || '',
+                    'Puesto Votación': r.votingPlace || '',
+                    'Mesa': r.votingTable || '',
+                    'Teléfono': r.phone || '',
+                    'Fecha': new Date(r.date).toLocaleDateString('es-CO'),
+                    'Estado': r.confirmed ? 'Confirmado' : 'Pendiente'
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Mis Registros');
+
+                // Safe filename generation
+                const safeName = leaderData && leaderData.name ? leaderData.name.replace(/[^a-zA-Z0-9]/g, '_') : 'leader';
+                XLSX.writeFile(wb, `mis_registros_${safeName}.xlsx`);
+            } catch (err) {
+                console.error('Export Error:', err);
+                alert('Ocurrió un error al exportar: ' + err.message);
+            }
         }
+
+        // ============== QR MODAL ==============
+        function openQrModal() {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            qrContainer.innerHTML = ''; // Clear previous
+
+            const link = document.getElementById('registrationLink').value;
+
+            new QRCode(qrContainer, {
+                text: link,
+                width: 250,
+                height: 250
+            });
+
+            document.getElementById('qrModal').style.display = 'block';
+        }
+
+        function closeQrModal() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+
+
 
         // ============== INIT ==============
         window.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
-            loadLeaderPanel();
+            if (checkAuth()) {
+                loadLeaderPanel();
+            }
         });
+
+        function downloadTemplate() {
+            const headers = [
+                ['Nombre', 'Apellido', 'Cédula', 'Email', 'Celular', 'Mesa', 'Localidad', 'Puesto Votación']
+            ];
+
+            // Remove example row - Create empty template
+            const ws = XLSX.utils.aoa_to_sheet(headers);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
+            XLSX.writeFile(wb, "Plantilla_Registros.xlsx");
+        }
+
+        function handleImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    if (jsonData.length === 0) {
+                        alert("El archivo está vacío");
+                        input.value = '';
+                        return;
+                    }
+
+                    // Map keys to backend expected format
+                    const registrations = jsonData.map(row => ({
+                        firstName: row['Nombre'],
+                        lastName: row['Apellido'],
+                        cedula: row['Cédula'] || row['Cedula'], // Handle no accent
+                        email: row['Email'],
+                        phone: row['Celular'] || row['Telefono'],
+                        votingTable: row['Mesa'],
+                        localidad: row['Localidad'],
+                        votingPlace: row['Puesto Votación'] || row['Puesto Votacion']
+                    }));
+
+                    // Send to backend
+                    fetch(`${API_URL}/api/registrations/bulk`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${currentToken}`
+                        },
+                        body: JSON.stringify({
+                            leaderId: currentLeaderId,
+                            registrations: registrations
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            input.value = ''; // Reset input
+                            if (data.error) {
+                                if (data.details) {
+                                    // Show error modal
+                                    const list = document.getElementById('errorList');
+                                    list.innerHTML = '';
+                                    data.details.forEach(err => {
+                                        const li = document.createElement('li');
+                                        li.textContent = `Fila ${err.row} - ${err.name}: ${err.error}`;
+                                        list.appendChild(li);
+                                    });
+                                    document.getElementById('errorModal').style.display = 'block';
+                                } else {
+                                    alert(data.error);
+                                }
+                            } else {
+                                showSuccessModal('¡Importación Exitosa!', data.message);
+                                loadLeaderPanel(); // Reload table
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert("Error de conexión al importar");
+                            input.value = '';
+                        });
+
+                } catch (err) {
+                    console.error(err);
+                    alert("Error al leer el archivo Excel");
+                    input.value = '';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // ================== EDIT & DELETE ACTIONS ==================
+
+        // --- SUCCESS MODAL ---
+        function showSuccessModal(title, message) {
+            document.getElementById('successTitle').textContent = title;
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successModal').style.display = 'block';
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+
+        // --- GENERIC ERROR MODAL ---
+        function showGenericErrorModal(message) {
+            document.getElementById('genericErrorMessage').textContent = message;
+            document.getElementById('genericErrorModal').style.display = 'block';
+        }
+
+        function closeGenericErrorModal() {
+            document.getElementById('genericErrorModal').style.display = 'none';
+        }
+
+        // --- DELETE CONFIRMATION ---
+        let deleteId = null;
+
+        function confirmDelete(id) {
+            deleteId = id;
+            document.getElementById('deleteConfirmModal').style.display = 'block';
+        }
+
+        function closeDeleteConfirmModal() {
+            deleteId = null;
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            if (deleteId) {
+                performDelete(deleteId);
+            }
+        });
+
+        function performDelete(id) {
+            fetch(`${API_URL}/api/registrations/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                    } else {
+                        closeDeleteConfirmModal();
+                        showSuccessModal('¡Eliminado!', 'La persona ha sido eliminada correctamente.');
+                        loadLeaderPanel(); // Reload table
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error al eliminar registro');
+                    closeDeleteConfirmModal();
+                });
+        }
+
+        // ================== EDIT & DELETE ACTIONS ==================
+
+        function openEditModal(id, firstName, lastName, email, phone, place, table) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editFirstName').value = firstName;
+            document.getElementById('editLastName').value = lastName;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editVotingPlace').value = place;
+            document.getElementById('editVotingTable').value = table;
+
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveEditRegistration(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const data = {
+                firstName: document.getElementById('editFirstName').value,
+                lastName: document.getElementById('editLastName').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                votingPlace: document.getElementById('editVotingPlace').value,
+                votingTable: document.getElementById('editVotingTable').value
+            };
+
+            fetch(`${API_URL}/api/registrations/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentToken}`
+                },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showGenericErrorModal(data.error);
+                    } else {
+                        closeEditModal();
+                        showSuccessModal('¡Actualizado!', 'Los datos se han guardado correctamente.');
+                        loadLeaderPanel(); // Reload table
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showGenericErrorModal('Error al actualizar registro');
+                });
+        }
+
+        function deleteRegistration(id) {
+            confirmDelete(id);
+            return;
+
+            fetch(`${API_URL}/api/registrations/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${currentToken}`
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showGenericErrorModal(data.error);
+                    } else {
+                        closeDeleteConfirmModal();
+                        showSuccessModal('¡Eliminado!', 'La persona ha sido eliminada correctamente.');
+                        loadLeaderPanel(); // Reload table
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showGenericErrorModal('Error al eliminar registro');
+                    closeDeleteConfirmModal();
+                });
+        }
+
+        // Close modal if clicked outside
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('qrModal')) {
+                closeQrModal();
+            }
+            if (event.target == document.getElementById('errorModal')) {
+                document.getElementById('errorModal').style.display = 'none';
+            }
+            if (event.target == document.getElementById('editModal')) {
+                closeEditModal();
+            }
+            if (event.target == document.getElementById('successModal')) {
+                closeSuccessModal();
+            }
+            if (event.target == document.getElementById('deleteConfirmModal')) {
+                closeDeleteConfirmModal();
+            }
+            if (event.target == document.getElementById('genericErrorModal')) {
+                closeGenericErrorModal();
+            }
+        }
     </script>
 </body>
 

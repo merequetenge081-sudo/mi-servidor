@@ -4,8 +4,8 @@
  */
 
 const requestCounts = {};
-const WINDOW_SIZE = 10 * 60 * 1000; // 10 minutes in milliseconds
-const MAX_REQUESTS = 20; // Maximum 20 requests per window
+const WINDOW_SIZE = 15 * 60 * 1000; // 15 minutes in milliseconds
+const MAX_REQUESTS = 200; // Maximum 200 requests per window
 
 function getClientIp(req) {
   return (
