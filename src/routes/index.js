@@ -245,8 +245,16 @@ router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async
     const { Leader } = await import("../models/Leader.js");
     const bcryptjs = (await import("bcryptjs")).default;
 
-    // Find all leaders without a username
-    const leaders = await Leader.find({ $or: [{ username: { $exists: false } }, { username: null }, { username: "" }] });
+    // Find leaders without fixed passwords or without username
+    const leaders = await Leader.find({
+      $or: [
+        { username: { $exists: false } },
+        { username: null },
+        { username: "" },
+        { isTemporaryPassword: true },
+        { passwordCanBeChanged: true }
+      ]
+    });
 
     if (leaders.length === 0) {
       return res.json({ message: "Todos los líderes ya tienen usuario asignado.", migrated: 0, results: [] });
@@ -256,20 +264,23 @@ router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async
     const results = [];
 
     for (const leader of leaders) {
-      const cleanName = (leader.name || "usuario desconocido").trim().split(/\s+/);
-      const firstName = cleanName[0] || "user";
-      const lastName = cleanName.length > 1 ? cleanName[1] : "leader";
+      let username = leader.username;
+      if (!username) {
+        const cleanName = (leader.name || "usuario desconocido").trim().split(/\s+/);
+        const firstName = cleanName[0] || "user";
+        const lastName = cleanName.length > 1 ? cleanName[1] : "leader";
 
-      let baseUsername = normalize(firstName.charAt(0) + lastName);
-      if (!baseUsername) baseUsername = "user";
-      let username = baseUsername;
+        let baseUsername = normalize(firstName.charAt(0) + lastName);
+        if (!baseUsername) baseUsername = "user";
+        username = baseUsername;
 
-      // Ensure uniqueness (check DB + already assigned in this batch)
-      const usedInBatch = results.map(r => r.username);
-      let counter = 1;
-      while ((await Leader.findOne({ username })) || usedInBatch.includes(username)) {
-        counter++;
-        username = `${baseUsername}${counter}`;
+        // Ensure uniqueness (check DB + already assigned in this batch)
+        const usedInBatch = results.map(r => r.username);
+        let counter = 1;
+        while ((await Leader.findOne({ username })) || usedInBatch.includes(username)) {
+          counter++;
+          username = `${baseUsername}${counter}`;
+        }
       }
 
       // Generate temporary password
@@ -281,7 +292,10 @@ router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async
         $set: {
           username: username,
           passwordHash: passwordHash,
-          isTemporaryPassword: true
+          isTemporaryPassword: true,
+          passwordCanBeChanged: true,
+          passwordResetRequested: false,
+          tempPasswordPlaintext: tempPassword
         }
       });
 

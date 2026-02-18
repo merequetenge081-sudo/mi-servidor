@@ -372,7 +372,7 @@
                     
                     <div class="form-text">
                         ¿No sabes tu localidad?
-                        <a href="https://www.registraduria.gov.co/buscar-puesto-votacion" target="_blank">
+                        <a href="https://eleccionescolombia.registraduria.gov.co/identificacion" target="_blank">
                             Click aquí para consultar en la Registraduría
                         </a>
                     </div>
@@ -501,12 +501,14 @@
         
         let currentLeaderId = null;
         let currentEventId = null;
+        let currentLeaderToken = null;
 
         // Validar token y cargar info del líder
         async function validateToken() {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
             const leaderIdParam = urlParams.get('leaderId'); // Soporte legacy
+            currentLeaderToken = token || leaderIdParam || null;
 
             // Si no hay token ni leaderId, es un registro general (sin líder) o error
             if (!token && !leaderIdParam) {
@@ -585,6 +587,7 @@
                 // Submit registration
                 const payload = {
                     leaderId: currentLeaderId,
+                    leaderToken: currentLeaderToken,
                     eventId: currentEventId,
                     firstName,
                     lastName,

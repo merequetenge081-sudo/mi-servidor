@@ -1394,6 +1394,24 @@
                 <i class="bi bi-bar-chart"></i> Análisis de Datos
             </div>
 
+            <div class="filters" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 20px;">
+                <span style="font-weight: 600; color: #667eea;">Filtro:</span>
+                <select id="analyticsRegionFilter" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
+                    <option value="all">Todos</option>
+                    <option value="bogota">Bogotá</option>
+                    <option value="resto">Resto del País</option>
+                </select>
+                <select id="analyticsLeaderFilter" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; min-width: 220px;">
+                    <option value="all">Todos los líderes</option>
+                </select>
+                <button class="btn btn-sm btn-primary" id="applyAnalyticsFilterBtn">
+                    <i class="bi bi-funnel"></i> Aplicar
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="clearAnalyticsFilterBtn">
+                    Ver todos
+                </button>
+            </div>
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-percent"></i></div>
@@ -1408,7 +1426,7 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-geo-alt"></i></div>
                     <div class="stat-value" id="localidadesCount">0</div>
-                    <div class="stat-label">Localidades</div>
+                    <div class="stat-label">Bogotá / Resto</div>
                 </div>
             </div>
 
@@ -1767,6 +1785,143 @@
         let currentPage = 1;
         const itemsPerPage = 50;
 
+        const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+        const LAST_ACTIVITY_KEY = 'lastActivity';
+
+        function touchActivity() {
+            localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+        }
+
+        function isSessionExpired() {
+            const last = parseInt(localStorage.getItem(LAST_ACTIVITY_KEY) || '0', 10);
+            if (!last) return false;
+            return Date.now() - last > SESSION_TIMEOUT_MS;
+        }
+
+        function enforceSessionTimeout() {
+            if (!currentToken) return false;
+            if (isSessionExpired()) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('eventId');
+                window.location.href = '/';
+                return true;
+            }
+            return false;
+        }
+
+        function bindSessionActivity() {
+            ['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt => {
+                document.addEventListener(evt, touchActivity, { passive: true });
+            });
+        }
+
+        function getBogotaLocalidades() {
+            return ['Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'];
+        }
+
+        function showAlert(message, type = 'info') {
+            return new Promise(resolve => {
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                const palette = {
+                    info: { bg: '#667eea', text: 'Informacion' },
+                    success: { bg: '#28a745', text: 'Listo' },
+                    warning: { bg: '#f0ad4e', text: 'Atencion' },
+                    error: { bg: '#dc3545', text: 'Error' }
+                };
+                const theme = palette[type] || palette.info;
+
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+
+                const card = document.createElement('div');
+                card.style.cssText = `background: ${isDarkMode ? '#16213e' : '#ffffff'}; color: ${isDarkMode ? '#e0e0e0' : '#333'}; border-radius: 12px; padding: 24px; width: 92%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid ${isDarkMode ? '#2d3748' : '#e2e8f0'};`;
+
+                const header = document.createElement('div');
+                header.style.cssText = `display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-weight: 700; color: ${theme.bg};`;
+                header.textContent = theme.text;
+
+                const body = document.createElement('div');
+                body.style.cssText = 'font-size: 14px; line-height: 1.5; margin-bottom: 18px;';
+                body.textContent = message;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.style.cssText = `width: 100%; border: none; border-radius: 8px; padding: 10px; background: ${theme.bg}; color: white; font-weight: 600; cursor: pointer;`;
+                btn.textContent = 'Aceptar';
+                btn.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(true);
+                });
+
+                card.appendChild(header);
+                card.appendChild(body);
+                card.appendChild(btn);
+                overlay.appendChild(card);
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                        resolve(true);
+                    }
+                });
+                document.body.appendChild(overlay);
+            });
+        }
+
+        function showConfirm(message) {
+            return new Promise(resolve => {
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+
+                const card = document.createElement('div');
+                card.style.cssText = `background: ${isDarkMode ? '#16213e' : '#ffffff'}; color: ${isDarkMode ? '#e0e0e0' : '#333'}; border-radius: 12px; padding: 24px; width: 92%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid ${isDarkMode ? '#2d3748' : '#e2e8f0'};`;
+
+                const header = document.createElement('div');
+                header.style.cssText = 'font-weight: 700; margin-bottom: 12px; color: #667eea;';
+                header.textContent = 'Confirmar';
+
+                const body = document.createElement('div');
+                body.style.cssText = 'font-size: 14px; line-height: 1.5; margin-bottom: 18px;';
+                body.textContent = message;
+
+                const actions = document.createElement('div');
+                actions.style.cssText = 'display: flex; gap: 10px;';
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.style.cssText = `flex: 1; border: none; border-radius: 8px; padding: 10px; background: ${isDarkMode ? '#4a5568' : '#6c757d'}; color: white; font-weight: 600; cursor: pointer;`;
+                cancelBtn.textContent = 'Cancelar';
+                cancelBtn.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(false);
+                });
+
+                const okBtn = document.createElement('button');
+                okBtn.type = 'button';
+                okBtn.style.cssText = 'flex: 1; border: none; border-radius: 8px; padding: 10px; background: #667eea; color: white; font-weight: 600; cursor: pointer;';
+                okBtn.textContent = 'Confirmar';
+                okBtn.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(true);
+                });
+
+                actions.appendChild(cancelBtn);
+                actions.appendChild(okBtn);
+                card.appendChild(header);
+                card.appendChild(body);
+                card.appendChild(actions);
+                overlay.appendChild(card);
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                        resolve(false);
+                    }
+                });
+                document.body.appendChild(overlay);
+            });
+        }
+
         function filterLeadersByName(searchTerm) {
             const filtered = searchTerm.trim() === '' ? allLeaders : 
                 allLeaders.filter(leader => leader.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -1778,7 +1933,7 @@
                     passwordStatus = '<span style="background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-exclamation-triangle"></i> Reset Solicitado</span>';
                 } else if (leader.isTemporaryPassword) {
                     passwordStatus = '<span style="background: #cfe2ff; color: #084298; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-clock"></i> Temporal</span>';
-                } else if (leader.passwordCanBeChanged === false) {
+                } else if (leader.username) {
                     passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-lock"></i> Fija</span>';
                 } else {
                     passwordStatus = '<span style="background: #f8d7da; color: #842029; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-x-circle"></i> Sin configurar</span>';
@@ -1808,7 +1963,7 @@
                         <button class="btn btn-sm btn-outline-secondary edit-leader-btn" data-leader-id="${leader._id}" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger generate-pass-btn" data-leader-id="${leader._id}" title="Generar Nueva Contraseña">
+                        <button class="btn btn-sm btn-outline-danger generate-pass-btn" data-leader-id="${leader._id}" data-can-generate="${leader.passwordResetRequested ? 'true' : 'false'}" ${leader.passwordResetRequested ? '' : 'disabled'} title="${leader.passwordResetRequested ? 'Generar Nueva Contraseña' : 'Solo disponible si el líder solicita'}" style="${leader.passwordResetRequested ? '' : 'opacity: 0.5; cursor: not-allowed;'}">
                             <i class="bi bi-key"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}" title="Eliminar">
@@ -1832,7 +1987,13 @@
                 btn.addEventListener('click', () => showEditLeader(btn.dataset.leaderId));
             });
             document.querySelectorAll('.generate-pass-btn').forEach(btn => {
-                btn.addEventListener('click', () => generateNewPassword(btn.dataset.leaderId));
+                btn.addEventListener('click', () => {
+                    if (btn.dataset.canGenerate !== 'true') {
+                        showAlert('Solo puedes generar una nueva contraseña si el líder la solicita.', 'warning');
+                        return;
+                    }
+                    generateNewPassword(btn.dataset.leaderId);
+                });
             });
             document.querySelectorAll('.view-credentials-btn').forEach(btn => {
                 btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId, btn.dataset.username, btn.dataset.password));
@@ -1900,6 +2061,7 @@
                 loadRegistrationsTabbed();
                 populateLeaderFilter();
                 populateExportLeader();
+                populateAnalyticsLeaderFilter();
                 // Defer heavy work - charts only render when visible
                 chartsLoaded = false;
                 analyticsLoaded = false;
@@ -2026,7 +2188,7 @@
                     passwordStatus = '<span style="background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-exclamation-triangle"></i> Reset Solicitado</span>';
                 } else if (leader.isTemporaryPassword) {
                     passwordStatus = '<span style="background: #cfe2ff; color: #084298; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-clock"></i> Temporal</span>';
-                } else if (leader.passwordCanBeChanged === false) {
+                } else if (leader.username) {
                     passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-lock"></i> Fija</span>';
                 } else {
                     passwordStatus = '<span style="background: #f8d7da; color: #842029; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-x-circle"></i> Sin configurar</span>';
@@ -2056,7 +2218,7 @@
                         <button class="btn btn-sm btn-outline-secondary edit-leader-btn" data-leader-id="${leader._id}" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger generate-pass-btn" data-leader-id="${leader._id}" title="Generar Nueva Contraseña">
+                        <button class="btn btn-sm btn-outline-danger generate-pass-btn" data-leader-id="${leader._id}" data-can-generate="${leader.passwordResetRequested ? 'true' : 'false'}" ${leader.passwordResetRequested ? '' : 'disabled'} title="${leader.passwordResetRequested ? 'Generar Nueva Contraseña' : 'Solo disponible si el líder solicita'}" style="${leader.passwordResetRequested ? '' : 'opacity: 0.5; cursor: not-allowed;'}">
                             <i class="bi bi-key"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}" title="Eliminar">
@@ -2078,7 +2240,13 @@
                 btn.addEventListener('click', () => showEditLeader(btn.dataset.leaderId));
             });
             document.querySelectorAll('.generate-pass-btn').forEach(btn => {
-                btn.addEventListener('click', () => generateNewPassword(btn.dataset.leaderId));
+                btn.addEventListener('click', () => {
+                    if (btn.dataset.canGenerate !== 'true') {
+                        showAlert('Solo puedes generar una nueva contraseña si el líder la solicita.', 'warning');
+                        return;
+                    }
+                    generateNewPassword(btn.dataset.leaderId);
+                });
             });
             document.querySelectorAll('.view-credentials-btn').forEach(btn => {
                 btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId, btn.dataset.username, btn.dataset.password));
@@ -2088,7 +2256,7 @@
         // ====== RESET PASSWORD MODAL ======
         function openResetPassModal(leaderId) {
             const leader = allLeaders.find(l => l._id === leaderId);
-            if (!leader) return alert('Líder no encontrado');
+            if (!leader) return showAlert('Líder no encontrado', 'error');
 
             document.getElementById('resetPassLeaderId').value = leaderId;
             document.getElementById('resetPassLeaderName').value = leader.name;
@@ -2124,7 +2292,7 @@
             const btn = document.getElementById('confirmResetPassBtn');
 
             if (!newPassword || newPassword.length < 6) {
-                return alert('La contraseña debe tener al menos 6 caracteres');
+                return showAlert('La contraseña debe tener al menos 6 caracteres', 'warning');
             }
 
             btn.disabled = true;
@@ -2148,13 +2316,13 @@
                     btn.classList.add('btn-success');
                     loadDashboard(); // Refresh table to show updated username
                 } else {
-                    alert('Error: ' + (data.error || 'No se pudo restablecer'));
+                    showAlert('Error: ' + (data.error || 'No se pudo restablecer'), 'error');
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-check-circle"></i> Guardar y Restablecer';
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error de conexión');
+                showAlert('Error de conexión', 'error');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-check-circle"></i> Guardar y Restablecer';
             }
@@ -2175,14 +2343,23 @@
         // ====== GENERATE NEW PASSWORD ======
         async function generateNewPassword(leaderId) {
             const leader = allLeaders.find(l => l._id === leaderId);
-            if (!leader) return alert('Líder no encontrado');
+            if (!leader) {
+                await showAlert('Líder no encontrado', 'error');
+                return;
+            }
+
+            if (!leader.passwordResetRequested) {
+                await showAlert('El líder no ha solicitado una nueva contraseña.', 'warning');
+                return;
+            }
 
             let message = `¿Generar nueva contraseña temporal para ${leader.name}?`;
             if (leader.passwordResetRequested) {
                 message = `El líder ${leader.name} solicitó un reset de contraseña.\n\n¿Generar nueva contraseña temporal?`;
             }
 
-            if (!confirm(message)) return;
+            const confirmed = await showConfirm(message);
+            if (!confirmed) return;
 
             try {
                 const res = await apiCall('/api/auth/admin-generate-password', {
@@ -2218,18 +2395,18 @@
                     document.body.appendChild(modal);
                     modal.onclick = (e) => { if (e.target === modal) { modal.remove(); loadDashboard(); } };
                 } else {
-                    alert('Error: ' + (data.error || 'No se pudo generar contraseña'));
+                    showAlert('Error: ' + (data.error || 'No se pudo generar contraseña'), 'error');
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error al generar contraseña');
+                showAlert('Error al generar contraseña', 'error');
             }
         }
 
         // ====== MOSTRAR CREDENCIALES ======
         function showCredentials(leaderId, username, password) {
             const leader = allLeaders.find(l => l._id === leaderId);
-            if (!leader) return alert('Líder no encontrado');
+            if (!leader) return showAlert('Líder no encontrado', 'error');
 
             const isDarkMode = document.body.classList.contains('dark-mode');
             const bgColor = isDarkMode ? '#16213e' : 'white';
@@ -2266,7 +2443,8 @@
 
         // ====== MIGRATE USERNAMES ======
         document.getElementById('migrateUsernamesBtn').addEventListener('click', async () => {
-            if (!confirm('¿Deseas agregar usuarios y contraseñas temporales para los líderes que aún no las configuran?\n\nLos líderes con contraseña fija no serán modificados.\n\nEsto actualiza la base de datos directamente.')) return;
+            const confirmed = await showConfirm('¿Deseas agregar usuarios y contraseñas temporales para los líderes que aún no las configuran?\n\nLos líderes con contraseña fija no serán modificados.\n\nEsto actualiza la base de datos directamente.');
+            if (!confirmed) return;
 
             const btn = document.getElementById('migrateUsernamesBtn');
             btn.disabled = true;
@@ -2305,13 +2483,13 @@
 
                     loadDashboard(); // Refresh table
                 } else if (res.ok) {
-                    alert(data.message || 'Todos los líderes ya tienen usuario.');
+                    showAlert(data.message || 'Todos los líderes ya tienen usuario.', 'info');
                 } else {
-                    alert('Error: ' + (data.error || 'No se pudo migrar'));
+                    showAlert('Error: ' + (data.error || 'No se pudo migrar'), 'error');
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error de conexión');
+                showAlert('Error de conexión', 'error');
             }
 
             btn.disabled = false;
@@ -2327,6 +2505,13 @@
         function populateExportLeader() {
             const select = document.getElementById('exportLeaderSelect');
             select.innerHTML = allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+        }
+
+        function populateAnalyticsLeaderFilter() {
+            const select = document.getElementById('analyticsLeaderFilter');
+            if (!select) return;
+            select.innerHTML = '<option value="all">Todos los líderes</option>' +
+                allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
         }
 
         function filterRegistrations() {
@@ -2471,28 +2656,79 @@
             });
         }
 
-        function loadAnalytics() {
-            // Bogotá vs Resto del País
-            const bogotaLocalidades = ['Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'];
-            const bogotaRegs = allRegistrations.filter(r => bogotaLocalidades.includes(r.localidad));
-            const restoRegs = allRegistrations.filter(r => !bogotaLocalidades.includes(r.localidad));
-            
-            const total = allRegistrations.length;
-            const confirmed = allRegistrations.filter(r => r.confirmed).length;
-            const rate = total > 0 ? ((confirmed / total) * 100).toFixed(1) : 0;
-            const leadersCount = allLeaders.length;
-            const avgRegs = leadersCount > 0 ? (total / leadersCount).toFixed(1) : 0;
+        let analyticsFiltersBound = false;
 
-            const localidades = new Set(allRegistrations.map(r => r.localidad).filter(l => l));
+        function bindAnalyticsFilters() {
+            if (analyticsFiltersBound) return;
+            const applyBtn = document.getElementById('applyAnalyticsFilterBtn');
+            const clearBtn = document.getElementById('clearAnalyticsFilterBtn');
+            const regionSelect = document.getElementById('analyticsRegionFilter');
+            const leaderSelect = document.getElementById('analyticsLeaderFilter');
+
+            if (applyBtn) {
+                applyBtn.addEventListener('click', () => {
+                    loadAnalytics();
+                    analyticsLoaded = true;
+                });
+            }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    if (regionSelect) regionSelect.value = 'all';
+                    if (leaderSelect) leaderSelect.value = 'all';
+                    loadAnalytics();
+                    analyticsLoaded = true;
+                });
+            }
+
+            analyticsFiltersBound = true;
+        }
+
+        function getAnalyticsFilteredData() {
+            const regionSelect = document.getElementById('analyticsRegionFilter');
+            const leaderSelect = document.getElementById('analyticsLeaderFilter');
+            const region = regionSelect ? regionSelect.value : 'all';
+            const leaderId = leaderSelect ? leaderSelect.value : 'all';
+            const bogotaLocalidades = getBogotaLocalidades();
+
+            let regs = allRegistrations;
+            if (leaderId !== 'all') {
+                regs = regs.filter(r => r.leaderId === leaderId);
+            }
+
+            if (region === 'bogota') {
+                regs = regs.filter(r => bogotaLocalidades.includes(r.localidad));
+            } else if (region === 'resto') {
+                regs = regs.filter(r => !bogotaLocalidades.includes(r.localidad));
+            }
+
+            let leaders = allLeaders;
+            if (leaderId !== 'all') {
+                leaders = leaders.filter(l => l._id === leaderId);
+            }
+
+            return { regs, leaders, bogotaLocalidades };
+        }
+
+        function loadAnalytics() {
+            const { regs, leaders, bogotaLocalidades } = getAnalyticsFilteredData();
+            const bogotaRegs = regs.filter(r => bogotaLocalidades.includes(r.localidad));
+            const restoRegs = regs.filter(r => !bogotaLocalidades.includes(r.localidad));
+
+            const total = regs.length;
+            const confirmed = regs.filter(r => r.confirmed).length;
+            const rate = total > 0 ? ((confirmed / total) * 100).toFixed(1) : 0;
+            const leadersCount = leaders.length;
+            const avgRegs = leadersCount > 0 ? (total / leadersCount).toFixed(1) : 0;
 
             document.getElementById('avgConfirmRate').textContent = rate + '%';
             document.getElementById('avgRegsPerLeader').textContent = avgRegs;
             document.getElementById('localidadesCount').textContent = bogotaRegs.length + ' Bogotá / ' + restoRegs.length + ' Resto';
 
             // Leader Registrations Chart
-            const leaderStats = allLeaders.map(l => ({
+            const leaderStats = leaders.map(l => ({
                 name: l.name.split(' ')[0],
-                registros: allRegistrations.filter(r => r.leaderId === l._id).length,
+                registros: regs.filter(r => r.leaderId === l._id).length,
                 bogota: bogotaRegs.filter(r => r.leaderId === l._id).length,
                 resto: restoRegs.filter(r => r.leaderId === l._id).length
             })).sort((a, b) => b.registros - a.registros);
@@ -2525,8 +2761,9 @@
 
             // Locality Chart
             const localityData = {};
-            allRegistrations.forEach(r => {
-                localityData[r.localidad] = (localityData[r.localidad] || 0) + 1;
+            regs.forEach(r => {
+                const key = r.localidad || r.departamento || 'Sin dato';
+                localityData[key] = (localityData[key] || 0) + 1;
             });
 
             const topLocalities = Object.entries(localityData)
@@ -2557,8 +2794,8 @@
             });
 
             // Leader Details Table - Prepare Data
-            leaderAnalyticsData = allLeaders.map(l => {
-                const leaderRegs = allRegistrations.filter(r => r.leaderId === l._id);
+            leaderAnalyticsData = leaders.map(l => {
+                const leaderRegs = regs.filter(r => r.leaderId === l._id);
                 const leaderConfirmed = leaderRegs.filter(r => r.confirmed).length;
                 return {
                     name: l.name,
@@ -2644,7 +2881,11 @@
                 requestAnimationFrame(() => {
                     if (section === 'registrations') filterRegistrations();
                     if (section === 'dashboard' && !chartsLoaded) { loadCharts(); chartsLoaded = true; }
-                    if (section === 'analytics' && !analyticsLoaded) { loadAnalytics(); analyticsLoaded = true; }
+                    if (section === 'analytics') {
+                        populateAnalyticsLeaderFilter();
+                        bindAnalyticsFilters();
+                        if (!analyticsLoaded) { loadAnalytics(); analyticsLoaded = true; }
+                    }
                     
                     // Attach leader search listener
                     const leaderSearchInput = document.getElementById('leaderSearchInput');
@@ -2778,11 +3019,11 @@
                     loadDashboard();
                     showSuccessModal('¡Eliminado!', 'El líder ha sido eliminado permanentemente.');
                 } else {
-                    alert('Error eliminando líder');
+                    showAlert('Error eliminando líder', 'error');
                 }
             } catch (error) {
                 console.error('Error deleting leader:', error);
-                alert('Error de conexión');
+                showAlert('Error de conexión', 'error');
             }
         });
 
@@ -2792,7 +3033,7 @@
             const email = document.getElementById('leaderEmail').value;
             const phone = document.getElementById('leaderPhone').value;
             const customUsername = document.getElementById('leaderUsername').value.trim();
-            if (!name) return alert('Ingresa el nombre');
+            if (!name) return showAlert('Ingresa el nombre', 'warning');
 
             try {
                 const res = await apiCall('/api/leaders', {
@@ -2825,18 +3066,18 @@
                         showSuccessModal('¡Creado!', 'Líder creado correctamente.');
                     }
                 } else {
-                    alert('Error: ' + (data.error || 'No se pudo crear el líder'));
+                    showAlert('Error: ' + (data.error || 'No se pudo crear el líder'), 'error');
                 }
             } catch (error) {
                 console.error(error);
-                alert('Error creando líder');
+                showAlert('Error creando líder', 'error');
             }
         });
 
         document.getElementById('copyQrBtn').addEventListener('click', () => {
             document.getElementById('qrLink').select();
             document.execCommand('copy');
-            alert('✓ Link copiado al portapapeles');
+            showAlert('Link copiado al portapapeles', 'success');
         });
 
         document.getElementById('searchInput').addEventListener('input', filterRegistrations);
@@ -2888,7 +3129,7 @@
         });
 
         document.getElementById('exportLeaderStatsBtn').addEventListener('click', () => {
-            if (!leaderAnalyticsData || leaderAnalyticsData.length === 0) return alert('No hay datos para exportar');
+            if (!leaderAnalyticsData || leaderAnalyticsData.length === 0) return showAlert('No hay datos para exportar', 'warning');
             const data = leaderAnalyticsData.map(l => ({
                 Líder: l.name,
                 Total: l.total,
@@ -2933,7 +3174,7 @@
         // === ACTUALIZAR EVENTO ===
         document.getElementById('updateEventBtn').addEventListener('click', () => {
             loadDashboard();
-            alert('✓ Dashboard actualizado');
+            showAlert('Dashboard actualizado', 'success');
         });
 
         // === CAMBIAR EVENTO ===
@@ -2948,7 +3189,7 @@
                 ).join('');
                 document.getElementById('changeEventModal').classList.add('active');
             } catch (err) {
-                alert('Error cargando eventos: ' + err.message);
+                showAlert('Error cargando eventos: ' + err.message, 'error');
             }
         });
 
@@ -2999,7 +3240,7 @@
             const email = document.getElementById('editLeaderEmail').value;
             const phone = document.getElementById('editLeaderPhone').value;
 
-            if (!name) return alert('El nombre es obligatorio');
+            if (!name) return showAlert('El nombre es obligatorio', 'warning');
 
             try {
                 const res = await apiCall(`/api/leaders/${id}`, {
@@ -3029,8 +3270,8 @@
             const localidad = document.getElementById('regLocalidad').value;
             const leaderId = document.getElementById('regLeaderSelect').value;
 
-            if (!firstName || !lastName) return alert('Nombre y Apellido son obligatorios');
-            if (!cedula) return alert('Cédula es obligatoria');
+            if (!firstName || !lastName) return showAlert('Nombre y Apellido son obligatorios', 'warning');
+            if (!cedula) return showAlert('Cédula es obligatoria', 'warning');
 
             try {
                 const body = { firstName, lastName, cedula, phone, email, localidad, leaderId };
@@ -3184,6 +3425,9 @@
         // Initialize init
         // Inicializar: verificar auth, cargar evento si falta, luego cargar dashboard
         (async function init() {
+            if (enforceSessionTimeout()) return;
+            touchActivity();
+            bindSessionActivity();
             const authed = await checkAuth();
             if (authed) loadDashboard();
         })();

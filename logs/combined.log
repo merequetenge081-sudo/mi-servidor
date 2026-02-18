@@ -1072,3 +1072,119 @@
 {"level":"info","message":"GET /leaders 200 97ms","service":"mi-servidor","timestamp":"2026-02-18 14:53:19"}
 {"level":"info","message":"GET /registrations 200 426ms","service":"mi-servidor","timestamp":"2026-02-18 14:53:19"}
 {"level":"info","message":"POST /migrate-usernames 200 70ms","service":"mi-servidor","timestamp":"2026-02-18 14:54:45"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-18 15:02:21"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-18 15:02:22"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-18 15:02:22"}
+{"level":"info","message":"GET /leaders 200 97ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:11"}
+{"level":"info","message":"GET /registrations 200 443ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:11"}
+{"level":"info","message":"POST /migrate-usernames 200 70ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:23"}
+{"level":"info","message":"Nueva contraseña temporal generada para Test: xmtgkd18Aa1!","service":"mi-servidor","timestamp":"2026-02-18 15:05:45"}
+{"level":"info","message":"POST /auth/admin-generate-password 200 306ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:45"}
+{"level":"info","message":"GET /leaders 200 73ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:45"}
+{"level":"info","message":"GET /registrations 200 409ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:45"}
+{"level":"info","message":"Nueva contraseña temporal generada para Tatiana Otavo: at56ddl6Aa1!","service":"mi-servidor","timestamp":"2026-02-18 15:05:51"}
+{"level":"info","message":"POST /auth/admin-generate-password 200 351ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:51"}
+{"level":"info","message":"GET /leaders 200 94ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:54"}
+{"level":"info","message":"GET /registrations 200 710ms","service":"mi-servidor","timestamp":"2026-02-18 15:05:54"}
+{"level":"info","message":"POST /migrate-usernames 200 69ms","service":"mi-servidor","timestamp":"2026-02-18 15:06:06"}
+{"level":"info","message":"Nueva contraseña temporal generada para Adonay Palacios: 7yp0xuhlAa1!","service":"mi-servidor","timestamp":"2026-02-18 15:07:41"}
+{"level":"info","message":"POST /auth/admin-generate-password 200 286ms","service":"mi-servidor","timestamp":"2026-02-18 15:07:41"}
+{"level":"info","message":"GET /leaders 200 74ms","service":"mi-servidor","timestamp":"2026-02-18 15:07:43"}
+{"level":"info","message":"GET /registrations 200 609ms","service":"mi-servidor","timestamp":"2026-02-18 15:07:44"}
+{"level":"info","message":"Nueva contraseña temporal generada para César Yusty: wy9zmev9Aa1!","service":"mi-servidor","timestamp":"2026-02-18 15:07:54"}
+{"level":"info","message":"POST /auth/admin-generate-password 200 291ms","service":"mi-servidor","timestamp":"2026-02-18 15:07:54"}
+{"level":"info","message":"GET /leaders 200 90ms","service":"mi-servidor","timestamp":"2026-02-18 15:07:56"}
+{"level":"info","message":"GET /registrations 200 793ms","service":"mi-servidor","timestamp":"2026-02-18 15:07:56"}
+{"level":"info","message":"Nueva contraseña temporal generada para Jeisson Mendez: rp0vln4oAa1!","service":"mi-servidor","timestamp":"2026-02-18 15:08:19"}
+{"level":"info","message":"POST /auth/admin-generate-password 200 337ms","service":"mi-servidor","timestamp":"2026-02-18 15:08:19"}
+{"level":"info","message":"GET /leaders 200 104ms","service":"mi-servidor","timestamp":"2026-02-18 15:08:20"}
+{"level":"info","message":"GET /registrations 200 1639ms","service":"mi-servidor","timestamp":"2026-02-18 15:08:21"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-18 15:08:41","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 131ms","service":"mi-servidor","timestamp":"2026-02-18 15:08:41"}
+{"level":"info","message":"POST /auth/change-password 200 287ms","service":"mi-servidor","timestamp":"2026-02-18 15:08:53"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-18 15:09:05","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 126ms","service":"mi-servidor","timestamp":"2026-02-18 15:09:05"}
+{"level":"info","message":"GET /leaders/LID-MLSGC2HI-9FJN 200 85ms","service":"mi-servidor","timestamp":"2026-02-18 15:09:06"}
+{"level":"info","message":"GET /registrations 200 150ms","service":"mi-servidor","timestamp":"2026-02-18 15:09:06"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-18 15:09:28","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 207ms","service":"mi-servidor","timestamp":"2026-02-18 15:09:28"}
+{"level":"info","message":"GET /events 200 71ms","service":"mi-servidor","timestamp":"2026-02-18 15:09:29"}
+{"level":"info","message":"GET /leaders 200 74ms","service":"mi-servidor","timestamp":"2026-02-18 15:09:30"}
+{"level":"info","message":"GET /registrations 200 592ms","service":"mi-servidor","timestamp":"2026-02-18 15:09:31"}
+{"level":"info","message":"POST /migrate-usernames 200 72ms","service":"mi-servidor","timestamp":"2026-02-18 15:11:53"}
+{"level":"info","message":"GET /leaders 200 85ms","service":"mi-servidor","timestamp":"2026-02-18 15:27:36"}
+{"level":"info","message":"GET /registrations 200 606ms","service":"mi-servidor","timestamp":"2026-02-18 15:27:36"}
+{"level":"info","message":"Password reset solicitado para líder Edwin Herrera","service":"mi-servidor","timestamp":"2026-02-18 15:30:57"}
+{"level":"info","message":"POST /auth/request-password-reset 200 165ms","service":"mi-servidor","timestamp":"2026-02-18 15:30:57"}
+{"level":"info","message":"GET /leaders 200 72ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:02"}
+{"level":"info","message":"GET /registrations 200 759ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:02"}
+{"level":"info","message":"Nueva contraseña temporal generada para Edwin Herrera: e5cw1k22Aa1!","service":"mi-servidor","timestamp":"2026-02-18 15:31:07"}
+{"level":"info","message":"POST /auth/admin-generate-password 200 298ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:07"}
+{"level":"info","message":"GET /leaders 200 75ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:12"}
+{"level":"info","message":"GET /registrations 200 647ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:13"}
+{"level":"info","message":"Password reset solicitado para líder Edwin Herrera","service":"mi-servidor","timestamp":"2026-02-18 15:31:26"}
+{"level":"info","message":"POST /auth/request-password-reset 200 157ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:26"}
+{"level":"info","message":"POST /auth/request-password-reset 200 73ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:28"}
+{"level":"info","message":"GET /leaders 200 73ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:34"}
+{"level":"info","message":"GET /registrations 200 2503ms","service":"mi-servidor","timestamp":"2026-02-18 15:31:36"}
+{"level":"info","message":"Nueva contraseña temporal generada para Edwin Herrera: 6hzg1zuwAa1!","service":"mi-servidor","timestamp":"2026-02-18 15:32:37"}
+{"level":"info","message":"POST /auth/admin-generate-password 200 301ms","service":"mi-servidor","timestamp":"2026-02-18 15:32:37"}
+{"level":"info","message":"GET /leaders 200 161ms","service":"mi-servidor","timestamp":"2026-02-18 15:32:43"}
+{"level":"info","message":"GET /registrations 200 1269ms","service":"mi-servidor","timestamp":"2026-02-18 15:32:44"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-18 15:32:46","user":"eherrera"}
+{"level":"info","message":"POST /auth/leader-login 200 292ms","service":"mi-servidor","timestamp":"2026-02-18 15:32:46"}
+{"level":"info","message":"POST /auth/change-password 200 286ms","service":"mi-servidor","timestamp":"2026-02-18 15:32:55"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-18 15:33:09","user":"eherrera"}
+{"level":"info","message":"POST /auth/leader-login 200 130ms","service":"mi-servidor","timestamp":"2026-02-18 15:33:09"}
+{"level":"info","message":"GET /leaders/690f99c7ee9dedbe5de6b952 200 80ms","service":"mi-servidor","timestamp":"2026-02-18 15:33:09"}
+{"level":"info","message":"GET /registrations 200 158ms","service":"mi-servidor","timestamp":"2026-02-18 15:33:09"}
+{"level":"info","message":"GET /leaders 200 75ms","service":"mi-servidor","timestamp":"2026-02-18 15:55:33"}
+{"level":"info","message":"GET /registrations 200 810ms","service":"mi-servidor","timestamp":"2026-02-18 15:55:33"}
+{"level":"info","message":"GET /registro/leader1770062708604 200 152ms","service":"mi-servidor","timestamp":"2026-02-18 15:55:40"}
+{"level":"info","message":"POST /registrations 400 0ms","service":"mi-servidor","timestamp":"2026-02-18 15:55:49"}
+{"level":"info","message":"GET /registro/leader1770062708604 304 158ms","service":"mi-servidor","timestamp":"2026-02-18 15:59:42"}
+{"level":"info","message":"POST /registrations 400 0ms","service":"mi-servidor","timestamp":"2026-02-18 15:59:52"}
+{"level":"info","message":"GET /registro/leader1762630087202 200 151ms","service":"mi-servidor","timestamp":"2026-02-18 16:00:25"}
+{"level":"info","message":"POST /registrations 201 452ms","service":"mi-servidor","timestamp":"2026-02-18 16:00:38"}
+{"level":"info","message":"GET /registro/leader1762630087202 304 205ms","service":"mi-servidor","timestamp":"2026-02-18 16:00:43"}
+{"level":"info","message":"GET /registro/leader1770062708604 304 136ms","service":"mi-servidor","timestamp":"2026-02-18 16:00:48"}
+{"level":"info","message":"POST /registrations 400 0ms","service":"mi-servidor","timestamp":"2026-02-18 16:00:58"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-18 16:04:43"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-18 16:04:44"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-18 16:04:44"}
+{"level":"info","message":"GET /registro/leader1770062708604 304 438ms","service":"mi-servidor","timestamp":"2026-02-18 16:06:34"}
+{"level":"info","message":"POST /registrations 400 72ms","service":"mi-servidor","timestamp":"2026-02-18 16:06:44"}
+{"level":"info","message":"GET /registro/leader1770062708604 304 177ms","service":"mi-servidor","timestamp":"2026-02-18 16:06:47"}
+{"level":"info","message":"POST /registrations 400 69ms","service":"mi-servidor","timestamp":"2026-02-18 16:06:57"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-18 16:08:03"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-18 16:08:04"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-18 16:08:04"}
+{"level":"info","message":"GET /registro/leader1770062708604 304 146ms","service":"mi-servidor","timestamp":"2026-02-18 16:09:58"}
+{"error":"Registration validation failed: organizationId: Path `organizationId` is required.","level":"error","message":"Create registration error:","service":"mi-servidor","stack":"ValidationError: Registration validation failed: organizationId: Path `organizationId` is required.\n    at Document.invalidate (C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3362:32)\n    at C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3123:17\n    at C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2026-02-18 16:10:10"}
+{"level":"info","message":"POST /registrations 500 222ms","service":"mi-servidor","timestamp":"2026-02-18 16:10:10"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-18 16:10:19"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 0ms","service":"mi-servidor","timestamp":"2026-02-18 16:10:19"}
+{"error":"Registration validation failed: organizationId: Path `organizationId` is required.","level":"error","message":"Create registration error:","service":"mi-servidor","stack":"ValidationError: Registration validation failed: organizationId: Path `organizationId` is required.\n    at Document.invalidate (C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3362:32)\n    at C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3123:17\n    at C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2026-02-18 16:10:25"}
+{"level":"info","message":"POST /registrations 500 239ms","service":"mi-servidor","timestamp":"2026-02-18 16:10:25"}
+{"error":"Registration validation failed: organizationId: Path `organizationId` is required.","level":"error","message":"Create registration error:","service":"mi-servidor","stack":"ValidationError: Registration validation failed: organizationId: Path `organizationId` is required.\n    at Document.invalidate (C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3362:32)\n    at C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3123:17\n    at C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2026-02-18 16:10:34"}
+{"level":"info","message":"POST /registrations 500 222ms","service":"mi-servidor","timestamp":"2026-02-18 16:10:34"}
+{"error":"Registration validation failed: organizationId: Path `organizationId` is required.","level":"error","message":"Create registration error:","service":"mi-servidor","stack":"ValidationError: Registration validation failed: organizationId: Path `organizationId` is required.\n    at Document.invalidate (C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3362:32)\n    at C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3123:17\n    at C:\\Users\\Janus\\Desktop\\mi-servidor\\node_modules\\mongoose\\lib\\schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2026-02-18 16:10:41"}
+{"level":"info","message":"POST /registrations 500 216ms","service":"mi-servidor","timestamp":"2026-02-18 16:10:41"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-18 16:11:51"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-18 16:11:52"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-18 16:11:52"}
+{"level":"info","message":"POST /registrations 400 225ms","service":"mi-servidor","timestamp":"2026-02-18 16:12:54"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-18 16:12:59"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-18 16:12:59"}
+{"level":"info","message":"GET /registro/leader1770062708604 304 165ms","service":"mi-servidor","timestamp":"2026-02-18 16:12:59"}
+{"level":"info","message":"POST /registrations 400 232ms","service":"mi-servidor","timestamp":"2026-02-18 16:13:10"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-18 16:14:23"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-18 16:14:24"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-18 16:14:24"}
+{"level":"info","message":"POST /registrations 201 832ms","service":"mi-servidor","timestamp":"2026-02-18 16:16:18"}
+{"level":"info","message":"GET /registro/leader1770062708604 304 222ms","service":"mi-servidor","timestamp":"2026-02-18 16:16:24"}
+{"level":"info","message":"GET /registro/leader1762630204853 304 172ms","service":"mi-servidor","timestamp":"2026-02-18 16:17:05"}
+{"level":"info","message":"POST /registrations 201 471ms","service":"mi-servidor","timestamp":"2026-02-18 16:17:43"}
+{"level":"info","message":"GET /leaders 200 83ms","service":"mi-servidor","timestamp":"2026-02-18 16:17:47"}
+{"level":"info","message":"GET /registrations 200 445ms","service":"mi-servidor","timestamp":"2026-02-18 16:17:48"}
+{"level":"info","message":"GET /registro/leader1762630204853 304 146ms","service":"mi-servidor","timestamp":"2026-02-18 16:17:49"}
