@@ -4,6 +4,7 @@ import { AuditService } from "../services/audit.service.js";
 import logger from "../config/logger.js";
 import bcryptjs from "bcryptjs";
 import crypto from "crypto";
+import { Organization } from "../models/Organization.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
 
 // Generar token único de 32 caracteres hexadecimales
@@ -28,7 +29,7 @@ export async function createLeader(req, res) {
     // Generar token automáticamente (no permitir token manual)
     let token = generateToken();
     let tokenExists = await Leader.findOne({ token });
-    
+
     // Si el token existe (muy improbable), generar uno nuevo
     while (tokenExists) {
       token = generateToken();
@@ -57,12 +58,12 @@ export async function createLeader(req, res) {
     res.status(201).json(leader);
   } catch (error) {
     logger.error("Create leader error:", { error: error.message, stack: error.stack });
-    
+
     // Manejar error de token duplicado (por si acaso)
     if (error.code === 11000 && error.keyPattern?.token) {
       return res.status(500).json({ error: "Error al generar token único, intenta nuevamente" });
     }
-    
+
     res.status(500).json({ error: "Error al crear líder" });
   }
 }
@@ -103,9 +104,29 @@ export async function updateLeader(req, res) {
     const user = req.user;
     const orgId = req.user.organizationId; // Multi-tenant filter
 
-    const leader = await Leader.findOne({ _id: req.params.id, organizationId: orgId });
+    // DEBUG LOGS
+    console.log(`[UPDATE DEBUG] Search ID: ${req.params.id}, Requesting Org: ${orgId}`);
+
+    // Find by ID first to allow adopting legacy records (missing organizationId)
+    const leader = await Leader.findOne({ _id: req.params.id });
+
     if (!leader) {
-      return res.status(404).json({ error: "Líder no encontrado" });
+      console.log(`[UPDATE DEBUG] Leader NOT FOUND in DB`);
+      return res.status(404).json({ error: "Líder no encontrado (DB miss)" });
+    }
+
+    console.log(`[UPDATE DEBUG] Found Leader: ${leader.name}, Org: ${leader.organizationId}`);
+
+    // Security check: If leader has orgId and it doesn't match, block access
+    // UNLESS user is superadmin (who has no orgId or has access to all)
+    // FIX: Also treat 'admin' with no orgId as superadmin (legacy admin support)
+    const isSuperAdmin = req.user.role === 'superadmin' ||
+      req.user.role === 'super_admin' ||
+      (req.user.role === 'admin' && !orgId);
+
+    if (!isSuperAdmin && leader.organizationId && leader.organizationId !== orgId) {
+      console.log(`[UPDATE DEBUG] Org Mismatch! Leader Org: ${leader.organizationId} !== Req Org: ${orgId}`);
+      return res.status(404).json({ error: "Líder no encontrado (Org mismatch)" });
     }
 
     const changes = {};
@@ -130,6 +151,36 @@ export async function updateLeader(req, res) {
       leader.active = active;
     }
 
+    // Backfill required fields for legacy data to pass validation
+    if (!leader.leaderId) leader.leaderId = leader._id.toString();
+    if (!leader.token) leader.token = generateToken();
+
+    // Fix: Ensure organizationId is set for legacy leaders
+    if (!leader.organizationId) {
+      if (orgId) {
+        leader.organizationId = orgId;
+      } else {
+        // Fallback to default organization
+        let defaultOrg = await Organization.findOne({ slug: "default" });
+        if (!defaultOrg) {
+          // Create default org if not exists (auto-fix)
+          defaultOrg = new Organization({
+            name: "Default Organization",
+            slug: "default",
+            description: "Organización por defecto para datos migrables",
+            status: "active",
+            plan: "pro"
+          });
+          await defaultOrg.save();
+          logger.info("Created default organization for legacy leader fix");
+        }
+        leader.organizationId = defaultOrg._id.toString();
+        // Also update changes object for audit log
+        changes.organizationId = { old: null, new: leader.organizationId };
+        console.log(`[UPDATE FIX] Assigned leader to Default Org: ${leader.organizationId}`);
+      }
+    }
+
     leader.updatedAt = new Date();
     await leader.save();
 
@@ -138,7 +189,7 @@ export async function updateLeader(req, res) {
     res.json(leader);
   } catch (error) {
     logger.error("Update leader error:", { error: error.message, stack: error.stack });
-    res.status(500).json({ error: "Error al actualizar líder" });
+    res.status(500).json({ error: "Error al actualizar líder: " + error.message });
   }
 }
 
@@ -191,9 +242,9 @@ export async function generateLeaderQR(req, res) {
       return res.status(404).json({ error: "Líder no encontrado" });
     }
 
-    // Generar URL del formulario con leaderId
+    // Generar URL del formulario con token (más seguro y consistente)
     const baseUrl = process.env.BASE_URL || "http://localhost:5000";
-    const formUrl = `${baseUrl}/form.html?leaderId=${leaderId}`;
+    const formUrl = `${baseUrl}/form.html?token=${leader.token}`;
 
     // Generar QR como base64 usando qrcode
     const QRCode = (await import("qrcode")).default;
@@ -226,7 +277,10 @@ export async function getLeaderByToken(req, res) {
       return res.status(400).json({ error: "Token requerido" });
     }
 
-    const leader = await Leader.findOne({ token }).select('leaderId name eventId active');
+    // Permitir búsqueda por token (UUID) o leaderId (legacy L001)
+    const leader = await Leader.findOne({
+      $or: [{ token: token }, { leaderId: token }]
+    }).select('leaderId name eventId active');
 
     if (!leader) {
       return res.status(404).json({ error: "Token inválido o líder no encontrado" });

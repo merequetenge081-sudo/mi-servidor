@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -18,12 +23,12 @@
             justify-content: center;
             padding: 20px;
         }
-        
+
         .form-container {
             width: 100%;
             max-width: 600px;
         }
-        
+
         .form-card {
             background: white;
             border-radius: 15px;
@@ -31,47 +36,56 @@
             padding: 40px;
             animation: slideUp 0.5s ease-out;
         }
-        
+
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         .form-header {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .form-header h1 {
             color: #667eea;
             font-weight: 700;
             font-size: 28px;
             margin-bottom: 10px;
         }
-        
+
         .form-header p {
             color: #999;
             font-size: 14px;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
             font-weight: 600;
             color: #333;
             margin-bottom: 8px;
         }
-        
+
         .required::after {
             content: '*';
             color: #dc3545;
             margin-left: 5px;
         }
-        
-        input, select, textarea {
+
+        input,
+        select,
+        textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -80,29 +94,31 @@
             font-family: inherit;
             transition: border-color 0.3s;
         }
-        
-        input:focus, select:focus, textarea:focus {
+
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #667eea;
             background: #f8f9ff;
         }
-        
+
         .form-text {
             font-size: 12px;
             color: #999;
             margin-top: 6px;
         }
-        
+
         .form-text a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
         }
-        
+
         .form-text a:hover {
             text-decoration: underline;
         }
-        
+
         .btn-submit {
             width: 100%;
             padding: 12px;
@@ -115,50 +131,55 @@
             transition: transform 0.3s, box-shadow 0.3s;
             margin-top: 10px;
         }
-        
+
         .btn-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
-        
+
         .btn-submit:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-        
+
         .alert {
             border-radius: 8px;
             margin-bottom: 20px;
             display: none;
         }
-        
+
         .alert.show {
             display: block;
         }
-        
+
         .loading-spinner {
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 3px solid rgba(102,126,234,0.3);
+            border: 3px solid rgba(102, 126, 234, 0.3);
             border-radius: 50%;
             border-top-color: #667eea;
             animation: spin 0.8s linear infinite;
             margin-right: 8px;
         }
-        
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .success-message {
             display: none;
             text-align: center;
         }
-        
+
         .success-message.show {
             display: block;
         }
     </style>
 </head>
+
 <body>
     <div class="form-container">
         <div class="form-card">
@@ -229,7 +250,7 @@
                         <option value="Rafael Uribe">Rafael Uribe</option>
                     </select>
                     <div class="form-text">
-                        ¿No sabes tu localidad? 
+                        ¿No sabes tu localidad?
                         <a href="https://www.registraduria.gov.co/buscar-puesto-votacion" target="_blank">
                             Click aquí para consultar en la Registraduría
                         </a>
@@ -282,15 +303,39 @@
 
     <script>
         const API_URL = window.location.origin;
-        let leaderToken = null;
+        let currentLeaderId = null;
 
-        // Extract leader token from URL
-        function getLeaderFromURL() {
-            const pathParts = window.location.pathname.split('/').filter(Boolean);
-            leaderToken = pathParts[pathParts.length - 1];
-            
-            if (leaderToken && leaderToken !== 'form') {
-                document.getElementById('leaderInfo').textContent = `Registrando para: ${leaderToken}`;
+        // Validar token y cargar info del líder
+        async function validateToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const leaderIdParam = urlParams.get('leaderId'); // Soporte legacy
+
+            // Si no hay token ni leaderId, es un registro general (sin líder) o error
+            if (!token && !leaderIdParam) {
+                return;
+            }
+
+            const lookupValue = token || leaderIdParam;
+
+            try {
+                // Usar endpoint público seguro
+                const response = await fetch(`${API_URL}/api/registro/${lookupValue}`);
+
+                if (response.ok) {
+                    const leader = await response.json();
+                    currentLeaderId = leader.leaderId; // El ID interno o string usado para relaciones
+
+                    document.getElementById('leaderInfo').innerHTML = `
+                        Registrando con el líder: <strong style="color: #667eea">${leader.name}</strong>
+                    `;
+                    document.getElementById('leaderInfo').style.display = 'block';
+                } else {
+                    console.warn('Líder no encontrado o token inválido');
+                    // No bloqueamos el formulario, pero no asignamos líder
+                }
+            } catch (err) {
+                console.error('Error validando token:', err);
             }
         }
 
@@ -322,18 +367,9 @@
             btn.innerHTML = '<span class="loading-spinner"></span> Procesando...';
 
             try {
-                // Find leader by token
-                let leaderId = null;
-                if (leaderToken && leaderToken !== 'form') {
-                    const leadersRes = await fetch(`${API_URL}/api/leaders`);
-                    const leaders = await leadersRes.json();
-                    const leader = leaders.find(l => l._id === leaderToken || l.token === leaderToken);
-                    if (leader) leaderId = leader._id;
-                }
-
                 // Submit registration
                 const payload = {
-                    leaderId,
+                    leaderId: currentLeaderId, // Puede ser null si no hay token
                     firstName,
                     lastName,
                     email: email || null,
@@ -357,10 +393,10 @@
                     document.getElementById('publicForm').style.display = 'none';
                     document.getElementById('successMessage').classList.add('show');
                     document.getElementById('successAlert').classList.add('show');
-                    
-                    // Reset after 3 seconds
+
+                    // Reset after 5 seconds
                     setTimeout(() => {
-                        location.reload();
+                        window.location.reload();
                     }, 5000);
                 } else {
                     const error = await response.json();
@@ -384,8 +420,9 @@
 
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
-            getLeaderFromURL();
+            validateToken();
         });
     </script>
 </body>
+
 </html>
