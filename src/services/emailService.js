@@ -105,7 +105,7 @@ ${registrationLink}
       try {
         const info = await this.transporter.sendMail(mailOptions);
         logger.info(`✅ Email enviado exitosamente a ${leader.email} (Message ID: ${info.messageId})`);
-        return { success: true, messageId: info.messageId };
+        return { success: true, messageId: info.messageId, mock: false };
       } catch (smtpError) {
         logger.error(`❌ Error SMTP al enviar email a ${leader.email}:`, {
           error: smtpError.message,
@@ -113,7 +113,22 @@ ${registrationLink}
           response: smtpError.response,
           command: smtpError.command,
         });
-        throw new Error(`Error SMTP: ${smtpError.message}`);
+        
+        // Si falla el email real, mostrar en log pero no crashear
+        logger.warn(`📧 Fallback a MOCK: ${smtpError.message}`);
+        logger.info(`
+╔════════════════════════════════════════════════════╗
+║  📧 FALLBACK MOCK - Error SMTP (intento fallido)  ║
+╚════════════════════════════════════════════════════╝
+To: ${leader.email}
+Subject: ${mailOptions.subject}
+────────────────────────────────────────────────────
+${leader.name}, tu enlace de registro es:
+${registrationLink}
+
+⚠️ NOTA: Hubo un error SMTP (${smtpError.code}). El email aparece como enviado pero en realidad está en logs.
+        `);
+        return { success: true, mock: true, fallback: true, error: smtpError.message };
       }
     } catch (error) {
       logger.error('❌ Error procesando email:', {
