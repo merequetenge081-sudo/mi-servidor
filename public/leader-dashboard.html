@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,13 +57,13 @@
       align-items: center;
       gap: 10px;
       padding: 8px 12px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 8px;
     }
 
     .btn-logout {
-      background: rgba(255,255,255,0.2);
-      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       color: white;
       padding: 8px 16px;
       border-radius: 8px;
@@ -77,8 +78,8 @@
     }
 
     .btn-logout:hover {
-      background: rgba(255,255,255,0.3);
-      border-color: rgba(255,255,255,0.5);
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
       color: white;
     }
 
@@ -116,14 +117,14 @@
       background: white;
       border-radius: 12px;
       padding: 25px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       transition: all 0.3s ease;
       border-top: 4px solid #667eea;
     }
 
     .stat-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     }
 
     .stat-value {
@@ -145,7 +146,7 @@
       background: white;
       border-radius: 12px;
       padding: 30px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       margin-bottom: 30px;
     }
 
@@ -188,9 +189,11 @@
         padding: 20px;
         margin-top: 70px;
       }
+
       .page-header h1 {
         font-size: 24px;
       }
+
       .stats-grid {
         grid-template-columns: 1fr;
       }
@@ -206,7 +209,7 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
+      /* backdrop-filter: blur(8px); REMOVED */
       animation: fadeIn 0.3s ease;
     }
 
@@ -316,8 +319,13 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     @keyframes slideUp {
@@ -325,6 +333,7 @@
         transform: translateY(50px);
         opacity: 0;
       }
+
       to {
         transform: translateY(0);
         opacity: 1;
@@ -336,6 +345,7 @@
         transform: scale(0);
         opacity: 0;
       }
+
       to {
         transform: scale(1);
         opacity: 1;
@@ -350,6 +360,7 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Header -->
   <div class="header">
@@ -403,7 +414,9 @@
         <h2>Mis Registros</h2>
       </div>
       <div id="registroContainer">
-        <div class="empty-state"><i class="fas fa-inbox"></i><div>Cargando...</div></div>
+        <div class="empty-state"><i class="fas fa-inbox"></i>
+          <div>Cargando...</div>
+        </div>
       </div>
     </div>
   </div>
@@ -411,11 +424,13 @@
   <!-- LOGOUT CONFIRMATION MODAL -->
   <div id="logoutModal" class="modal">
     <div class="modal-content" style="max-width: 450px; text-align: center;">
-      <div class="modal-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
+      <div class="modal-icon"
+        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
         <i class="fas fa-sign-out-alt"></i>
       </div>
       <h3 style="margin-bottom: 12px; font-size: 24px; font-weight: 700; color: #1a1a2e;">Cerrar Sesión</h3>
-      <p style="color: #6c757d; margin-bottom: 32px; font-size: 15px; line-height: 1.6;">¿Estás seguro de que deseas cerrar tu sesión? Deberás iniciar sesión nuevamente para acceder.</p>
+      <p style="color: #6c757d; margin-bottom: 32px; font-size: 15px; line-height: 1.6;">¿Estás seguro de que deseas
+        cerrar tu sesión? Deberás iniciar sesión nuevamente para acceder.</p>
       <div style="display: flex; gap: 12px;">
         <button class="btn-modern btn-cancel" onclick="closeLogoutModal()" style="flex: 1;">
           <i class="fas fa-times-circle"></i> Cancelar
@@ -516,4 +531,5 @@
     loadRegistrations();
   </script>
 </body>
+
 </html>

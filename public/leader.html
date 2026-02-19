@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -142,6 +143,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -149,8 +151,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes scaleIn {
@@ -158,6 +165,7 @@
                 opacity: 0;
                 transform: scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -212,9 +220,17 @@
             animation: scaleIn 0.5s ease-out backwards;
         }
 
-        .action-card:nth-child(1) { animation-delay: 0.1s; }
-        .action-card:nth-child(2) { animation-delay: 0.2s; }
-        .action-card:nth-child(3) { animation-delay: 0.3s; }
+        .action-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .action-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .action-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
 
         .action-card::before {
             content: '';
@@ -694,7 +710,7 @@
             background: #f8f9ff;
         }
 
-        .ubicacion-option input[type="radio"]:checked + .ubicacion-label {
+        .ubicacion-option input[type="radio"]:checked+.ubicacion-label {
             border-color: #667eea;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -846,8 +862,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .modal.active {
@@ -865,8 +886,8 @@
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4), 
-                        0 8px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4),
+                0 8px 24px rgba(0, 0, 0, 0.2);
             animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             border: 1px solid rgba(255, 255, 255, 0.9);
@@ -877,6 +898,7 @@
                 opacity: 0;
                 transform: translateY(50px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -926,6 +948,7 @@
                 transform: scale(0);
                 opacity: 0;
             }
+
             to {
                 transform: scale(1);
                 opacity: 1;
@@ -959,7 +982,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* ============== MODERN BUTTONS ============== */
@@ -1066,6 +1091,7 @@
                 transform: scale(0);
                 opacity: 0;
             }
+
             to {
                 transform: scale(1);
                 opacity: 1;
@@ -1278,11 +1304,11 @@
             border-radius: 50%;
         }
 
-        input:checked + .slider {
+        input:checked+.slider {
             background-color: rgba(255, 255, 255, 0.4);
         }
 
-        input:checked + .slider:before {
+        input:checked+.slider:before {
             transform: translateX(24px);
         }
 
@@ -1421,8 +1447,19 @@
         body.dark-mode .tooltip-text::after {
             border-color: #2d2d2d transparent transparent transparent;
         }
+
+        /* FORCE REMOVE BLUR - USER REQUEST */
+        .modal,
+        .modal-overlay,
+        .glass,
+        .glass-panel {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background: rgba(0, 0, 0, 0.85) !important;
+        }
     </style>
 </head>
+
 <body>
     <!-- NAVBAR -->
     <div class="navbar">
@@ -1475,7 +1512,8 @@
                     Ver Registros
                 </div>
                 <div class="help-section-content">
-                    Accede a la vista de registros para ver, editar, eliminar e importar tus datos. Puedes buscar por nombre o cédula.
+                    Accede a la vista de registros para ver, editar, eliminar e importar tus datos. Puedes buscar por
+                    nombre o cédula.
                 </div>
             </div>
 
@@ -1485,7 +1523,8 @@
                     Agregar Persona
                 </div>
                 <div class="help-section-content">
-                    Rellena el formulario con los datos de la nueva persona. Incluye nombre, email, cédula, ubicación y puesto de votación.
+                    Rellena el formulario con los datos de la nueva persona. Incluye nombre, email, cédula, ubicación y
+                    puesto de votación.
                 </div>
             </div>
 
@@ -1495,7 +1534,8 @@
                     Compartir Formulario
                 </div>
                 <div class="help-section-content">
-                    Copia el link personalizado o escanea el código QR para que otros puedan llenar sus datos directamente.
+                    Copia el link personalizado o escanea el código QR para que otros puedan llenar sus datos
+                    directamente.
                 </div>
             </div>
 
@@ -1515,7 +1555,8 @@
                     Modo Oscuro
                 </div>
                 <div class="help-section-content">
-                    Activa o desactiva el modo oscuro desde el botón en la barra superior para una mejor experiencia visual.
+                    Activa o desactiva el modo oscuro desde el botón en la barra superior para una mejor experiencia
+                    visual.
                 </div>
             </div>
         </div>
@@ -1523,7 +1564,7 @@
 
     <!-- MAIN CONTAINER -->
     <div class="main-container">
-        
+
         <!-- WELCOME VIEW -->
         <div id="welcomeView" class="view active">
             <div class="welcome-container">
@@ -1594,13 +1635,15 @@
                             <button class="btn-secondary" onclick="copyLink()">
                                 <i class="bi bi-clipboard"></i> Copiar
                             </button>
-                            <span class="tooltip-text">Copiar tu enlace personalizado para compartirlo y registrar personas.</span>
+                            <span class="tooltip-text">Copiar tu enlace personalizado para compartirlo y registrar
+                                personas.</span>
                         </div>
                         <div class="tooltip-container">
                             <button class="btn-secondary" onclick="openQrModal()">
                                 <i class="bi bi-qr-code"></i> Ver QR
                             </button>
-                            <span class="tooltip-text">Genera un código QR para que las personas se registren escaneándolo.</span>
+                            <span class="tooltip-text">Genera un código QR para que las personas se registren
+                                escaneándolo.</span>
                         </div>
                         <div class="tooltip-container">
                             <button class="btn-primary" onclick="openForm()">
@@ -1616,7 +1659,7 @@
                         <i class="bi bi-search"></i>
                         <input type="text" id="searchInput" placeholder="Buscar por nombre, email o cédula...">
                     </div>
-                    
+
                     <select class="filter-select" id="filterStatus">
                         <option value="">Todos los estados</option>
                         <option value="confirmed">✓ Confirmados</option>
@@ -1646,7 +1689,8 @@
                         </button>
                         <span class="tooltip-text">Sube un archivo Excel con múltiples registros al sistema.</span>
                     </div>
-                    <input type="file" id="importFile" accept=".xlsx, .xls" style="display: none;" onchange="handleImport(this)">
+                    <input type="file" id="importFile" accept=".xlsx, .xls" style="display: none;"
+                        onchange="handleImport(this)">
 
                     <div class="tooltip-container">
                         <button class="btn-primary" onclick="exportToExcel()">
@@ -1694,7 +1738,8 @@
                         <button id="prevPageBtn" onclick="previousPage()" disabled>
                             <i class="bi bi-chevron-left"></i>
                         </button>
-                        <span class="page-number">Página <span id="currentPage">1</span> de <span id="totalPages">1</span></span>
+                        <span class="page-number">Página <span id="currentPage">1</span> de <span
+                                id="totalPages">1</span></span>
                         <button id="nextPageBtn" onclick="nextPage()">
                             <i class="bi bi-chevron-right"></i>
                         </button>
@@ -1737,28 +1782,31 @@
 
                         <div class="form-group">
                             <label class="form-label required">Cédula</label>
-                            <input type="text" class="form-input" id="cedula" placeholder="Tu número de cédula" required>
+                            <input type="text" class="form-input" id="cedula" placeholder="Tu número de cédula"
+                                required>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label required">Ubicación</label>
                             <div class="ubicacion-selector">
                                 <div class="ubicacion-option">
-                                    <input type="radio" name="ubicacionTipo" id="ubicacionBogota" value="bogota" onchange="toggleUbicacion('bogota')" checked>
+                                    <input type="radio" name="ubicacionTipo" id="ubicacionBogota" value="bogota"
+                                        onchange="toggleUbicacion('bogota')" checked>
                                     <label for="ubicacionBogota" class="ubicacion-label">
                                         <i class="bi bi-buildings"></i>
                                         Bogotá D.C.
                                     </label>
                                 </div>
                                 <div class="ubicacion-option">
-                                    <input type="radio" name="ubicacionTipo" id="ubicacionResto" value="resto" onchange="toggleUbicacion('resto')">
+                                    <input type="radio" name="ubicacionTipo" id="ubicacionResto" value="resto"
+                                        onchange="toggleUbicacion('resto')">
                                     <label for="ubicacionResto" class="ubicacion-label">
                                         <i class="bi bi-geo-alt"></i>
                                         Resto del país
                                     </label>
                                 </div>
                             </div>
-                            
+
                             <!-- Localidades de Bogotá -->
                             <div id="bogotaContainer">
                                 <label class="form-label required">Localidad</label>
@@ -1786,7 +1834,7 @@
                                     <option value="Sumapaz">Sumapaz</option>
                                 </select>
                             </div>
-                            
+
                             <!-- Departamentos del resto del país -->
                             <div id="restoContainer" style="display: none;">
                                 <label class="form-label required">Departamento</label>
@@ -1825,16 +1873,18 @@
                                     <option value="Vaupés">Vaupés</option>
                                     <option value="Vichada">Vichada</option>
                                 </select>
-                                
+
                                 <div id="capitalContainer" style="margin-top: 12px; display: none;">
                                     <label class="form-label">Capital</label>
-                                    <input type="text" class="form-input" id="capital" readonly style="background: #f5f5f5; cursor: not-allowed;">
+                                    <input type="text" class="form-input" id="capital" readonly
+                                        style="background: #f5f5f5; cursor: not-allowed;">
                                 </div>
                             </div>
-                            
+
                             <div class="form-text">
                                 ¿No sabes tu localidad?
-                                <a href="https://eleccionescolombia.registraduria.gov.co/identificacion" target="_blank">
+                                <a href="https://eleccionescolombia.registraduria.gov.co/identificacion"
+                                    target="_blank">
                                     Click aquí para consultar en la Registraduría
                                 </a>
                             </div>
@@ -1842,7 +1892,8 @@
 
                         <div class="form-group">
                             <label class="form-label required">Puesto de Votación</label>
-                            <input type="text" class="form-input" id="votingPlace" placeholder="Ej: Colegio San José, Salón 101" required>
+                            <input type="text" class="form-input" id="votingPlace"
+                                placeholder="Ej: Colegio San José, Salón 101" required>
                             <div class="form-text">El lugar donde debes ir a votar</div>
                         </div>
 
@@ -1951,7 +2002,8 @@
             <button class="modal-close" onclick="closeQrModal()">&times;</button>
             <h4 style="margin-bottom: 20px; color: var(--primary);">Tu Código QR</h4>
             <div id="qrCodeContainer" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
-            <p style="color: var(--text-muted); font-size: 14px;">Escanea este código para abrir el formulario de registro</p>
+            <p style="color: var(--text-muted); font-size: 14px;">Escanea este código para abrir el formulario de
+                registro</p>
         </div>
     </div>
 
@@ -1959,7 +2011,8 @@
     <div id="editModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeEditModal()">&times;</button>
-            <h4 style="margin-bottom: 20px; color: var(--primary);"><i class="bi bi-pencil-square"></i> Editar Registro</h4>
+            <h4 style="margin-bottom: 20px; color: var(--primary);"><i class="bi bi-pencil-square"></i> Editar Registro
+            </h4>
             <form id="editForm" onsubmit="saveEditRegistration(event)">
                 <input type="hidden" id="editId">
                 <div class="form-group">
@@ -1987,7 +2040,8 @@
                     <input type="text" class="form-input" id="editVotingTable">
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="button" class="btn-secondary" onclick="closeEditModal()" style="flex: 1;">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()"
+                        style="flex: 1;">Cancelar</button>
                     <button type="submit" class="btn-primary" style="flex: 1;">Guardar Cambios</button>
                 </div>
             </form>
@@ -2001,10 +2055,12 @@
                 <i class="bi bi-exclamation-triangle-fill"></i>
             </div>
             <h4 style="margin-bottom: 15px;">¿Estás seguro?</h4>
-            <p style="color: var(--text-muted); margin-bottom: 25px;">¿Realmente deseas eliminar a esta persona? Esta acción no se puede deshacer.</p>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">¿Realmente deseas eliminar a esta persona? Esta
+                acción no se puede deshacer.</p>
             <div style="display: flex; gap: 10px;">
                 <button class="btn-secondary" onclick="closeDeleteConfirmModal()" style="flex: 1;">Cancelar</button>
-                <button class="btn-primary" id="confirmDeleteBtn" style="flex: 1; background: var(--danger);">Sí, Eliminar</button>
+                <button class="btn-primary" id="confirmDeleteBtn" style="flex: 1; background: var(--danger);">Sí,
+                    Eliminar</button>
             </div>
         </div>
     </div>
@@ -2030,7 +2086,8 @@
             </div>
             <h4 style="margin-bottom: 15px; text-align: center;">Errores de Importación</h4>
             <p style="margin-bottom: 15px;">Se encontraron los siguientes problemas en el archivo Excel:</p>
-            <div style="max-height: 300px; overflow-y: auto; background: #fee2e2; padding: 10px; border-radius: 10px; border: 1px solid #fecaca;">
+            <div
+                style="max-height: 300px; overflow-y: auto; background: #fee2e2; padding: 10px; border-radius: 10px; border: 1px solid #fecaca;">
                 <ul id="errorList" style="margin: 0; padding-left: 20px; color: #991b1b;"></ul>
             </div>
             <div style="text-align: center; margin-top: 15px;">
@@ -2042,11 +2099,13 @@
     <!-- LOGOUT CONFIRMATION MODAL -->
     <div id="logoutModal" class="modal">
         <div class="modal-content" style="max-width: 450px; text-align: center;">
-            <div class="modal-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 95px; height: 95px; font-size: 46px; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
+            <div class="modal-icon"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 95px; height: 95px; font-size: 46px; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
                 <i class="bi bi-box-arrow-right"></i>
             </div>
             <h3 style="margin-bottom: 12px; font-size: 24px; font-weight: 700; color: #1a1a2e;">Cerrar Sesión</h3>
-            <p style="color: #6c757d; margin-bottom: 32px; font-size: 15px; line-height: 1.6;">¿Estás seguro de que deseas cerrar tu sesión? Deberás iniciar sesión nuevamente para acceder.</p>
+            <p style="color: #6c757d; margin-bottom: 32px; font-size: 15px; line-height: 1.6;">¿Estás seguro de que
+                deseas cerrar tu sesión? Deberás iniciar sesión nuevamente para acceder.</p>
             <div style="display: flex; gap: 12px;">
                 <button class="btn-modern btn-cancel" onclick="closeLogoutModal()" style="flex: 1;">
                     <i class="bi bi-x-circle"></i> Cancelar
@@ -2138,7 +2197,7 @@
             const targetView = document.getElementById(viewName + 'View');
             if (targetView) {
                 targetView.classList.add('active');
-                
+
                 if (viewName === 'registrations') {
                     loadRegistrations();
                 } else if (viewName === 'statistics') {
@@ -2179,11 +2238,11 @@
                 if (!response.ok) throw new Error('Error al cargar datos del líder');
 
                 leaderData = await response.json();
-                
+
                 // Set leader name in welcome screen (solo primer nombre)
                 const firstName = leaderData.name ? leaderData.name.split(' ')[0] : 'Líder';
                 document.getElementById('leaderNameWelcome').textContent = firstName;
-                
+
                 // Set registration link
                 const token = leaderData.token || leaderData.publicToken || leaderData.leaderId;
                 const link = `${API_URL}/form.html?token=${token}`;
@@ -2203,7 +2262,7 @@
                 if (!response.ok) throw new Error('Error al cargar registros');
 
                 const allRegistrations = await response.json();
-                
+
                 // Filtrar registros del líder actual
                 if (Array.isArray(allRegistrations)) {
                     myRegistrations = allRegistrations.filter(r => r.leaderId === currentLeaderId);
@@ -2215,7 +2274,7 @@
                     console.warn('Formato de registros inesperado', allRegistrations);
                     myRegistrations = [];
                 }
-                
+
                 filteredRegistrations = [...myRegistrations];
                 currentPage = 1;
                 renderRegistrations();
@@ -2320,7 +2379,7 @@
                     const status = filterStatus?.value || '';
 
                     filteredRegistrations = myRegistrations.filter(reg => {
-                        const matchSearch = !search || 
+                        const matchSearch = !search ||
                             (reg.firstName && reg.firstName.toLowerCase().includes(search)) ||
                             (reg.lastName && reg.lastName.toLowerCase().includes(search)) ||
                             (reg.email && reg.email.toLowerCase().includes(search)) ||
@@ -2348,7 +2407,7 @@
             try {
                 const endpoint = currentStatus ? `/api/registrations/${id}/unconfirm` : `/api/registrations/${id}/confirm`;
                 const res = await apiCall(endpoint, { method: 'POST' });
-                
+
                 if (res.ok) {
                     loadRegistrations();
                 }
@@ -2480,32 +2539,32 @@
                             registrations: registrations
                         })
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        input.value = '';
-                        if (data.error) {
-                            if (data.details) {
-                                const list = document.getElementById('errorList');
-                                list.innerHTML = '';
-                                data.details.forEach(err => {
-                                    const li = document.createElement('li');
-                                    li.textContent = `Fila ${err.row} - ${err.name}: ${err.error}`;
-                                    list.appendChild(li);
-                                });
-                                document.getElementById('errorModal').classList.add('active');
+                        .then(response => response.json())
+                        .then(data => {
+                            input.value = '';
+                            if (data.error) {
+                                if (data.details) {
+                                    const list = document.getElementById('errorList');
+                                    list.innerHTML = '';
+                                    data.details.forEach(err => {
+                                        const li = document.createElement('li');
+                                        li.textContent = `Fila ${err.row} - ${err.name}: ${err.error}`;
+                                        list.appendChild(li);
+                                    });
+                                    document.getElementById('errorModal').classList.add('active');
+                                } else {
+                                    alert(data.error);
+                                }
                             } else {
-                                alert(data.error);
+                                showSuccessModal('¡Importación Exitosa!', data.message);
+                                loadRegistrations();
                             }
-                        } else {
-                            showSuccessModal('¡Importación Exitosa!', data.message);
-                            loadRegistrations();
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert("Error de conexión al importar");
-                        input.value = '';
-                    });
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert("Error de conexión al importar");
+                            input.value = '';
+                        });
 
                 } catch (err) {
                     console.error(err);
@@ -2549,20 +2608,20 @@
                 method: 'PUT',
                 body: JSON.stringify(data)
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    closeEditModal();
-                    showSuccessModal('¡Actualizado!', 'Los datos se han guardado correctamente.');
-                    loadRegistrations();
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Error al actualizar registro');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        closeEditModal();
+                        showSuccessModal('¡Actualizado!', 'Los datos se han guardado correctamente.');
+                        loadRegistrations();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error al actualizar registro');
+                });
         }
 
         // ============== DELETE ==============
@@ -2588,21 +2647,21 @@
             apiCall(`/api/registrations/${id}`, {
                 method: 'DELETE'
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    alert('Error: ' + data.error);
-                } else {
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                    } else {
+                        closeDeleteConfirmModal();
+                        showSuccessModal('¡Eliminado!', 'La persona ha sido eliminada correctamente.');
+                        loadRegistrations();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error al eliminar registro');
                     closeDeleteConfirmModal();
-                    showSuccessModal('¡Eliminado!', 'La persona ha sido eliminada correctamente.');
-                    loadRegistrations();
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Error al eliminar registro');
-                closeDeleteConfirmModal();
-            });
+                });
         }
 
         // ============== NEW REGISTRATION ==============
@@ -2611,7 +2670,7 @@
             const restoContainer = document.getElementById('restoContainer');
             const localidadSelect = document.getElementById('localidad');
             const departamentoSelect = document.getElementById('departamento');
-            
+
             if (tipo === 'bogota') {
                 bogotaContainer.style.display = 'block';
                 restoContainer.style.display = 'none';
@@ -2627,12 +2686,12 @@
                 localidadSelect.value = '';
             }
         }
-        
+
         function actualizarCapital() {
             const departamento = document.getElementById('departamento').value;
             const capitalContainer = document.getElementById('capitalContainer');
             const capitalInput = document.getElementById('capital');
-            
+
             if (departamento && capitalesColombia[departamento]) {
                 capitalInput.value = capitalesColombia[departamento];
                 capitalContainer.style.display = 'block';
@@ -2649,12 +2708,12 @@
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim();
             const cedula = document.getElementById('cedula').value.trim();
-            
+
             const ubicacionTipo = document.querySelector('input[name="ubicacionTipo"]:checked').value;
             let localidad = '';
             let departamento = '';
             let capital = '';
-            
+
             if (ubicacionTipo === 'bogota') {
                 localidad = document.getElementById('localidad').value;
             } else {
@@ -2662,7 +2721,7 @@
                 capital = document.getElementById('capital').value;
                 localidad = departamento;
             }
-            
+
             const votingPlace = document.getElementById('votingPlace').value.trim();
             const votingTable = document.getElementById('votingTable').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -2759,7 +2818,7 @@
                 date.setDate(date.getDate() - i);
                 const dateStr = date.toLocaleDateString('es-CO', { weekday: 'short' });
                 last7Days.push(dateStr);
-                
+
                 const count = myRegistrations.filter(r => {
                     const regDate = new Date(r.date);
                     return regDate.toDateString() === date.toDateString();
@@ -2815,7 +2874,7 @@
         }
 
         // Close modals on outside click
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target.classList.contains('modal')) {
                 event.target.classList.remove('active');
             }
@@ -2826,7 +2885,7 @@
             const drawer = document.getElementById('helpDrawer');
             const overlay = document.getElementById('helpOverlay');
             const isActive = drawer.classList.contains('active');
-            
+
             if (isActive) {
                 closeHelpDrawer();
             } else {
@@ -2862,24 +2921,24 @@
         // ============== TOOLTIPS ==============
         function initializeTooltips() {
             const tooltipContainers = document.querySelectorAll('.tooltip-container');
-            
+
             tooltipContainers.forEach(container => {
                 const tooltipText = container.querySelector('.tooltip-text');
                 if (!tooltipText) return;
-                
+
                 let tooltipTimeout;
-                
+
                 container.addEventListener('mouseenter', () => {
                     tooltipTimeout = setTimeout(() => {
                         tooltipText.classList.add('active');
                     }, 600); // 600ms delay
                 });
-                
+
                 container.addEventListener('mouseleave', () => {
                     clearTimeout(tooltipTimeout);
                     tooltipText.classList.remove('active');
                 });
-                
+
                 // For touch devices
                 container.addEventListener('touchstart', (e) => {
                     e.preventDefault();
@@ -2887,7 +2946,7 @@
                         tooltipText.classList.add('active');
                     }, 600);
                 });
-                
+
                 container.addEventListener('touchend', () => {
                     clearTimeout(tooltipTimeout);
                     tooltipText.classList.remove('active');
@@ -2906,4 +2965,5 @@
         });
     </script>
 </body>
+
 </html>
