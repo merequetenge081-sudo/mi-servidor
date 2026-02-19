@@ -924,6 +924,238 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ============== HELP DRAWER ============== */
+        .help-drawer {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100%;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1100;
+            overflow-y: auto;
+        }
+
+        .help-drawer.active {
+            right: 0;
+        }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1050;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .help-overlay.active {
+            display: block;
+        }
+
+        .help-drawer-header {
+            padding: 24px 28px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .help-drawer-header h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .help-drawer-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .help-drawer-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .help-drawer-body {
+            padding: 28px;
+        }
+
+        .help-section {
+            margin-bottom: 24px;
+        }
+
+        .help-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-section-content {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        /* ============== DARK MODE TOGGLE ============== */
+        .dark-mode-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 0;
+            margin-top: 0;
+        }
+
+        .dark-mode-toggle label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 500;
+            margin: 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            margin: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .4s;
+            border-radius: 26px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* ============== DARK MODE ============== */
+        body.dark-mode {
+            background: #1a1a2e !important;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .main-container {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .welcome-container {
+            background: transparent;
+        }
+
+        body.dark-mode .action-card,
+        body.dark-mode .page-header,
+        body.dark-mode .qr-section,
+        body.dark-mode .toolbar,
+        body.dark-mode .registrations-table,
+        body.dark-mode .modal-content {
+            background: #16213e !important;
+            color: #e0e0e0;
+            border-color: #2d3748 !important;
+        }
+
+        body.dark-mode .page-header h2,
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode h5,
+        body.dark-mode h6,
+        body.dark-mode .card-title {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+            border-color: #4a5568 !important;
+        }
+
+        body.dark-mode .table {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .table th {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+            border-color: #4a5568 !important;
+        }
+
+        body.dark-mode .table td {
+            background: #16213e !important;
+            border-color: #2d3748 !important;
+        }
+
+        body.dark-mode .btn-secondary {
+            background: #2d3748 !important;
+            color: #e0e0e0 !important;
+            border-color: #4a5568 !important;
+        }
     </style>
 </head>
 <body>
@@ -937,9 +1169,90 @@
             <button class="nav-btn" onclick="goToView('welcome')" title="Inicio">
                 <i class="bi bi-house-fill"></i>
             </button>
+            <button class="nav-btn" id="helpBtn" onclick="toggleHelpDrawer()" title="Ayuda">
+                <i class="bi bi-question-circle-fill"></i>
+            </button>
+            <label class="switch" title="Modo Oscuro" style="margin: 0 8px;">
+                <input type="checkbox" id="darkModeSwitch" onchange="toggleDarkMode()">
+                <span class="slider"></span>
+            </label>
             <button class="nav-btn" title="Cerrar sesión" onclick="logout()">
                 <i class="bi bi-box-arrow-right"></i>
             </button>
+        </div>
+    </div>
+
+    <!-- HELP DRAWER OVERLAY -->
+    <div class="help-overlay" id="helpOverlay" onclick="closeHelpDrawer()"></div>
+
+    <!-- HELP DRAWER -->
+    <div class="help-drawer" id="helpDrawer">
+        <div class="help-drawer-header">
+            <h3><i class="bi bi-question-circle-fill"></i> Centro de Ayuda</h3>
+            <button class="help-drawer-close" onclick="closeHelpDrawer()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="help-drawer-body" id="helpDrawerBody">
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-info-circle-fill"></i>
+                    Bienvenido al Panel del Líder
+                </div>
+                <div class="help-section-content">
+                    Este panel te permite gestionar registros de tu equipo de forma sencilla y eficiente.
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-table"></i>
+                    Ver Registros
+                </div>
+                <div class="help-section-content">
+                    Accede a la vista de registros para ver, editar, eliminar e importar tus datos. Puedes buscar por nombre o cédula.
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-plus-circle"></i>
+                    Agregar Persona
+                </div>
+                <div class="help-section-content">
+                    Rellena el formulario con los datos de la nueva persona. Incluye nombre, email, cédula, ubicación y puesto de votación.
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-qr-code"></i>
+                    Compartir Formulario
+                </div>
+                <div class="help-section-content">
+                    Copia el link personalizado o escanea el código QR para que otros puedan llenar sus datos directamente.
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-bar-chart"></i>
+                    Ver Estadísticas
+                </div>
+                <div class="help-section-content">
+                    Revisa gráficos y métricas sobre tus registros, confirmaciones y distribución por ubicación.
+                </div>
+            </div>
+
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-moon-stars-fill"></i>
+                    Modo Oscuro
+                </div>
+                <div class="help-section-content">
+                    Activa o desactiva el modo oscuro desde el botón en la barra superior para una mejor experiencia visual.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2190,8 +2503,47 @@
             }
         }
 
+        // ============== HELP DRAWER ==============
+        function toggleHelpDrawer() {
+            const drawer = document.getElementById('helpDrawer');
+            const overlay = document.getElementById('helpOverlay');
+            const isActive = drawer.classList.contains('active');
+            
+            if (isActive) {
+                closeHelpDrawer();
+            } else {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+            }
+        }
+
+        function closeHelpDrawer() {
+            const drawer = document.getElementById('helpDrawer');
+            const overlay = document.getElementById('helpOverlay');
+            drawer.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        // ============== DARK MODE ==============
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        function loadDarkMode() {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                const darkModeSwitch = document.getElementById('darkModeSwitch');
+                if (darkModeSwitch) {
+                    darkModeSwitch.checked = true;
+                }
+            }
+        }
+
         // ============== INIT ==============
         window.addEventListener('DOMContentLoaded', () => {
+            loadDarkMode();
             if (!checkAuth()) return;
 
             loadLeaderData();
