@@ -27,11 +27,13 @@
         .navbar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px 20px;
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
             position: fixed;
             top: 0;
             left: 0;
@@ -39,8 +41,9 @@
             height: 60px;
             width: 100%;
             z-index: 1000;
-            gap: 12px;
+            gap: 16px;
             box-sizing: border-box;
+            transition: all 0.3s ease;
         }
 
         .navbar-brand {
@@ -63,9 +66,346 @@
 
         .navbar-actions {
             display: flex;
-            gap: 6px;
+            gap: 10px;
             align-items: center;
             flex-shrink: 0;
+        }
+
+        /* ============== HELP BUTTON ============== */
+        .help-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .help-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ============== NOTIFICATIONS BUTTON ============== */
+        .notifications-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .notifications-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* ============== NOTIFICATIONS DROPDOWN ============== */
+        .notifications-dropdown {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 380px;
+            max-height: 500px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1100;
+        }
+
+        .notifications-dropdown.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .notifications-dropdown-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .notifications-dropdown-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .mark-all-read-btn {
+            background: transparent;
+            border: none;
+            color: #667eea;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .mark-all-read-btn:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .notifications-dropdown-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background: #f0f4ff;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.info {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+
+        .notification-icon.warning {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .notification-icon.alert {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 6px;
+        }
+
+        .notifications-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .notifications-empty i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        /* ============== HELP DRAWER ============== */
+        .help-drawer {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100%;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1100;
+            overflow-y: auto;
+        }
+
+        .help-drawer.active {
+            right: 0;
+        }
+
+        .help-drawer-header {
+            padding: 24px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .help-drawer-header h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .help-drawer-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .help-drawer-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .help-drawer-body {
+            padding: 28px;
+        }
+
+        .help-section {
+            margin-bottom: 30px;
+        }
+
+        .help-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-section-title i {
+            color: #667eea;
+        }
+
+        .help-section-content {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .help-section-content ul {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .help-section-content li {
+            margin-bottom: 8px;
+        }
+
+        .help-tip {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .help-tip-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .help-tip-content {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .help-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            z-index: 1099;
+            transition: opacity 0.3s ease;
+        }
+
+        .help-overlay.active {
+            display: block;
         }
 
         .btn-logout {
@@ -774,6 +1114,8 @@
         @media (max-width: 480px) {
             .navbar {
                 padding: 8px 12px;
+                border-bottom-left-radius: 8px;
+                border-bottom-right-radius: 8px;
             }
 
             .sidebar {
@@ -796,6 +1138,38 @@
 
             .navbar-brand {
                 font-size: 14px;
+            }
+
+            .help-btn, .notifications-btn {
+                font-size: 16px;
+                padding: 6px 8px;
+            }
+
+            .notifications-dropdown {
+                width: calc(100vw - 20px);
+                right: 10px;
+                max-height: 70vh;
+            }
+
+            .help-drawer {
+                width: 100%;
+                right: -100%;
+            }
+
+            .help-drawer-header {
+                padding: 20px 16px;
+            }
+
+            .help-drawer-header h3 {
+                font-size: 18px;
+            }
+
+            .help-drawer-body {
+                padding: 20px 16px;
+            }
+
+            #adminUsername {
+                display: none;
             }
         }
 
@@ -1248,7 +1622,14 @@
             <span id="eventNameDisplay" style="font-weight: 700;">Evento</span>
         </div>
         <div class="navbar-actions">
-            <span id="adminUsername" style="opacity: 0.9; font-size: 13px; margin-right: 10px;">Admin</span>
+            <button class="help-btn" id="helpBtn" onclick="toggleHelpDrawer()" title="Ayuda">
+                <i class="bi bi-question-circle-fill"></i>
+            </button>
+            <button class="notifications-btn" id="notificationsBtn" onclick="toggleNotificationsDropdown()" title="Notificaciones">
+                <i class="bi bi-bell-fill"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+            </button>
+            <span id="adminUsername" style="opacity: 0.9; font-size: 13px; margin-left: 4px;">Admin</span>
             <button class="hamburger-btn" onclick="toggleHamburgerMenu()">
                 <i class="bi bi-list"></i>
             </button>
@@ -1304,6 +1685,47 @@
         <div class="hamburger-menu-item" onclick="document.getElementById('logoutBtn').click();">
             <i class="bi bi-box-arrow-right"></i>
             <span>Cerrar Sesión</span>
+        </div>
+    </div>
+
+    <!-- NOTIFICATIONS DROPDOWN -->
+    <div class="notifications-dropdown" id="notificationsDropdown">
+        <div class="notifications-dropdown-header">
+            <h4><i class="bi bi-bell-fill"></i> Notificaciones</h4>
+            <button class="mark-all-read-btn" onclick="markAllNotificationsRead()">
+                Marcar todas como leídas
+            </button>
+        </div>
+        <div class="notifications-dropdown-body" id="notificationsBody">
+            <div class="notifications-empty">
+                <i class="bi bi-bell-slash"></i>
+                <p style="margin: 12px 0 0 0; font-size: 14px;">No tienes notificaciones</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- HELP DRAWER OVERLAY -->
+    <div class="help-overlay" id="helpOverlay" onclick="closeHelpDrawer()"></div>
+
+    <!-- HELP DRAWER -->
+    <div class="help-drawer" id="helpDrawer">
+        <div class="help-drawer-header">
+            <h3><i class="bi bi-question-circle-fill"></i> Centro de Ayuda</h3>
+            <button class="help-drawer-close" onclick="closeHelpDrawer()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="help-drawer-body" id="helpDrawerBody">
+            <!-- Dynamic help content will be inserted here -->
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-info-circle-fill"></i>
+                    Ayuda General
+                </div>
+                <div class="help-section-content">
+                    Selecciona una sección en el menú lateral para ver ayuda específica.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -3240,6 +3662,333 @@
             menu.classList.remove('active');
             overlay.classList.remove('active');
         }
+
+        // ============== NOTIFICATIONS SYSTEM ==============
+        let notifications = [
+            {
+                id: 1,
+                type: 'info',
+                title: 'Nuevo registro confirmado',
+                message: 'Juan Pérez ha confirmado asistencia al evento.',
+                time: 'Hace 5 min',
+                read: false
+            },
+            {
+                id: 2,
+                type: 'warning',
+                title: 'Meta parcialmente alcanzada',
+                message: 'Has alcanzado el 75% de tu meta de confirmación.',
+                time: 'Hace 1 hora',
+                read: false
+            },
+            {
+                id: 3,
+                type: 'alert',
+                title: 'Líder sin registros',
+                message: 'El líder María González no ha registrado personas en 7 días.',
+                time: 'Hace 2 horas',
+                read: true
+            }
+        ];
+
+        function toggleNotificationsDropdown() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const isActive = dropdown.classList.contains('active');
+            
+            // Close help drawer if open
+            closeHelpDrawer();
+            
+            if (isActive) {
+                dropdown.classList.remove('active');
+            } else {
+                dropdown.classList.add('active');
+                loadNotifications();
+            }
+        }
+
+        function closeNotificationsDropdown() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            dropdown.classList.remove('active');
+        }
+
+        function loadNotifications() {
+            const body = document.getElementById('notificationsBody');
+            const badge = document.getElementById('notificationBadge');
+            
+            const unreadCount = notifications.filter(n => !n.read).length;
+            
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+            
+            if (notifications.length === 0) {
+                body.innerHTML = `
+                    <div class="notifications-empty">
+                        <i class="bi bi-bell-slash"></i>
+                        <p style="margin: 12px 0 0 0; font-size: 14px;">No tienes notificaciones</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            body.innerHTML = notifications.map(notif => {
+                const iconClass = notif.type === 'info' ? 'bi-info-circle-fill' : 
+                                 notif.type === 'warning' ? 'bi-exclamation-triangle-fill' : 
+                                 'bi-exclamation-circle-fill';
+                
+                return `
+                    <div class="notification-item ${notif.read ? '' : 'unread'}" onclick="markNotificationRead(${notif.id})">
+                        <div class="notification-icon ${notif.type}">
+                            <i class="bi ${iconClass}"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">${notif.title}</div>
+                            <div class="notification-message">${notif.message}</div>
+                            <div class="notification-time">${notif.time}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function markNotificationRead(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                notification.read = true;
+                loadNotifications();
+            }
+        }
+
+        function markAllNotificationsRead() {
+            notifications.forEach(n => n.read = true);
+            loadNotifications();
+        }
+
+        // Close notifications dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const btn = document.getElementById('notificationsBtn');
+            if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+                closeNotificationsDropdown();
+            }
+        });
+
+        // ============== HELP DRAWER ==============
+        const helpContent = {
+            dashboard: {
+                title: 'Dashboard General',
+                sections: [
+                    {
+                        title: 'Visión General',
+                        content: 'El Dashboard te muestra las métricas más importantes de tus eventos en tiempo real.',
+                        icon: 'speedometer2'
+                    },
+                    {
+                        title: '¿Qué puedes hacer aquí?',
+                        content: `
+                            <ul>
+                                <li>Ver el total de líderes activos y registros</li>
+                                <li>Monitorear la tasa de confirmación</li>
+                                <li>Analizar gráficos de estado de registros</li>
+                                <li>Ver la actividad reciente</li>
+                                <li>Identificar los líderes más productivos</li>
+                            </ul>
+                        `,
+                        icon: 'list-check'
+                    },
+                    {
+                        title: 'Consejo',
+                        content: 'Revisa el Dashboard cada mañana para identificar tendencias y tomar acciones rápidas.',
+                        icon: 'lightbulb',
+                        isTip: true
+                    }
+                ]
+            },
+            leaders: {
+                title: 'Gestión de Líderes',
+                sections: [
+                    {
+                        title: 'Administración de Líderes',
+                        content: 'Aquí puedes crear, editar y eliminar líderes. También puedes asignarles usuarios y contraseñas para que accedan a su panel.',
+                        icon: 'people-fill'
+                    },
+                    {
+                        title: 'Funciones disponibles',
+                        content: `
+                            <ul>
+                                <li><strong>Nuevo Líder:</strong> Crea un nuevo líder con datos básicos</li>
+                                <li><strong>Agregar Usuarios:</strong> Asigna credenciales de acceso</li>
+                                <li><strong>Buscar:</strong> Filtra líderes por nombre</li>
+                                <li><strong>Editar:</strong> Modifica información del líder</li>
+                                <li><strong>Eliminar:</strong> Remueve un líder (cuidado, esta acción es irreversible)</li>
+                            </ul>
+                        `,
+                        icon: 'tools'
+                    },
+                    {
+                        title: 'Consejo',
+                        content: 'Asegúrate de comunicar las credenciales de acceso a cada líder de forma segura (WhatsApp, email cifrado).',
+                        icon: 'shield-check',
+                        isTip: true
+                    }
+                ]
+            },
+            registrations: {
+                title: 'Registros',
+                sections: [
+                    {
+                        title: 'Base de Datos de Registros',
+                        content: 'Visualiza todos los registros de personas, filtra por estado, líder o busca por nombre/cédula.',
+                        icon: 'table'
+                    },
+                    {
+                        title: 'Filtros y búsqueda',
+                        content: `
+                            <ul>
+                                <li><strong>Estado:</strong> Filtra por Todos, Confirmados o Pendientes</li>
+                                <li><strong>Líder:</strong> Ve solo registros de un líder específico</li>
+                                <li><strong>Buscar:</strong> Encuentra rápidamente por nombre o cédula</li>
+                                <li><strong>Editar:</strong> Actualiza información de contacto o estado</li>
+                                <li><strong>Eliminar:</strong> Remueve registros duplicados o erróneos</li>
+                            </ul>
+                        `,
+                        icon: 'funnel'
+                    },
+                    {
+                        title: 'Consejo',
+                        content: 'Usa los filtros combinados para análisis específicos: por ejemplo, "Pendientes" de un líder particular.',
+                        icon: 'lightbulb',
+                        isTip: true
+                    }
+                ]
+            },
+            analytics: {
+                title: 'Análisis',
+                sections: [
+                    {
+                        title: 'Reportes y Estadísticas',
+                        content: 'El módulo de Análisis te permite generar reportes detallados por líder, localidad y período de tiempo.',
+                        icon: 'bar-chart'
+                    },
+                    {
+                        title: 'Métricas disponibles',
+                        content: `
+                            <ul>
+                                <li><strong>Por Líder:</strong> Ve el rendimiento individual de cada líder</li>
+                                <li><strong>Por Localidad:</strong> Analiza datos geográficos (Bogotá vs Resto del País)</li>
+                                <li><strong>Tendencias:</strong> Identifica patrones de crecimiento</li>
+                                <li><strong>Comparativas:</strong> Compara periodos de tiempo</li>
+                            </ul>
+                        `,
+                        icon: 'graph-up'
+                    },
+                    {
+                        title: 'Consejo',
+                        content: 'Exporta los análisis en formato Excel para presentarlos en reuniones estratégicas.',
+                        icon: 'file-earmark-excel',
+                        isTip: true
+                    }
+                ]
+            },
+            export: {
+                title: 'Exportar Datos',
+                sections: [
+                    {
+                        title: 'Descarga de Información',
+                        content: 'Exporta todos tus datos en formato Excel para análisis externos o respaldos.',
+                        icon: 'download'
+                    },
+                    {
+                        title: 'Formatos disponibles',
+                        content: `
+                            <ul>
+                                <li><strong>Excel (.xlsx):</strong> Compatible con Microsoft Excel y Google Sheets</li>
+                                <li><strong>Datos completos:</strong> Incluye todos los campos de registros</li>
+                                <li><strong>Filtros aplicados:</strong> Exporta solo los datos filtrados</li>
+                            </ul>
+                        `,
+                        icon: 'file-spreadsheet'
+                    },
+                    {
+                        title: 'Consejo',
+                        content: 'Realiza exportaciones periódicas (semanales) como respaldo de seguridad de tus datos.',
+                        icon: 'cloud-download',
+                        isTip: true
+                    }
+                ]
+            }
+        };
+
+        function toggleHelpDrawer() {
+            const drawer = document.getElementById('helpDrawer');
+            const overlay = document.getElementById('helpOverlay');
+            const isActive = drawer.classList.contains('active');
+            
+            // Close notifications dropdown if open
+            closeNotificationsDropdown();
+            
+            if (isActive) {
+                closeHelpDrawer();
+            } else {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+                updateHelpContent();
+            }
+        }
+
+        function closeHelpDrawer() {
+            const drawer = document.getElementById('helpDrawer');
+            const overlay = document.getElementById('helpOverlay');
+            drawer.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        function updateHelpContent() {
+            const activeSection = document.querySelector('.nav-link.active');
+            const sectionKey = activeSection ? activeSection.dataset.section : 'dashboard';
+            const content = helpContent[sectionKey] || helpContent.dashboard;
+            const body = document.getElementById('helpDrawerBody');
+            
+            body.innerHTML = content.sections.map(section => {
+                if (section.isTip) {
+                    return `
+                        <div class="help-tip">
+                            <div class="help-tip-title">
+                                <i class="bi bi-${section.icon}"></i> ${section.title}
+                            </div>
+                            <div class="help-tip-content">${section.content}</div>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="help-section">
+                        <div class="help-section-title">
+                            <i class="bi bi-${section.icon}"></i>
+                            ${section.title}
+                        </div>
+                        <div class="help-section-content">
+                            ${section.content}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update help content when changing sections
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                setTimeout(updateHelpContent, 100);
+            });
+        });
+
+        // Initialize notifications on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadNotifications();
+        });
 
         // ============== SIDEBAR TOGGLE ==============
         function toggleSidebar() {
