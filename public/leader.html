@@ -33,11 +33,20 @@
         .navbar {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 12px 24px;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
         }
 
         .navbar-brand {
@@ -47,7 +56,7 @@
 
         .navbar-actions {
             display: flex;
-            gap: 20px;
+            gap: 10px;
             align-items: center;
         }
 
@@ -441,6 +450,404 @@
         .modal-close:hover {
             color: #333;
         }
+
+        /* ============== HELP BUTTON ============== */
+        .help-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .help-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ============== NOTIFICATIONS BUTTON ============== */
+        .notifications-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+       .notifications-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* ============== NOTIFICATIONS DROPDOWN ============== */
+        .notifications-dropdown {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 380px;
+            max-height: 500px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1100;
+        }
+
+        .notifications-dropdown.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .notifications-dropdown-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .notifications-dropdown-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .mark-all-read-btn {
+            background: transparent;
+            border: none;
+            color: #667eea;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .mark-all-read-btn:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .notifications-dropdown-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background: #f0f4ff;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.info {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+
+        .notification-icon.warning {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .notification-icon.alert {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 6px;
+        }
+
+        .notifications-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .notifications-empty i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        /* ============== HELP DRAWER ============== */
+        .help-drawer {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100%;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1100;
+            overflow-y: auto;
+        }
+
+        .help-drawer.active {
+            right: 0;
+        }
+
+        .help-drawer-header {
+            padding: 24px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .help-drawer-header h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .help-drawer-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .help-drawer-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .help-drawer-body {
+            padding: 28px;
+        }
+
+        .help-section {
+            margin-bottom: 30px;
+        }
+
+        .help-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-section-title i {
+            color: #667eea;
+        }
+
+        .help-section-content {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .help-section-content ul {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .help-section-content li {
+            margin-bottom: 8px;
+        }
+
+        .help-tip {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .help-tip-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .help-tip-content {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .help-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            z-index: 1099;
+            transition: opacity 0.3s ease;
+        }
+
+        .help-overlay.active {
+            display: block;
+        }
+
+        /* ============== DARK MODE TOGGLE ============== */
+        .dark-mode-toggle {
+            padding: 15px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .dark-mode-toggle label:first-child {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
     </style>
 </head>
 
@@ -451,7 +858,14 @@
             <i class="bi bi-people-fill"></i> Red Social y Política - Panel del Líder
         </div>
         <div class="navbar-actions">
-            <span id="leaderName">Líder</span>
+            <button class="help-btn" id="helpBtn" onclick="toggleHelpDrawer()" title="Ayuda">
+                <i class="bi bi-question-circle-fill"></i>
+            </button>
+            <button class="notifications-btn" id="notificationsBtn" onclick="toggleNotificationsDropdown()" title="Notificaciones">
+                <i class="bi bi-bell-fill"></i>
+                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+            </button>
+            <span id="leaderName" style="margin-left: 4px;">Líder</span>
             <button class="hamburger-btn" onclick="toggleHamburgerMenu()">
                 <i class="bi bi-list"></i>
             </button>
@@ -471,9 +885,87 @@
             <i class="bi bi-key"></i>
             <span>Cambiar Contraseña</span>
         </div>
+
+        <div style="border-top: 2px solid #e0e0e0; margin: 15px 0;"></div>
+        
+        <div class="dark-mode-toggle">
+            <label>
+                <i class="bi bi-moon-stars-fill"></i>
+                Modo Oscuro
+            </label>
+            <label class="switch">
+                <input type="checkbox" id="darkModeSwitch" onchange="toggleDarkMode()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div style="border-top: 2px solid #e0e0e0; margin: 15px 0;"></div>
+
         <div class="hamburger-menu-item" onclick="logout()">
             <i class="bi bi-box-arrow-right"></i>
             <span>Cerrar Sesión</span>
+        </div>
+    </div>
+
+    <!-- NOTIFICATIONS DROPDOWN -->
+    <div class="notifications-dropdown" id="notificationsDropdown">
+        <div class="notifications-dropdown-header">
+            <h4><i class="bi bi-bell-fill"></i> Notificaciones</h4>
+            <button class="mark-all-read-btn" onclick="markAllNotificationsRead()">
+                Marcar todas como leídas
+            </button>
+        </div>
+        <div class="notifications-dropdown-body" id="notificationsBody">
+            <div class="notifications-empty">
+                <i class="bi bi-bell-slash"></i>
+                <p style="margin: 12px 0 0 0; font-size: 14px;">No tienes notificaciones</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- HELP DRAWER OVERLAY -->
+    <div class="help-overlay" id="helpOverlay" onclick="closeHelpDrawer()"></div>
+
+    <!-- HELP DRAWER -->
+    <div class="help-drawer" id="helpDrawer">
+        <div class="help-drawer-header">
+            <h3><i class="bi bi-question-circle-fill"></i> Centro de Ayuda</h3>
+            <button class="help-drawer-close" onclick="closeHelpDrawer()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="help-drawer-body" id="helpDrawerBody">
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-speedometer2"></i>
+                    Panel del Líder
+                </div>
+                <div class="help-section-content">
+                    Aquí puedes gestionar tus registros y ver tu rendimiento.
+                </div>
+            </div>
+            <div class="help-section">
+                <div class="help-section-title">
+                    <i class="bi bi-plus-circle"></i>
+                    Nuevo Registro
+                </div>
+                <div class="help-section-content">
+                    <ul>
+                        <li>Haz clic en "Nuevo Registro" para agregar una persona</li>
+                        <li>Completa todos los campos requeridos</li>
+                        <li>Verifica que la cédula sea correcta</li>
+                        <li>Guarda el registro</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="help-tip">
+                <div class="help-tip-title">
+                    <i class="bi bi-lightbulb"></i> Consejo
+                </div>
+                <div class="help-tip-content">
+                    Revisa regularmente tus registros para asegurar que toda la información esté actualizada.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -843,6 +1335,136 @@
             menu.classList.remove('active');
             overlay.classList.remove('active');
         }
+
+        // ============== NOTIFICATIONS SYSTEM ==============
+        let notifications = [];
+
+        function toggleNotificationsDropdown() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const isActive = dropdown.classList.contains('active');
+            
+            // Close help drawer if open
+            closeHelpDrawer();
+            
+            if (isActive) {
+                dropdown.classList.remove('active');
+            } else {
+                dropdown.classList.add('active');
+                loadNotifications();
+            }
+        }
+
+        function closeNotificationsDropdown() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            dropdown.classList.remove('active');
+        }
+
+        function loadNotifications() {
+            const body = document.getElementById('notificationsBody');
+            const badge = document.getElementById('notificationBadge');
+            
+            const unreadCount = notifications.filter(n => !n.read).length;
+            
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+            
+            if (notifications.length === 0) {
+                body.innerHTML = `
+                    <div class="notifications-empty">
+                        <i class="bi bi-bell-slash"></i>
+                        <p style="margin: 12px 0 0 0; font-size: 14px;">No tienes notificaciones</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            body.innerHTML = notifications.map(notif => {
+                const iconClass = notif.type === 'info' ? 'bi-info-circle-fill' : 
+                                 notif.type === 'warning' ? 'bi-exclamation-triangle-fill' : 
+                                 'bi-exclamation-circle-fill';
+                
+                return `
+                    <div class="notification-item ${notif.read ? '' : 'unread'}" onclick="markNotificationRead(${notif.id})">
+                        <div class="notification-icon ${notif.type}">
+                            <i class="bi ${iconClass}"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">${notif.title}</div>
+                            <div class="notification-message">${notif.message}</div>
+                            <div class="notification-time">${notif.time}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function markNotificationRead(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                notification.read = true;
+                loadNotifications();
+            }
+        }
+
+        function markAllNotificationsRead() {
+            notifications.forEach(n => n.read = true);
+            loadNotifications();
+        }
+
+        // Close notifications dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const btn = document.getElementById('notificationsBtn');
+            if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+                closeNotificationsDropdown();
+            }
+        });
+
+        // ============== HELP DRAWER ==============
+        function toggleHelpDrawer() {
+            const drawer = document.getElementById('helpDrawer');
+            const overlay = document.getElementById('helpOverlay');
+            const isActive = drawer.classList.contains('active');
+            
+            // Close notifications dropdown if open
+            closeNotificationsDropdown();
+            
+            if (isActive) {
+                closeHelpDrawer();
+            } else {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+            }
+        }
+
+        function closeHelpDrawer() {
+            const drawer = document.getElementById('helpDrawer');
+            const overlay = document.getElementById('helpOverlay');
+            drawer.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        // ============== DARK MODE ==============
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Restore dark mode on page load
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            const darkModeSwitch = document.getElementById('darkModeSwitch');
+            if (darkModeSwitch) darkModeSwitch.checked = true;
+        }
+
+        // Initialize notifications on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadNotifications();
+        });
 
         function logout() {
             if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {

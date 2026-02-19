@@ -3664,32 +3664,7 @@
         }
 
         // ============== NOTIFICATIONS SYSTEM ==============
-        let notifications = [
-            {
-                id: 1,
-                type: 'info',
-                title: 'Nuevo registro confirmado',
-                message: 'Juan Pérez ha confirmado asistencia al evento.',
-                time: 'Hace 5 min',
-                read: false
-            },
-            {
-                id: 2,
-                type: 'warning',
-                title: 'Meta parcialmente alcanzada',
-                message: 'Has alcanzado el 75% de tu meta de confirmación.',
-                time: 'Hace 1 hora',
-                read: false
-            },
-            {
-                id: 3,
-                type: 'alert',
-                title: 'Líder sin registros',
-                message: 'El líder María González no ha registrado personas en 7 días.',
-                time: 'Hace 2 horas',
-                read: true
-            }
-        ];
+        let notifications = [];
 
         function toggleNotificationsDropdown() {
             const dropdown = document.getElementById('notificationsDropdown');
