@@ -470,6 +470,30 @@
     <script>
         const API_URL = window.location.origin;
 
+        // Enable Enter key for form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            const adminInputs = document.querySelectorAll('#adminForm input');
+            const leaderInputs = document.querySelectorAll('#leaderForm input');
+            
+            adminInputs.forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('adminBtn').click();
+                    }
+                });
+            });
+            
+            leaderInputs.forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('leaderBtn').click();
+                    }
+                });
+            });
+        });
+
         async function loginAdmin(e) {
             e.preventDefault();
             const username = document.getElementById('adminUsername').value;
