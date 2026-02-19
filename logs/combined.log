@@ -2273,3 +2273,120 @@
 {"level":"info","message":"GET /events 200 93ms","service":"mi-servidor","timestamp":"2026-02-19 16:12:49"}
 {"level":"info","message":"GET /leaders 200 98ms","service":"mi-servidor","timestamp":"2026-02-19 16:12:49"}
 {"level":"info","message":"GET /registrations 200 879ms","service":"mi-servidor","timestamp":"2026-02-19 16:12:50"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:17:04","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 273ms","service":"mi-servidor","timestamp":"2026-02-19 16:17:04"}
+{"level":"info","message":"GET /events 200 96ms","service":"mi-servidor","timestamp":"2026-02-19 16:17:04"}
+{"level":"info","message":"GET /events 200 93ms","service":"mi-servidor","timestamp":"2026-02-19 16:17:05"}
+{"level":"info","message":"GET /leaders 200 97ms","service":"mi-servidor","timestamp":"2026-02-19 16:17:05"}
+{"level":"info","message":"GET /registrations 200 685ms","service":"mi-servidor","timestamp":"2026-02-19 16:17:06"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:19:00","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 248ms","service":"mi-servidor","timestamp":"2026-02-19 16:19:00"}
+{"level":"info","message":"GET /events 200 94ms","service":"mi-servidor","timestamp":"2026-02-19 16:19:00"}
+{"level":"info","message":"GET /events 200 93ms","service":"mi-servidor","timestamp":"2026-02-19 16:19:02"}
+{"level":"info","message":"GET /leaders 200 105ms","service":"mi-servidor","timestamp":"2026-02-19 16:19:02"}
+{"level":"info","message":"GET /registrations 200 858ms","service":"mi-servidor","timestamp":"2026-02-19 16:19:03"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:20:35","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 255ms","service":"mi-servidor","timestamp":"2026-02-19 16:20:35"}
+{"level":"info","message":"GET /events 200 90ms","service":"mi-servidor","timestamp":"2026-02-19 16:20:35"}
+{"level":"info","message":"GET /events 200 95ms","service":"mi-servidor","timestamp":"2026-02-19 16:20:37"}
+{"level":"info","message":"GET /leaders 200 97ms","service":"mi-servidor","timestamp":"2026-02-19 16:20:37"}
+{"level":"info","message":"GET /registrations 200 665ms","service":"mi-servidor","timestamp":"2026-02-19 16:20:38"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:23:12","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 264ms","service":"mi-servidor","timestamp":"2026-02-19 16:23:12"}
+{"level":"info","message":"GET /events 200 92ms","service":"mi-servidor","timestamp":"2026-02-19 16:23:12"}
+{"level":"info","message":"GET /events 200 91ms","service":"mi-servidor","timestamp":"2026-02-19 16:23:14"}
+{"level":"info","message":"GET /leaders 200 95ms","service":"mi-servidor","timestamp":"2026-02-19 16:23:14"}
+{"level":"info","message":"GET /registrations 200 791ms","service":"mi-servidor","timestamp":"2026-02-19 16:23:15"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:24:48","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 256ms","service":"mi-servidor","timestamp":"2026-02-19 16:24:48"}
+{"level":"info","message":"GET /events 200 94ms","service":"mi-servidor","timestamp":"2026-02-19 16:24:48"}
+{"level":"info","message":"GET /events 200 93ms","service":"mi-servidor","timestamp":"2026-02-19 16:24:50"}
+{"level":"info","message":"GET /leaders 200 98ms","service":"mi-servidor","timestamp":"2026-02-19 16:24:50"}
+{"level":"info","message":"GET /registrations 200 1043ms","service":"mi-servidor","timestamp":"2026-02-19 16:24:51"}
+{"level":"info","message":"GET /events 200 92ms","service":"mi-servidor","timestamp":"2026-02-19 16:24:58"}
+{"level":"info","message":"POST /leaders 201 714ms","service":"mi-servidor","timestamp":"2026-02-19 16:33:14"}
+{"level":"info","message":"GET /events 200 96ms","service":"mi-servidor","timestamp":"2026-02-19 16:33:14"}
+{"level":"info","message":"GET /leaders 200 96ms","service":"mi-servidor","timestamp":"2026-02-19 16:33:14"}
+{"level":"info","message":"GET /registrations 200 796ms","service":"mi-servidor","timestamp":"2026-02-19 16:33:15"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:33:48","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 166ms","service":"mi-servidor","timestamp":"2026-02-19 16:33:48"}
+{"level":"info","message":"POST /auth/change-password 200 370ms","service":"mi-servidor","timestamp":"2026-02-19 16:33:59"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:34:09","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 158ms","service":"mi-servidor","timestamp":"2026-02-19 16:34:09"}
+{"level":"info","message":"GET /leaders/LID-MLTZ9MGO-GAH4 200 95ms","service":"mi-servidor","timestamp":"2026-02-19 16:34:09"}
+{"level":"info","message":"GET /registrations 200 194ms","service":"mi-servidor","timestamp":"2026-02-19 16:34:10"}
+{"level":"info","message":"GET /registrations 304 188ms","service":"mi-servidor","timestamp":"2026-02-19 16:38:19"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:38:25","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 288ms","service":"mi-servidor","timestamp":"2026-02-19 16:38:25"}
+{"level":"info","message":"GET /events 200 97ms","service":"mi-servidor","timestamp":"2026-02-19 16:38:25"}
+{"level":"info","message":"GET /events 200 93ms","service":"mi-servidor","timestamp":"2026-02-19 16:38:27"}
+{"level":"info","message":"GET /leaders 200 99ms","service":"mi-servidor","timestamp":"2026-02-19 16:38:27"}
+{"level":"info","message":"GET /registrations 200 783ms","service":"mi-servidor","timestamp":"2026-02-19 16:38:28"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:39:06","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 177ms","service":"mi-servidor","timestamp":"2026-02-19 16:39:06"}
+{"level":"info","message":"GET /leaders/LID-MLTZ9MGO-GAH4 304 91ms","service":"mi-servidor","timestamp":"2026-02-19 16:39:06"}
+{"level":"info","message":"GET /registrations 304 179ms","service":"mi-servidor","timestamp":"2026-02-19 16:39:06"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:39:30","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 255ms","service":"mi-servidor","timestamp":"2026-02-19 16:39:30"}
+{"level":"info","message":"GET /events 200 99ms","service":"mi-servidor","timestamp":"2026-02-19 16:39:30"}
+{"level":"info","message":"GET /events 200 92ms","service":"mi-servidor","timestamp":"2026-02-19 16:39:32"}
+{"level":"info","message":"GET /leaders 200 101ms","service":"mi-servidor","timestamp":"2026-02-19 16:39:32"}
+{"level":"info","message":"GET /registrations 200 682ms","service":"mi-servidor","timestamp":"2026-02-19 16:39:33"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:40:21","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 172ms","service":"mi-servidor","timestamp":"2026-02-19 16:40:21"}
+{"level":"info","message":"GET /leaders/LID-MLTZ9MGO-GAH4 304 92ms","service":"mi-servidor","timestamp":"2026-02-19 16:40:22"}
+{"level":"info","message":"GET /registrations 304 179ms","service":"mi-servidor","timestamp":"2026-02-19 16:40:22"}
+{"level":"info","message":"GET /registrations 304 188ms","service":"mi-servidor","timestamp":"2026-02-19 16:40:27"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:43:32","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 207ms","service":"mi-servidor","timestamp":"2026-02-19 16:43:32"}
+{"level":"info","message":"GET /leaders/LID-MLTZ9MGO-GAH4 304 91ms","service":"mi-servidor","timestamp":"2026-02-19 16:43:33"}
+{"level":"info","message":"GET /registrations 304 179ms","service":"mi-servidor","timestamp":"2026-02-19 16:43:33"}
+{"level":"info","message":"GET /registrations 304 179ms","service":"mi-servidor","timestamp":"2026-02-19 16:43:37"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:47:15","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 166ms","service":"mi-servidor","timestamp":"2026-02-19 16:47:15"}
+{"level":"info","message":"GET /leaders/LID-MLTZ9MGO-GAH4 304 92ms","service":"mi-servidor","timestamp":"2026-02-19 16:47:16"}
+{"level":"info","message":"GET /registrations 304 180ms","service":"mi-servidor","timestamp":"2026-02-19 16:47:16"}
+{"level":"info","message":"GET /registrations 304 181ms","service":"mi-servidor","timestamp":"2026-02-19 16:47:21"}
+{"level":"info","message":"GET /registro/469346063bd48157ad0fc2495f46ff4f 200 236ms","service":"mi-servidor","timestamp":"2026-02-19 16:47:27"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-19 16:56:42"}
+{"level":"info","message":"📧 EMAIL_USER configurado: Si","service":"mi-servidor","timestamp":"2026-02-19 16:56:42"}
+{"level":"info","message":"📧 EMAIL_PASS configurado: Si","service":"mi-servidor","timestamp":"2026-02-19 16:56:42"}
+{"level":"info","message":"📧 SMTP_HOST: smtp.hostinger.com","service":"mi-servidor","timestamp":"2026-02-19 16:56:42"}
+{"level":"info","message":"📧 SMTP_PORT: 465","service":"mi-servidor","timestamp":"2026-02-19 16:56:42"}
+{"level":"info","message":"📧 Intentando conectar SMTP: smtp.hostinger.com:465 (secure: true)","service":"mi-servidor","timestamp":"2026-02-19 16:56:42"}
+{"level":"info","message":"✅ SMTP configurado correctamente: smtp.hostinger.com:465 (secure: true)","service":"mi-servidor","timestamp":"2026-02-19 16:56:42"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 16:56:43"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 16:56:44"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 16:56:44"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:56:47","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 286ms","service":"mi-servidor","timestamp":"2026-02-19 16:56:47"}
+{"level":"info","message":"GET /events 200 105ms","service":"mi-servidor","timestamp":"2026-02-19 16:56:47"}
+{"level":"info","message":"GET /events 200 98ms","service":"mi-servidor","timestamp":"2026-02-19 16:56:50"}
+{"level":"info","message":"GET /leaders 200 105ms","service":"mi-servidor","timestamp":"2026-02-19 16:56:50"}
+{"level":"info","message":"GET /registrations 200 724ms","service":"mi-servidor","timestamp":"2026-02-19 16:56:51"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 16:57:04","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 169ms","service":"mi-servidor","timestamp":"2026-02-19 16:57:04"}
+{"level":"info","message":"GET /leaders/LID-MLTZ9MGO-GAH4 304 96ms","service":"mi-servidor","timestamp":"2026-02-19 16:57:05"}
+{"level":"info","message":"GET /registrations 304 185ms","service":"mi-servidor","timestamp":"2026-02-19 16:57:05"}
+{"level":"info","message":"GET /registrations 304 199ms","service":"mi-servidor","timestamp":"2026-02-19 16:57:10"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 17:00:27","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 259ms","service":"mi-servidor","timestamp":"2026-02-19 17:00:27"}
+{"level":"info","message":"GET /events 200 91ms","service":"mi-servidor","timestamp":"2026-02-19 17:00:27"}
+{"level":"info","message":"GET /events 200 91ms","service":"mi-servidor","timestamp":"2026-02-19 17:00:30"}
+{"level":"info","message":"GET /leaders 200 95ms","service":"mi-servidor","timestamp":"2026-02-19 17:00:30"}
+{"level":"info","message":"GET /registrations 200 676ms","service":"mi-servidor","timestamp":"2026-02-19 17:00:31"}
+{"level":"info","message":"GET /registro/leader1762630204853 304 187ms","service":"mi-servidor","timestamp":"2026-02-19 17:00:48"}
+{"level":"info","message":"GET /events 200 91ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:07"}
+{"level":"info","message":"GET /events 200 89ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:08"}
+{"level":"info","message":"GET /leaders 200 92ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:08"}
+{"level":"info","message":"GET /registrations 200 178ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:08"}
+{"level":"info","message":"GET /events 200 91ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:09"}
+{"level":"info","message":"GET /events 200 96ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:12"}
+{"level":"info","message":"GET /leaders 200 95ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:12"}
+{"level":"info","message":"GET /registrations 200 760ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:12"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 17:01:28","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 160ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:28"}
+{"level":"info","message":"GET /leaders/LID-MLTZ9MGO-GAH4 304 90ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:29"}
+{"level":"info","message":"GET /registrations 304 174ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:29"}
+{"level":"info","message":"GET /registrations 304 176ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:33"}
+{"level":"info","message":"GET /registrations 304 175ms","service":"mi-servidor","timestamp":"2026-02-19 17:01:39"}
