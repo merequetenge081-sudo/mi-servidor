@@ -1511,3 +1511,22 @@
 {"level":"info","message":"POST /auth/leader-login 200 127ms","service":"mi-servidor","timestamp":"2026-02-19 03:35:08"}
 {"level":"info","message":"GET /leaders/LID-MLSGYMFG-J5QC 304 70ms","service":"mi-servidor","timestamp":"2026-02-19 03:35:09"}
 {"level":"info","message":"GET /registrations 304 144ms","service":"mi-servidor","timestamp":"2026-02-19 03:35:09"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 03:39:41"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 03:39:42"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 03:39:42"}
+{"level":"info","message":"GET /leader 200 5ms","service":"mi-servidor","timestamp":"2026-02-19 03:40:11"}
+{"level":"info","message":"GET /leaders/LID-MLSGYMFG-J5QC 200 79ms","service":"mi-servidor","timestamp":"2026-02-19 03:40:22"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-19 03:40:22"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-19 03:40:22"}
+{"level":"info","message":"GET /registrations 200 147ms","service":"mi-servidor","timestamp":"2026-02-19 03:40:22"}
+{"level":"info","message":"GET /registrations 304 142ms","service":"mi-servidor","timestamp":"2026-02-19 03:40:39"}
+{"level":"info","message":"GET /registrations 304 141ms","service":"mi-servidor","timestamp":"2026-02-19 03:43:14"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 03:50:03"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 03:50:04"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 03:50:04"}
+{"level":"info","message":"GET /leader 200 4ms","service":"mi-servidor","timestamp":"2026-02-19 03:50:32"}
+{"level":"info","message":"GET /leaders/LID-MLSGYMFG-J5QC 200 84ms","service":"mi-servidor","timestamp":"2026-02-19 03:50:51"}
+{"level":"info","message":"GET /registrations 200 147ms","service":"mi-servidor","timestamp":"2026-02-19 03:50:51"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-19 03:50:51"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-19 03:50:51"}
+{"level":"info","message":"GET /registrations 304 143ms","service":"mi-servidor","timestamp":"2026-02-19 03:51:16"}
