@@ -1592,3 +1592,17 @@
 {"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 04:36:32"}
 {"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 04:36:33"}
 {"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 04:36:33"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 04:51:26"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 04:51:28"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 04:51:28"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-19 04:52:44"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-19 04:52:44"}
+{"level":"info","message":"POST /auth/admin-login 401 139ms","service":"mi-servidor","timestamp":"2026-02-19 04:52:52"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 04:52:58","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 218ms","service":"mi-servidor","timestamp":"2026-02-19 04:52:58"}
+{"level":"info","message":"GET /events 200 75ms","service":"mi-servidor","timestamp":"2026-02-19 04:53:01"}
+{"level":"info","message":"GET /leaders 200 79ms","service":"mi-servidor","timestamp":"2026-02-19 04:53:03"}
+{"level":"info","message":"GET /registrations 200 415ms","service":"mi-servidor","timestamp":"2026-02-19 04:53:03"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 04:58:20"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 04:58:21"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 04:58:21"}
