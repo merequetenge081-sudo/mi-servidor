@@ -195,6 +195,159 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* ============== MODERN BUTTONS & MODAL ============== */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.active {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .modal-icon {
+      width: 95px;
+      height: 95px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 46px;
+      animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .btn-modern {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-modern::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s;
+    }
+
+    .btn-modern:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-modern i {
+      font-size: 18px;
+    }
+
+    .btn-modern:active {
+      transform: scale(0.96);
+    }
+
+    .btn-cancel {
+      background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+      color: #424242;
+    }
+
+    .btn-cancel:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, #eeeeee 0%, #e0e0e0 100%);
+    }
+
+    .btn-logout-action {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-logout-action:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, #7c91f7 0%, #8b5cb8 100%);
+    }
+
+    .btn-logout-action i,
+    .btn-cancel i {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-logout-action:hover i {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .btn-cancel:hover i {
+      transform: scale(1.1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .btn-modern {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -255,6 +408,25 @@
     </div>
   </div>
 
+  <!-- LOGOUT CONFIRMATION MODAL -->
+  <div id="logoutModal" class="modal">
+    <div class="modal-content" style="max-width: 450px; text-align: center;">
+      <div class="modal-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
+        <i class="fas fa-sign-out-alt"></i>
+      </div>
+      <h3 style="margin-bottom: 12px; font-size: 24px; font-weight: 700; color: #1a1a2e;">Cerrar Sesión</h3>
+      <p style="color: #6c757d; margin-bottom: 32px; font-size: 15px; line-height: 1.6;">¿Estás seguro de que deseas cerrar tu sesión? Deberás iniciar sesión nuevamente para acceder.</p>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-modern btn-cancel" onclick="closeLogoutModal()" style="flex: 1;">
+          <i class="fas fa-times-circle"></i> Cancelar
+        </button>
+        <button class="btn-modern btn-logout-action" onclick="confirmLogout()" style="flex: 1;">
+          <i class="fas fa-check-circle"></i> Sí, Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const baseUrl = window.location.origin;
 
@@ -271,12 +443,18 @@
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        window.location.href = '/login-pro.html';
-      }
+      document.getElementById('logoutModal').classList.add('active');
     });
+
+    function closeLogoutModal() {
+      document.getElementById('logoutModal').classList.remove('active');
+    }
+
+    function confirmLogout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.href = '/login-pro.html';
+    }
 
     // Load registrations
     async function loadRegistrations() {
