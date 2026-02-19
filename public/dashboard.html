@@ -2913,6 +2913,41 @@
             document.querySelectorAll('.view-credentials-btn').forEach(btn => {
                 btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId, btn.dataset.username, btn.dataset.password));
             });
+            document.querySelectorAll('.send-email-btn').forEach(btn => {
+                btn.addEventListener('click', () => sendAccessEmail(btn.dataset.leaderId, btn.dataset.leaderName, btn.dataset.leaderEmail));
+            });
+        }
+
+        // ====== SEND ACCESS EMAIL ======
+        async function sendAccessEmail(leaderId, leaderName, leaderEmail) {
+            const confirmSend = confirm(`¿Enviar correo de acceso a ${leaderName} (${leaderEmail})?\n\nEste correo incluirá:\n- Enlace de acceso personalizado\n- Código QR\n- Instrucciones de uso`);
+            
+            if (!confirmSend) return;
+            
+            try {
+                showAlert('Enviando correo...', 'info');
+                
+                const res = await apiCall(`/api/leaders/${leaderId}/send-access`, { 
+                    method: 'POST'
+                });
+                
+                if (!res.ok) {
+                    const error = await res.json();
+                    throw new Error(error.error || 'Error al enviar correo');
+                }
+                
+                const result = await res.json();
+                
+                if (result.mock) {
+                    showAlert(`✅ Correo enviado exitosamente (SIMULADO)\n\nEn producción se enviaría a: ${leaderEmail}\n\n${result.message || ''}`, 'success');
+                } else {
+                    showAlert(`✅ Correo enviado exitosamente a ${leaderEmail}`, 'success');
+                }
+                
+            } catch (error) {
+                console.error('Error al enviar correo:', error);
+                showAlert(`❌ Error al enviar correo: ${error.message}`, 'error');
+            }
         }
 
         // ====== RESET PASSWORD MODAL ======
