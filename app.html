@@ -2938,7 +2938,8 @@ function updateRegistrationsTable() {
   const tbody = document.getElementById('registrationsTableBody');
   tbody.innerHTML = registrations.map(reg => {
     const nombre = reg.name || ((reg.firstName || '') + ' ' + (reg.lastName || '')).trim() || 'Sin nombre';
-    const lider = (leaders.find(l => l._id === reg.leaderId).name) || reg.leaderName || 'Sin líder';
+    const leaderMatch = leaders.find(l => String(l._id) === String(reg.leaderId));
+    const lider = leaderMatch?.name || reg.leaderName || 'Sin líder';
     const fecha = reg.date ? new Date(reg.date).toLocaleDateString() : 'Sin fecha';
     const confirmed = reg.confirmed ? true : false;
     const confirmedBy = reg.confirmedBy ? reg.confirmedBy : '';
@@ -3109,12 +3110,38 @@ async function saveLeader() {
 async function deleteLeader(id) {
  if (!confirm("¿Eliminar este líder?")) return;
 
- const res = await apiCall(`/leaders/${id}`, { method: "DELETE" });
- if (res.ok) {
-  leaders = leaders.filter(l => l._id !== id);
-  updateLeadersTable();
+ try {
+  const res = await apiCall(`/leaders/${id}`, { method: "DELETE" });
+  if (!res.ok) {
+   showToast('danger', 'Error al eliminar líder');
+   return;
+  }
+
+  leaders = leaders.filter(l => String(l._id) !== String(id));
+
+  // Limpiar filtros huérfanos si apuntaban al líder eliminado
+  if (String(currentFilterLeaderId || '') === String(id)) {
+   currentFilterLeaderId = '';
+   const filterLeaderSelect = document.getElementById('filterLeaderSelect');
+   if (filterLeaderSelect) filterLeaderSelect.value = '';
+  }
+
+  // Refrescar datos completos para mantener todo sincronizado
+  await loadLeaders();
+  await loadRegistrations();
+  await updateDashboard();
+
+  // Si análisis está visible, recalcular filtros/listas
+  const analysisSection = document.getElementById('analysisSection');
+  if (analysisSection && analysisSection.style.display !== 'none') {
+   try { await refreshAnalysis(); } catch (e) { console.warn('refreshAnalysis after deleteLeader failed', e); }
+  } else {
+   try { applyFilters(); } catch (e) { console.warn('applyFilters after deleteLeader failed', e); }
+  }
+
   showToast('success', 'Líder eliminado correctamente');
- } else {
+ } catch (err) {
+  console.error('Error deleteLeader:', err);
   showToast('danger', 'Error al eliminar líder');
  }
 }
@@ -4472,7 +4499,15 @@ function applyFilters() {
   let titleText = 'Todos los Registros';
   if (currentFilterLeaderId) {
     const leader = allLeadersData.find(l => l._id === currentFilterLeaderId);
-    titleText = `Registros de ${leader.name || 'Líder'}`;
+    if (!leader) {
+      // Evitar errores cuando el filtro apunta a un líder ya eliminado
+      currentFilterLeaderId = '';
+      const filterLeaderSelect = document.getElementById('filterLeaderSelect');
+      if (filterLeaderSelect) filterLeaderSelect.value = '';
+      titleText = 'Todos los Registros';
+    } else {
+      titleText = `Registros de ${leader.name || 'Líder'}`;
+    }
   } else if (currentSearchTerm) {
     titleText = `Búsqueda: "${currentSearchTerm}"`;
   } else if (currentLocalidadFilter) {
