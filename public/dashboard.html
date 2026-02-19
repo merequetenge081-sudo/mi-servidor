@@ -1438,61 +1438,6 @@
                 </button>
             </div>
 
-            <!-- RESUMEN EJECUTIVO KPIs -->
-            <div class="card" style="margin-bottom: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
-                <div class="card-body">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px;">
-                        <!-- Total Registros -->
-                        <div>
-                            <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Total Registros</div>
-                            <div style="font-size: 32px; font-weight: 700;" id="kpiTotalRegistros">0</div>
-                            <div style="font-size: 13px; opacity: 0.8; margin-top: 8px;" id="kpiTotalChange">+0 esta semana</div>
-                        </div>
-                        <!-- Confirmados -->
-                        <div>
-                            <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Confirmados</div>
-                            <div style="font-size: 32px; font-weight: 700;" id="kpiConfirmados">0</div>
-                            <div style="font-size: 13px; opacity: 0.8; margin-top: 8px;" id="kpiConfirmadosPercent">0%</div>
-                        </div>
-                        <!-- Pendientes -->
-                        <div>
-                            <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Pendientes</div>
-                            <div style="font-size: 32px; font-weight: 700;" id="kpiPendientes">0</div>
-                            <div style="font-size: 13px; opacity: 0.8; margin-top: 8px;" id="kpiPendientesPercent">0%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BARRA DE PROGRESO META -->
-            <div class="card" style="margin-bottom: 20px;">
-                <div class="card-body">
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="font-weight: 600; color: #333;">Meta de Confirmación</span>
-                            <span style="font-size: 14px; color: #667eea; font-weight: 600;" id="kpiMetaPercent">0% / 80%</span>
-                        </div>
-                        <div style="width: 100%; height: 24px; background: #e0e0e0; border-radius: 12px; overflow: hidden;">
-                            <div id="kpiMetaBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); border-radius: 12px; transition: width 0.3s ease;"></div>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; font-size: 13px;">
-                        <div style="padding: 10px; background: #f8f9ff; border-radius: 8px; text-align: center;">
-                            <div style="color: #999; margin-bottom: 5px;">Vel. Promedio</div>
-                            <div style="font-weight: 600; color: #667eea;" id="kpiVelocidadPromedio">0h</div>
-                        </div>
-                        <div style="padding: 10px; background: #f8f9ff; border-radius: 8px; text-align: center;">
-                            <div style="color: #999; margin-bottom: 5px;">Mejor Líder</div>
-                            <div style="font-weight: 600; color: #667eea;" id="kpiBestLeader">-</div>
-                        </div>
-                        <div style="padding: 10px; background: #f8f9ff; border-radius: 8px; text-align: center;">
-                            <div style="color: #999; margin-bottom: 5px;">Promedio/Líder</div>
-                            <div style="font-weight: 600; color: #667eea;" id="kpiAvgPerLeader">0</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-percent"></i></div>
@@ -2915,54 +2860,6 @@
             document.getElementById('avgRegsPerLeader').textContent = avgRegs;
             document.getElementById('bogotaCount').textContent = bogotaRegs.length;
             document.getElementById('restoCount').textContent = restoRegs.length;
-
-            // === ACTUALIZAR KPIs MEJORADOS ===
-            const pending = total - confirmed;
-            const metaTarget = 80; // Meta: 80% de confirmación
-            
-            document.getElementById('kpiTotalRegistros').textContent = total;
-            document.getElementById('kpiConfirmados').textContent = confirmed;
-            document.getElementById('kpiConfirmadosPercent').textContent = rate + '%';
-            document.getElementById('kpiPendientes').textContent = pending;
-            document.getElementById('kpiPendientesPercent').textContent = ((pending / total * 100) || 0).toFixed(1) + '%';
-            document.getElementById('kpiMetaPercent').textContent = rate + '% / ' + metaTarget + '%';
-            
-            // Barra de progreso (limitada a 100%)
-            const metaBarWidth = Math.min(parseFloat(rate), 100);
-            document.getElementById('kpiMetaBar').style.width = metaBarWidth + '%';
-            document.getElementById('kpiMetaBar').style.backgroundColor = 
-                metaBarWidth >= metaTarget ? '#4CAF50' : (metaBarWidth >= 50 ? '#FFC107' : '#FF6B6B');
-            
-            // Velocidad promedio de confirmación (en horas)
-            let velocidadPromedio = 0;
-            let confirmadosCount = 0;
-            regs.forEach(r => {
-                if (r.confirmed && r.date) {
-                    const regDate = new Date(r.date);
-                    const ahora = new Date();
-                    const horas = (ahora - regDate) / (1000 * 60 * 60);
-                    velocidadPromedio += horas;
-                    confirmadosCount++;
-                }
-            });
-            velocidadPromedio = confirmadosCount > 0 ? (velocidadPromedio / confirmadosCount).toFixed(0) : 0;
-            document.getElementById('kpiVelocidadPromedio').textContent = velocidadPromedio + 'h';
-            
-            // Mejor líder (mayor tasa de confirmación)
-            let mejorLider = '-';
-            let mejorTasa = 0;
-            leaders.forEach(l => {
-                const liderRegs = regs.filter(r => r.leaderId === l._id);
-                const liderConfirmados = liderRegs.filter(r => r.confirmed).length;
-                const liderTasa = liderRegs.length > 0 ? (liderConfirmados / liderRegs.length) * 100 : 0;
-                if (liderTasa > mejorTasa) {
-                    mejorTasa = liderTasa;
-                    mejorLider = l.name.split(' ')[0];
-                }
-            });
-            document.getElementById('kpiBestLeader').textContent = mejorLider + ' (' + mejorTasa.toFixed(0) + '%)';
-            document.getElementById('kpiAvgPerLeader').textContent = avgRegs;
-
 
             // Leader Registrations Chart
             const leaderStats = leaders.map(l => ({
