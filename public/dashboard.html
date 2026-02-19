@@ -1350,6 +1350,19 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Paginación Bogotá -->
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding: 15px; border-top: 1px solid #f0f0f0;">
+                        <button class="btn btn-sm btn-light" id="firstPageBogotaBtn" title="Primera página">
+                            <i class="bi bi-chevron-bar-left"></i>
+                        </button>
+                        <button class="btn btn-sm btn-light" id="prevPageBogotaBtn">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </button>
+                        <span id="pageIndicatorBogota" style="font-size: 14px; font-weight: 600; color: #666; min-width: 120px; text-align: center;">Página 1 de 1</span>
+                        <button class="btn btn-sm btn-light" id="nextPageBogotaBtn">
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1384,6 +1397,19 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Paginación Resto del País -->
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding: 15px; border-top: 1px solid #f0f0f0;">
+                        <button class="btn btn-sm btn-light" id="firstPageRestoBtn" title="Primera página">
+                            <i class="bi bi-chevron-bar-left"></i>
+                        </button>
+                        <button class="btn btn-sm btn-light" id="prevPageRestoBtn">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </button>
+                        <span id="pageIndicatorResto" style="font-size: 14px; font-weight: 600; color: #666; min-width: 120px; text-align: center;">Página 1 de 1</span>
+                        <button class="btn btn-sm btn-light" id="nextPageRestoBtn">
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1412,6 +1438,61 @@
                 </button>
             </div>
 
+            <!-- RESUMEN EJECUTIVO KPIs -->
+            <div class="card" style="margin-bottom: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px;">
+                        <!-- Total Registros -->
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Total Registros</div>
+                            <div style="font-size: 32px; font-weight: 700;" id="kpiTotalRegistros">0</div>
+                            <div style="font-size: 13px; opacity: 0.8; margin-top: 8px;" id="kpiTotalChange">+0 esta semana</div>
+                        </div>
+                        <!-- Confirmados -->
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Confirmados</div>
+                            <div style="font-size: 32px; font-weight: 700;" id="kpiConfirmados">0</div>
+                            <div style="font-size: 13px; opacity: 0.8; margin-top: 8px;" id="kpiConfirmadosPercent">0%</div>
+                        </div>
+                        <!-- Pendientes -->
+                        <div>
+                            <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Pendientes</div>
+                            <div style="font-size: 32px; font-weight: 700;" id="kpiPendientes">0</div>
+                            <div style="font-size: 13px; opacity: 0.8; margin-top: 8px;" id="kpiPendientesPercent">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BARRA DE PROGRESO META -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body">
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: 600; color: #333;">Meta de Confirmación</span>
+                            <span style="font-size: 14px; color: #667eea; font-weight: 600;" id="kpiMetaPercent">0% / 80%</span>
+                        </div>
+                        <div style="width: 100%; height: 24px; background: #e0e0e0; border-radius: 12px; overflow: hidden;">
+                            <div id="kpiMetaBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); border-radius: 12px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; font-size: 13px;">
+                        <div style="padding: 10px; background: #f8f9ff; border-radius: 8px; text-align: center;">
+                            <div style="color: #999; margin-bottom: 5px;">Vel. Promedio</div>
+                            <div style="font-weight: 600; color: #667eea;" id="kpiVelocidadPromedio">0h</div>
+                        </div>
+                        <div style="padding: 10px; background: #f8f9ff; border-radius: 8px; text-align: center;">
+                            <div style="color: #999; margin-bottom: 5px;">Mejor Líder</div>
+                            <div style="font-weight: 600; color: #667eea;" id="kpiBestLeader">-</div>
+                        </div>
+                        <div style="padding: 10px; background: #f8f9ff; border-radius: 8px; text-align: center;">
+                            <div style="color: #999; margin-bottom: 5px;">Promedio/Líder</div>
+                            <div style="font-weight: 600; color: #667eea;" id="kpiAvgPerLeader">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-percent"></i></div>
@@ -1424,9 +1505,14 @@
                     <div class="stat-label">Registros/Líder</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-buildings"></i></div>
+                    <div class="stat-value" id="bogotaCount">0</div>
+                    <div class="stat-label">Bogotá</div>
+                </div>
+                <div class="stat-card">
                     <div class="stat-icon"><i class="bi bi-geo-alt"></i></div>
-                    <div class="stat-value" id="localidadesCount">0</div>
-                    <div class="stat-label">Bogotá / Resto</div>
+                    <div class="stat-value" id="restoCount">0</div>
+                    <div class="stat-label">Resto del País</div>
                 </div>
             </div>
 
@@ -1775,15 +1861,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_URL = window.location.origin;
-        let currentToken = localStorage.getItem('token');
-        let currentEventId = localStorage.getItem('eventId');
+        // Intentar leer token de sessionStorage primero (más seguro), luego localStorage
+        let currentToken = sessionStorage.getItem('token') || localStorage.getItem('token');
+        let currentEventId = sessionStorage.getItem('eventId') || localStorage.getItem('eventId');
         let allLeaders = [];
         let allRegistrations = [];
         let charts = {};
 
-        // Paginación
-        let currentPage = 1;
-        const itemsPerPage = 50;
+        // Paginación separada para cada pestaña
+        let currentPageBogota = 1;
+        let currentPageResto = 1;
+        const itemsPerPage = 5;
+        let currentTab = 'bogota'; // Track current active tab
 
         const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
         const LAST_ACTIVITY_KEY = 'lastActivity';
@@ -1804,6 +1893,11 @@
                 localStorage.removeItem('token');
                 localStorage.removeItem('role');
                 localStorage.removeItem('eventId');
+                localStorage.removeItem('username');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('role');
+                sessionStorage.removeItem('eventId');
+                sessionStorage.removeItem('username');
                 window.location.href = '/';
                 return true;
             }
@@ -2035,7 +2129,15 @@
                 headers
             });
             if (response.status === 401) {
+                console.warn('[API] Token inválido (401). Limpiando sesión.');
                 localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('eventId');
+                localStorage.removeItem('username');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('role');
+                sessionStorage.removeItem('eventId');
+                sessionStorage.removeItem('username');
                 window.location.href = '/';
             }
             return response;
@@ -2043,8 +2145,8 @@
 
         async function loadDashboard() {
             try {
-                document.getElementById('eventNameDisplay').textContent = localStorage.getItem('eventName') || 'Evento';
-                document.getElementById('adminUsername').textContent = localStorage.getItem('username') || 'Admin';
+                document.getElementById('eventNameDisplay').textContent = sessionStorage.getItem('eventName') || localStorage.getItem('eventName') || 'Evento';
+                document.getElementById('adminUsername').textContent = sessionStorage.getItem('username') || localStorage.getItem('username') || 'Admin';
 
                 const leadersRes = await apiCall(`/api/leaders${currentEventId ? '?eventId=' + currentEventId : ''}`);
                 const leadersData = await leadersRes.json();
@@ -2519,38 +2621,49 @@
             const leaderId = document.getElementById('leaderFilter').value;
             const status = document.getElementById('statusFilter').value;
 
+            // Filtrar registros por búsqueda, líder y estado
             const filtered = allRegistrations.filter(r => {
                 const matchSearch = !search ||
                     `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
-                    r.email.toLowerCase().includes(search) ||
+                    (r.email && r.email.toLowerCase().includes(search)) ||
                     r.cedula.includes(search);
                 const matchLeader = !leaderId || r.leaderId === leaderId;
                 const matchStatus = !status || (status === 'confirmed' ? r.confirmed : !r.confirmed);
                 return matchSearch && matchLeader && matchStatus;
             });
 
-            // Update Pagination (solo si existen los elementos)
-            const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
-            if (currentPage > totalPages) currentPage = 1;
+            // Separar por región
+            const bogotaFiltered = filtered.filter(r => isBogotaRegistration(r));
+            const restoFiltered = filtered.filter(r => !isBogotaRegistration(r) && r.departamento);
 
-            const pageIndicator = document.getElementById('pageIndicator');
-            const prevPageBtn = document.getElementById('prevPageBtn');
-            const nextPageBtn = document.getElementById('nextPageBtn');
+            // Aplicar paginación a Bogotá
+            renderRegistrationTable('bogota', bogotaFiltered);
             
-            if (pageIndicator) pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
-            if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
-            if (nextPageBtn) nextPageBtn.disabled = currentPage === totalPages;
+            // Aplicar paginación a Resto del País
+            renderRegistrationTable('resto', restoFiltered);
+        }
 
-            // Slice data
+        function renderRegistrationTable(tab, data) {
+            const currentPage = tab === 'bogota' ? currentPageBogota : currentPageResto;
+            const totalPages = Math.ceil(data.length / itemsPerPage) || 1;
+            
+            // Ajustar página si está fuera de rango
+            if (currentPage > totalPages) {
+                if (tab === 'bogota') currentPageBogota = 1;
+                else currentPageResto = 1;
+            }
+
             const start = (currentPage - 1) * itemsPerPage;
-            const paginated = filtered.slice(start, start + itemsPerPage);
+            const paginated = data.slice(start, start + itemsPerPage);
 
+            // Renderizar tabla según el tab
+            const tableId = tab === 'bogota' ? 'bogotaTable' : 'restoTable';
             const html = paginated.map(reg => `
                 <tr>
                     <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
                     <td>${reg.email || '-'}</td>
                     <td>${reg.cedula || '-'}</td>
-                    <td>${reg.localidad || '-'}</td>
+                    <td>${tab === 'bogota' ? (reg.localidad || '-') : (reg.departamento || '-')}</td>
                     <td>${reg.leaderName || '-'}</td>
                     <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
                     <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
@@ -2561,12 +2674,89 @@
                     </td>
                 </tr>
             `).join('');
-            document.getElementById('registrationsTable').innerHTML = html ||
-                '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros</td></tr>';
+            
+            const emptyMessage = tab === 'bogota' 
+                ? '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogotá</td></tr>'
+                : '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td></tr>';
+            
+            document.getElementById(tableId).innerHTML = html || emptyMessage;
 
+            // Actualizar controles de paginación
+            updatePaginationControls(tab, currentPage, totalPages);
+
+            // Agregar event listeners a botones de confirmación
             document.querySelectorAll('.toggle-confirm-btn').forEach(btn => {
                 btn.addEventListener('click', () => toggleConfirm(btn.dataset.regId, btn.dataset.confirmed === 'true'));
             });
+        }
+
+        function updatePaginationControls(tab, currentPage, totalPages) {
+            const suffix = tab === 'bogota' ? 'Bogota' : 'Resto';
+            const pageIndicator = document.getElementById(`pageIndicator${suffix}`);
+            const prevPageBtn = document.getElementById(`prevPage${suffix}Btn`);
+            const nextPageBtn = document.getElementById(`nextPage${suffix}Btn`);
+            const firstPageBtn = document.getElementById(`firstPage${suffix}Btn`);
+            
+            if (pageIndicator) pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+            if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
+            if (nextPageBtn) nextPageBtn.disabled = currentPage === totalPages;
+            if (firstPageBtn) firstPageBtn.disabled = currentPage === 1;
+        }
+
+        function changePageBogota(direction) {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const leaderId = document.getElementById('leaderFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            const filtered = allRegistrations.filter(r => {
+                const matchSearch = !search ||
+                    `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
+                    (r.email && r.email.toLowerCase().includes(search)) ||
+                    r.cedula.includes(search);
+                const matchLeader = !leaderId || r.leaderId === leaderId;
+                const matchStatus = !status || (status === 'confirmed' ? r.confirmed : !r.confirmed);
+                return matchSearch && matchLeader && matchStatus && isBogotaRegistration(r);
+            });
+
+            const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+            
+            if (direction === 'first') {
+                currentPageBogota = 1;
+            } else if (direction === 'prev' && currentPageBogota > 1) {
+                currentPageBogota--;
+            } else if (direction === 'next' && currentPageBogota < totalPages) {
+                currentPageBogota++;
+            }
+            
+            filterRegistrations();
+        }
+
+        function changePageResto(direction) {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const leaderId = document.getElementById('leaderFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            const filtered = allRegistrations.filter(r => {
+                const matchSearch = !search ||
+                    `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
+                    (r.email && r.email.toLowerCase().includes(search)) ||
+                    r.cedula.includes(search);
+                const matchLeader = !leaderId || r.leaderId === leaderId;
+                const matchStatus = !status || (status === 'confirmed' ? r.confirmed : !r.confirmed);
+                return matchSearch && matchLeader && matchStatus && !isBogotaRegistration(r) && r.departamento;
+            });
+
+            const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+            
+            if (direction === 'first') {
+                currentPageResto = 1;
+            } else if (direction === 'prev' && currentPageResto > 1) {
+                currentPageResto--;
+            } else if (direction === 'next' && currentPageResto < totalPages) {
+                currentPageResto++;
+            }
+            
+            filterRegistrations();
         }
 
         async function showQR(leaderId, leaderName) {
@@ -2723,7 +2913,56 @@
 
             document.getElementById('avgConfirmRate').textContent = rate + '%';
             document.getElementById('avgRegsPerLeader').textContent = avgRegs;
-            document.getElementById('localidadesCount').textContent = bogotaRegs.length + ' Bogotá / ' + restoRegs.length + ' Resto';
+            document.getElementById('bogotaCount').textContent = bogotaRegs.length;
+            document.getElementById('restoCount').textContent = restoRegs.length;
+
+            // === ACTUALIZAR KPIs MEJORADOS ===
+            const pending = total - confirmed;
+            const metaTarget = 80; // Meta: 80% de confirmación
+            
+            document.getElementById('kpiTotalRegistros').textContent = total;
+            document.getElementById('kpiConfirmados').textContent = confirmed;
+            document.getElementById('kpiConfirmadosPercent').textContent = rate + '%';
+            document.getElementById('kpiPendientes').textContent = pending;
+            document.getElementById('kpiPendientesPercent').textContent = ((pending / total * 100) || 0).toFixed(1) + '%';
+            document.getElementById('kpiMetaPercent').textContent = rate + '% / ' + metaTarget + '%';
+            
+            // Barra de progreso (limitada a 100%)
+            const metaBarWidth = Math.min(parseFloat(rate), 100);
+            document.getElementById('kpiMetaBar').style.width = metaBarWidth + '%';
+            document.getElementById('kpiMetaBar').style.backgroundColor = 
+                metaBarWidth >= metaTarget ? '#4CAF50' : (metaBarWidth >= 50 ? '#FFC107' : '#FF6B6B');
+            
+            // Velocidad promedio de confirmación (en horas)
+            let velocidadPromedio = 0;
+            let confirmadosCount = 0;
+            regs.forEach(r => {
+                if (r.confirmed && r.date) {
+                    const regDate = new Date(r.date);
+                    const ahora = new Date();
+                    const horas = (ahora - regDate) / (1000 * 60 * 60);
+                    velocidadPromedio += horas;
+                    confirmadosCount++;
+                }
+            });
+            velocidadPromedio = confirmadosCount > 0 ? (velocidadPromedio / confirmadosCount).toFixed(0) : 0;
+            document.getElementById('kpiVelocidadPromedio').textContent = velocidadPromedio + 'h';
+            
+            // Mejor líder (mayor tasa de confirmación)
+            let mejorLider = '-';
+            let mejorTasa = 0;
+            leaders.forEach(l => {
+                const liderRegs = regs.filter(r => r.leaderId === l._id);
+                const liderConfirmados = liderRegs.filter(r => r.confirmed).length;
+                const liderTasa = liderRegs.length > 0 ? (liderConfirmados / liderRegs.length) * 100 : 0;
+                if (liderTasa > mejorTasa) {
+                    mejorTasa = liderTasa;
+                    mejorLider = l.name.split(' ')[0];
+                }
+            });
+            document.getElementById('kpiBestLeader').textContent = mejorLider + ' (' + mejorTasa.toFixed(0) + '%)';
+            document.getElementById('kpiAvgPerLeader').textContent = avgRegs;
+
 
             // Leader Registrations Chart
             const leaderStats = leaders.map(l => ({
@@ -2962,6 +3201,11 @@
             localStorage.removeItem('token');
             localStorage.removeItem('role');
             localStorage.removeItem('eventId');
+            localStorage.removeItem('username');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('role');
+            sessionStorage.removeItem('eventId');
+            sessionStorage.removeItem('username');
             window.location.href = '/';
         });
 
@@ -3080,9 +3324,31 @@
             showAlert('Link copiado al portapapeles', 'success');
         });
 
-        document.getElementById('searchInput').addEventListener('input', filterRegistrations);
-        document.getElementById('leaderFilter').addEventListener('change', filterRegistrations);
-        document.getElementById('statusFilter').addEventListener('change', filterRegistrations);
+        document.getElementById('searchInput').addEventListener('input', () => {
+            currentPageBogota = 1;
+            currentPageResto = 1;
+            filterRegistrations();
+        });
+        document.getElementById('leaderFilter').addEventListener('change', () => {
+            currentPageBogota = 1;
+            currentPageResto = 1;
+            filterRegistrations();
+        });
+        document.getElementById('statusFilter').addEventListener('change', () => {
+            currentPageBogota = 1;
+            currentPageResto = 1;
+            filterRegistrations();
+        });
+
+        // Event listeners para botones de paginación Bogotá
+        document.getElementById('firstPageBogotaBtn').addEventListener('click', () => changePageBogota('first'));
+        document.getElementById('prevPageBogotaBtn').addEventListener('click', () => changePageBogota('prev'));
+        document.getElementById('nextPageBogotaBtn').addEventListener('click', () => changePageBogota('next'));
+
+        // Event listeners para botones de paginación Resto
+        document.getElementById('firstPageRestoBtn').addEventListener('click', () => changePageResto('first'));
+        document.getElementById('prevPageRestoBtn').addEventListener('click', () => changePageResto('prev'));
+        document.getElementById('nextPageRestoBtn').addEventListener('click', () => changePageResto('next'));
 
         document.getElementById('exportRegsBtn').addEventListener('click', () => {
             const data = allRegistrations.map(r => ({
@@ -3306,56 +3572,12 @@
         }
 
         function loadRegistrationsTabbed() {
-            const bogota = allRegistrations.filter(r => isBogotaRegistration(r));
-            const resto = allRegistrations.filter(r => !isBogotaRegistration(r) && r.departamento);
-
-            // Load Bogota registrations
-            const bogotaHtml = bogota.map(reg => `
-                <tr>
-                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
-                    <td>${reg.email || '-'}</td>
-                    <td>${reg.cedula || '-'}</td>
-                    <td>${reg.localidad || '-'}</td>
-                    <td>${reg.leaderName || '-'}</td>
-                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
-                    <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${reg.confirmed}">
-                            <i class="bi bi-check-circle"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-            document.getElementById('bogotaTable').innerHTML = bogotaHtml ||
-                '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogotá</td></tr>';
-
-            // Load Resto del País registrations
-            const restoHtml = resto.map(reg => `
-                <tr>
-                    <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
-                    <td>${reg.email || '-'}</td>
-                    <td>${reg.cedula || '-'}</td>
-                    <td>${reg.departamento || '-'}</td>
-                    <td>${reg.leaderName || '-'}</td>
-                    <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
-                    <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${reg.confirmed}">
-                            <i class="bi bi-check-circle"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-            document.getElementById('restoTable').innerHTML = restoHtml ||
-                '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td></tr>';
-
-            // Agregar event listeners
-            document.querySelectorAll('.toggle-confirm-btn').forEach(btn => {
-                btn.addEventListener('click', () => toggleConfirm(btn.dataset.regId, btn.dataset.confirmed === 'true'));
-            });
+            // Usar filterRegistrations que ya maneja la paginación
+            filterRegistrations();
         }
 
         function showRegistrationTab(tab) {
+            currentTab = tab;
             const bogotaTab = document.getElementById('bogotaTab');
             const restoTab = document.getElementById('restoTab');
             const bogotaRegs = document.getElementById('bogotaRegistrations');
@@ -3425,11 +3647,17 @@
         // Initialize init
         // Inicializar: verificar auth, cargar evento si falta, luego cargar dashboard
         (async function init() {
+            console.log('[INIT] Iniciando dashboard. Token:', currentToken ? 'Presente' : 'FALTANTE', 'Event:', currentEventId);
             if (enforceSessionTimeout()) return;
             touchActivity();
             bindSessionActivity();
             const authed = await checkAuth();
-            if (authed) loadDashboard();
+            if (authed) {
+                console.log('[INIT] Auth exitosa. Cargando dashboard...');
+                loadDashboard();
+            } else {
+                console.error('[INIT] Auth falló. Redirigiendo a login.');
+            }
         })();
     </script>
 </body>
