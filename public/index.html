@@ -478,8 +478,13 @@
 
                 if (res.ok && data.token) {
                     adminToken = data.token;
+                    // Guardar token en ambos localStorage y sessionStorage para máxima compatibilidad
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('role', 'admin');
+                    localStorage.setItem('username', user);
+                    sessionStorage.setItem('token', data.token);
+                    sessionStorage.setItem('role', 'admin');
+                    sessionStorage.setItem('username', user);
                     showScreen('eventScreen');
                 } else {
                     error.textContent = data.error || 'Credenciales inválidas';
@@ -774,6 +779,16 @@
         function selectEvent(eventId, eventName) {
             localStorage.setItem('eventId', eventId);
             localStorage.setItem('eventName', eventName);
+            sessionStorage.setItem('eventId', eventId);
+            sessionStorage.setItem('eventName', eventName);
+            // Asegurar que el token esté disponible antes de redirigir
+            const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+            const role = sessionStorage.getItem('role') || localStorage.getItem('role');
+            if (!token || !role) {
+                console.error('Error: Token no disponible. Por favor, inicia sesión nuevamente.');
+                window.location.href = '/';
+                return;
+            }
             window.location.href = '/dashboard.html';
         }
 
@@ -783,8 +798,8 @@
 
         // ============== INIT ==============
         window.addEventListener('load', () => {
-            const token = localStorage.getItem('token');
-            const role = localStorage.getItem('role');
+            const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+            const role = sessionStorage.getItem('role') || localStorage.getItem('role');
             if (token && role) {
                 if (role === 'admin') {
                     adminToken = token;
