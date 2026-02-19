@@ -9,13 +9,6 @@ class EmailService {
   }
 
   initTransporter() {
-    // Validar variables de entorno
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      logger.warn('⚠️  EMAIL_USER o EMAIL_PASS no configurados. Modo mock habilitado.');
-      this.mockMode = true;
-      return;
-    }
-
     // En desarrollo, usar siempre mock mode
     if (process.env.NODE_ENV !== 'production') {
       logger.warn('⚠️  Desarrollo detectado. Usando modo mock para emails.');
@@ -23,9 +16,28 @@ class EmailService {
       return;
     }
 
+    // Validar credenciales de email
+    if (!process.env.EMAIL_USER) {
+      logger.error('⚠️  EMAIL_USER no definido. No se pueden enviar emails.');
+      this.mockMode = true;
+      return;
+    }
+
+    if (!process.env.EMAIL_PASS) {
+      logger.error('⚠️  EMAIL_PASS no definido. No se pueden enviar emails.');
+      this.mockMode = true;
+      return;
+    }
+
     try {
+      const smtpHost = process.env.SMTP_HOST || 'smtp.hostinger.com';
+      const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
+      const smtpSecure = smtpPort === 465;
+
       this.transporter = nodemailer.createTransport({
-        service: 'gmail', // O puedes usar otro servicio SMTP
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpSecure,
         auth: {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
@@ -33,7 +45,7 @@ class EmailService {
       });
 
       this.mockMode = false;
-      logger.info('✓ Nodemailer configurado correctamente');
+      logger.info(`📧 SMTP configurado correctamente (${smtpHost}:${smtpPort}, secure: ${smtpSecure})`);
     } catch (error) {
       logger.error('❌ Error configurando Nodemailer:', error.message);
       this.mockMode = true;
@@ -46,7 +58,7 @@ class EmailService {
    * @param {string} baseUrl - URL base (ej: https://midominio.com)
    * @returns {Promise<Object>} { success: true, messageId?: string }
    */
-  async sendAccessEmail(leader, baseUrl = process.env.BASE_URL || 'http://localhost:3000') {
+  async sendAccessEmail(leader, baseUrl = process.env.BASE_URL) {
     try {
       if (!leader || !leader.email) {
         throw new Error('Leader email no proporcionado');
@@ -56,8 +68,14 @@ class EmailService {
         throw new Error('Leader token no disponible');
       }
 
+      if (!baseUrl) {
+        throw new Error('BASE_URL no configurado en variables de entorno');
+      }
+
       const registrationLink = `${baseUrl}/form.html?token=${leader.token}`;
       
+      logger.info(`📧 Generando QR para enlace: ${registrationLink}`);
+
       // Generar QR como data URI (para incrustar en el email)
       const qrDataUri = await QRCode.toDataURL(registrationLink, {
         errorCorrectionLevel: 'H',
@@ -90,11 +108,27 @@ ${registrationLink}
       }
 
       // Enviar correo real
-      const info = await this.transporter.sendMail(mailOptions);
-      logger.info(`✓ Email enviado a ${leader.email} (Message ID: ${info.messageId})`);
-      return { success: true, messageId: info.messageId };
+      logger.info(`📧 Enviando correo a ${leader.email}...`);
+      
+      try {
+        const info = await this.transporter.sendMail(mailOptions);
+        logger.info(`✅ Email enviado exitosamente a ${leader.email} (Message ID: ${info.messageId})`);
+        return { success: true, messageId: info.messageId };
+      } catch (smtpError) {
+        logger.error(`❌ Error SMTP al enviar email a ${leader.email}:`, {
+          error: smtpError.message,
+          code: smtpError.code,
+          response: smtpError.response,
+          command: smtpError.command,
+        });
+        throw new Error(`Error SMTP: ${smtpError.message}`);
+      }
     } catch (error) {
-      logger.error('❌ Error enviando email:', error.message);
+      logger.error('❌ Error procesando email:', {
+        message: error.message,
+        stack: error.stack,
+        leaderEmail: leader?.email,
+      });
       throw new Error(`No se pudo enviar el email: ${error.message}`);
     }
   }

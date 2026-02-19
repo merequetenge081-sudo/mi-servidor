@@ -38,27 +38,49 @@ Responder con { success: true }
 ### Variables de Entorno (.env)
 
 ```dotenv
-# Email Configuration
-EMAIL_USER=tu_email@gmail.com              # Cuenta SMTP para envío
-EMAIL_PASS=tu_app_password                 # App Password (NO contraseña normal)
-NODE_ENV=development                       # Desarrollo usa MOCK
+# SMTP Configuration (Hostinger)
+SMTP_HOST=smtp.hostinger.com              # Host SMTP (default: smtp.hostinger.com)
+SMTP_PORT=465                              # Puerto SMTP (default: 465)
+EMAIL_USER=tu_email@tudominio.com          # Usuario del correo
+EMAIL_PASS=tu_contraseña_segura            # Contraseña del correo
+NODE_ENV=development                       # Desarrollo usa MOCK, production envía real
 
 # URLs
-BASE_URL=https://midominio.com             # Dominio donde está alojado
+BASE_URL=https://midominio.com             # Dominio donde está alojado (REQUERIDO)
 FRONTEND_URL=https://midominio.com         # URL del frontend
-
-# En Producción
-NODE_ENV=production                        # Activa Nodemailer real
 ```
 
-### Para Gmail
+### Configuración por Ambiente
 
-Si usas Gmail, necesitas:
-1. Habilitar **2-Step Verification**
-2. Crear un **App Password** (no la contraseña normal)
-3. Usar ese App Password en `EMAIL_PASS`
+**Desarrollo (NODE_ENV=development)**
+- ✅ Modo MOCK activo automáticamente
+- Los emails se muestran en la consola del servidor
+- No necesita credenciales válidas
 
-[Instrucciones de Google](https://support.google.com/accounts/answer/185833)
+**Producción (NODE_ENV=production)**
+- ✅ Envío real de emails via SMTP
+- Requiere EMAIL_USER y EMAIL_PASS válidos
+- Requiere BASE_URL configurado
+- Puerto 465 usa SSL automáticamente
+
+### Para Hostinger
+
+Si usas hosting de Hostinger:
+
+1. **Configuración SMTP**:
+   - Host: `smtp.hostinger.com`
+   - Puerto: `465` (SSL) o `587` (TLS)
+   - Autenticación: Tu email y contraseña del cPanel
+
+2. **Variables en .env**:
+   ```dotenv
+   SMTP_HOST=smtp.hostinger.com
+   SMTP_PORT=465
+   EMAIL_USER=tu-email@tudominio.com
+   EMAIL_PASS=tu-contraseña-cpanel
+   ```
+
+3. **Verificar dominio**: Asegúrate que el email tenga el dominio configurado en tu hosting
 
 ## 📡 API Endpoint
 
@@ -186,8 +208,11 @@ Buscar `#667eea` y `#764ba2` en el HTML y reemplazar
 1. **Usar credenciales reales**:
    ```dotenv
    NODE_ENV=production
-   EMAIL_USER=tu-email@gmail.com
-   EMAIL_PASS=tu-app-password
+   SMTP_HOST=smtp.hostinger.com
+   SMTP_PORT=465
+   EMAIL_USER=tu-email@tudominio.com
+   EMAIL_PASS=tu-contraseña
+   BASE_URL=https://tudominio.com
    ```
 
 2. **Probar antes**:
@@ -197,8 +222,9 @@ Buscar `#667eea` y `#764ba2` en el HTML y reemplazar
    ```
 
 3. **Verificar SMTP**:
-   - Gmail: Requiere App Password
-   - SendGrid/Resend: Usar tokens API
+   - Hostinger: Puerto 465 (SSL) o 587 (TLS)
+   - Verifica que el dominio esté configurado
+   - Prueba las credenciales en un cliente de email primero
 
 ### Monitoreo
 
@@ -211,8 +237,12 @@ Buscar `#667eea` y `#764ba2` en el HTML y reemplazar
 | Problema | Solución |
 |----------|----------|
 | "Route not found" | Reiniciar servidor después agregar ruta |
-| "Invalid login" (Gmail) | Usar App Password, no contraseña normal |
+| "EMAIL_USER no definido" | Agregar EMAIL_USER a .env |
+| "EMAIL_PASS no definido" | Agregar EMAIL_PASS a .env |
+| "BASE_URL no configurado" | Agregar BASE_URL a .env |
 | Email no se envía (prod) | Verificar NODE_ENV=production |
+| "Invalid login" (SMTP) | Verificar credenciales en cPanel |
+| "Connection timeout" | Verificar SMTP_HOST y SMTP_PORT |
 | QR cortado | Aumentar width del QR en emailService.js |
 | No aparece en auditoría | Base de datos desconectada (non-blocking) |
 
@@ -221,7 +251,7 @@ Buscar `#667eea` y `#764ba2` en el HTML y reemplazar
 - [Nodemailer Docs](https://nodemailer.com/)
 - [QRCode.js Docs](https://davidshimjs.github.io/qrcodejs/)
 - [Email Templates Best Practices](https://stripo.email/blog/email-templates/)
-- [Gmail App Passwords](https://support.google.com/accounts/answer/185833)
+- [Hostinger SMTP Configuration](https://support.hostinger.com/en/articles/1583229-how-to-use-smtp)
 
 ## 🔄 Próximas Mejoras
 
