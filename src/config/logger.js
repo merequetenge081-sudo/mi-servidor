@@ -38,20 +38,18 @@ const logger = winston.createLogger({
   ]
 });
 
-// Agregar consola en desarrollo
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(({ level, message, timestamp, ...meta }) => {
-          return `${timestamp} [${level}]: ${message} ${
-            Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ""
-          }`;
-        })
-      )
-    })
-  );
-}
+// Siempre agregar consola (desarrollo y producción)
+logger.add(
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.printf(({ level, message, timestamp, ...meta }) => {
+        return `${timestamp} [${level}]: ${message} ${
+          Object.keys(meta).length ? JSON.stringify(meta, null, 2) : ""
+        }`;
+      })
+    ),
+  })
+);
 
 export default logger;

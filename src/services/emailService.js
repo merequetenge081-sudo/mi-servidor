@@ -146,7 +146,8 @@ ${registrationLink}
 
 ⚠️ NOTA: Hubo un error SMTP (${smtpError.code}). El email aparece como enviado pero en realidad está en logs.
         `);
-        return { success: true, mock: true, fallback: true, error: smtpError.message };
+        // Retornar con indicador claro de que es fallback
+        return { success: false, mock: true, fallback: true, error: smtpError.message };
       }
     } catch (error) {
       logger.error('❌ Error procesando email:', {

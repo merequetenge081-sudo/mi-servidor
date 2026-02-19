@@ -3393,8 +3393,23 @@
                 
                 const result = await res.json();
                 
-                // En producción, mostrar directamente el mensaje
-                showAlert(`✅ Correo enviado exitosamente a ${leaderEmail}`, 'success');
+                // Mostrar modal de resultado detallado según el status
+                if (result.success === false && result.fallback) {
+                    // Es fallback - error SMTP
+                    showAlert(
+                        `⚠️ Error SMTP: No se pudo enviar el correo a ${leaderEmail}\n\nDetalles: ${result.error}\n\nVerifica los logs del servidor para más información.`,
+                        'warning'
+                    );
+                } else if (result.mock) {
+                    // Es modo mock
+                    showAlert(
+                        `📋 Modo Simulado: El correo se simula pero no se envía\n\nDestinatario: ${leaderEmail}\n\nNota: Verifica que EMAIL_USER y EMAIL_PASS estén configurados.`,
+                        'info'
+                    );
+                } else {
+                    // Es real - exitoso
+                    showAlert(`✅ Correo enviado exitosamente a ${leaderEmail}\n\nEl líder recibirá su enlace de registro.`, 'success');
+                }
                 
             } catch (error) {
                 console.error('Error al enviar correo:', error);
