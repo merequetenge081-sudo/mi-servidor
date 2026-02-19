@@ -41,10 +41,18 @@ class EmailService {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
         },
-        connectionTimeout: 10000,
-        socketTimeout: 10000,
+        connectionTimeout: 20000,    // 20 segundos
+        socketTimeout: 20000,        // 20 segundos
+        greetingTimeout: 10000,      // 10 segundos para greeting
+        pool: {
+          maxConnections: 5,
+          maxMessages: 100,
+          rateDelta: 1000,            // Esperar 1 segundo entre grupos de mensajes
+          rateLimit: 5                // Máximo 5 mensajes por segundo
+        },
         tls: {
-          rejectUnauthorized: false
+          rejectUnauthorized: false,
+          minVersion: 'TLSv1.2'
         }
       });
 
@@ -120,21 +128,43 @@ ${registrationLink}
       // Enviar correo real
       logger.info(`📧 Enviando correo a ${leader.email}...`);
       
-      try {
-        const info = await this.transporter.sendMail(mailOptions);
-        logger.info(`✅ Email enviado exitosamente a ${leader.email} (Message ID: ${info.messageId})`);
-        return { success: true, messageId: info.messageId, mock: false };
-      } catch (smtpError) {
-        logger.error(`❌ Error SMTP al enviar email a ${leader.email}:`, {
-          error: smtpError.message,
-          code: smtpError.code,
-          response: smtpError.response,
-          command: smtpError.command,
-        });
-        
-        // Si falla el email real, mostrar en log pero no crashear
-        logger.warn(`📧 Fallback a MOCK: ${smtpError.message}`);
-        logger.info(`
+      let attempt = 0;
+      const maxAttempts = 2;
+      let lastError = null;
+
+      while (attempt < maxAttempts) {
+        try {
+          attempt++;
+          logger.info(`📧 Intento ${attempt}/${maxAttempts} de envío a ${leader.email}...`);
+          
+          const info = await this.transporter.sendMail(mailOptions);
+          logger.info(`✅ Email enviado exitosamente a ${leader.email} (Message ID: ${info.messageId}, Intento: ${attempt})`);
+          return { success: true, messageId: info.messageId, mock: false };
+        } catch (smtpError) {
+          lastError = smtpError;
+          
+          logger.error(`❌ Error SMTP intento ${attempt} al enviar email a ${leader.email}:`, {
+            error: smtpError.message,
+            code: smtpError.code,
+            response: smtpError.response,
+            command: smtpError.command,
+          });
+
+          // Si es timeout y quedan intentos, esperar un poco y reintentar
+          if ((smtpError.code === 'ETIMEDOUT' || smtpError.message.includes('timeout')) && attempt < maxAttempts) {
+            logger.warn(`⏳ Timeout detectado, esperando 3 segundos antes de reintentar...`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            continue;
+          }
+
+          // Si no es timeout o fue el último intento, salir del loop
+          break;
+        }
+      }
+
+      // Si fallaron todos los intentos
+      logger.warn(`📧 Fallback a MOCK después de ${attempt} intento(s): ${lastError.message}`);
+      logger.info(`
 ╔════════════════════════════════════════════════════╗
 ║  📧 FALLBACK MOCK - Error SMTP (intento fallido)  ║
 ╚════════════════════════════════════════════════════╝
@@ -144,10 +174,10 @@ Subject: ${mailOptions.subject}
 ${leader.name}, tu enlace de registro es:
 ${registrationLink}
 
-⚠️ NOTA: Hubo un error SMTP (${smtpError.code}). El email aparece como enviado pero en realidad está en logs.
+⚠️ NOTA: Hubo un error SMTP (${lastError.code}). El email aparece como enviado pero en realidad está en logs.
         `);
         // Retornar con indicador claro de que es fallback
-        return { success: false, mock: true, fallback: true, error: smtpError.message };
+        return { success: false, mock: true, fallback: true, error: lastError.message };
       }
     } catch (error) {
       logger.error('❌ Error procesando email:', {
