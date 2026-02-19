@@ -1722,3 +1722,38 @@
 {"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-19 05:30:52"}
 {"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 05:34:27","username":"admin"}
 {"level":"info","message":"POST /auth/admin-login 200 199ms","service":"mi-servidor","timestamp":"2026-02-19 05:34:27"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 05:52:07"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 05:52:09"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (production)","service":"mi-servidor","timestamp":"2026-02-19 05:52:09"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 05:52:54"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 05:52:54"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (production)","service":"mi-servidor","timestamp":"2026-02-19 05:52:54"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 05:53:17"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 05:53:18"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (production)","service":"mi-servidor","timestamp":"2026-02-19 05:53:18"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: production","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 EMAIL_USER configurado: Si","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 EMAIL_PASS configurado: Si","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 SMTP_HOST: smtp.hostinger.com","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 SMTP_PORT: 465","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 Intentando conectar SMTP: smtp.hostinger.com:465 (secure: true)","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"✅ SMTP configurado correctamente: smtp.hostinger.com:465 (secure: true)","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 sendAccessEmail() llamada para: test@example.com","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 Mock mode: false","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 Generando QR para enlace: https://midominio.com/form.html?token=test-token-12345","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 mailOptions TO: test@example.com, FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"📧 Enviando correo a test@example.com...","service":"mi-servidor","timestamp":"2026-02-19 05:53:44"}
+{"level":"info","message":"✅ Email enviado exitosamente a test@example.com (Message ID: <eaaa2861-9e07-69ed-818d-459721f800b5@fulars.com>)","service":"mi-servidor","timestamp":"2026-02-19 05:53:46"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: production","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 EMAIL_USER configurado: Si","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 EMAIL_PASS configurado: Si","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 SMTP_HOST: smtp.hostinger.com","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 SMTP_PORT: 465","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 Intentando conectar SMTP: smtp.hostinger.com:465 (secure: true)","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"✅ SMTP configurado correctamente: smtp.hostinger.com:465 (secure: true)","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 sendAccessEmail() llamada para: jonnathanpena1@gmail.com","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 Mock mode: false","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 Generando QR para enlace: https://midominio.com/form.html?token=test-token-12345","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 mailOptions TO: jonnathanpena1@gmail.com, FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"📧 Enviando correo a jonnathanpena1@gmail.com...","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
+{"level":"info","message":"✅ Email enviado exitosamente a jonnathanpena1@gmail.com (Message ID: <26c8a73f-f48b-d73c-0bd0-f6036f43dbfe@fulars.com>)","service":"mi-servidor","timestamp":"2026-02-19 05:55:20"}
