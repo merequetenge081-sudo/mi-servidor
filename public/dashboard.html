@@ -33,10 +33,14 @@
             align-items: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             position: fixed;
-            width: 100%;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            height: 60px;
+            width: 100%;
+            z-index: 1000;
             gap: 12px;
+            box-sizing: border-box;
         }
 
         .navbar-brand {
@@ -585,8 +589,9 @@
             padding: 20px 0;
             overflow-y: auto;
             box-shadow: inset -2px 0 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, left 0.3s ease;
-            z-index: 999;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 900;
+            border-right: 1px solid rgba(102, 126, 234, 0.15);
         }
 
         .sidebar.collapsed {
@@ -636,14 +641,53 @@
 
         /* ============== MAIN CONTENT ============== */
         .main-content {
+            position: relative;
             margin-left: 260px;
             margin-top: 60px;
             padding: 40px 30px;
-            transition: margin-left 0.3s ease;
+            min-height: calc(100vh - 100px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
         }
 
         .main-content.expanded {
             margin-left: 0;
+        }
+
+        /* ============== RESPONSIVE DESIGN ============== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 240px;
+            }
+
+            .main-content {
+                margin-left: 240px;
+                padding: 20px 15px;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 8px 12px;
+            }
+
+            .sidebar {
+                width: 200px;
+                padding: 15px 0;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 15px 10px;
+            }
+
+            .navbar-brand {
+                font-size: 14px;
+            }
         }
 
         .section {
