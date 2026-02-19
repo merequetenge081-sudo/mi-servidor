@@ -475,10 +475,14 @@ export async function sendAccessEmail(req, res) {
     logger.info(`✓ Email de acceso enviado a líder ${leader.name} (${leader.email})`);
 
     res.json({
-      success: true,
-      message: `Email enviado correctamente a ${leader.email}`,
+      success: emailResult.success !== false,
+      message: emailResult.fallback 
+        ? `Error SMTP: ${emailResult.error}` 
+        : `Email enviado correctamente a ${leader.email}`,
       messageId: emailResult.messageId,
       mock: emailResult.mock || false,
+      fallback: emailResult.fallback || false,
+      error: emailResult.error || null,
     });
   } catch (error) {
     logger.error("Error al enviar email de acceso:", { 
