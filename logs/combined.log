@@ -1343,3 +1343,5 @@
 {"level":"info","message":"GET /events 200 74ms","service":"mi-servidor","timestamp":"2026-02-19 01:32:29"}
 {"level":"info","message":"GET /leaders 200 80ms","service":"mi-servidor","timestamp":"2026-02-19 01:32:31"}
 {"level":"info","message":"GET /registrations 200 422ms","service":"mi-servidor","timestamp":"2026-02-19 01:32:31"}
+{"level":"info","message":"GET /leaders 200 76ms","service":"mi-servidor","timestamp":"2026-02-19 01:37:15"}
+{"level":"info","message":"GET /registrations 200 411ms","service":"mi-servidor","timestamp":"2026-02-19 01:37:15"}
