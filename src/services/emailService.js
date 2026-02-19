@@ -132,7 +132,14 @@ ${registrationLink}
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
           logger.info(`📧 Intento ${attempt}/2 de envío a ${leader.email}...`);
-          const info = await this.transporter.sendMail(mailOptions);
+          
+          // Usar Promise.race para un timeout de 15 segundos en la solicitud
+          const sendPromise = this.transporter.sendMail(mailOptions);
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Email send timeout')), 15000)
+          );
+          
+          const info = await Promise.race([sendPromise, timeoutPromise]);
           logger.info(`✅ Email enviado exitosamente a ${leader.email} (Message ID: ${info.messageId})`);
           return { success: true, messageId: info.messageId, mock: false };
         } catch (smtpError) {
@@ -141,8 +148,8 @@ ${registrationLink}
           
           // Si es timeout y no es el último intento, esperar y reintentar
           if ((smtpError.code === 'ETIMEDOUT' || smtpError.message.includes('timeout')) && attempt < 2) {
-            logger.warn(`⏳ Timeout, esperando 3s antes de reintentar...`);
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            logger.warn(`⏳ Timeout, esperando 2s antes de reintentar...`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
             continue;
           }
           
