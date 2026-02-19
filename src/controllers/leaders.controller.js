@@ -6,6 +6,7 @@ import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 import { Organization } from "../models/Organization.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
+import { emailService } from "../services/emailService.js";
 
 // Generar token único de 32 caracteres hexadecimales
 function generateToken() {
@@ -427,84 +428,97 @@ export async function getLeaderByToken(req, res) {
  * POST /api/leaders/:id/send-access
  */
 export async function sendAccessEmail(req, res) {
+  let leaderId = null;
   try {
     const { id } = req.params;
+    leaderId = id;
     const orgFilter = buildOrgFilter(req.user);
 
     // Validar que el líder existe y pertenece a la organización
     const leader = await Leader.findOne({ _id: id, ...orgFilter });
     if (!leader) {
+      logger.warn(`❌ Líder no encontrado: ${id}`);
       return res.status(404).json({ error: "Líder no encontrado" });
     }
 
     if (!leader.email) {
+      logger.warn(`❌ Email no configurado para líder: ${leader.name}`);
       return res.status(400).json({ error: "El líder no tiene email configurado" });
     }
-
-    // Importar servicio de email
-    const { emailService } = await import("../services/emailService.js");
 
     // Determinar base URL
     const baseUrl = process.env.BASE_URL || 
                    (process.env.FRONTEND_URL) ||
                    `${req.protocol}://${req.get('host')}`;
 
-    // Enviar respuesta inmediata (no esperar completamente SMTP)
-    res.json({
-      success: true,
-      message: `Enviando correo a ${leader.email}... por favor espera...`,
-      mock: false,
-      fallback: false,
+    logger.info(`📧 Iniciando envío de email a ${leader.email} para ${leader.name}...`);
+
+    // Enviar email de forma síncrona (emailService ya tiene timeout de 15 segundos)
+    const emailResult = await emailService.sendAccessEmail(leader, baseUrl);
+
+    logger.info(`📧 Resultado del envío:`, { 
+      success: emailResult.success, 
+      email: leader.email,
+      fallback: emailResult.fallback,
+      error: emailResult.error,
+      messageId: emailResult.messageId
     });
 
-    // Procesar el envío de email en background (sin bloquear respuesta)
-    setImmediate(async () => {
+    // Registrar en auditoría
+    if (req.user && req.user._id) {
       try {
-        const emailResult = await emailService.sendAccessEmail(leader, baseUrl);
-
-        // Registrar en auditoría
-        if (req.user && req.user._id) {
-          try {
-            AuditService.log({
-              action: 'SEND_ACCESS_EMAIL',
-              actor: req.user._id,
-              target: 'Leader',
-              targetId: id,
-              details: {
-                leaderEmail: leader.email,
-                leaderName: leader.name,
-                success: emailResult.success,
-                mock: emailResult.mock || false,
-                fallback: emailResult.fallback || false,
-              },
-              organizationId: orgFilter._id || req.user.organizationId,
-            });
-          } catch (auditError) {
-            logger.warn('Audit log failed (non-blocking):', auditError.message);
-          }
-        }
-
-        if (emailResult.success && !emailResult.fallback) {
-          logger.info(`✅ Email de acceso ENVIADO a líder ${leader.name} (${leader.email})`);
-        } else {
-          logger.warn(`⚠️ Email de acceso FALLIDO a líder ${leader.name}: ${emailResult.error}`);
-        }
-      } catch (error) {
-        logger.error("❌ Error en envío de email en background:", { 
-          error: error.message,
-          leaderId: id,
-          leaderEmail: leader.email
+        AuditService.log({
+          action: 'SEND_ACCESS_EMAIL',
+          actor: req.user._id,
+          target: 'Leader',
+          targetId: id,
+          details: {
+            leaderEmail: leader.email,
+            leaderName: leader.name,
+            success: emailResult.success && !emailResult.fallback,
+            messageId: emailResult.messageId,
+            fallback: emailResult.fallback,
+          },
+          organizationId: orgFilter._id || req.user.organizationId,
         });
+      } catch (auditError) {
+        logger.warn('❌ Audit log error:', auditError.message);
       }
-    });
+    }
+
+    // Responder según el resultado
+    if (emailResult.success && !emailResult.fallback) {
+      logger.info(`✅ Email EXITOSO a ${leader.email} - MessageID: ${emailResult.messageId}`);
+      res.json({
+        success: true,
+        message: `✅ Correo enviado exitosamente a ${leader.email}`,
+        messageId: emailResult.messageId,
+      });
+    } else if (emailResult.fallback) {
+      logger.warn(`⚠️ Email FALLIDO (modo fallback) a ${leader.email}: ${emailResult.error}`);
+      res.json({
+        success: false,
+        message: `⚠️ Error enviando correo. Detalle: ${emailResult.error}`,
+        fallback: true,
+        error: emailResult.error,
+      });
+    } else {
+      logger.warn(`❌ Email FALLIDO a ${leader.email}`);
+      res.json({
+        success: false,
+        message: `Error: No fue posible enviar el correo a ${leader.email}`,
+        error: emailResult.error,
+      });
+    }
   } catch (error) {
-    logger.error("Error al enviar email de acceso:", { 
-      error: error.message, 
+    logger.error("❌ EXCEPTION en sendAccessEmail:", { 
+      error: error.message,
       stack: error.stack,
-      leaderId: req.params.id 
+      leaderId 
     });
     res.status(500).json({ 
-      error: error.message || "Error al enviar el email" 
+      error: error.message || "Error al enviar el email",
+      success: false
     });
   }
 }
