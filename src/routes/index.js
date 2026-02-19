@@ -201,6 +201,7 @@ router.get("/leaders/:leaderId/qr", authMiddleware, leaderController.generateLea
 router.get("/leaders/:id", authMiddleware, leaderController.getLeader);
 router.put("/leaders/:id", authMiddleware, roleMiddleware("admin"), leaderController.updateLeader);
 router.delete("/leaders/:id", authMiddleware, roleMiddleware("admin"), leaderController.deleteLeader);
+router.post("/leaders/:id/send-access", authMiddleware, roleMiddleware("admin"), leaderController.sendAccessEmail);
 
 // ==================== REGISTRACIONES ====================
 router.post("/registrations", rateLimitMiddleware, registrationController.createRegistration);

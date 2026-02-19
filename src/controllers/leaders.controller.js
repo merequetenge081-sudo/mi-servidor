@@ -421,3 +421,73 @@ export async function getLeaderByToken(req, res) {
     res.status(500).json({ error: "Error al obtener información del líder" });
   }
 }
+
+/**
+ * Envía email con enlace personalizado y QR al líder
+ * POST /api/leaders/:id/send-access
+ */
+export async function sendAccessEmail(req, res) {
+  try {
+    const { id } = req.params;
+    const orgFilter = buildOrgFilter(req.user);
+
+    // Validar que el líder existe y pertenece a la organización
+    const leader = await Leader.findOne({ _id: id, ...orgFilter });
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+
+    if (!leader.email) {
+      return res.status(400).json({ error: "El líder no tiene email configurado" });
+    }
+
+    // Importar servicio de email
+    const { emailService } = await import("../services/emailService.js");
+
+    // Determinar base URL
+    const baseUrl = process.env.BASE_URL || 
+                   (process.env.FRONTEND_URL) ||
+                   `${req.protocol}://${req.get('host')}`;
+
+    // Enviar email con enlace personalizado y QR
+    const emailResult = await emailService.sendAccessEmail(leader, baseUrl);
+
+    // Registrar en auditoría
+    if (req.user && req.user._id) {
+      try {
+        AuditService.log({
+          action: 'SEND_ACCESS_EMAIL',
+          actor: req.user._id,
+          target: 'Leader',
+          targetId: id,
+          details: {
+            leaderEmail: leader.email,
+            leaderName: leader.name,
+            mock: emailResult.mock || false,
+          },
+          organizationId: orgFilter._id || req.user.organizationId,
+        });
+      } catch (auditError) {
+        logger.warn('Audit log failed (non-blocking):', auditError.message);
+      }
+    }
+
+    logger.info(`✓ Email de acceso enviado a líder ${leader.name} (${leader.email})`);
+
+    res.json({
+      success: true,
+      message: `Email enviado correctamente a ${leader.email}`,
+      messageId: emailResult.messageId,
+      mock: emailResult.mock || false,
+    });
+  } catch (error) {
+    logger.error("Error al enviar email de acceso:", { 
+      error: error.message, 
+      stack: error.stack,
+      leaderId: req.params.id 
+    });
+    res.status(500).json({ 
+      error: error.message || "Error al enviar el email" 
+    });
+  }
+}
