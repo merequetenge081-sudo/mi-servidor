@@ -588,14 +588,67 @@
             color: white;
             padding: 20px 0;
             overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: inset -2px 0 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 900;
             border-right: 1px solid rgba(102, 126, 234, 0.15);
         }
 
         .sidebar.collapsed {
-            transform: translateX(-260px);
+            width: 70px;
+        }
+
+        /* ============== SIDEBAR HEADER ============== */
+        .sidebar-header {
+            padding: 28px 20px;
+            text-align: center;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 20px 10px;
+        }
+
+        .sidebar-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar.collapsed .sidebar-title-wrapper {
+            gap: 0;
+        }
+
+        .sidebar-title-wrapper h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .sidebar-title-wrapper h3 {
+            display: none;
+        }
+
+        .sidebar-subtitle {
+            margin: 10px 0 0 0;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed .sidebar-subtitle {
+            display: none;
         }
 
         .sidebar::-webkit-scrollbar {
@@ -611,25 +664,44 @@
             padding: 14px 20px;
             cursor: pointer;
             transition: all 0.2s ease;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.65);
             font-size: 14px;
             display: flex;
             align-items: center;
             gap: 12px;
             border-left: 3px solid transparent;
             letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .nav-link {
+            padding: 14px 10px;
+            justify-content: center;
+            border-left: none;
+            border-top: 3px solid transparent;
         }
 
         .nav-link i {
-            font-size: 16px;
-            width: 20px;
+            font-size: 18px;
+            width: 24px;
             text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            display: none;
         }
 
         .nav-link:hover {
             background: rgba(102, 126, 234, 0.15);
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.95);
             border-left-color: #667eea;
+        }
+
+        .sidebar.collapsed .nav-link:hover {
+            border-left-color: transparent;
+            border-top-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
         }
 
         .nav-link.active {
@@ -637,6 +709,12 @@
             color: #ffffff;
             border-left-color: #667eea;
             font-weight: 600;
+        }
+
+        .sidebar.collapsed .nav-link.active {
+            border-left: none;
+            border-top-color: #667eea;
+            background: rgba(102, 126, 234, 0.25);
         }
 
         /* ============== MAIN CONTENT ============== */
@@ -650,23 +728,46 @@
             z-index: 1;
         }
 
-        .main-content.expanded {
-            margin-left: 0;
+        /* YouTube-style sidebar collapse: when sidebar has .collapsed class, adjust main-content margin */
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 70px;
         }
 
         /* ============== RESPONSIVE DESIGN ============== */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .sidebar {
                 width: 240px;
             }
 
             .main-content {
                 margin-left: 240px;
-                padding: 20px 15px;
             }
 
-            .main-content.expanded {
-                margin-left: 0;
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 70px;
+            }
+
+            .sidebar.collapsed .nav-link span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 220px;
+                padding: 25px 15px;
+            }
+
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 70px;
+            }
+
+            .navbar-brand {
+                font-size: 18px;
             }
         }
 
@@ -676,13 +777,21 @@
             }
 
             .sidebar {
-                width: 200px;
+                width: 70px;
                 padding: 15px 0;
             }
 
             .main-content {
-                margin-left: 200px;
+                margin-left: 70px;
                 padding: 15px 10px;
+            }
+
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 70px;
+            }
+
+            .nav-link {
+                padding: 12px 5px;
             }
 
             .navbar-brand {
@@ -1200,26 +1309,32 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <div style="padding: 28px 20px; text-align: center; border-bottom: 2px solid rgba(102, 126, 234, 0.3); margin-bottom: 20px;">
-            <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: 1px; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;">
-                <i class="bi bi-diagram-3" style="color: #667eea; margin-right: 10px; font-size: 22px;"></i>PANEL ADMIN
-            </h3>
-            <p style="margin: 10px 0 0 0; font-size: 11px; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 500;\">Sistema de Gestión</p>
+        <div class="sidebar-header">
+            <div class="sidebar-title-wrapper">
+                <i class="bi bi-diagram-3" style="color: #667eea; font-size: 22px;"></i>
+                <h3>PANEL ADMIN</h3>
+            </div>
+            <p class="sidebar-subtitle">Sistema de Gestión</p>
         </div>
         <div class="nav-link active" data-section="dashboard">
-            <i class="bi bi-speedometer2"></i> Dashboard
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
         </div>
         <div class="nav-link" data-section="leaders">
-            <i class="bi bi-people-fill"></i> Gestión de Líderes
+            <i class="bi bi-people-fill"></i>
+            <span>Gestión de Líderes</span>
         </div>
         <div class="nav-link" data-section="registrations">
-            <i class="bi bi-table"></i> Registros
+            <i class="bi bi-table"></i>
+            <span>Registros</span>
         </div>
         <div class="nav-link" data-section="analytics">
-            <i class="bi bi-bar-chart"></i> Análisis
+            <i class="bi bi-bar-chart"></i>
+            <span>Análisis</span>
         </div>
         <div class="nav-link" data-section="export">
-            <i class="bi bi-download"></i> Exportar
+            <i class="bi bi-download"></i>
+            <span>Exportar</span>
         </div>
     </div>
 
