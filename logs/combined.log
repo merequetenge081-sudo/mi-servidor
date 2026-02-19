@@ -1757,3 +1757,9 @@
 {"level":"info","message":"📧 mailOptions TO: jonnathanpena1@gmail.com, FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
 {"level":"info","message":"📧 Enviando correo a jonnathanpena1@gmail.com...","service":"mi-servidor","timestamp":"2026-02-19 05:55:18"}
 {"level":"info","message":"✅ Email enviado exitosamente a jonnathanpena1@gmail.com (Message ID: <26c8a73f-f48b-d73c-0bd0-f6036f43dbfe@fulars.com>)","service":"mi-servidor","timestamp":"2026-02-19 05:55:20"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 05:59:30"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 05:59:33"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (production)","service":"mi-servidor","timestamp":"2026-02-19 05:59:33"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 06:04:12"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 06:04:13"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (production)","service":"mi-servidor","timestamp":"2026-02-19 06:04:13"}
