@@ -1156,6 +1156,64 @@
             color: #e0e0e0 !important;
             border-color: #4a5568 !important;
         }
+
+        /* ============== TOOLTIPS ============== */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            z-index: 2000;
+            background-color: #1f1f1f;
+            color: #ffffff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            letter-spacing: 0.3px;
+            max-width: 280px;
+            white-space: normal;
+            line-height: 1.4;
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f1f1f transparent transparent transparent;
+        }
+
+        .tooltip-container:hover .tooltip-text.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* Dark mode tooltip */
+        body.dark-mode .tooltip-text {
+            background-color: #2d2d2d;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark-mode .tooltip-text::after {
+            border-color: #2d2d2d transparent transparent transparent;
+        }
     </style>
 </head>
 <body>
@@ -1325,15 +1383,24 @@
                     </h4>
                     <div class="link-input">
                         <input type="text" id="registrationLink" readonly>
-                        <button class="btn-secondary" onclick="copyLink()">
-                            <i class="bi bi-clipboard"></i> Copiar
-                        </button>
-                        <button class="btn-secondary" onclick="openQrModal()">
-                            <i class="bi bi-qr-code"></i> Ver QR
-                        </button>
-                        <button class="btn-primary" onclick="openForm()">
-                            <i class="bi bi-box-arrow-up-right"></i> Llenar Formulario
-                        </button>
+                        <div class="tooltip-container">
+                            <button class="btn-secondary" onclick="copyLink()">
+                                <i class="bi bi-clipboard"></i> Copiar
+                            </button>
+                            <span class="tooltip-text">Copiar tu enlace personalizado para compartirlo y registrar personas.</span>
+                        </div>
+                        <div class="tooltip-container">
+                            <button class="btn-secondary" onclick="openQrModal()">
+                                <i class="bi bi-qr-code"></i> Ver QR
+                            </button>
+                            <span class="tooltip-text">Genera un código QR para que las personas se registren escaneándolo.</span>
+                        </div>
+                        <div class="tooltip-container">
+                            <button class="btn-primary" onclick="openForm()">
+                                <i class="bi bi-box-arrow-up-right"></i> Llenar Formulario
+                            </button>
+                            <span class="tooltip-text">Registra manualmente a una persona desde tu panel.</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1349,31 +1416,46 @@
                         <option value="pending">⏱ Pendientes</option>
                     </select>
 
-                    <button class="btn-secondary" onclick="refreshRegistrations()">
-                        <i class="bi bi-arrow-clockwise"></i>
-                        Actualizar
-                    </button>
+                    <div class="tooltip-container">
+                        <button class="btn-secondary" onclick="refreshRegistrations()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            Actualizar
+                        </button>
+                        <span class="tooltip-text">Actualiza la lista para ver los cambios más recientes.</span>
+                    </div>
 
-                    <button class="btn-secondary" onclick="downloadTemplate()">
-                        <i class="bi bi-file-earmark-spreadsheet"></i>
-                        Plantilla
-                    </button>
+                    <div class="tooltip-container">
+                        <button class="btn-secondary" onclick="downloadTemplate()">
+                            <i class="bi bi-file-earmark-spreadsheet"></i>
+                            Plantilla
+                        </button>
+                        <span class="tooltip-text">Descarga la plantilla oficial para importar registros masivos.</span>
+                    </div>
 
-                    <button class="btn-secondary" onclick="document.getElementById('importFile').click()">
-                        <i class="bi bi-upload"></i>
-                        Importar
-                    </button>
+                    <div class="tooltip-container">
+                        <button class="btn-secondary" onclick="document.getElementById('importFile').click()">
+                            <i class="bi bi-upload"></i>
+                            Importar
+                        </button>
+                        <span class="tooltip-text">Sube un archivo Excel con múltiples registros al sistema.</span>
+                    </div>
                     <input type="file" id="importFile" accept=".xlsx, .xls" style="display: none;" onchange="handleImport(this)">
 
-                    <button class="btn-primary" onclick="exportToExcel()">
-                        <i class="bi bi-download"></i>
-                        Exportar
-                    </button>
+                    <div class="tooltip-container">
+                        <button class="btn-primary" onclick="exportToExcel()">
+                            <i class="bi bi-download"></i>
+                            Exportar
+                        </button>
+                        <span class="tooltip-text">Descarga todos tus registros en formato Excel.</span>
+                    </div>
 
-                    <button class="btn-primary" onclick="goToView('newRegistration')">
-                        <i class="bi bi-plus-lg"></i>
-                        Nuevo Registro
-                    </button>
+                    <div class="tooltip-container">
+                        <button class="btn-primary" onclick="goToView('newRegistration')">
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo Registro
+                        </button>
+                        <span class="tooltip-text">Agrega una nueva persona manualmente.</span>
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -1597,36 +1679,40 @@
 
                 <!-- Stats Cards -->
                 <div class="stats-grid-4">
-                    <div class="stat-card-modern">
+                    <div class="tooltip-container stat-card-modern">
                         <div class="stat-icon primary">
                             <i class="bi bi-people-fill"></i>
                         </div>
                         <div class="stat-value" id="totalRegistrationsStat">0</div>
                         <div class="stat-label">Total Registros</div>
+                        <span class="tooltip-text">Cantidad total de personas registradas bajo tu liderazgo.</span>
                     </div>
 
-                    <div class="stat-card-modern">
+                    <div class="tooltip-container stat-card-modern">
                         <div class="stat-icon success">
                             <i class="bi bi-check-circle-fill"></i>
                         </div>
                         <div class="stat-value" id="confirmedStat">0</div>
                         <div class="stat-label">Confirmados</div>
+                        <span class="tooltip-text">Personas que ya confirmaron su participaci\u00f3n.</span>
                     </div>
 
-                    <div class="stat-card-modern">
+                    <div class="tooltip-container stat-card-modern">
                         <div class="stat-icon warning">
                             <i class="bi bi-clock-fill"></i>
                         </div>
                         <div class="stat-value" id="pendingStat">0</div>
                         <div class="stat-label">Pendientes</div>
+                        <span class=\"tooltip-text\">Personas registradas que a\u00fan no han confirmado que votaron.</span>
                     </div>
 
-                    <div class="stat-card-modern">
+                    <div class="tooltip-container stat-card-modern">
                         <div class="stat-icon purple">
                             <i class="bi bi-percent"></i>
                         </div>
                         <div class="stat-value" id="confirmRateStat">0%</div>
-                        <div class="stat-label">Tasa de Confirmación</div>
+                        <div class="stat-label">Tasa de Confirmaci\u00f3n</div>
+                        <span class=\"tooltip-text\">Porcentaje de registros confirmados sobre el total.</span>
                     </div>
                 </div>
 
@@ -2541,9 +2627,46 @@
             }
         }
 
+        // ============== TOOLTIPS ==============
+        function initializeTooltips() {
+            const tooltipContainers = document.querySelectorAll('.tooltip-container');
+            
+            tooltipContainers.forEach(container => {
+                const tooltipText = container.querySelector('.tooltip-text');
+                if (!tooltipText) return;
+                
+                let tooltipTimeout;
+                
+                container.addEventListener('mouseenter', () => {
+                    tooltipTimeout = setTimeout(() => {
+                        tooltipText.classList.add('active');
+                    }, 600); // 600ms delay
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                    clearTimeout(tooltipTimeout);
+                    tooltipText.classList.remove('active');
+                });
+                
+                // For touch devices
+                container.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    tooltipTimeout = setTimeout(() => {
+                        tooltipText.classList.add('active');
+                    }, 600);
+                });
+                
+                container.addEventListener('touchend', () => {
+                    clearTimeout(tooltipTimeout);
+                    tooltipText.classList.remove('active');
+                });
+            });
+        }
+
         // ============== INIT ==============
         window.addEventListener('DOMContentLoaded', () => {
             loadDarkMode();
+            initializeTooltips();
             if (!checkAuth()) return;
 
             loadLeaderData();
