@@ -9,22 +9,12 @@ class EmailService {
   }
 
   initTransporter() {
-    // En desarrollo, usar siempre mock mode
-    if (process.env.NODE_ENV !== 'production') {
-      logger.warn('⚠️  Desarrollo detectado. Usando modo mock para emails.');
-      this.mockMode = true;
-      return;
-    }
+    // Permitir intento de envío real si se definen EMAIL_USER y EMAIL_PASS (incluso en desarrollo)
+    const hasEmailCredentials = process.env.EMAIL_USER && process.env.EMAIL_PASS;
+    const forceMock = process.env.FORCE_EMAIL_MOCK === 'true';
 
-    // Validar credenciales de email
-    if (!process.env.EMAIL_USER) {
-      logger.error('⚠️  EMAIL_USER no definido. No se pueden enviar emails.');
-      this.mockMode = true;
-      return;
-    }
-
-    if (!process.env.EMAIL_PASS) {
-      logger.error('⚠️  EMAIL_PASS no definido. No se pueden enviar emails.');
+    if (!hasEmailCredentials || forceMock) {
+      logger.warn('⚠️  Usando modo mock para emails (credenciales no configuradas o forzado).');
       this.mockMode = true;
       return;
     }
@@ -42,12 +32,14 @@ class EmailService {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
         },
+        connectionTimeout: 5000,
+        socketTimeout: 5000,
       });
 
       this.mockMode = false;
-      logger.info(`📧 SMTP configurado correctamente (${smtpHost}:${smtpPort}, secure: ${smtpSecure})`);
+      logger.info(`📧 SMTP configurado: ${smtpHost}:${smtpPort} (secure: ${smtpSecure})`);
     } catch (error) {
-      logger.error('❌ Error configurando Nodemailer:', error.message);
+      logger.error('❌ Error configurando EmailService:', error.message);
       this.mockMode = true;
     }
   }

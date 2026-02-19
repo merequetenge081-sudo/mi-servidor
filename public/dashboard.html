@@ -1680,12 +1680,207 @@
             z-index: 1;
         }
 
-        .btn span, .btn .bi {
-            position: relative;
-            z-index: 1;
+        /* ============== SEND EMAIL CONFIRMATION MODAL ============== */
+        #sendEmailModal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
         }
 
-        /* ============== MODERN BUTTONS ============== */
+        #sendEmailModal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .send-email-modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .send-email-modal-content .modal-icon {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 46px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .send-email-modal-content h3 {
+            margin-bottom: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .send-email-modal-content .email-info {
+            background: #f5f7fb;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .send-email-modal-content .email-info strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .send-email-modal-content .email-details {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .send-email-modal-content .email-includes {
+            background: #f0f4ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: left;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .send-email-modal-content .email-includes ul {
+            margin: 10px 0 0 20px;
+            padding: 0;
+        }
+
+        .send-email-modal-content .email-includes li {
+            margin: 5px 0;
+        }
+
+        .send-email-modal-content .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .send-email-modal-content .btn-modal-cancel,
+        .send-email-modal-content .btn-modal-send {
+            flex: 1;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .send-email-modal-content .btn-modal-cancel::before,
+        .send-email-modal-content .btn-modal-send::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .send-email-modal-content .btn-modal-cancel:hover::before,
+        .send-email-modal-content .btn-modal-send:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .send-email-modal-content .btn-modal-cancel {
+            background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+            color: #424242;
+        }
+
+        .send-email-modal-content .btn-modal-cancel:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #eeeeee 0%, #e0e0e0 100%);
+        }
+
+        .send-email-modal-content .btn-modal-send {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .send-email-modal-content .btn-modal-send:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #7c91f7 0%, #8b5cb8 100%);
+        }
+
+        .send-email-modal-content .btn-modal-send i,
+        .send-email-modal-content .btn-modal-cancel i {
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+            font-size: 18px;
+        }
+
+        .send-email-modal-content .btn-modal-send:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .send-email-modal-content .btn-modal-cancel:hover i {
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
         .btn-modern {
             padding: 14px 28px;
             border: none;
@@ -2614,6 +2809,39 @@
         </div>
     </div>
 
+    <!-- SEND EMAIL CONFIRMATION MODAL -->
+    <div id="sendEmailModal" class="modal">
+        <div class="send-email-modal-content">
+            <div class="modal-icon">
+                <i class="bi bi-envelope-check-fill"></i>
+            </div>
+            <h3>Enviar Correo de Acceso</h3>
+            <div class="email-info">
+                <strong id="sendEmailLeaderName">Líder</strong>
+                <span id="sendEmailLeaderEmail">email@dominio.com</span>
+            </div>
+            <div class="email-details">
+                Este correo incluirá toda la información necesaria para que el líder acceda al sistema:
+            </div>
+            <div class="email-includes">
+                📋 <strong>Contenido del correo:</strong>
+                <ul>
+                    <li>✓ Enlace de acceso personalizado</li>
+                    <li>✓ Código QR para escanear</li>
+                    <li>✓ Instrucciones de uso</li>
+                </ul>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-modal-cancel" onclick="closeSendEmailModal()">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button class="btn-modal-send" onclick="confirmSendAccessEmail()">
+                    <i class="bi bi-check-circle"></i> Sí, Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const API_URL = window.location.origin;
@@ -3127,11 +3355,29 @@
             });
         }
 
-        // ====== SEND ACCESS EMAIL ======
+        // ====== SEND EMAIL MODAL MANAGEMENT ======
+        let pendingEmailData = null;
+
         async function sendAccessEmail(leaderId, leaderName, leaderEmail) {
-            const confirmSend = confirm(`¿Enviar correo de acceso a ${leaderName} (${leaderEmail})?\n\nEste correo incluirá:\n- Enlace de acceso personalizado\n- Código QR\n- Instrucciones de uso`);
+            // Guardar datos para usar después
+            pendingEmailData = { leaderId, leaderName, leaderEmail };
             
-            if (!confirmSend) return;
+            // Mostrar modal
+            document.getElementById('sendEmailLeaderName').textContent = leaderName;
+            document.getElementById('sendEmailLeaderEmail').textContent = leaderEmail;
+            document.getElementById('sendEmailModal').classList.add('active');
+        }
+
+        function closeSendEmailModal() {
+            document.getElementById('sendEmailModal').classList.remove('active');
+            pendingEmailData = null;
+        }
+
+        async function confirmSendAccessEmail() {
+            if (!pendingEmailData) return;
+            
+            const { leaderId, leaderName, leaderEmail } = pendingEmailData;
+            closeSendEmailModal();
             
             try {
                 showAlert('Enviando correo...', 'info');
@@ -3158,6 +3404,8 @@
                 showAlert(`❌ Error al enviar correo: ${error.message}`, 'error');
             }
         }
+
+        // ====== SEND ACCESS EMAIL (ORIGINAL - REEMPLAZADO) ======
 
         // ====== RESET PASSWORD MODAL ======
         function openResetPassModal(leaderId) {
