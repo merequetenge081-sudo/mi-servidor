@@ -1386,3 +1386,12 @@
 {"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-19 02:12:31"}
 {"level":"info","message":"GET /leaders 200 75ms","service":"mi-servidor","timestamp":"2026-02-19 02:12:31"}
 {"level":"info","message":"GET /registrations 200 396ms","service":"mi-servidor","timestamp":"2026-02-19 02:12:32"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 02:15:04"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 02:15:05"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 02:15:05"}
+{"level":"info","message":"GET /leaders 200 93ms","service":"mi-servidor","timestamp":"2026-02-19 02:15:47"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-19 02:15:48"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-19 02:15:48"}
+{"level":"info","message":"GET /registrations 200 446ms","service":"mi-servidor","timestamp":"2026-02-19 02:15:48"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 02:24:39"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 02:24:40"}
