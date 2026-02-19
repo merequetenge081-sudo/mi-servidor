@@ -962,7 +962,124 @@
             to { transform: rotate(360deg); }
         }
 
+        /* ============== MODERN BUTTONS ============== */
+        .btn-modern {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-modern::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn-modern:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-modern i {
+            position: relative;
+            z-index: 1;
+            font-size: 18px;
+        }
+
+        .btn-modern:active {
+            transform: scale(0.96);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+            color: #424242;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #eeeeee 0%, #e0e0e0 100%);
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #7c91f7 0%, #8b5cb8 100%);
+        }
+
+        .btn-logout i,
+        .btn-cancel i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-logout:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .btn-cancel:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Dark mode for modern buttons */
+        body.dark-mode .btn-cancel {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .btn-cancel:hover {
+            background: linear-gradient(135deg, #5a6578 0%, #3d4758 100%);
+        }
+
+        body.dark-mode .modal-content h3 {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .modal-content p {
+            color: #a0aec0 !important;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         /* ============== RESPONSIVE ============== */
+        @media (max-width: 768px) {
+            .btn-modern {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
         @media (max-width: 768px) {
             .welcome-title {
                 font-size: 36px;
@@ -1922,6 +2039,25 @@
         </div>
     </div>
 
+    <!-- LOGOUT CONFIRMATION MODAL -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <div class="modal-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 95px; height: 95px; font-size: 46px; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
+                <i class="bi bi-box-arrow-right"></i>
+            </div>
+            <h3 style="margin-bottom: 12px; font-size: 24px; font-weight: 700; color: #1a1a2e;">Cerrar Sesión</h3>
+            <p style="color: #6c757d; margin-bottom: 32px; font-size: 15px; line-height: 1.6;">¿Estás seguro de que deseas cerrar tu sesión? Deberás iniciar sesión nuevamente para acceder.</p>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-modern btn-cancel" onclick="closeLogoutModal()" style="flex: 1;">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button class="btn-modern btn-logout" onclick="confirmLogout()" style="flex: 1;">
+                    <i class="bi bi-check-circle"></i> Sí, Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = window.location.origin;
         let currentToken = localStorage.getItem('token');
@@ -2021,12 +2157,18 @@
         }
 
         function logout() {
-            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('role');
-                localStorage.removeItem('leaderId');
-                window.location.href = '/';
-            }
+            document.getElementById('logoutModal').classList.add('active');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.remove('active');
+        }
+
+        function confirmLogout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            localStorage.removeItem('leaderId');
+            window.location.href = '/';
         }
 
         // ============== LOAD LEADER DATA ==============
