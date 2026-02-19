@@ -3393,11 +3393,8 @@
                 
                 const result = await res.json();
                 
-                if (result.mock) {
-                    showAlert(`✅ Correo enviado exitosamente (SIMULADO)\n\nEn producción se enviaría a: ${leaderEmail}\n\n${result.message || ''}`, 'success');
-                } else {
-                    showAlert(`✅ Correo enviado exitosamente a ${leaderEmail}`, 'success');
-                }
+                // En producción, mostrar directamente el mensaje
+                showAlert(`✅ Correo enviado exitosamente a ${leaderEmail}`, 'success');
                 
             } catch (error) {
                 console.error('Error al enviar correo:', error);

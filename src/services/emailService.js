@@ -9,7 +9,14 @@ class EmailService {
   }
 
   initTransporter() {
-    // Permitir intento de envío real si se definen EMAIL_USER y EMAIL_PASS (incluso en desarrollo)
+    // Log de variables de entorno para debugging
+    logger.info(`📧 EmailService Init - NODE_ENV: ${process.env.NODE_ENV}`);
+    logger.info(`📧 EMAIL_USER configurado: ${process.env.EMAIL_USER ? 'Si' : 'No'}`);
+    logger.info(`📧 EMAIL_PASS configurado: ${process.env.EMAIL_PASS ? 'Si' : 'No'}`);
+    logger.info(`📧 SMTP_HOST: ${process.env.SMTP_HOST || 'smtp.hostinger.com'}`);
+    logger.info(`📧 SMTP_PORT: ${process.env.SMTP_PORT || '465'}`);
+
+    // Permitir intento de envío real si se definen EMAIL_USER y EMAIL_PASS
     const hasEmailCredentials = process.env.EMAIL_USER && process.env.EMAIL_PASS;
     const forceMock = process.env.FORCE_EMAIL_MOCK === 'true';
 
@@ -24,6 +31,8 @@ class EmailService {
       const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
       const smtpSecure = smtpPort === 465;
 
+      logger.info(`📧 Intentando conectar SMTP: ${smtpHost}:${smtpPort} (secure: ${smtpSecure})`);
+
       this.transporter = nodemailer.createTransport({
         host: smtpHost,
         port: smtpPort,
@@ -32,14 +41,18 @@ class EmailService {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
         },
-        connectionTimeout: 5000,
-        socketTimeout: 5000,
+        connectionTimeout: 10000,
+        socketTimeout: 10000,
+        tls: {
+          rejectUnauthorized: false
+        }
       });
 
       this.mockMode = false;
-      logger.info(`📧 SMTP configurado: ${smtpHost}:${smtpPort} (secure: ${smtpSecure})`);
+      logger.info(`✅ SMTP configurado correctamente: ${smtpHost}:${smtpPort} (secure: ${smtpSecure})`);
     } catch (error) {
       logger.error('❌ Error configurando EmailService:', error.message);
+      logger.error('Stack:', error.stack);
       this.mockMode = true;
     }
   }
@@ -52,6 +65,9 @@ class EmailService {
    */
   async sendAccessEmail(leader, baseUrl = process.env.BASE_URL) {
     try {
+      logger.info(`📧 sendAccessEmail() llamada para: ${leader?.email || 'SIN EMAIL'}`);
+      logger.info(`📧 Mock mode: ${this.mockMode}`);
+      
       if (!leader || !leader.email) {
         throw new Error('Leader email no proporcionado');
       }
@@ -84,7 +100,9 @@ class EmailService {
         html: htmlContent,
       };
 
-      // Modo mock (desarrollo)
+      logger.info(`📧 mailOptions TO: ${mailOptions.to}, FROM: ${mailOptions.from}`);
+
+      // Modo mock
       if (this.mockMode) {
         logger.info(`
 ╔════════════════════════════════════════════════════╗
