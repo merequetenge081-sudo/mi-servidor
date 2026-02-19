@@ -3244,41 +3244,40 @@
         // ============== SIDEBAR TOGGLE ==============
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
             const toggleBtn = document.getElementById('sidebarToggleBtn');
             
+            // Toggle collapsed class on sidebar (YouTube-style)
             sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
             
-            // Guardar estado en localStorage
+            // Save state to localStorage
             const isCollapsed = sidebar.classList.contains('collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
             
-            // Cambiar icono del botón
+            // Change button icon
             const icon = toggleBtn.querySelector('i');
             if (isCollapsed) {
                 icon.className = 'bi bi-arrow-right-square-fill';
-                toggleBtn.title = 'Mostrar Panel';
+                toggleBtn.title = 'Expandir Panel';
             } else {
                 icon.className = 'bi bi-arrow-left-square-fill';
-                toggleBtn.title = 'Esconder Panel';
+                toggleBtn.title = 'Contraer Panel';
             }
         }
 
-        // Restaurar estado del sidebar al cargar
+        // Restore sidebar state on page load
         (function initSidebarState() {
             const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             if (isCollapsed) {
                 const sidebar = document.querySelector('.sidebar');
-                const mainContent = document.querySelector('.main-content');
                 const toggleBtn = document.getElementById('sidebarToggleBtn');
                 
+                // Add collapsed class to sidebar (CSS handles main-content margin via sibling selector)
                 sidebar.classList.add('collapsed');
-                mainContent.classList.add('expanded');
                 
+                // Update toggle button icon
                 const icon = toggleBtn.querySelector('i');
                 icon.className = 'bi bi-arrow-right-square-fill';
-                toggleBtn.title = 'Mostrar Panel';
+                toggleBtn.title = 'Expandir Panel';
             }
         })();
 

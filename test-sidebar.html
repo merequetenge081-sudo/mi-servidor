@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sidebar YouTube-style</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fb;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* ============== NAVBAR ============== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============== SIDEBAR ============== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 260px;
+            height: calc(100vh - 60px);
+            background: #1a1a2e;
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: inset -2px 0 8px rgba(0, 0, 0, 0.3);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 900;
+            border-right: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        /* ============== SIDEBAR HEADER ============== */
+        .sidebar-header {
+            padding: 28px 20px;
+            text-align: center;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 20px 10px;
+        }
+
+        .sidebar-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar.collapsed .sidebar-title-wrapper {
+            gap: 0;
+        }
+
+        .sidebar-title-wrapper h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .sidebar-title-wrapper h3 {
+            display: none;
+        }
+
+        .sidebar-subtitle {
+            margin: 10px 0 0 0;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed .sidebar-subtitle {
+            display: none;
+        }
+
+        .nav-link {
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            padding: 14px 10px;
+            justify-content: center;
+            border-left: none;
+            border-top: 3px solid transparent;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.15);
+            color: rgba(255, 255, 255, 0.95);
+            border-left-color: #667eea;
+        }
+
+        .sidebar.collapsed .nav-link:hover {
+            border-left-color: transparent;
+            border-top-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.3) 0%, rgba(102, 126, 234, 0.08) 100%);
+            color: #ffffff;
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        .sidebar.collapsed .nav-link.active {
+            border-left: none;
+            border-top-color: #667eea;
+            background: rgba(102, 126, 234, 0.25);
+        }
+
+        /* ============== MAIN CONTENT ============== */
+        .main-content {
+            position: relative;
+            margin-left: 260px;
+            margin-top: 60px;
+            padding: 40px 30px;
+            min-height: calc(100vh - 100px);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+            background: #f5f7fb;
+            overflow-y: auto;
+        }
+
+        /* YouTube-style sidebar collapse: when sidebar has .collapsed class, adjust main-content margin */
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 70px;
+        }
+
+        .content-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .content-box h2 {
+            color: #1a1a2e;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .content-box p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .toggle-btn {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .test-log {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div style="flex: 1; text-align: left;">
+            <button class="toggle-btn" onclick="toggleSidebar()">🔘 Toggle Sidebar</button>
+        </div>
+        <div class="navbar-brand">Test Sidebar YouTube-style</div>
+        <div style="flex: 1; text-align: right;">
+            <i class="bi bi-person-circle" style="font-size: 24px;"></i>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title-wrapper">
+                <i class="bi bi-diagram-3" style="color: #667eea; font-size: 22px;"></i>
+                <h3>PANEL ADMIN</h3>
+            </div>
+            <p class="sidebar-subtitle">Sistema de Gestión</p>
+        </div>
+        <div class="nav-link active">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-link">
+            <i class="bi bi-people-fill"></i>
+            <span>Gestión de Líderes</span>
+        </div>
+        <div class="nav-link">
+            <i class="bi bi-table"></i>
+            <span>Registros</span>
+        </div>
+        <div class="nav-link">
+            <i class="bi bi-bar-chart"></i>
+            <span>Análisis</span>
+        </div>
+        <div class="nav-link">
+            <i class="bi bi-download"></i>
+            <span>Exportar</span>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="content-box">
+            <h2>✅ Test de YouTube-style Sidebar</h2>
+            <p>
+                Esta es una página de prueba para verificar que la sidebar colapsable tipo YouTube funciona correctamente.
+            </p>
+            <p style="margin-top: 10px;">
+                <strong>Características esperadas:</strong>
+            </p>
+            <ul style="margin-left: 20px; margin-top: 10px; color: #555;">
+                <li>✓ Sidebar ancho: 260px (normal)</li>
+                <li>✓ Sidebar ancho: 70px (colapsada)</li>
+                <li>✓ Transición suave de 0.3s</li>
+                <li>✓ Texto oculto cuando está colapsada</li>
+                <li>✓ Solo íconos visibles en estado colapsado</li>
+                <li>✓ Main-content se ajusta automáticamente (margin-left: 260px → 70px)</li>
+                <li>✓ No usar transform:translate, usar width property</li>
+            </ul>
+        </div>
+
+        <div class="content-box">
+            <h2>📊 Estado de la Sidebar</h2>
+            <p>
+                <strong>Estado actual:</strong> <span id="sidebarState">Expandida (260px)</span>
+            </p>
+            <p style="margin-top: 10px;">
+                <strong>Margin-left del main-content:</strong> <span id="mainContentMargin">260px</span>
+            </p>
+            <div class="test-log" id="testLog"></div>
+        </div>
+
+        <div class="content-box">
+            <h2>🧪 Tests Automáticos</h2>
+            <p>Los tests se ejecutan automáticamente y se muestran aquí abajo:</p>
+            <div class="test-log" id="testResults"></div>
+        </div>
+
+        <div class="content-box">
+            <h2>📝 Instrucciones</h2>
+            <ol style="margin-left: 20px; color: #555; line-height: 2;">
+                <li>Haz clic en el botón "Toggle Sidebar" para expandir/contraer la sidebar</li>
+                <li>Observa que la transición es suave (0.3s)</li>
+                <li>Verifica que solo se ven íconos cuando está colapsada</li>
+                <li>Observa que el main-content se ajusta correctamente su margin-left</li>
+                <li>Prueba en diferentes tamaños de pantalla (responsive)</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        const testLog = document.getElementById('testLog');
+        const testResults = document.getElementById('testResults');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            console.log(`[${timestamp}] ${message}`);
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logEntry.style.marginBottom = '5px';
+            logEntry.style.fontSize = '12px';
+            testLog.appendChild(logEntry);
+            testLog.scrollTop = testLog.scrollHeight;
+        }
+
+        function updateStatus() {
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            const computedStyle = window.getComputedStyle(mainContent);
+            const marginLeft = computedStyle.marginLeft;
+            
+            document.getElementById('sidebarState').textContent = isCollapsed ? 'Colapsada (70px)' : 'Expandida (260px)';
+            document.getElementById('mainContentMargin').textContent = marginLeft;
+        }
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            log(isCollapsed ? '🔴 Sidebar colapsada' : '🟢 Sidebar expandida');
+            updateStatus();
+        }
+
+        function runTests() {
+            const tests = [];
+            
+            // Test 1: Sidebar width property
+            const sidebarStyle = window.getComputedStyle(sidebar);
+            const sidebarWidth = sidebarStyle.width;
+            tests.push({
+                name: 'Sidebar width (normal)',
+                expected: '260px',
+                actual: sidebarWidth,
+                pass: sidebarWidth === '260px'
+            });
+
+            // Test 2: Collapsed width
+            sidebar.classList.add('collapsed');
+            const collapsedSidebarStyle = window.getComputedStyle(sidebar);
+            const collapsedSidebarWidth = collapsedSidebarStyle.width;
+            tests.push({
+                name: 'Sidebar width (collapsed)',
+                expected: '70px',
+                actual: collapsedSidebarWidth,
+                pass: collapsedSidebarWidth === '70px'
+            });
+            sidebar.classList.remove('collapsed');
+
+            // Test 3: Main-content margin-left (normal)
+            const mainContentStyle = window.getComputedStyle(mainContent);
+            const mainContentMarginLeft = mainContentStyle.marginLeft;
+            tests.push({
+                name: 'Main-content margin-left (normal)',
+                expected: '260px',
+                actual: mainContentMarginLeft,
+                pass: mainContentMarginLeft === '260px'
+            });
+
+            // Test 4: Main-content margin-left (collapsed)
+            sidebar.classList.add('collapsed');
+            // Force reflow to get updated computed style
+            void sidebar.offsetWidth;
+            const collapsedMainContentStyle = window.getComputedStyle(mainContent);
+            const collapsedMainContentMarginLeft = collapsedMainContentStyle.marginLeft;
+            tests.push({
+                name: 'Main-content margin-left (collapsed)',
+                expected: '70px',
+                actual: collapsedMainContentMarginLeft,
+                pass: collapsedMainContentMarginLeft === '70px'
+            });
+            sidebar.classList.remove('collapsed');
+
+            // Test 5: Transition property
+            const sidebarTransition = sidebarStyle.transition;
+            tests.push({
+                name: 'Sidebar transition set',
+                expected: 'contains "width"',
+                actual: sidebarTransition,
+                pass: sidebarTransition.includes('width')
+            });
+
+            // Test 6: Z-index
+            const sidebarZIndex = window.getComputedStyle(sidebar).zIndex;
+            const mainContentZIndex = window.getComputedStyle(mainContent).zIndex;
+            tests.push({
+                name: 'Z-index: sidebar >= main-content',
+                expected: 'sidebar (900) >= main-content (1)',
+                actual: `sidebar (${sidebarZIndex}) >= main-content (${mainContentZIndex})`,
+                pass: parseInt(sidebarZIndex) >= parseInt(mainContentZIndex)
+            });
+
+            // Render results
+            testResults.innerHTML = '';
+            tests.forEach(test => {
+                const resultDiv = document.createElement('div');
+                const icon = test.pass ? '✅' : '❌';
+                resultDiv.innerHTML = `
+                    <div style="margin-bottom: 10px; padding: 10px; background: ${test.pass ? '#d4edda' : '#f8d7da'}; border-radius: 4px;">
+                        <strong>${icon} ${test.name}</strong><br>
+                        <small style="color: #666;">Expected: ${test.expected}<br>Actual: ${test.actual}</small>
+                    </div>
+                `;
+                testResults.appendChild(resultDiv);
+            });
+
+            const passCount = tests.filter(t => t.pass).length;
+            const totalCount = tests.length;
+            log(`Tests completados: ${passCount}/${totalCount} pasaron`);
+        }
+
+        // Initialize
+        log('🚀 Página de test cargada');
+        updateStatus();
+        setTimeout(runTests, 500);
+
+        // Update status when sidebar changes
+        const observer = new MutationObserver(updateStatus);
+        observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+        observer.observe(mainContent, { attributes: true, attributeFilter: ['class'] });
+    </script>
+</body>
+</html>
