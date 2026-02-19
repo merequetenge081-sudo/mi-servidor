@@ -1642,3 +1642,36 @@
 {"level":"info","message":"GET /leaders/LID-MLSGYMFG-J5QC 200 71ms","service":"mi-servidor","timestamp":"2026-02-19 05:03:23"}
 {"level":"info","message":"GET /registrations 200 142ms","service":"mi-servidor","timestamp":"2026-02-19 05:03:24"}
 {"level":"info","message":"GET /registrations 304 146ms","service":"mi-servidor","timestamp":"2026-02-19 05:03:25"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 05:09:38"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 05:09:39"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 05:09:39"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-19 05:11:18"}
+{"level":"info","message":"GET /favicon.ico 404 3ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:18"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 05:11:29","user":"tleader"}
+{"level":"info","message":"POST /auth/leader-login 200 134ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:29"}
+{"level":"info","message":"GET /leaders/LID-MLSGYMFG-J5QC 200 73ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:30"}
+{"level":"info","message":"GET /registrations 200 147ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:30"}
+{"level":"info","message":"GET /registrations 304 562ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:31"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 05:11:47","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 225ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:47"}
+{"level":"info","message":"GET /events 200 73ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:48"}
+{"level":"info","message":"GET /leaders 200 145ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:49"}
+{"level":"info","message":"GET /registrations 200 1237ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:50"}
+{"level":"warn","message":"⚠️  Desarrollo detectado. Usando modo mock para emails.","service":"mi-servidor","timestamp":"2026-02-19 05:11:59"}
+{"level":"info","message":"📧 Generando QR para enlace: https://midominio.com/form.html?token=255b2b71324c72952fdb78d2a249d16c","service":"mi-servidor","timestamp":"2026-02-19 05:11:59"}
+{"level":"info","message":"\n╔════════════════════════════════════════════════════╗\n║           📧 MOCK EMAIL - MODO DESARROLLO          ║\n╚════════════════════════════════════════════════════╝\nTo: jonnathanpena1@gmail.com\nSubject: 🔗 Tu enlace personalizado de registro\n────────────────────────────────────────────────────\nTestEmail, tu enlace de registro es:\nhttps://midominio.com/form.html?token=255b2b71324c72952fdb78d2a249d16c\n        ","service":"mi-servidor","timestamp":"2026-02-19 05:11:59"}
+{"level":"info","message":"✓ Email de acceso enviado a líder TestEmail (jonnathanpena1@gmail.com)","service":"mi-servidor","timestamp":"2026-02-19 05:11:59"}
+{"level":"info","message":"POST /leaders/6996ed605f46654db43a8780/send-access 200 165ms","service":"mi-servidor","timestamp":"2026-02-19 05:11:59"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 05:12:28","user":"tleader"}
+{"level":"info","message":"POST /auth/leader-login 200 132ms","service":"mi-servidor","timestamp":"2026-02-19 05:12:28"}
+{"level":"info","message":"GET /leaders/LID-MLSGYMFG-J5QC 304 73ms","service":"mi-servidor","timestamp":"2026-02-19 05:12:28"}
+{"level":"info","message":"GET /registrations 304 144ms","service":"mi-servidor","timestamp":"2026-02-19 05:12:28"}
+{"level":"info","message":"GET /registrations 304 142ms","service":"mi-servidor","timestamp":"2026-02-19 05:12:40"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-19 05:13:45","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 213ms","service":"mi-servidor","timestamp":"2026-02-19 05:13:45"}
+{"level":"info","message":"GET /events 200 72ms","service":"mi-servidor","timestamp":"2026-02-19 05:13:46"}
+{"level":"info","message":"GET /leaders 200 78ms","service":"mi-servidor","timestamp":"2026-02-19 05:13:47"}
+{"level":"info","message":"GET /registrations 200 506ms","service":"mi-servidor","timestamp":"2026-02-19 05:13:48"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-19 05:17:59"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-19 05:18:00"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-19 05:18:00"}
