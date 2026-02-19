@@ -2608,6 +2608,11 @@
                             : '<span style="color: #999; font-size: 12px;">Sin usuario</span>'}
                     </td>
                     <td>
+                        ${leader.email ? 
+                            `<button class="btn btn-sm btn-outline-primary send-email-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" data-leader-email="${leader.email}" title="Enviar Correo de Acceso">
+                                <i class="bi bi-envelope"></i>
+                            </button>` 
+                            : ''}
                         <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" title="Ver QR">
                             <i class="bi bi-qr-code"></i>
                         </button>
@@ -2651,6 +2656,9 @@
             });
             document.querySelectorAll('.view-credentials-btn').forEach(btn => {
                 btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId, btn.dataset.username, btn.dataset.password));
+            });
+            document.querySelectorAll('.send-email-btn').forEach(btn => {
+                btn.addEventListener('click', () => sendAccessEmail(btn.dataset.leaderId, btn.dataset.leaderName, btn.dataset.leaderEmail));
             });
         }
 
@@ -2871,6 +2879,11 @@
                             : '<span style="color: #999; font-size: 12px;">Sin usuario</span>'}
                     </td>
                     <td>
+                        ${leader.email ? 
+                            `<button class="btn btn-sm btn-outline-primary send-email-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" data-leader-email="${leader.email}" title="Enviar Correo de Acceso">
+                                <i class="bi bi-envelope"></i>
+                            </button>` 
+                            : ''}
                         <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" title="Ver QR">
                             <i class="bi bi-qr-code"></i>
                         </button>
