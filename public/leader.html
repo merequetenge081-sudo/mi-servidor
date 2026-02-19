@@ -1442,6 +1442,7 @@
         let filteredRegistrations = [];
         let currentPage = 1;
         const itemsPerPage = 10;
+        let isRedirecting = false;
 
         // Capitales de Colombia para el formulario
         const capitalesColombia = {
@@ -1478,6 +1479,30 @@
             'Vaupés': 'Mitú',
             'Vichada': 'Puerto Carreño'
         };
+
+        // ============== API CALL HELPER ==============
+        async function apiCall(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentToken}`,
+                ...options.headers
+            };
+
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers
+            });
+
+            if (response.status === 401 && !isRedirecting) {
+                isRedirecting = true;
+                localStorage.removeItem('token');
+                localStorage.removeItem('leaderId');
+                window.location.href = '/';
+                throw new Error('Session expired');
+            }
+
+            return response;
+        }
 
         // ============== VIEW NAVIGATION ==============
         function goToView(viewName) {
@@ -1518,48 +1543,63 @@
         // ============== LOAD LEADER DATA ==============
         async function loadLeaderData() {
             try {
-                const response = await fetch(`${API_URL}/api/leaders/${currentLeaderId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${currentToken}`
-                    }
-                });
+                const response = await apiCall(`/api/leaders/${currentLeaderId}`);
 
                 if (!response.ok) throw new Error('Error al cargar datos del líder');
 
-                const data = await response.json();
-                leaderData = data.leader;
+                leaderData = await response.json();
                 
-                // Set leader name in welcome screen
-                document.getElementById('leaderNameWelcome').textContent = leaderData.name || 'Líder';
+                // Set leader name in welcome screen (solo primer nombre)
+                const firstName = leaderData.name ? leaderData.name.split(' ')[0] : 'Líder';
+                document.getElementById('leaderNameWelcome').textContent = firstName;
                 
                 // Set registration link
-                const link = `${API_URL}/form.html?token=${leaderData.publicToken}`;
+                const token = leaderData.token || leaderData.publicToken || leaderData.leaderId;
+                const link = `${API_URL}/form.html?token=${token}`;
                 document.getElementById('registrationLink').value = link;
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al cargar datos del líder:', error);
+                document.getElementById('leaderNameWelcome').textContent = 'Líder';
             }
         }
 
         // ============== REGISTRATIONS ==============
         async function loadRegistrations() {
             try {
-                const response = await fetch(`${API_URL}/api/registrations?leaderId=${currentLeaderId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${currentToken}`
-                    }
-                });
+                const response = await apiCall(`/api/registrations?leaderId=${currentLeaderId}&limit=1000`);
 
                 if (!response.ok) throw new Error('Error al cargar registros');
 
-                const data = await response.json();
-                myRegistrations = data.registrations || [];
+                const allRegistrations = await response.json();
+                
+                // Filtrar registros del líder actual
+                if (Array.isArray(allRegistrations)) {
+                    myRegistrations = allRegistrations.filter(r => r.leaderId === currentLeaderId);
+                } else if (allRegistrations.registrations && Array.isArray(allRegistrations.registrations)) {
+                    myRegistrations = allRegistrations.registrations.filter(r => r.leaderId === currentLeaderId);
+                } else if (allRegistrations.data && Array.isArray(allRegistrations.data)) {
+                    myRegistrations = allRegistrations.data.filter(r => r.leaderId === currentLeaderId);
+                } else {
+                    console.warn('Formato de registros inesperado', allRegistrations);
+                    myRegistrations = [];
+                }
+                
                 filteredRegistrations = [...myRegistrations];
                 currentPage = 1;
                 renderRegistrations();
             } catch (error) {
-                console.error('Error:', error);
-                alert('Error al cargar los registros');
+                console.error('Error al cargar registros:', error);
+                const tbody = document.getElementById('registrationsTableBody');
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 40px; color: var(--danger);">
+                                Error al cargar registros: ${error.message}
+                            </td>
+                        </tr>
+                    `;
+                }
             }
         }
 
@@ -1676,12 +1716,7 @@
         async function toggleConfirm(id, currentStatus) {
             try {
                 const endpoint = currentStatus ? `/api/registrations/${id}/unconfirm` : `/api/registrations/${id}/confirm`;
-                const res = await fetch(`${API_URL}${endpoint}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${currentToken}`
-                    }
-                });
+                const res = await apiCall(endpoint, { method: 'POST' });
                 
                 if (res.ok) {
                     loadRegistrations();
@@ -1879,12 +1914,8 @@
                 votingTable: document.getElementById('editVotingTable').value
             };
 
-            fetch(`${API_URL}/api/registrations/${id}`, {
+            apiCall(`/api/registrations/${id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${currentToken}`
-                },
                 body: JSON.stringify(data)
             })
             .then(res => res.json())
@@ -1923,11 +1954,8 @@
         });
 
         function performDelete(id) {
-            fetch(`${API_URL}/api/registrations/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${currentToken}`
-                }
+            apiCall(`/api/registrations/${id}`, {
+                method: 'DELETE'
             })
             .then(res => res.json())
             .then(data => {
@@ -2030,12 +2058,8 @@
                     date: new Date().toISOString()
                 };
 
-                const response = await fetch(`${API_URL}/api/registrations`, {
+                const response = await apiCall(`/api/registrations`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${currentToken}`
-                    },
                     body: JSON.stringify(payload)
                 });
 
