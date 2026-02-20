@@ -8,7 +8,7 @@ import logger from "./src/config/logger.js";
 const PORT = config.port;
 
 async function start() {
-  // Validar JWT_SECRET en producción
+  // Validar secrets en producción
   if (process.env.NODE_ENV === "production") {
     if (!process.env.JWT_SECRET) {
       logger.error("CRÍTICO: JWT_SECRET no está configurado en producción");
@@ -17,6 +17,21 @@ async function start() {
     if (process.env.JWT_SECRET.length < 32) {
       logger.error("CRÍTICO: JWT_SECRET es demasiado corto (mínimo 32 caracteres)");
       process.exit(1);
+    }
+    if (!process.env.ENCRYPTION_KEY) {
+      logger.error("CRÍTICO: ENCRYPTION_KEY no está configurado en producción");
+      process.exit(1);
+    }
+    if (process.env.ENCRYPTION_KEY.length < 16) {
+      logger.error("CRÍTICO: ENCRYPTION_KEY es demasiado corto (mínimo 16 caracteres)");
+      process.exit(1);
+    }
+  } else {
+    if (!process.env.JWT_SECRET) {
+      logger.warn("⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)");
+    }
+    if (!process.env.ENCRYPTION_KEY) {
+      logger.warn("⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)");
     }
   }
 

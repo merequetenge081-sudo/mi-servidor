@@ -2861,3 +2861,92 @@
 {"level":"info","message":"GET /events 200 74ms","service":"mi-servidor","timestamp":"2026-02-20 03:36:56"}
 {"level":"info","message":"GET /leaders 200 75ms","service":"mi-servidor","timestamp":"2026-02-20 03:36:56"}
 {"level":"info","message":"GET /registrations 200 473ms","service":"mi-servidor","timestamp":"2026-02-20 03:36:57"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-20 17:42:39"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-20 17:42:39"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-20 17:42:39"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-20 17:42:39"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-20 17:42:39"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-20 17:42:39"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-20 17:42:39"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-20 17:42:39"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-20 17:42:40"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-20 17:42:40"}
+{"level":"info","message":"POST /auth/admin-login 401 172ms","service":"mi-servidor","timestamp":"2026-02-20 17:43:00"}
+{"level":"info","message":"POST /auth/admin-login 401 162ms","service":"mi-servidor","timestamp":"2026-02-20 17:43:02"}
+{"level":"info","message":"POST /auth/admin-login 401 154ms","service":"mi-servidor","timestamp":"2026-02-20 17:43:04"}
+{"level":"info","message":"POST /auth/admin-login 401 152ms","service":"mi-servidor","timestamp":"2026-02-20 17:43:06"}
+{"level":"info","message":"POST /auth/admin-login 401 156ms","service":"mi-servidor","timestamp":"2026-02-20 17:43:08"}
+{"level":"info","message":"POST /auth/admin-login 429 1ms","service":"mi-servidor","timestamp":"2026-02-20 17:43:10"}
+{"level":"info","message":"POST /auth/admin-login 429 1ms","service":"mi-servidor","timestamp":"2026-02-20 17:44:12"}
+{"level":"info","message":"POST /auth/admin-login 429 1ms","service":"mi-servidor","timestamp":"2026-02-20 17:44:14"}
+{"level":"info","message":"POST /auth/admin-login 429 1ms","service":"mi-servidor","timestamp":"2026-02-20 17:44:19"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-20 17:46:16"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-20 17:46:16"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-20 17:46:16"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-20 17:46:16"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-20 17:46:16"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-20 17:46:16"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-20 17:46:17"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-20 17:46:17"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-20 17:46:18"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-20 17:46:18"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-20 17:46:20","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 322ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:20"}
+{"level":"info","message":"GET /events 200 104ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:20"}
+{"level":"info","message":"GET /events 200 99ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:23"}
+{"level":"info","message":"GET /leaders 304 97ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:23"}
+{"level":"info","message":"GET /registrations 304 188ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:23"}
+{"level":"info","message":"POST /auth/admin-login 401 191ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:47"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-20 17:46:53","username":"jopena-admin"}
+{"level":"info","message":"POST /auth/admin-login 200 270ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:53"}
+{"level":"info","message":"GET /events 200 98ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:53"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-20 17:46:59","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 283ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:59"}
+{"level":"info","message":"GET /events 200 96ms","service":"mi-servidor","timestamp":"2026-02-20 17:46:59"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-20 17:47:04","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 275ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:04"}
+{"level":"info","message":"GET /events 200 97ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:04"}
+{"level":"info","message":"POST /auth/admin-login 401 172ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:09"}
+{"level":"info","message":"POST /auth/admin-login 401 170ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:11"}
+{"level":"info","message":"POST /auth/admin-login 401 169ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:11"}
+{"level":"info","message":"POST /auth/admin-login 401 168ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:12"}
+{"level":"info","message":"POST /auth/admin-login 401 171ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:13"}
+{"level":"info","message":"POST /auth/admin-login 429 1ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:13"}
+{"level":"info","message":"POST /auth/admin-login 429 1ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:18"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-20 17:47:30","username":"jmendez-superadmin"}
+{"level":"info","message":"POST /auth/admin-login 200 259ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:30"}
+{"level":"info","message":"GET /events 200 96ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:30"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-20 17:47:55","username":"jmendez-superadmin"}
+{"level":"info","message":"POST /auth/admin-login 200 252ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:55"}
+{"level":"info","message":"GET /events 200 95ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:55"}
+{"level":"info","message":"GET /events 200 95ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:56"}
+{"level":"info","message":"GET /events 200 95ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:57"}
+{"level":"info","message":"GET /leaders 200 99ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:57"}
+{"level":"info","message":"GET /registrations 200 808ms","service":"mi-servidor","timestamp":"2026-02-20 17:47:58"}
+{"level":"info","message":"GET /leaders/6997ed84873b83e8f45efcc6/credentials 200 93ms","service":"mi-servidor","timestamp":"2026-02-20 17:48:01"}
+{"error":"AuditLog validation failed: action: `LOGOUT` is not a valid enum value for path `action`.","level":"error","message":"Audit log failed (non-blocking):","service":"mi-servidor","stack":"ValidationError: AuditLog validation failed: action: `LOGOUT` is not a valid enum value for path `action`.\n    at Document.invalidate (D:\\Users\\jeiss\\OneDrive\\Escritorio\\Version Original Politica website\\node_modules\\mongoose\\lib\\document.js:3362:32)\n    at D:\\Users\\jeiss\\OneDrive\\Escritorio\\Version Original Politica website\\node_modules\\mongoose\\lib\\document.js:3123:17\n    at D:\\Users\\jeiss\\OneDrive\\Escritorio\\Version Original Politica website\\node_modules\\mongoose\\lib\\schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)","timestamp":"2026-02-20 17:49:01"}
+{"level":"info","message":"✅ Logout exitoso","service":"mi-servidor","timestamp":"2026-02-20 17:49:01","userId":"69989d9f3db1d8a1cc07245c"}
+{"level":"info","message":"POST /auth/logout 200 5ms","service":"mi-servidor","timestamp":"2026-02-20 17:49:01"}
+{"level":"info","message":"GET /events 200 175ms","service":"mi-servidor","timestamp":"2026-02-20 17:51:08"}
+{"level":"info","message":"GET /leaders 200 167ms","service":"mi-servidor","timestamp":"2026-02-20 17:51:08"}
+{"level":"info","message":"GET /registrations 200 838ms","service":"mi-servidor","timestamp":"2026-02-20 17:51:08"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-20 17:53:16"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-20 17:53:16"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-20 17:53:16"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-20 17:53:16"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-20 17:53:17"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-20 17:53:17"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-20 17:53:17"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-20 17:53:17"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-20 17:53:18"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-20 17:53:18"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-20 17:53:22","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 300ms","service":"mi-servidor","timestamp":"2026-02-20 17:53:22"}
+{"level":"info","message":"GET /events 200 98ms","service":"mi-servidor","timestamp":"2026-02-20 17:53:22"}
+{"level":"info","message":"GET /events 200 93ms","service":"mi-servidor","timestamp":"2026-02-20 17:53:23"}
+{"level":"info","message":"GET /events 200 110ms","service":"mi-servidor","timestamp":"2026-02-20 17:53:24"}
+{"level":"info","message":"GET /leaders 200 107ms","service":"mi-servidor","timestamp":"2026-02-20 17:53:24"}
+{"level":"info","message":"GET /registrations 200 839ms","service":"mi-servidor","timestamp":"2026-02-20 17:53:25"}
+{"error":"AuditLog validation failed: action: `LOGOUT` is not a valid enum value for path `action`.","level":"error","message":"Audit log failed (non-blocking):","service":"mi-servidor","stack":"ValidationError: AuditLog validation failed: action: `LOGOUT` is not a valid enum value for path `action`.\n    at Document.invalidate (D:\\Users\\jeiss\\OneDrive\\Escritorio\\Version Original Politica website\\node_modules\\mongoose\\lib\\document.js:3362:32)\n    at D:\\Users\\jeiss\\OneDrive\\Escritorio\\Version Original Politica website\\node_modules\\mongoose\\lib\\document.js:3123:17\n    at D:\\Users\\jeiss\\OneDrive\\Escritorio\\Version Original Politica website\\node_modules\\mongoose\\lib\\schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)","timestamp":"2026-02-20 17:53:28"}
+{"level":"info","message":"✅ Logout exitoso","service":"mi-servidor","timestamp":"2026-02-20 17:53:28","userId":"698cd4a2548cde381741c46e"}
+{"level":"info","message":"POST /auth/logout 200 13ms","service":"mi-servidor","timestamp":"2026-02-20 17:53:28"}

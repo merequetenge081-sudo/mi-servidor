@@ -54,6 +54,9 @@ export async function initMemoryAuth() {
     ];
 
     logger.info("✅ Autenticación en memoria inicializada");
+    if (process.env.NODE_ENV !== 'production') {
+      logger.info("📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123");
+    }
   } catch (err) {
     logger.error("Error inicializando autenticación en memoria:", { error: err.message });
   }
@@ -128,10 +131,11 @@ export async function findLeaderWithFallback(Leader, email) {
  */
 export function getTestCredentials() {
   return {
+    message: "Credenciales de prueba disponibles (ver consola del servidor al iniciar)",
     admins: [
       {
         username: "admin",
-        password: "admin123",
+        passwordHint: "Ver logs del servidor",
         role: "super_admin",
         email: "admin@example.com",
         source: "memory"
@@ -140,14 +144,14 @@ export function getTestCredentials() {
     leaders: [
       {
         email: "lider@example.com",
-        password: "leader123",
+        passwordHint: "Ver logs del servidor",
         name: "Líder Prueba",
         cedula: "1000000001",
         source: "memory"
       },
       {
         email: "lider2@example.com",
-        password: "leader123",
+        passwordHint: "Ver logs del servidor",
         name: "Segundo Líder",
         cedula: "1000000002",
         source: "memory"

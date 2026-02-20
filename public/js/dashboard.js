@@ -212,7 +212,7 @@ function filterLeadersByName(searchTerm) {
             <td>${passwordStatus}</td>
             <td>
                 ${leader.username ?
-                `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" data-username="${leader.username}" data-password="${leader.tempPasswordPlaintext || '-'}" title="Ver Credenciales (Usuario y Contraseña)">
+                `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" title="Ver Credenciales (Usuario y Contraseña)">
                         <i class="bi bi-eye"></i> Ver Credenciales
                     </button>`
                 : '<span style="color: #999; font-size: 12px;">Sin usuario</span>'}
@@ -265,7 +265,7 @@ function filterLeadersByName(searchTerm) {
         });
     });
     document.querySelectorAll('.view-credentials-btn').forEach(btn => {
-        btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId, btn.dataset.username, btn.dataset.password));
+        btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId));
     });
     document.querySelectorAll('.send-email-btn').forEach(btn => {
         btn.addEventListener('click', () => sendAccessEmail(btn.dataset.leaderId, btn.dataset.leaderName, btn.dataset.leaderEmail));
@@ -531,7 +531,7 @@ function loadLeadersTable() {
             <td>${passwordStatus}</td>
             <td>
                 ${leader.username ?
-                `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" data-username="${leader.username}" data-password="${leader.tempPasswordPlaintext || '-'}" title="Ver Credenciales (Usuario y Contraseña)" style="color: #1e40af; font-weight: 600;">
+                `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" title="Ver Credenciales (Usuario y Contraseña)" style="color: #1e40af; font-weight: 600;">
                         <i class="bi bi-eye"></i> Ver Credenciales
                     </button>`
                 : '<span style="color: #666; font-size: 12px;">Sin usuario</span>'}
@@ -612,7 +612,7 @@ function loadLeadersTable() {
     console.log('✅ Event listeners asignados:', document.querySelectorAll('.gen-pass-btn').length, 'botones gen-pass-btn encontrados');
     
     document.querySelectorAll('.view-credentials-btn').forEach(btn => {
-        btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId, btn.dataset.username, btn.dataset.password));
+        btn.addEventListener('click', () => showCredentials(btn.dataset.leaderId));
     });
     document.querySelectorAll('.send-email-btn').forEach(btn => {
         btn.addEventListener('click', () => sendAccessEmail(btn.dataset.leaderId, btn.dataset.leaderName, btn.dataset.leaderEmail));
@@ -799,14 +799,24 @@ document.getElementById('generatePassBtn').addEventListener('click', () => {
     document.getElementById('resetPassPassword').value = Math.random().toString(36).slice(-8) + 'Aa1!';
 });
 
+    function validatePassword(password) {
+        const errors = [];
+        if (password.length < 8) errors.push('mínimo 8 caracteres');
+        if (!/[A-Z]/.test(password)) errors.push('una mayúscula');
+        if (!/[a-z]/.test(password)) errors.push('una minúscula');
+        if (!/[0-9]/.test(password)) errors.push('un número');
+        return { isValid: errors.length === 0, errors };
+    }
+
 document.getElementById('confirmResetPassBtn').addEventListener('click', async () => {
     const leaderId = document.getElementById('resetPassLeaderId').value;
     const newUsername = document.getElementById('resetPassUsername').value.trim();
     const newPassword = document.getElementById('resetPassPassword').value.trim();
     const btn = document.getElementById('confirmResetPassBtn');
 
-    if (!newPassword || newPassword.length < 6) {
-        return showAlert('La contraseña debe tener al menos 6 caracteres', 'warning');
+    const validation = validatePassword(newPassword);
+    if (!newPassword || !validation.isValid) {
+        return showAlert(`La contraseña debe tener: ${validation.errors.join(', ')}`, 'warning');
     }
 
     btn.disabled = true;
@@ -855,7 +865,7 @@ document.getElementById('copyCredsBtn').addEventListener('click', () => {
 });
 
 // ====== MOSTRAR CREDENCIALES ======
-function showCredentials(leaderId, username, password) {
+async function showCredentials(leaderId) {
     const leader = allLeaders.find(l => l._id === leaderId);
     if (!leader) return showAlert('Líder no encontrado', 'error');
 
@@ -867,29 +877,66 @@ function showCredentials(leaderId, username, password) {
     const codeColor = isDarkMode ? '#ffd700' : '#333';
     const btnBg = isDarkMode ? '#4a5568' : '#6c757d';
 
-    const modal = document.createElement('div');
-    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
-    modal.innerHTML = `
-        <div style="background: ${bgColor}; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid ${isDarkMode ? '#2d3748' : '#ddd'};">
-            <h4 style="color: #667eea; margin-bottom: 20px;"><i class="bi bi-person-badge"></i> Credenciales del Líder</h4>
-            <div style="background: ${isDarkMode ? '#2d3748' : '#f8f9fa'}; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid ${isDarkMode ? '#4a5568' : '#ddd'};">
-                <p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Líder:</strong> ${leader.name}</p>
-                <p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Usuario:</strong> <code style="background: ${codeBg}; color: ${codeColor}; padding: 4px 8px; border-radius: 4px; font-weight: 600;">${username}</code></p>
-                <p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Contraseña Temporal:</strong> <code style="background: ${codeBg}; color: ${codeColor}; padding: 4px 8px; border-radius: 4px; font-size: 14px; font-weight: 600;">${password}</code></p>
-            </div>
-            <p style="color: ${labelColor}; font-size: 13px; margin-bottom: 20px;">
+    try {
+        const res = await apiCall(`/api/leaders/${leaderId}/credentials`);
+        const data = await res.json();
+
+        if (!res.ok) {
+            return showAlert(data.error || 'Error al obtener credenciales', 'error');
+        }
+
+        if (!data.hasCredentials) {
+            return showAlert('Este líder no tiene credenciales configuradas', 'warning');
+        }
+
+        const username = data.username;
+        const password = data.tempPassword || 'No disponible';
+        const passwordFixed = data.passwordFixed;
+        const message = data.message;
+
+        let passwordSection = '';
+        let infoText = '';
+        let copyBtn = '';
+
+        if (passwordFixed) {
+            passwordSection = `<p style="margin: 5px 0; color: #f59e0b; font-size: 14px; margin-top: 10px;"><i class="bi bi-exclamation-triangle"></i> ${message}</p>`;
+            infoText = '';
+            copyBtn = `<button onclick="navigator.clipboard.writeText('Usuario: ${username}'); this.innerHTML='<i class=\\'bi bi-check\\'></i> ¡Copiado!'; this.style.background='#28a745'; this.style.color='white';" class="btn btn-primary" style="flex: 1; background: #667eea; color: white; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-weight: 600;">
+                <i class="bi bi-clipboard"></i> Copiar Usuario
+            </button>`;
+        } else {
+            passwordSection = `<p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Contraseña Temporal:</strong> <code style="background: ${codeBg}; color: ${codeColor}; padding: 4px 8px; border-radius: 4px; font-size: 14px; font-weight: 600;">${password}</code></p>`;
+            infoText = `<p style="color: ${labelColor}; font-size: 13px; margin-bottom: 20px;">
                 <i class="bi bi-info-circle"></i> Esta es la última contraseña temporal generada por el administrador.
-            </p>
-            <div style="display: flex; gap: 10px;">
-                <button onclick="navigator.clipboard.writeText('Usuario: ${username}\\nContraseña: ${password}'); this.innerHTML='<i class=\\'bi bi-check\\'></i> ¡Copiado!'; this.style.background='#28a745'; this.style.color='white';" class="btn btn-primary" style="flex: 1; background: #667eea; color: white; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-weight: 600;">
-                    <i class="bi bi-clipboard"></i> Copiar
-                </button>
-                <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove();" class="btn btn-secondary" style="flex: 1; background: ${btnBg}; color: white; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-weight: 600;">Cerrar</button>
+            </p>`;
+            copyBtn = `<button onclick="navigator.clipboard.writeText('Usuario: ${username}\\nContraseña: ${password}'); this.innerHTML='<i class=\\'bi bi-check\\'></i> ¡Copiado!'; this.style.background='#28a745'; this.style.color='white';" class="btn btn-primary" style="flex: 1; background: #667eea; color: white; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-weight: 600;">
+                <i class="bi bi-clipboard"></i> Copiar
+            </button>`;
+        }
+
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+        modal.innerHTML = `
+            <div style="background: ${bgColor}; padding: 30px; border-radius: 12px; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid ${isDarkMode ? '#2d3748' : '#ddd'};">
+                <h4 style="color: #667eea; margin-bottom: 20px;"><i class="bi bi-person-badge"></i> Credenciales del Líder</h4>
+                <div style="background: ${isDarkMode ? '#2d3748' : '#f8f9fa'}; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid ${isDarkMode ? '#4a5568' : '#ddd'};">
+                    <p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Líder:</strong> ${leader.name}</p>
+                    <p style="margin: 5px 0; color: ${textColor};"><strong style="color: ${labelColor};">Usuario:</strong> <code style="background: ${codeBg}; color: ${codeColor}; padding: 4px 8px; border-radius: 4px; font-weight: 600;">${username}</code></p>
+                    ${passwordSection}
+                </div>
+                ${infoText}
+                <div style="display: flex; gap: 10px;">
+                    ${copyBtn}
+                    <button onclick="this.closest('div[style*=\\'position: fixed\\']').remove();" class="btn btn-secondary" style="flex: 1; background: ${btnBg}; color: white; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-weight: 600;">Cerrar</button>
+                </div>
             </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        `;
+        document.body.appendChild(modal);
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+    } catch (err) {
+        console.error(err);
+        showAlert('Error al obtener credenciales', 'error');
+    }
 }
 
 function populateLeaderFilter() {
@@ -2160,19 +2207,34 @@ addListener('confirmChangeEventBtn', 'click', () => {
 });
 
 // Logout
-function confirmLogout() {
+async function confirmLogout() {
+    try {
+        const token = localStorage.getItem('token');
+        if (token) {
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+        }
+    } catch (e) {
+        console.log('Logout server error (ignored):', e);
+    }
+    
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('eventId');
     localStorage.removeItem('username');
+    localStorage.removeItem('leaderId');
+    localStorage.removeItem('lastActivity');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('eventId');
     sessionStorage.removeItem('username');
     window.location.href = '/';
 }
-// Attach to a global or use onclick in HTML, but here we prefer JS attachment if ID exists
-// Note: original HTML has onclick="confirmLogout()". We should keep the function global.
 window.confirmLogout = confirmLogout;
 window.closeLogoutModal = function () { document.getElementById('logoutModal').classList.remove('active'); };
 
