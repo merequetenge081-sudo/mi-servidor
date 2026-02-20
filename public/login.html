@@ -335,6 +335,48 @@
             opacity: 0.8;
         }
 
+        /* Password Toggle Button */
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px;
+            transition: color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .password-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        /* Default role styling */
+        .login-card.default-role {
+            border-top: 4px solid #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .login-card.default-role h2 {
+            color: #667eea;
+        }
+
         @media (max-width: 768px) {
             .login-grid {
                 grid-template-columns: 1fr;
@@ -381,6 +423,9 @@
                         <div class="input-wrapper">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="adminPassword" placeholder="Ingrese contraseña" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('adminPassword')">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
                         </div>
                     </div>
                     <button type="submit" class="btn-admin" id="adminBtn">
@@ -395,7 +440,7 @@
             </div>
 
             <!-- Leader Login -->
-            <div class="login-card">
+            <div class="login-card default-role">
                 <h2><i class="fas fa-users"></i> Líder</h2>
                 <p class="subtitle">Gestiona tus registros</p>
 
@@ -415,6 +460,9 @@
                         <div class="input-wrapper">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="leaderPassword" placeholder="Ingrese contraseña" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('leaderPassword')">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
                         </div>
                     </div>
                     <button type="submit" class="btn-leader" id="leaderBtn">
@@ -469,6 +517,25 @@
 
     <script>
         const API_URL = window.location.origin;
+
+        // Password visibility toggle
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = event.currentTarget;
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                button.setAttribute('aria-label', 'Ocultar contraseña');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                button.setAttribute('aria-label', 'Mostrar contraseña');
+            }
+        }
 
         // Enable Enter key for form submission
         document.addEventListener('DOMContentLoaded', () => {

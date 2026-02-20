@@ -34,16 +34,21 @@
         .role-tab.active {
             background: white;
             color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.18);
+            transform: translateY(-1px);
         }
 
         .login-form {
             display: none;
-            animation: fadeIn 0.4s ease-out;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
         }
 
         .login-form.active {
             display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .screen {
@@ -99,54 +104,430 @@
         }
 
         .event-list-scrollable {
-            max-height: 400px;
+            max-height: 450px;
             overflow-y: auto;
-            margin-bottom: 20px;
-            padding-right: 5px;
-            /* For scrollbar space */
+            margin-bottom: 24px;
+            padding-right: 8px;
+            scroll-behavior: smooth;
         }
 
-        /* Custom Scrollbar for event list */
+        /* Premium Custom Scrollbar */
         .event-list-scrollable::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
 
         .event-list-scrollable::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
         }
 
         .event-list-scrollable::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            border: 2px solid rgba(0, 0, 0, 0.05);
         }
 
         .event-list-scrollable::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: linear-gradient(180deg, #5568d3 0%, #6a418a 100%);
         }
 
         .event-item {
             width: 100%;
-            padding: 20px;
-            margin-bottom: 12px;
-            background: white;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 16px;
             text-align: center;
-            /* Centered as requested */
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .event-item:hover::before {
+            left: 100%;
         }
 
         .event-item:hover {
-            border-color: var(--primary);
-            background: #f8fafc;
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f0f4ff 0%, #faf8ff 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+        }
+
+        .event-item strong {
+            display: block;
+            color: #1e293b;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            word-break: break-word;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+        }
+
+        .event-item small {
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+        }
+
+        /* Select Event Screen - Blue Background - Full Coverage */
+        #selectEventScreen {
+            background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 100%) !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden;
+        }
+
+        #selectEventScreen::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            pointer-events: none;
+        }
+
+        #selectEventScreen::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -80px;
+            left: -80px;
+            pointer-events: none;
+        }
+
+        #selectEventScreen.screen.active {
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            visibility: visible;
+            background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 100%) !important;
+        }
+
+        /* Premium Card Container */
+        #eventButtonsView,
+        #eventListContainer {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.7) !important;
+            border-radius: 24px !important;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08),
+                        0 0 1px rgba(0, 0, 0, 0.05) !important;
+            padding: 48px 40px !important;
+            max-width: 480px !important;
+            width: 90% !important;
+            animation: slideAndFadeIn 0.4s ease-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes slideAndFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #eventListContainer {
+            display: none;
+        }
+
+        #eventListContainer.show {
+            display: flex !important;
+            flex-direction: column;
+        }
+
+        /* Header Styling - Minimalista */
+        #eventButtonsView .text-center,
+        #eventListContainer .text-center {
+            margin-bottom: 40px !important;
+        }
+
+        #eventButtonsView .text-center h3,
+        #eventListContainer .text-center h3 {
+            color: #1e293b !important;
+            font-size: 1.35rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 8px !important;
+            letter-spacing: -0.3px;
+        }
+
+        #eventButtonsView .text-center p,
+        #eventListContainer .text-center p {
+            color: #94a3b8 !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            margin: 0 !important;
+        }
+
+        #eventButtonsView .text-center div,
+        #eventListContainer .text-center div {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%) !important;
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 16px !important;
+            margin: 0 auto 20px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        #eventButtonsView .text-center i,
+        #eventListContainer .text-center i {
+            color: #667eea !important;
+            font-size: 24px !important;
+        }
+
+        /* Container for buttons - Minimalista */
+        .event-buttons-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            text-align: center;
+            margin-bottom: 32px;
+            width: 100%;
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .event-buttons-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        .event-btn-card {
+            padding: 28px 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            min-height: 140px;
+            animation: cardFadeInUp 0.5s ease-out backwards;
+        }
+
+        .event-btn-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .event-btn-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes cardFadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .event-btn-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.03) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .event-btn-card:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f8ff 100%);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(102, 126, 234, 0.18);
+        }
+
+        .event-btn-card:hover::before {
+            opacity: 1;
+        }
+
+        .event-btn-card:active {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        }
+
+        .event-btn-card i {
+            font-size: 48px;
+            color: #667eea;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+            display: block;
+            line-height: 1;
+        }
+
+        .event-btn-card:hover i {
+            font-size: 52px;
+            transform: scale(1.25) rotateZ(10deg);
+            color: #667eea;
+            filter: drop-shadow(0 6px 16px rgba(102, 126, 234, 0.4));
+        }
+
+        .event-btn-card-title {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        .event-btn-card:hover .event-btn-card-title {
+            color: #667eea;
+        }
+
+        .event-btn-card-subtitle {
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 0.8rem;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+
+        .event-btn-card:hover .event-btn-card-subtitle {
+            color: #667eea;
+        }
+
+        /* Back Button Styling - Minimalista */
+        #backBtn3,
+        #backToButtonsBtn {
+            background: linear-gradient(135deg, #f0f4f8 0%, #eff2f7 100%) !important;
+            color: #64748b !important;
+            border: 1px solid #e2e8f0 !important;
+            padding: 14px 28px !important;
+            font-weight: 500 !important;
+            border-radius: 12px !important;
+            transition: all 0.3s ease !important;
+            margin-top: 20px !important;
+            font-size: 0.95rem !important;
+        }
+
+        #backBtn3:hover,
+        #backToButtonsBtn:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #dce4ed 100%) !important;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+            transform: translateY(-2px) !important;
+            color: #475569 !important;
+        }
+
+        /* Form Styling for modern inputs */
+        .modern-input {
+            background: linear-gradient(135deg, #f8fafc 0%, #fbfcfe 100%) !important;
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            padding: 14px 18px !important;
+            font-size: 0.95rem !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+            color: #1e293b !important;
+        }
+
+        .modern-input::placeholder {
+            color: #94a3b8 !important;
+            font-weight: 500 !important;
+        }
+
+        .modern-input:focus {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%) !important;
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+            outline: none !important;
+        }
+
+        .form-label {
+            color: #334155 !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 24px !important;
+        }
+
+        /* Error message styling */
+        .error-msg {
+            background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%) !important;
+            color: #991b1b !important;
+            padding: 14px 18px !important;
+            border-radius: 12px !important;
+            font-size: 0.9rem !important;
+            margin-bottom: 20px !important;
+            display: none !important;
+            border: 1px solid #fecaca !important;
+            font-weight: 500 !important;
+        }
+
+        .error-msg.show {
+            display: block !important;
+            animation: fadeIn 0.3s ease;
         }
 
         /* FIX: Ensure split layout takes full height and overrides .screen.active centering */
@@ -185,8 +566,8 @@
                 </div>
 
                 <div class="role-tabs">
-                    <div class="role-tab active" data-role="admin">Administrador</div>
-                    <div class="role-tab" data-role="leader">Líder</div>
+                    <div class="role-tab" data-role="admin">Administrador</div>
+                    <div class="role-tab active" data-role="leader">Líder</div>
                 </div>
 
                 <!-- ADMIN FORM -->
@@ -202,9 +583,13 @@
                     <div class="form-group mb-4">
                         <label class="form-label"
                             style="font-weight:600; font-size:0.9rem; margin-bottom:8px; display:block;">Contraseña</label>
-                        <div class="modern-input-group">
-                            <input type="password" id="adminPass" class="modern-input" placeholder="Contraseña segura">
+                        <div class="modern-input-group position-relative">
+                            <input type="password" id="adminPass" class="modern-input pe-5" placeholder="Contraseña segura">
                             <i class="bi bi-lock input-icon"></i>
+                            <button type="button" class="btn btn-link p-0 border-0 position-absolute end-0 top-50 translate-middle-y me-3 text-muted password-toggle"
+                                onclick="togglePasswordVisibility('adminPass', this)" aria-label="Mostrar contraseña">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="error-msg" id="adminError"></div>
@@ -227,9 +612,13 @@
                     <div class="form-group mb-2">
                         <label class="form-label"
                             style="font-weight:600; font-size:0.9rem; margin-bottom:8px; display:block;">Contraseña</label>
-                        <div class="modern-input-group">
-                            <input type="password" id="leaderPass" class="modern-input" placeholder="Tu contraseña">
+                        <div class="modern-input-group position-relative">
+                            <input type="password" id="leaderPass" class="modern-input pe-5" placeholder="Tu contraseña">
                             <i class="bi bi-key input-icon"></i>
+                            <button type="button" class="btn btn-link p-0 border-0 position-absolute end-0 top-50 translate-middle-y me-3 text-muted password-toggle"
+                                onclick="togglePasswordVisibility('leaderPass', this)" aria-label="Mostrar contraseña">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="text-end mb-4">
@@ -252,18 +641,129 @@
 
     <!-- CREATE EVENT SCREEN -->
     <div id="createEventScreen" class="screen">
-        <div class="login-card glass-panel animate-fade-in" style="max-width: 500px;">
+        <style>
+            #createEventScreen {
+                background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 100%);
+                position: relative;
+                overflow: hidden;
+            }
+
+            #createEventScreen::before {
+                content: '';
+                position: absolute;
+                width: 400px;
+                height: 400px;
+                background: radial-gradient(circle, rgba(102, 126, 234, 0.08) 0%, transparent 70%);
+                border-radius: 50%;
+                top: -100px;
+                right: -100px;
+                pointer-events: none;
+            }
+
+            #createEventScreen::after {
+                content: '';
+                position: absolute;
+                width: 300px;
+                height: 300px;
+                background: radial-gradient(circle, rgba(118, 75, 162, 0.06) 0%, transparent 70%);
+                border-radius: 50%;
+                bottom: -80px;
+                left: -80px;
+                pointer-events: none;
+            }
+
+            #createEventScreen.screen.active {
+                background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 100%);
+            }
+
+            #createEventScreen .login-card {
+                background: rgba(255, 255, 255, 0.95) !important;
+                backdrop-filter: blur(20px) !important;
+                -webkit-backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.7) !important;
+                border-radius: 24px !important;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08),
+                            0 0 1px rgba(0, 0, 0, 0.05) !important;
+                padding: 48px 40px !important;
+                max-width: 480px !important;
+                width: 90% !important;
+                animation: slideAndFadeIn 0.4s ease-out;
+                position: relative;
+                z-index: 10;
+            }
+
+            #createEventScreen .text-center h3 {
+                color: #1e293b !important;
+                font-size: 1.35rem !important;
+                font-weight: 700 !important;
+                margin-bottom: 8px !important;
+                letter-spacing: -0.3px;
+            }
+
+            #createEventScreen .text-center p {
+                color: #94a3b8 !important;
+                font-size: 0.9rem !important;
+                font-weight: 500 !important;
+            }
+
+            #createEventScreen .text-center div {
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%) !important;
+                width: 56px !important;
+                height: 56px !important;
+                border-radius: 16px !important;
+                margin: 0 auto 20px !important;
+            }
+
+            #createEventScreen .d-grid {
+                gap: 12px !important;
+                margin-top: 32px !important;
+            }
+
+            #createEventScreen .btn-modern {
+                padding: 16px 32px !important;
+                font-weight: 600 !important;
+                border-radius: 14px !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                font-size: 1rem !important;
+            }
+
+            #createEventScreen .btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                border: none !important;
+                box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2) !important;
+            }
+
+            #createEventScreen .btn-primary:hover {
+                transform: translateY(-3px) !important;
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.35) !important;
+                background: linear-gradient(135deg, #5568d3 0%, #6a418a 100%) !important;
+            }
+
+            #createEventScreen .btn-secondary {
+                background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+                color: #0f172a !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+
+            #createEventScreen .btn-secondary:hover {
+                background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%) !important;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+                transform: translateY(-2px) !important;
+            }
+        </style>
+
+        <div class="login-card glass-panel animate-fade-in" style="max-width: 480px;">
             <div class="text-center mb-4">
                 <div
-                    style="width: 60px; height: 60px; background: var(--light-bg); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px; color: var(--primary); font-size: 24px;">
+                    style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%); border-radius: 16px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; color: #667eea; font-size: 24px;">
                     <i class="bi bi-calendar-plus"></i>
                 </div>
-                <h3>Crear Nuevo Evento</h3>
-                <p class="text-muted">Configura un nuevo espacio de trabajo</p>
+                <h3 style="color: #1e293b; font-weight: 700; font-size: 1.35rem;">Crear Nuevo Evento</h3>
+                <p style="color: #94a3b8; font-weight: 500; font-size: 0.9rem;">Configura un nuevo espacio de trabajo</p>
             </div>
 
             <div class="form-group mb-3">
-                <label class="form-label" style="font-weight:600; margin-bottom:8px; display:block;">Nombre del
+                <label class="form-label" style="font-weight:600; margin-bottom:8px; display:block; color: #334155; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Nombre del
                     Evento</label>
                 <div class="modern-input-group">
                     <input type="text" id="eventName" class="modern-input" placeholder="Ej: Campaña Bogotá 2026">
@@ -272,7 +772,7 @@
             </div>
 
             <div class="form-group mb-4">
-                <label class="form-label" style="font-weight:600; margin-bottom:8px; display:block;">Descripción
+                <label class="form-label" style="font-weight:600; margin-bottom:8px; display:block; color: #334155; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Descripción
                     (Opcional)</label>
                 <div class="modern-input-group">
                     <input type="text" id="eventDesc" class="modern-input" placeholder="Detalles adicionales...">
@@ -291,14 +791,45 @@
 
     <!-- SELECT EVENT SCREEN -->
     <div id="selectEventScreen" class="screen">
-        <div class="login-card glass-panel" style="max-width: 500px;">
+        <!-- Button Selection View -->
+        <div id="eventButtonsView" class="login-card glass-panel" style="max-width: 500px;">
             <div class="text-center mb-4">
                 <div
-                    style="width: 60px; height: 60px; background: var(--light-bg); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px; color: var(--primary); font-size: 24px;">
+                    style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.08) 100%); border-radius: 16px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; color: #667eea; font-size: 24px;">
                     <i class="bi bi-calendar-check"></i>
                 </div>
-                <h3>Seleccionar Evento</h3>
-                <p class="text-muted">Elige dónde quieres trabajar hoy</p>
+                <h3 style="color: #1e293b; font-weight: 700; font-size: 1.4rem; margin-bottom: 8px;">Seleccionar Evento</h3>
+                <p style="color: #94a3b8; font-weight: 500; font-size: 0.9rem; margin: 0;">¿Qué deseas hacer?</p>
+            </div>
+
+            <div class="event-buttons-container">
+                <div class="event-btn-card" id="selectEventBtn" role="button">
+                    <i class="bi bi-folder-open"></i>
+                    <p class="event-btn-card-title">Entrar en Evento</p>
+                    <p class="event-btn-card-subtitle">Evento existente</p>
+                </div>
+                <div class="event-btn-card" id="createEventBtn" role="button">
+                    <i class="bi bi-plus-circle"></i>
+                    <p class="event-btn-card-title">Crear Evento</p>
+                    <p class="event-btn-card-subtitle">Nuevo evento</p>
+                </div>
+            </div>
+
+            <button id="backBtn3" type="button" class="btn-modern btn-secondary w-100"
+                onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='/';">
+                <i class="bi bi-arrow-left"></i> Volver a Login
+            </button>
+        </div>
+
+        <!-- Event List View -->
+        <div id="eventListContainer" class="login-card glass-panel" style="max-width: 500px;">
+            <div class="text-center mb-4">
+                <div
+                    style="width: 56px; height: 56px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.08) 100%); border-radius: 16px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; color: #667eea; font-size: 24px;">
+                    <i class="bi bi-calendar2-event"></i>
+                </div>
+                <h3 style="color: #1e293b; font-weight: 700; font-size: 1.4rem; margin-bottom: 8px;">Eventos Disponibles</h3>
+                <p style="color: #94a3b8; font-weight: 500; font-size: 0.9rem; margin: 0;">Selecciona donde trabajar hoy</p>
             </div>
 
             <div class="error-msg" id="selectError"></div>
@@ -307,9 +838,9 @@
                 <!-- Events populated by JS -->
             </div>
 
-            <button id="backBtn3" type="button" class="btn-modern btn-secondary w-100"
-                onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='/';">
-                <i class="bi bi-arrow-left"></i> Volver a Login
+            <button id="backToButtonsBtn" type="button" class="btn-modern btn-secondary w-100"
+                onclick="document.getElementById('eventListContainer').classList.remove('show'); document.getElementById('eventButtonsView').style.display = 'block';">
+                <i class="bi bi-arrow-left"></i> Volver
             </button>
         </div>
     </div>
@@ -358,8 +889,26 @@
     <!-- JS LOGIC - PRESERVED EXACTLY -->
     <script>
         const API_URL = window.location.origin;
-        let currentRole = 'admin';
+        let currentRole = 'leader';
         let adminToken = null;
+
+        // ============== PASSWORD TOGGLE ==============
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+                button.setAttribute('aria-label', 'Ocultar contraseña');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+                button.setAttribute('aria-label', 'Mostrar contraseña');
+            }
+        }
 
         // ============== ROLE SELECTOR ==============
         document.querySelectorAll('.role-tab').forEach(btn => {
@@ -584,12 +1133,15 @@
 
         // ============== EVENT SELECTION ==============
         document.getElementById('createEventBtn').addEventListener('click', () => {
+            document.getElementById('eventButtonsView').style.display = 'none';
+            document.getElementById('eventListContainer').classList.remove('show');
             showScreen('createEventScreen');
         });
 
         document.getElementById('selectEventBtn').addEventListener('click', () => {
+            document.getElementById('eventListContainer').classList.add('show');
+            document.getElementById('eventButtonsView').style.display = 'none';
             loadEvents();
-            showScreen('selectEventScreen');
         });
 
         // Redirect back btn
@@ -644,8 +1196,10 @@
         }
 
         document.getElementById('backBtn2').addEventListener('click', () => {
-            // Back from create event -> login/select
-            showScreen('loginScreen');
+            // Back from create event -> select event screen
+            document.getElementById('eventButtonsView').style.display = 'block';
+            document.getElementById('eventListContainer').classList.remove('show');
+            showScreen('selectEventScreen');
         });
 
         document.getElementById('backBtn3').addEventListener('click', () => {
@@ -706,8 +1260,9 @@
             if (token && role) {
                 if (role === 'admin') {
                     adminToken = token;
-                    // Auto show select event if logged in
-                    loadEvents();
+                    // Auto show select event screen if logged in
+                    document.getElementById('eventButtonsView').style.display = 'block';
+                    document.getElementById('eventListContainer').classList.remove('show');
                     showScreen('selectEventScreen');
                 } else {
                     window.location.href = '/leader.html';
