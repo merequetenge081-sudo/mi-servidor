@@ -7,6 +7,7 @@ import crypto from "crypto";
 import { Organization } from "../models/Organization.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
 import { emailService } from "../services/emailService.js";
+import { decrypt } from "../utils/crypto.js";
 
 // Generar token único de 32 caracteres hexadecimales
 function generateToken() {
@@ -157,16 +158,69 @@ export async function createLeader(req, res) {
 export async function getLeaders(req, res) {
   try {
     const { eventId, active } = req.query;
-    const filter = buildOrgFilter(req); // Multi-tenant filtering
+    const filter = buildOrgFilter(req);
 
     if (eventId) filter.eventId = eventId;
     if (active !== undefined) filter.active = active === "true";
 
-    const leaders = await Leader.find(filter).sort({ name: 1 });
+    const leaders = await Leader.find(filter)
+      .select('-passwordHash -tempPasswordPlaintext')
+      .sort({ name: 1 });
     res.json(leaders);
   } catch (error) {
     logger.error("Get leaders error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener líderes" });
+  }
+}
+
+export async function getLeaderCredentials(req, res) {
+  try {
+    const { id } = req.params;
+    const orgFilter = buildOrgFilter(req);
+
+    const leader = await Leader.findOne({ _id: id, ...orgFilter })
+      .select('username tempPasswordPlaintext name isTemporaryPassword');
+
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+
+    if (!leader.username) {
+      return res.json({ hasCredentials: false, username: null, tempPassword: null });
+    }
+
+    // Si el líder ya cambió su contraseña (no es temporal), no mostrar contraseña
+    if (!leader.isTemporaryPassword) {
+      return res.json({
+        hasCredentials: true,
+        username: leader.username,
+        tempPassword: null,
+        passwordFixed: true,
+        message: "Si el líder no puede cambiar su contraseña por favor genera una nueva",
+        name: leader.name
+      });
+    }
+
+    // Si tiene contraseña temporal, desencriptarla
+    let tempPassword = null;
+    if (leader.tempPasswordPlaintext) {
+      try {
+        tempPassword = decrypt(leader.tempPasswordPlaintext);
+      } catch (e) {
+        tempPassword = leader.tempPasswordPlaintext;
+      }
+    }
+
+    res.json({
+      hasCredentials: true,
+      username: leader.username,
+      tempPassword: tempPassword || 'No disponible',
+      passwordFixed: false,
+      name: leader.name
+    });
+  } catch (error) {
+    logger.error("Get leader credentials error:", { error: error.message, stack: error.stack });
+    res.status(500).json({ error: "Error al obtener credenciales" });
   }
 }
 

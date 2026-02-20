@@ -8,6 +8,7 @@ import { emailService } from "../services/emailService.js";
 import { config } from "../config/env.js";
 import logger from "../config/logger.js";
 import { findAdminWithFallback, findLeaderWithFallback, getTestCredentials } from "../utils/authFallback.js";
+import { validatePassword, getPasswordRequirements } from "../utils/passwordValidator.js";
 
 export async function adminLogin(req, res) {
   try {
@@ -17,31 +18,41 @@ export async function adminLogin(req, res) {
       return res.status(400).json({ error: "Username y password requeridos" });
     }
 
-    // Intenta obtener admin de MongoDB con fallback a memoria
     const { data: admin, source } = await findAdminWithFallback(Admin, username);
 
     if (!admin) {
-      return res.status(401).json({ error: "Credenciales inválidas" });
+      if (req.loginRateLimit) req.loginRateLimit.recordFailedAttempt();
+      const remaining = req.loginRateLimit ? req.loginRateLimit.getAttemptsRemaining() : 5;
+      return res.status(401).json({ 
+        error: "Credenciales inválidas", 
+        attemptsRemaining: remaining 
+      });
     }
 
     const isValid = await bcryptjs.compare(password, admin.passwordHash);
     if (!isValid) {
-      return res.status(401).json({ error: "Credenciales inválidas" });
+      if (req.loginRateLimit) req.loginRateLimit.recordFailedAttempt();
+      const remaining = req.loginRateLimit ? req.loginRateLimit.getAttemptsRemaining() : 5;
+      return res.status(401).json({ 
+        error: "Credenciales inválidas", 
+        attemptsRemaining: remaining 
+      });
     }
+
+    if (req.loginRateLimit) req.loginRateLimit.resetAttempts();
 
     const token = jwt.sign(
       {
         userId: admin._id,
         role: "admin",
         username: admin.username,
-        organizationId: admin.organizationId || null, // Multi-tenant context
-        source // Indica si proviene de MongoDB o memoria
+        organizationId: admin.organizationId || null,
+        source
       },
       config.jwtSecret,
       { expiresIn: "1h" }
     );
 
-    // Log de auditoría (solo si MongoDB está disponible)
     try {
       await AuditService.log("LOGIN", "Admin", admin._id.toString(), { username, role: "admin", source }, {}, `Admin ${username} inició sesión`);
     } catch (auditError) {
@@ -58,26 +69,18 @@ export async function adminLogin(req, res) {
 
 export async function leaderLogin(req, res) {
   try {
-    const { email, username, password } = req.body; // Accept email OR username
+    const { email, username, password } = req.body;
 
     if ((!email && !username) || !password) {
       return res.status(400).json({ error: "Usuario/Email y password requeridos" });
     }
 
-    // Determine query (Email or Username)
     const query = email ? { email } : { username };
 
-    // Intenta obtener líder de MongoDB con fallback a memoria
-    // NOTE: Fallback logic might need adjustment if it doesn't support username, 
-    // but for now we prioritize MongoDB which has the new fields.
-    // Assuming findLeaderWithFallback handles basic query or we query DB directly first.
-
-    // For security upgrade, let's query DB directly first as memory fallback might be legacy
     let leader = await Leader.findOne(query);
     let source = 'mongodb';
 
     if (!leader) {
-      // Fallback to legacy function if by email, but likely won't have passwordHash if legacy
       if (email) {
         const result = await findLeaderWithFallback(Leader, email);
         leader = result.data;
@@ -86,17 +89,29 @@ export async function leaderLogin(req, res) {
     }
 
     if (!leader || !leader.passwordHash) {
-      return res.status(401).json({ error: "Credenciales inválidas" });
+      if (req.loginRateLimit) req.loginRateLimit.recordFailedAttempt();
+      const remaining = req.loginRateLimit ? req.loginRateLimit.getAttemptsRemaining() : 5;
+      return res.status(401).json({ 
+        error: "Credenciales inválidas", 
+        attemptsRemaining: remaining 
+      });
     }
 
     const isValid = await bcryptjs.compare(password, leader.passwordHash);
     if (!isValid) {
-      return res.status(401).json({ error: "Credenciales inválidas" });
+      if (req.loginRateLimit) req.loginRateLimit.recordFailedAttempt();
+      const remaining = req.loginRateLimit ? req.loginRateLimit.getAttemptsRemaining() : 5;
+      return res.status(401).json({ 
+        error: "Credenciales inválidas", 
+        attemptsRemaining: remaining 
+      });
     }
 
     if (!leader.active) {
       return res.status(403).json({ error: "Cuenta inactiva. Contacte al administrador." });
     }
+
+    if (req.loginRateLimit) req.loginRateLimit.resetAttempts();
 
     const token = jwt.sign(
       {
@@ -104,8 +119,8 @@ export async function leaderLogin(req, res) {
         leaderId: leader.leaderId,
         role: "leader",
         name: leader.name,
-        organizationId: leader.organizationId, // Multi-tenant context
-        source // Indica si proviene de MongoDB o memoria
+        organizationId: leader.organizationId,
+        source
       },
       config.jwtSecret,
       { expiresIn: "1h" }
@@ -113,7 +128,6 @@ export async function leaderLogin(req, res) {
 
     logger.info(`✅ Leader login exitoso [${source}]`, { user: email || username, source });
 
-    // Return flag if password change is required
     res.json({
       token,
       source,
@@ -134,30 +148,26 @@ export async function changePassword(req, res) {
     const { currentPassword, newPassword } = req.body;
     const leaderId = req.user.userId;
 
-    if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ error: "La nueva contraseña debe tener al menos 6 caracteres" });
+    const validation = validatePassword(newPassword);
+    if (!validation.isValid) {
+      return res.status(400).json({ 
+        error: `La contraseña no cumple los requisitos: ${validation.errors.join(', ')}`,
+        requirements: getPasswordRequirements()
+      });
     }
 
     const leader = await Leader.findById(leaderId);
     if (!leader) return res.status(404).json({ error: "Usuario no encontrado" });
 
-    // Verify current (unless it's a force reset flow where we might want to relax this, 
-    // but typically we still ask for current to ensure session validity is manual? 
-    // Actually, if they are logged in with a valid token (which they strictly are to hit this endpoint), 
-    // enforcing current password is good practice but if they forgot it... 
-    // logic: If they are logged in, they know the current (temp) password.
-
     if (currentPassword) {
       const isValid = await bcryptjs.compare(currentPassword, leader.passwordHash);
       if (!isValid) return res.status(401).json({ error: "Contraseña actual incorrecta" });
     } else if (!leader.isTemporaryPassword) {
-      // If not temporary, we MUST require current password
       return res.status(400).json({ error: "Se requiere la contraseña actual" });
     }
 
     const salt = await bcryptjs.genSalt(10);
     const newHash = await bcryptjs.hash(newPassword, salt);
-    // Use updateOne to avoid validation issues on legacy documents
     await Leader.updateOne({ _id: leader._id }, {
       $set: {
         passwordHash: newHash,
@@ -448,21 +458,23 @@ export async function leaderChangePassword(req, res) {
     const { currentPassword, newPassword } = req.body;
     const leaderId = req.user.userId;
 
-    if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ error: "La nueva contraseña debe tener al menos 6 caracteres" });
+    const validation = validatePassword(newPassword);
+    if (!validation.isValid) {
+      return res.status(400).json({ 
+        error: `La contraseña no cumple los requisitos: ${validation.errors.join(', ')}`,
+        requirements: getPasswordRequirements()
+      });
     }
 
     const leader = await Leader.findById(leaderId);
     if (!leader) return res.status(404).json({ error: "Usuario no encontrado" });
 
-    // Verificar si puede cambiar contraseña
     if (!leader.passwordCanBeChanged && !leader.isTemporaryPassword) {
       return res.status(403).json({ 
         error: "No puedes cambiar tu contraseña. Solicita un reset al administrador." 
       });
     }
 
-    // Verificar contraseña actual
     if (currentPassword) {
       const isValid = await bcryptjs.compare(currentPassword, leader.passwordHash);
       if (!isValid) return res.status(401).json({ error: "Contraseña actual incorrecta" });
@@ -556,6 +568,17 @@ function decrypt(encryptedText) {
     return decrypted;
   } catch (error) {
     logger.error('Error desencriptando:', error.message);
-    return encryptedText; // Fallback: retornar texto original si falla
+    return encryptedText;
+  }
+}
+
+export async function logout(req, res) {
+  try {
+    await AuditService.log("LOGOUT", "User", req.user?.userId || 'unknown', req.user, {}, `Usuario cerró sesión`);
+    logger.info(`✅ Logout exitoso`, { userId: req.user?.userId });
+    res.json({ message: "Sesión cerrada exitosamente" });
+  } catch (error) {
+    logger.error("Logout error:", { error: error.message });
+    res.json({ message: "Sesión cerrada exitosamente" });
   }
 }

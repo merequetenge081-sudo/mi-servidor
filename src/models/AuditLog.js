@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const auditLogSchema = new mongoose.Schema({
   // Información de la acción
-  action: { type: String, required: true, enum: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'CONFIRM', 'UNCONFIRM', 'LOGIN', 'EXPORT'] },
+  action: { type: String, required: true, enum: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'CONFIRM', 'UNCONFIRM', 'LOGIN', 'LOGOUT', 'EXPORT'] },
   resourceType: { type: String, required: true },
   resourceId: String,
   
