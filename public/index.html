@@ -28,7 +28,7 @@
             border-radius: 8px;
             font-weight: 600;
             color: var(--text-muted);
-            transition: all 0.3s ease;
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
         }
 
         .role-tab.active {
@@ -39,7 +39,8 @@
 
         .login-form {
             display: none;
-            animation: fadeIn 0.4s ease-out;
+            will-change: opacity, transform;
+            animation: fadeIn 0.25s ease-out;
         }
 
         .login-form.active {
@@ -284,7 +285,8 @@
 
             <div class="d-grid gap-2">
                 <button id="createBtn" class="btn-modern btn-primary">Crear Evento</button>
-                <button id="backBtn2" class="btn-modern btn-secondary">Cancelar</button>
+                <button id="cancelCreateEventBtn" type="button" class="btn-modern btn-secondary"
+                    onclick="showScreen('selectEventScreen')">Cancelar</button>
             </div>
         </div>
     </div>
@@ -307,6 +309,11 @@
                 <!-- Events populated by JS -->
             </div>
 
+            <button id="createEventBtn" type="button" class="btn-modern btn-primary w-100 mb-3">
+                <i class="bi bi-plus-circle"></i> Crear Nuevo Evento
+            </button>
+
+
             <button id="backBtn3" type="button" class="btn-modern btn-secondary w-100"
                 onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='/';">
                 <i class="bi bi-arrow-left"></i> Volver a Login
@@ -319,7 +326,7 @@
 
     <!-- Modal de Recuperación de Contraseña -->
     <div id="forgotPasswordModal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center;">
         <div class="login-card glass-panel animate-fade-in" style="max-width: 450px; position: relative;">
             <button onclick="closeForgotPasswordModal()"
                 style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);">&times;</button>
@@ -643,10 +650,7 @@
             }
         }
 
-        document.getElementById('backBtn2').addEventListener('click', () => {
-            // Back from create event -> login/select
-            showScreen('loginScreen');
-        });
+
 
         document.getElementById('backBtn3').addEventListener('click', () => {
             // Logout and back to login
