@@ -72,7 +72,7 @@ class EmailService {
       const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
 
       // Configurar remitente y asunto
-      const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev'; // Default de Resend para testing
+      const fromEmail = process.env.EMAIL_FROM || 'redsp@fulars.com'; // Default de Resend para testing
       const subject = '🔗 Tu enlace personalizado de registro';
 
       logger.info(`📧 Email Options - TO: ${leader.email}, FROM: ${fromEmail}`);
