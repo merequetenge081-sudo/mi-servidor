@@ -1,0 +1,40 @@
+Resumen de cambios (1:00 a 6:00)
+
+Contexto general
+- Se modernizo la experiencia de login manteniendo la logica existente.
+- Se mejoraron plantillas de correo y la presentacion de selectores en modales.
+- Se unifico el rol de administracion y se eliminaron referencias a super_admin.
+- Se actualizaron rutas y middleware para el rol unico admin.
+- Se ajusto la gestion de .env para seguridad (no versionado).
+
+Cambios de interfaz (UX/UI)
+- Login: se establecio Lider como rol por defecto.
+- Login: se agrego boton para mostrar/ocultar contrasena en campos Admin y Lider.
+- Login: animaciones suaves al alternar roles (fade/slide y realce en pestaña activa).
+- Modales de seleccion de email: se convirtieron checkboxes en tarjetas modernas.
+- Estilos compartidos para tarjetas de email y animaciones suaves.
+
+Archivos de UI principales tocados
+- public/index.html (login real servido por /login y /).
+- public/login.html (login alterno).
+- public/dashboard.html y public/leaders.html (modales de emails).
+- public/css/dashboard.css (clases de tarjetas de email y animaciones).
+
+Cambios en correos (EmailService)
+- Plantillas HTML de correo re-hechas con tablas e inline styles (compatibles con Gmail/Outlook).
+- Plantillas actualizadas: welcome, credentials, warning, temporary password, QR/registro.
+- Estilo visual profesional con cabeceras en gradiente, CTA claros y avisos de seguridad.
+
+Autenticacion y roles
+- Se elimino el rol super_admin y variantes (superadmin/super_admin).
+- Se dejo un solo rol admin donde aplicaba control de acceso.
+- Ajustes en middleware y rutas para usar admin.
+
+Seguridad y repositorio
+- .env eliminado del tracking de Git y protegido via .gitignore.
+- Push exitoso a main con cambios de login y remocion de .env.
+
+Notas para el equipo
+- El login servido en /login y / es public/index.html.
+- Revisar que .env nunca se suba; debe permanecer local.
+- node_modules no debe versionarse; si existe, considerar limpieza futura.
