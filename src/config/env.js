@@ -2,7 +2,8 @@ export const config = {
   port: process.env.PORT || 5000,
   env: process.env.NODE_ENV || "development",
   apiUrl: process.env.API_URL || "http://localhost:5000",
-  jwtSecret: process.env.JWT_SECRET || (process.env.NODE_ENV === "production" ? null : "dev_secret_key_change_in_production")
+  jwtSecret: process.env.JWT_SECRET || (process.env.NODE_ENV === "production" ? null : "dev_secret_key_change_in_production"),
+  encryptionKey: process.env.ENCRYPTION_KEY || "dev_encryption_key_32_chars_long_exactly!!" // Must be 32 chars for AES-256
 };
 
 // Validación en producción

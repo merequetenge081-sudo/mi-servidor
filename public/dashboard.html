@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Gestión Política</title>
+    <title>Panel de Administración - Red Social y Política</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Icons -->
@@ -638,6 +638,64 @@
                         <button class="btn btn-secondary"
                             onclick="document.getElementById('changeEventModal').classList.remove('active')">Cancelar</button>
                         <button class="btn btn-primary" id="confirmChangeEventBtn">Cambiar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Registration Modal -->
+            <div class="modal-overlay" id="editRegModal">
+                <div class="modal-card">
+                    <div class="modal-header"
+                        style="border: none; display: flex; justify-content: space-between; align-items: center; padding-bottom: 0;">
+                        <h3
+                            style="font-size: 1.5rem; margin: 0; display: flex; align-items: center; gap: 12px; color: #667eea;">
+                            <i class="bi bi-pencil-square"></i> Editar Registro
+                        </h3>
+                        <button class="close-btn"
+                            onclick="document.getElementById('editRegModal').classList.remove('active')"><i
+                                class="bi bi-x-lg"></i></button>
+                    </div>
+                    <div class="modal-body" style="padding-top: 20px;">
+                        <input type="hidden" id="editRegId">
+
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="editRegFirstName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Apellido</label>
+                            <input type="text" id="editRegLastName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="editRegEmail" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Celular</label>
+                            <input type="tel" id="editRegPhone" class="form-control">
+                        </div>
+
+                        <!-- New Fields -->
+                        <div class="form-group">
+                            <label>Puesto de Votación</label>
+                            <input type="text" id="editRegVotingPlace" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Mesa</label>
+                            <input type="text" id="editRegVotingTable" class="form-control">
+                        </div>
+
+                        <!-- Keeping Localidad/Depto invisible but preserved or editable if needed later? 
+                             For now relying on existing data or add if requested. User screenshot showed these fields. -->
+
+                    </div>
+                    <div class="modal-footer" style="border: none; padding-top: 10px;">
+                        <button class="btn btn-secondary"
+                            onclick="document.getElementById('editRegModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-primary" id="saveEditRegBtn"
+                            style="background: #667eea; border-color: #667eea;">
+                            Guardar Cambios
+                        </button>
                     </div>
                 </div>
             </div>

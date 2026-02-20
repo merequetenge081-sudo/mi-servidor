@@ -6,6 +6,7 @@ import { AuditService } from "../services/audit.service.js";
 import { config } from "../config/env.js";
 import logger from "../config/logger.js";
 import { findAdminWithFallback, findLeaderWithFallback, getTestCredentials } from "../utils/authFallback.js";
+import { encrypt, decrypt } from "../utils/crypto.js";
 
 export async function adminLogin(req, res) {
   try {
@@ -109,6 +110,7 @@ export async function leaderLogin(req, res) {
       { expiresIn: "1h" }
     );
 
+    // Decrypt source if needed or logging (be careful not to log passwords)
     logger.info(`✅ Leader login exitoso [${source}]`, { user: email || username, source });
 
     // Return flag if password change is required
@@ -202,6 +204,7 @@ export async function adminResetPassword(req, res) {
 
     leader.passwordHash = passwordHash;
     leader.isTemporaryPassword = true;
+    leader.tempPasswordPlaintext = encrypt(tempPassword); // Encrypt before saving
     await leader.save();
 
     // Log & "Send Email"
@@ -324,9 +327,9 @@ export async function requestPasswordReset(req, res) {
 
     // Verificar si ya hay una solicitud pendiente
     if (leader.passwordResetRequested) {
-      return res.status(200).json({ 
+      return res.status(200).json({
         alreadyRequested: true,
-        message: "Ya se solicitó el cambio de contraseña. Por favor espere a que el administrador genere una nueva contraseña temporal.", 
+        message: "Ya se solicitó el cambio de contraseña. Por favor espere a que el administrador genere una nueva contraseña temporal.",
         leaderId: leader.leaderId,
         name: leader.name
       });
@@ -342,9 +345,9 @@ export async function requestPasswordReset(req, res) {
 
     logger.info(`Password reset solicitado para líder ${leader.name}`);
 
-    res.json({ 
+    res.json({
       alreadyRequested: false,
-      message: "Solicitud enviada. El administrador generará una nueva contraseña temporal.", 
+      message: "Solicitud enviada. El administrador generará una nueva contraseña temporal.",
       leaderId: leader.leaderId,
       name: leader.name
     });
@@ -382,7 +385,9 @@ export async function adminGenerateNewPassword(req, res) {
         isTemporaryPassword: true,
         passwordResetRequested: false,
         passwordCanBeChanged: true,
-        tempPasswordPlaintext: tempPassword // Guardar contraseña temporal para referencia del admin
+        passwordResetRequested: false,
+        passwordCanBeChanged: true,
+        tempPasswordPlaintext: encrypt(tempPassword) // Guardar contraseña temporal ENCRIPTADA para referencia del admin
       }
     });
 
@@ -390,8 +395,8 @@ export async function adminGenerateNewPassword(req, res) {
 
     logger.info(`Nueva contraseña temporal generada para ${leader.name}: ${tempPassword}`);
 
-    res.json({ 
-      message: "Nueva contraseña generada", 
+    res.json({
+      message: "Nueva contraseña generada",
       tempPassword,
       username: leader.username || leader.name
     });
@@ -416,8 +421,8 @@ export async function leaderChangePassword(req, res) {
 
     // Verificar si puede cambiar contraseña
     if (!leader.passwordCanBeChanged && !leader.isTemporaryPassword) {
-      return res.status(403).json({ 
-        error: "No puedes cambiar tu contraseña. Solicita un reset al administrador." 
+      return res.status(403).json({
+        error: "No puedes cambiar tu contraseña. Solicita un reset al administrador."
       });
     }
 

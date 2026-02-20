@@ -241,6 +241,8 @@ router.post("/send-whatsapp", authMiddleware, roleMiddleware("admin"), whatsappC
 router.post("/leaders/:id/send-qr", authMiddleware, roleMiddleware("admin"), whatsappController.sendQRCode);
 
 // ==================== MIGRACIÓN DE USUARIOS ====================
+import { encrypt } from "../utils/crypto.js";
+
 router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async (req, res) => {
   try {
     const { Leader } = await import("../models/Leader.js");
@@ -296,7 +298,7 @@ router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async
           isTemporaryPassword: true,
           passwordCanBeChanged: true,
           passwordResetRequested: false,
-          tempPasswordPlaintext: tempPassword
+          tempPasswordPlaintext: encrypt(tempPassword)
         }
       });
 
