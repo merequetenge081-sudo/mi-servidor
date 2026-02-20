@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Líder - Sistema de Gestión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --light-bg: #f5f7fb;
+            --white: #ffffff;
+            --dark: #1a1a2e;
+            --text-dark: #1a1a1a;
+            --text-muted: #6c757d;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--light-bg);
+            overflow-x: hidden;
+        }
+
+        /* ============== NAVBAR ============== */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 12px 24px;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ============== MAIN CONTAINER ============== */
+        .main-container {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            padding: 20px;
+        }
+
+        /* ============== VIEW TRANSITIONS ============== */
+        .view {
+            display: none;
+            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* ============== WELCOME VIEW ============== */
+        .welcome-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .welcome-header {
+            margin-bottom: 60px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .welcome-title {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .welcome-subtitle {
+            font-size: 20px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: scaleIn 0.5s ease-out backwards;
+        }
+
+        .action-card:nth-child(1) { animation-delay: 0.1s; }
+        .action-card:nth-child(2) { animation-delay: 0.2s; }
+        .action-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .action-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .action-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .card-description {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ============== REGISTRATIONS VIEW ============== */
+        .registrations-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .page-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: var(--light-bg);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        .toolbar {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 2px solid var(--light-bg);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            border: 2px solid var(--light-bg);
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 2px solid var(--light-bg);
+            color: var(--text-dark);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .modern-table thead {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .modern-table thead th {
+            padding: 18px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--light-bg);
+        }
+
+        .modern-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .modern-table tbody tr:hover {
+            background: var(--light-bg);
+        }
+
+        .modern-table tbody td {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            margin-right: 6px;
+        }
+
+        .action-btn-edit {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .action-btn-edit:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .action-btn-delete {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-btn-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+            background: white;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 2px solid var(--light-bg);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .page-number {
+            padding: 8px 16px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* ============== NEW REGISTRATION VIEW ============== */
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--light-bg);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--danger);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .form-actions button {
+            flex: 1;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* ============== STATISTICS VIEW ============== */
+        .statistics-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .stats-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card-modern {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .stat-card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon.primary {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+        }
+
+        .stat-icon.success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+            color: #6b21a8;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ============== SUCCESS MODAL ============== */
+        .success-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .success-modal.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: all;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .success-modal h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .success-modal p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* ============== RESPONSIVE ============== */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 36px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .navbar-brand {
+                font-size: 16px;
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ============== LOADING STATE ============== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="navbar-brand">
+            <i class="bi bi-people-fill"></i>
+            Panel del Líder
+        </div>
+        <div class="navbar-actions">
+            <button class="nav-btn" onclick="goToView('welcome')" title="Inicio">
+                <i class="bi bi-house-fill"></i>
+            </button>
+            <button class="nav-btn" id="notificationsBtn" title="Notificaciones">
+                <i class="bi bi-bell-fill"></i>
+            </button>
+            <button class="nav-btn" id="helpBtn" title="Ayuda">
+                <i class="bi bi-question-circle-fill"></i>
+            </button>
+            <button class="nav-btn" title="Cerrar sesión" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        
+        <!-- WELCOME VIEW -->
+        <div id="welcomeView" class="view active">
+            <div class="welcome-container">
+                <div class="welcome-header">
+                    <h1 class="welcome-title">Bienvenido, <span id="leaderNameWelcome">Líder</span></h1>
+                    <p class="welcome-subtitle">Gestiona tus registros y haz crecer tu equipo</p>
+                </div>
+
+                <div class="cards-grid">
+                    <!-- CARD 1: Ver Registros -->
+                    <div class="action-card" onclick="goToView('registrations')">
+                        <div class="card-icon">
+                            <i class="bi bi-table"></i>
+                        </div>
+                        <h3 class="card-title">📋 Ver Registros</h3>
+                        <p class="card-description">
+                            Administra, edita, importa y exporta tus registros de forma sencilla
+                        </p>
+                    </div>
+
+                    <!-- CARD 2: Agregar Persona -->
+                    <div class="action-card" onclick="goToView('newRegistration')">
+                        <div class="card-icon">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <h3 class="card-title">➕ Agregar Persona Nueva</h3>
+                        <p class="card-description">
+                            Registra una nueva persona manualmente en tu equipo
+                        </p>
+                    </div>
+
+                    <!-- CARD 3: Estadísticas -->
+                    <div class="action-card" onclick="goToView('statistics')">
+                        <div class="card-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h3 class="card-title">📊 Mis Estadísticas</h3>
+                        <p class="card-description">
+                            Visualiza tu rendimiento y métricas en tiempo real
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REGISTRATIONS VIEW -->
+        <div id="registrationsView" class="view">
+            <div class="registrations-container">
+                <button class="back-btn" onclick="goToView('welcome')">
+                    <i class="bi bi-arrow-left"></i> Volver al inicio
+                </button>
+
+                <div class="page-header">
+                    <h2>
+                        <i class="bi bi-table"></i>
+                        Gestión de Registros
+                    </h2>
+                </div>
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar por nombre, email o cédula...">
+                    </div>
+                    
+                    <select class="filter-select" id="filterStatus">
+                        <option value="">Todos los estados</option>
+                        <option value="confirmed">✓ Confirmados</option>
+                        <option value="pending">⏱ Pendientes</option>
+                    </select>
+
+                    <button class="btn-secondary" onclick="refreshRegistrations()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Actualizar
+                    </button>
+
+                    <button class="btn-primary" onclick="exportToExcel()">
+                        <i class="bi bi-download"></i>
+                        Exportar
+                    </button>
+
+                    <button class="btn-primary" onclick="goToView('newRegistration')">
+                        <i class="bi bi-plus-lg"></i>
+                        Nuevo Registro
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registrationsTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px;">
+                                    <div class="loading"></div>
+                                    <p style="margin-top: 12px; color: var(--text-muted);">Cargando registros...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="pagination" id="paginationControls">
+                        <button id="prevPageBtn" onclick="previousPage()" disabled>
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <span class="page-number">Página <span id="currentPage">1</span> de <span id="totalPages">1</span></span>
+                        <button id="nextPageBtn" onclick="nextPage()">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW REGISTRATION VIEW -->
+        <div id="newRegistrationView" class="view">
+            <div class="form-container">
+                <button class="back-btn" onclick="goToView('welcome')">
+                    <i class="bi bi-arrow-left"></i> Volver al inicio
+                </button>
+
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2>➕ Nuevo Registro</h2>
+                        <p>Completa todos los campos para agregar una nueva persona</p>
+                    </div>
+
+                    <form id="newRegistrationForm" onsubmit="handleSubmit(event)">
+                        <div class="form-group">
+                            <label class="form-label">Nombre Completo *</label>
+                            <input type="text" class="form-input" id="fullName" required>
+                            <span class="error-message" id="fullNameError">Este campo es requerido</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-input" id="email" required>
+                            <span class="error-message" id="emailError">Ingresa un email válido</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Cédula *</label>
+                            <input type="text" class="form-input" id="cedula" required>
+                            <span class="error-message" id="cedulaError">Ingresa una cédula válida</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Teléfono *</label>
+                            <input type="tel" class="form-input" id="phone" required>
+                            <span class="error-message" id="phoneError">Ingresa un teléfono válido</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Localidad</label>
+                            <select class="form-input" id="locality">
+                                <option value="">Selecciona una localidad</option>
+                                <option value="Usaquén">Usaquén</option>
+                                <option value="Chapinero">Chapinero</option>
+                                <option value="Santa Fe">Santa Fe</option>
+                                <option value="San Cristóbal">San Cristóbal</option>
+                                <option value="Usme">Usme</option>
+                                <option value="Tunjuelito">Tunjuelito</option>
+                                <option value="Bosa">Bosa</option>
+                                <option value="Kennedy">Kennedy</option>
+                                <option value="Fontibón">Fontibón</option>
+                                <option value="Engativá">Engativá</option>
+                                <option value="Suba">Suba</option>
+                                <option value="Barrios Unidos">Barrios Unidos</option>
+                                <option value="Teusaquillo">Teusaquillo</option>
+                                <option value="Los Mártires">Los Mártires</option>
+                                <option value="Antonio Nariño">Antonio Nariño</option>
+                                <option value="Puente Aranda">Puente Aranda</option>
+                                <option value="La Candelaria">La Candelaria</option>
+                                <option value="Rafael Uribe Uribe">Rafael Uribe Uribe</option>
+                                <option value="Ciudad Bolívar">Ciudad Bolívar</option>
+                                <option value="Sumapaz">Sumapaz</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="goToView('welcome')">
+                                <i class="bi bi-x-lg"></i> Cancelar
+                            </button>
+                            <button type="submit" class="btn-primary">
+                                <i class="bi bi-check-lg"></i> Guardar Registro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATISTICS VIEW -->
+        <div id="statisticsView" class="view">
+            <div class="statistics-container">
+                <button class="back-btn" onclick="goToView('welcome')">
+                    <i class="bi bi-arrow-left"></i> Volver al inicio
+                </button>
+
+                <div class="page-header">
+                    <h2>
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Estadísticas y Métricas
+                    </h2>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid-4">
+                    <div class="stat-card-modern">
+                        <div class="stat-icon primary">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="stat-value" id="totalRegistrationsStat">0</div>
+                        <div class="stat-label">Total Registros</div>
+                    </div>
+
+                    <div class="stat-card-modern">
+                        <div class="stat-icon success">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <div class="stat-value" id="confirmedStat">0</div>
+                        <div class="stat-label">Confirmados</div>
+                    </div>
+
+                    <div class="stat-card-modern">
+                        <div class="stat-icon warning">
+                            <i class="bi bi-clock-fill"></i>
+                        </div>
+                        <div class="stat-value" id="pendingStat">0</div>
+                        <div class="stat-label">Pendientes</div>
+                    </div>
+
+                    <div class="stat-card-modern">
+                        <div class="stat-icon purple">
+                            <i class="bi bi-percent"></i>
+                        </div>
+                        <div class="stat-value" id="confirmRateStat">0%</div>
+                        <div class="stat-label">Tasa de Confirmación</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>
+                            <i class="bi bi-pie-chart-fill"></i>
+                            Estado de Registros
+                        </h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>
+                            <i class="bi bi-bar-chart-fill"></i>
+                            Registros por Día (Últimos 7 días)
+                        </h3>
+                        <canvas id="dailyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeSuccessModal()"></div>
+    <div class="success-modal" id="successModal">
+        <div class="success-icon">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        <h3>¡Registro Exitoso!</h3>
+        <p>La persona ha sido agregada correctamente a tu equipo</p>
+        <button class="btn-primary" onclick="closeSuccessModal()">
+            Aceptar
+        </button>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let currentToken = localStorage.getItem('token');
+        let currentLeaderId = localStorage.getItem('leaderId');
+        let myRegistrations = [];
+        let filteredRegistrations = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // ============== VIEW NAVIGATION ==============
+        function goToView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Show target view
+            const targetView = document.getElementById(viewName + 'View');
+            if (targetView) {
+                targetView.classList.add('active');
+                
+                // Load data for specific views
+                if (viewName === 'registrations') {
+                    loadRegistrations();
+                } else if (viewName === 'statistics') {
+                    loadStatistics();
+                }
+            }
+        }
+
+        // ============== AUTH ==============
+        function checkAuth() {
+            if (!currentToken || !currentLeaderId) {
+                window.location.href = '/';
+                return false;
+            }
+            return true;
+        }
+
+        function logout() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                localStorage.removeItem('leaderId');
+                window.location.href = '/';
+            }
+        }
+
+        // ============== REGISTRATIONS ==============
+        async function loadRegistrations() {
+            try {
+                const response = await fetch(`${API_URL}/api/registrations?leaderId=${currentLeaderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al cargar registros');
+
+                const data = await response.json();
+                myRegistrations = data.registrations || [];
+                filteredRegistrations = [...myRegistrations];
+                renderRegistrations();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar los registros');
+            }
+        }
+
+        function renderRegistrations() {
+            const tbody = document.getElementById('registrationsTableBody');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredRegistrations.slice(start, end);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            <i class="bi bi-inbox" style="font-size: 48px; color: var(--text-muted);"></i>
+                            <p style="margin-top: 12px; color: var(--text-muted);">No hay registros para mostrar</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = pageData.map(reg => `
+                    <tr>
+                        <td>${reg.name || ''}</td>
+                        <td>${reg.email || ''}</td>
+                        <td>${reg.cedula || ''}</td>
+                        <td>${reg.phone || ''}</td>
+                        <td>
+                            <span class="badge ${reg.status === 'confirmed' ? 'badge-success' : 'badge-warning'}">
+                                ${reg.status === 'confirmed' ? '✓ Confirmado' : '⏱ Pendiente'}
+                            </span>
+                        </td>
+                        <td>${new Date(reg.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <button class="action-btn action-btn-edit" onclick="editRegistration('${reg._id}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" onclick="deleteRegistration('${reg._id}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredRegistrations.length / itemsPerPage);
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderRegistrations();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredRegistrations.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderRegistrations();
+            }
+        }
+
+        function refreshRegistrations() {
+            loadRegistrations();
+        }
+
+        function exportToExcel() {
+            alert('Función de exportación en desarrollo');
+        }
+
+        function editRegistration(id) {
+            alert('Editar registro: ' + id);
+        }
+
+        function deleteRegistration(id) {
+            if (confirm('¿Estás seguro de eliminar este registro?')) {
+                alert('Eliminar registro: ' + id);
+            }
+        }
+
+        // Search and filter
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const filterStatus = document.getElementById('filterStatus');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const search = e.target.value.toLowerCase();
+                    const status = filterStatus?.value || '';
+
+                    filteredRegistrations = myRegistrations.filter(reg => {
+                        const matchSearch = !search || 
+                            (reg.name && reg.name.toLowerCase().includes(search)) ||
+                            (reg.email && reg.email.toLowerCase().includes(search)) ||
+                            (reg.cedula && reg.cedula.toLowerCase().includes(search));
+
+                        const matchStatus = !status || reg.status === status;
+
+                        return matchSearch && matchStatus;
+                    });
+
+                    currentPage = 1;
+                    renderRegistrations();
+                });
+            }
+
+            if (filterStatus) {
+                filterStatus.addEventListener('change', () => {
+                    searchInput.dispatchEvent(new Event('input'));
+                });
+            }
+        });
+
+        // ============== NEW REGISTRATION ==============
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                cedula: document.getElementById('cedula').value,
+                phone: document.getElementById('phone').value,
+                locality: document.getElementById('locality').value,
+                leaderId: currentLeaderId
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/registrations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) throw new Error('Error al guardar');
+
+                showSuccessModal();
+                document.getElementById('newRegistrationForm').reset();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar el registro');
+            }
+        }
+
+        function showSuccessModal() {
+            document.getElementById('modalOverlay').classList.add('show');
+            document.getElementById('successModal').classList.add('show');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            document.getElementById('successModal').classList.remove('show');
+            goToView('registrations');
+        }
+
+        // ============== STATISTICS ==============
+        let statusChart = null;
+        let dailyChart = null;
+
+        function loadStatistics() {
+            // Calculate stats
+            const total = myRegistrations.length;
+            const confirmed = myRegistrations.filter(r => r.status === 'confirmed').length;
+            const pending = total - confirmed;
+            const confirmRate = total > 0 ? Math.round((confirmed / total) * 100) : 0;
+
+            document.getElementById('totalRegistrationsStat').textContent = total;
+            document.getElementById('confirmedStat').textContent = confirmed;
+            document.getElementById('pendingStat').textContent = pending;
+            document.getElementById('confirmRateStat').textContent = confirmRate + '%';
+
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart');
+            if (statusChart) statusChart.destroy();
+            statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Confirmados', 'Pendientes'],
+                    datasets: [{
+                        data: [confirmed, pending],
+                        backgroundColor: ['#10b981', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Daily Chart (mock data)
+            const dailyCtx = document.getElementById('dailyChart');
+            if (dailyChart) dailyChart.destroy();
+            dailyChart = new Chart(dailyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                    datasets: [{
+                        label: 'Registros',
+                        data: [12, 19, 8, 15, 10, 3, 9],
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 5
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============== INIT ==============
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!checkAuth()) return;
+
+            // Load leader name
+            fetch(`${API_URL}/api/leaders/${currentLeaderId}`, {
+                headers: { 'Authorization': `Bearer ${currentToken}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.leader) {
+                    document.getElementById('leaderNameWelcome').textContent = data.leader.name || 'Líder';
+                }
+            })
+            .catch(console.error);
+
+            // Load initial data
+            loadRegistrations();
+        });
+    </script>
+</body>
+</html>

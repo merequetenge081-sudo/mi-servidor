@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Líderes - Panel Administrativo</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0d6efd">
+</head>
+<body class="bg-gray-100">
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Loader Overlay -->
+  <div id="loader-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 flex items-center gap-4">
+      <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
+      <span class="text-lg font-semibold">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-users text-2xl text-purple-600"></i>
+        <h1 class="text-2xl font-bold text-gray-800">Gestión de Líderes</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="toggleNotifications()" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition relative" title="Notificaciones">
+          <i class="fas fa-bell text-xl"></i>
+          <span id="notifications-badge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+        </button>
+        <button onclick="toggleHelp()" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition" title="Ayuda">
+          <i class="fas fa-question-circle text-xl"></i>
+        </button>
+        <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white min-h-screen fixed">
+      <div class="p-6 border-b border-gray-700">
+        <h2 class="text-xl font-bold">Menú</h2>
+      </div>
+      <nav class="p-4 space-y-2">
+        <a href="/dashboard.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="/events.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-calendar"></i> Eventos
+        </a>
+        <a href="/leaders.html" class="flex items-center gap-3 p-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition">
+          <i class="fas fa-users"></i> Líderes
+        </a>
+        <a href="/registrations.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-lg transition">
+          <i class="fas fa-clipboard-list"></i> Registros
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 p-8">
+      <div class="max-w-7xl">
+        <!-- Header con contadores -->
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800">Líderes</h2>
+            <p class="text-gray-600 mt-1">
+              Total: <span id="total-leaders" class="font-semibold text-blue-600">0</span> |
+              Activos: <span id="active-leaders" class="font-semibold text-green-600">0</span> |
+              Inactivos: <span id="inactive-leaders" class="font-semibold text-red-600">0</span>
+            </p>
+          </div>
+          <button id="create-btn" onclick="openCreateModal()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition shadow-md flex items-center gap-2">
+            <i class="fas fa-plus"></i>
+            <span>Crear Líder</span>
+          </button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <!-- Total Líderes -->
+          <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-600 text-sm font-medium">Total Líderes</p>
+                <p id="kpi-total-leaders" class="text-3xl font-bold text-blue-600 mt-2">0</p>
+              </div>
+              <i class="fas fa-users text-3xl text-blue-200"></i>
+            </div>
+          </div>
+
+          <!-- Total Registros -->
+          <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-600">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-600 text-sm font-medium">Total Registros</p>
+                <p id="kpi-total-registrations" class="text-3xl font-bold text-green-600 mt-2">0</p>
+              </div>
+              <i class="fas fa-clipboard-list text-3xl text-green-200"></i>
+            </div>
+          </div>
+
+          <!-- Confirmados -->
+          <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-600">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-600 text-sm font-medium">Confirmados</p>
+                <p id="kpi-confirmed" class="text-3xl font-bold text-purple-600 mt-2">0</p>
+              </div>
+              <i class="fas fa-check-circle text-3xl text-purple-200"></i>
+            </div>
+          </div>
+
+          <!-- % Conversión -->
+          <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-600">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-600 text-sm font-medium">% Conversión</p>
+                <p id="kpi-conversion" class="text-3xl font-bold text-orange-600 mt-2">0%</p>
+              </div>
+              <i class="fas fa-chart-pie text-3xl text-orange-200"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Solicitudes de Cambio de Contraseña Pendientes -->
+        <div id="password-requests-section" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg hidden">
+          <div class="flex items-start gap-3">
+            <i class="fas fa-exclamation-triangle text-yellow-600 text-2xl mt-1"></i>
+            <div class="flex-1">
+              <h3 class="font-bold text-yellow-800 mb-2">Solicitudes de Cambio de Contraseña Pendientes</h3>
+              <div id="password-requests-list" class="space-y-2">
+                <!-- Se llenarán dinámicamente -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Daily Trend Chart -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-chart-line text-blue-600"></i>
+              Tendencia de Registros
+            </h3>
+            <div id="daily-chart-skeleton" class="space-y-2 mb-4">
+              <div class="h-4 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-48 bg-gray-100 rounded animate-pulse"></div>
+            </div>
+            <canvas id="dailyTrendChart" class="hidden"></canvas>
+          </div>
+
+          <!-- Top Leaders Chart -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-chart-bar text-green-600"></i>
+              Top 5 Líderes
+            </h3>
+            <div id="top-leaders-skeleton" class="space-y-3 mb-4">
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+              <div class="h-6 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+            <canvas id="topLeadersChart" class="hidden"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-history text-purple-600"></i>
+            Actividad Reciente
+          </h3>
+          <div id="recent-activity-skeleton" class="space-y-3 mb-4">
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+            <div class="h-16 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+          <div id="recent-activity-list" class="space-y-3 hidden"></div>
+        </div>
+
+        <div class="mb-6">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-star text-yellow-500"></i>
+            Top Líderes
+          </h3>
+          <div id="ranking-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <!-- Skeleton loaders -->
+            <div class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg h-32 animate-pulse"></div>
+            <div class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg h-32 animate-pulse"></div>
+            <div class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg h-32 animate-pulse"></div>
+            <div class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg h-32 animate-pulse"></div>
+            <div class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg h-32 animate-pulse"></div>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-filter text-blue-600"></i>
+            Filtros
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Buscar por nombre</label>
+              <input
+                type="text"
+                id="filter-name"
+                placeholder="Ej: Juan Pérez"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+              <select id="filter-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todos</option>
+                <option value="true">Activos</option>
+                <option value="false">Inactivos</option>
+              </select>
+            </div>
+            <div class="flex items-end gap-2">
+              <button onclick="applyFilters()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                <i class="fas fa-search"></i>
+                Filtrar
+              </button>
+              <button onclick="clearFilters()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Leader ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Área</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Registros</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Confirmados</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">% Conversión</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Estado</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="leaders-tbody" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+                    <div class="space-y-3">
+                      <div class="h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-pulse"></div>
+                      <div class="h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-pulse"></div>
+                      <div class="h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-pulse"></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Crear/Editar -->
+  <div id="form-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+      <div class="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center">
+        <h2 id="modal-title" class="text-2xl font-bold text-gray-800">Crear Líder</h2>
+        <button onclick="closeFormModal()" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+
+      <form id="leader-form" class="p-6 space-y-4">
+        <input type="hidden" id="leader-id">
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Leader ID *</label>
+          <input id="leaderId" type="text" placeholder="L001" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          <p id="leaderId-error" class="text-red-600 text-xs mt-1 hidden"></p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
+          <input id="name" type="text" placeholder="Juan Pérez" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          <p id="name-error" class="text-red-600 text-xs mt-1 hidden"></p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input id="email" type="email" placeholder="juan@example.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <p id="email-error" class="text-red-600 text-xs mt-1 hidden"></p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+          <input id="phone" type="tel" placeholder="3001234567" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Área</label>
+          <input id="area" type="text" placeholder="Bogotá" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Evento ID</label>
+          <input id="eventId" type="text" placeholder="EVENT001" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña <span id="password-hint" class="text-xs text-gray-500">(opcional)</span></label>
+          <input id="password" type="password" placeholder="Dejar en blanco para no cambiar" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <p id="password-error" class="text-red-600 text-xs mt-1 hidden"></p>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button id="submit-btn" type="submit" class="flex-1 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
+            Guardar
+          </button>
+          <button type="button" onclick="closeFormModal()" class="flex-1 bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-400 transition">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal QR Profesional -->
+  <div id="qr-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-lg max-w-lg w-full overflow-hidden shadow-2xl scale-95 transition-transform duration-300" id="qr-modal-content">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">Código QR del Líder</h2>
+          <p id="qr-leader-name" class="text-blue-100 text-sm mt-1"></p>
+        </div>
+        <button onclick="closeQRModal()" class="text-white hover:bg-blue-800 p-2 rounded-lg transition">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="p-8 space-y-6">
+        <!-- QR Image -->
+        <div class="bg-gray-50 p-6 rounded-lg flex justify-center">
+          <img id="qr-image" src="" alt="QR Code" class="w-64 h-64 object-contain">
+        </div>
+
+        <!-- Leader Info -->
+        <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+          <div>
+            <p class="text-xs text-gray-600 uppercase font-semibold">Leader ID</p>
+            <p id="qr-leader-id" class="text-lg font-bold text-gray-800"></p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-600 uppercase font-semibold">Registros</p>
+            <p id="qr-registrations" class="text-lg font-bold text-blue-600">0</p>
+          </div>
+        </div>
+
+        <!-- Link -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Link público del formulario</label>
+          <div class="flex gap-2">
+            <input id="qr-link" type="text" readonly class="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-xs font-mono">
+            <button id="copy-link-btn" onclick="copyLink()" class="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-3 gap-3">
+          <button id="download-qr-btn" onclick="downloadQR()" class="bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fas fa-download"></i>
+            <span>Descargar</span>
+          </button>
+          <button id="open-form-btn" onclick="openForm()" class="bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fas fa-external-link-alt"></i>
+            <span>Abrir</span>
+          </button>
+          <button onclick="closeQRModal()" class="bg-gray-300 text-gray-800 px-4 py-3 rounded-lg hover:bg-gray-400 transition font-medium">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmación -->
+  <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full">
+      <div class="flex items-center gap-3 mb-4">
+        <i id="confirm-icon" class="fas fa-exclamation-triangle text-3xl text-yellow-500"></i>
+        <h3 id="confirm-title" class="text-xl font-bold text-gray-800">Confirmar acción</h3>
+      </div>
+      <div id="confirm-message" class="text-gray-600 mb-6 whitespace-pre-wrap leading-relaxed">¿Está seguro que desea realizar esta acción?</div>
+      <div class="flex gap-3 justify-end">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+          Cancelar
+        </button>
+        <button id="confirm-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Enviar Correos -->
+  <div id="send-emails-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-md w-full">
+      <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 text-white flex justify-between items-center rounded-t-lg">
+        <div>
+          <h2 class="text-2xl font-bold">Enviar Correos</h2>
+          <p id="send-emails-leader-name" class="text-green-100 text-sm mt-1"></p>
+        </div>
+        <button onclick="closeSendEmailsModal()" class="text-white hover:bg-green-800 p-2 rounded-lg transition">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <input type="hidden" id="send-emails-leader-id">
+        <p class="text-gray-600 mb-4">Selecciona los correos que deseas enviar:</p>
+
+        <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+          <input type="checkbox" id="send-welcome-check" class="mt-1">
+          <div>
+            <p class="font-semibold text-gray-800">📧 Bienvenida</p>
+            <p class="text-xs text-gray-500">Email de bienvenida al sistema</p>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+          <input type="checkbox" id="send-credentials-check" class="mt-1">
+          <div>
+            <p class="font-semibold text-gray-800">🔑 Credenciales</p>
+            <p class="text-xs text-gray-500">Usuario y contraseña de acceso</p>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+          <input type="checkbox" id="send-qr-check" class="mt-1" checked>
+          <div>
+            <p class="font-semibold text-gray-800">📲 Código QR</p>
+            <p class="text-xs text-gray-500">QR del enlace de registro</p>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+          <input type="checkbox" id="send-warning-check" class="mt-1">
+          <div>
+            <p class="font-semibold text-gray-800">⚠️ Aviso/Recordatorio</p>
+            <p class="text-xs text-gray-500">Mensaje de recordatorio o alerta</p>
+          </div>
+        </label>
+
+        <div id="send-emails-result" class="hidden mt-4 p-3 rounded-lg"></div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeSendEmailsModal()" class="flex-1 bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-400 transition">
+            Cancelar
+          </button>
+          <button id="send-emails-btn" onclick="confirmSendEmails()" class="flex-1 bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2">
+            <i class="fas fa-paper-plane"></i>
+            Enviar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/leaders.js"></script>
+</body>
+</html>
+
