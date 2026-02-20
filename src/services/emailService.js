@@ -1,66 +1,36 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import QRCode from 'qrcode';
 import logger from '../config/logger.js';
 
 class EmailService {
   constructor() {
-    this.transporter = null;
-    this.initTransporter();
+    this.resend = null;
+    this.initClient();
   }
 
-  initTransporter() {
+  initClient() {
     // Log de variables de entorno para debugging
     logger.info(`📧 EmailService Init - NODE_ENV: ${process.env.NODE_ENV}`);
-    logger.info(`📧 EMAIL_USER configurado: ${process.env.EMAIL_USER ? 'Si' : 'No'}`);
-    logger.info(`📧 EMAIL_PASS configurado: ${process.env.EMAIL_PASS ? 'Si' : 'No'}`);
-    logger.info(`📧 SMTP_HOST: ${process.env.SMTP_HOST || 'smtp.hostinger.com'}`);
-    logger.info(`📧 SMTP_PORT: ${process.env.SMTP_PORT || '465'}`);
 
-    // Permitir intento de envío real si se definen EMAIL_USER y EMAIL_PASS
-    const hasEmailCredentials = process.env.EMAIL_USER && process.env.EMAIL_PASS;
+    // Configuración de API Key: Priorizar RESEND_API_KEY, fallback a otras si el usuario las usó
+    const apiKey = process.env.RESEND_API_KEY || process.env.EMAIL_PASS;
+    const hasApiKey = !!apiKey;
     const forceMock = process.env.FORCE_EMAIL_MOCK === 'true';
 
-    if (!hasEmailCredentials || forceMock) {
-      logger.warn('⚠️  Usando modo mock para emails (credenciales no configuradas o forzado).');
+    logger.info(`📧 RESEND_API_KEY configurado: ${hasApiKey ? 'Si' : 'No'}`);
+
+    if (!hasApiKey || forceMock) {
+      logger.warn('⚠️  Usando modo mock para emails (API Key no configurada o forzado).');
       this.mockMode = true;
       return;
     }
 
     try {
-      const smtpHost = process.env.SMTP_HOST || 'smtp.hostinger.com';
-      const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
-      const smtpSecure = smtpPort === 465;
-
-      logger.info(`📧 Intentando conectar SMTP: ${smtpHost}:${smtpPort} (secure: ${smtpSecure})`);
-
-      this.transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpSecure,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-        connectionTimeout: 20000,    // 20 segundos
-        socketTimeout: 20000,        // 20 segundos
-        greetingTimeout: 10000,      // 10 segundos para greeting
-        pool: {
-          maxConnections: 5,
-          maxMessages: 100,
-          rateDelta: 1000,            // Esperar 1 segundo entre grupos de mensajes
-          rateLimit: 5                // Máximo 5 mensajes por segundo
-        },
-        tls: {
-          rejectUnauthorized: false,
-          minVersion: 'TLSv1.2'
-        }
-      });
-
+      this.resend = new Resend(apiKey);
       this.mockMode = false;
-      logger.info(`✅ SMTP configurado correctamente: ${smtpHost}:${smtpPort} (secure: ${smtpSecure})`);
+      logger.info(`✅ Cliente Resend inicializado correctamente.`);
     } catch (error) {
-      logger.error('❌ Error configurando EmailService:', error.message);
-      logger.error('Stack:', error.stack);
+      logger.error('❌ Error configurando EmailService (Resend):', error.message);
       this.mockMode = true;
     }
   }
@@ -75,7 +45,7 @@ class EmailService {
     try {
       logger.info(`📧 sendAccessEmail() llamada para: ${leader?.email || 'SIN EMAIL'}`);
       logger.info(`📧 Mock mode: ${this.mockMode}`);
-      
+
       if (!leader || !leader.email) {
         throw new Error('Leader email no proporcionado');
       }
@@ -89,7 +59,7 @@ class EmailService {
       }
 
       const registrationLink = `${baseUrl}/form.html?token=${leader.token}`;
-      
+
       logger.info(`📧 Generando QR para enlace: ${registrationLink}`);
 
       // Generar QR como data URI (para incrustar en el email)
@@ -101,14 +71,11 @@ class EmailService {
 
       const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
 
-      const mailOptions = {
-        from: process.env.EMAIL_USER || 'noreply@servidor.com',
-        to: leader.email,
-        subject: '🔗 Tu enlace personalizado de registro',
-        html: htmlContent,
-      };
+      // Configurar remitente y asunto
+      const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev'; // Default de Resend para testing
+      const subject = '🔗 Tu enlace personalizado de registro';
 
-      logger.info(`📧 mailOptions TO: ${mailOptions.to}, FROM: ${mailOptions.from}`);
+      logger.info(`📧 Email Options - TO: ${leader.email}, FROM: ${fromEmail}`);
 
       // Si está en mock mode, no enviar
       if (this.mockMode) {
@@ -117,7 +84,7 @@ class EmailService {
 ║           📧 MOCK EMAIL - MODO DESARROLLO          ║
 ╚════════════════════════════════════════════════════╝
 To: ${leader.email}
-Subject: ${mailOptions.subject}
+Subject: ${subject}
 ────────────────────────────────────────────────────
 ${leader.name}, tu enlace de registro es:
 ${registrationLink}
@@ -125,51 +92,43 @@ ${registrationLink}
         return { success: true, mock: true };
       }
 
-      // Enviar correo real con reintentos
-      logger.info(`📧 Enviando correo a ${leader.email}...`);
-      
-      let lastError = null;
-      for (let attempt = 1; attempt <= 2; attempt++) {
-        try {
-          logger.info(`📧 Intento ${attempt}/2 de envío a ${leader.email}...`);
-          
-          // Usar Promise.race para un timeout de 15 segundos en la solicitud
-          const sendPromise = this.transporter.sendMail(mailOptions);
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Email send timeout')), 15000)
-          );
-          
-          const info = await Promise.race([sendPromise, timeoutPromise]);
-          logger.info(`✅ Email enviado exitosamente a ${leader.email} (Message ID: ${info.messageId})`);
-          return { success: true, messageId: info.messageId, mock: false };
-        } catch (smtpError) {
-          lastError = smtpError;
-          logger.error(`❌ Error SMTP en intento ${attempt}:`, smtpError.message);
-          
-          // Si es timeout y no es el último intento, esperar y reintentar
-          if ((smtpError.code === 'ETIMEDOUT' || smtpError.message.includes('timeout')) && attempt < 2) {
-            logger.warn(`⏳ Timeout, esperando 2s antes de reintentar...`);
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            continue;
-          }
-          
-          // Si no es timeout, no reintentar
-          if (smtpError.code !== 'ETIMEDOUT' && !smtpError.message.includes('timeout')) {
-            break;
-          }
-        }
+      // Enviar correo real con Resend
+      logger.info(`📧 Enviando correo a ${leader.email} con Resend...`);
+
+      const { data, error } = await this.resend.emails.send({
+        from: fromEmail,
+        to: leader.email,
+        subject: subject,
+        html: htmlContent,
+      });
+
+      if (error) {
+        logger.error(`❌ Error regresado por Resend:`, error);
+        throw new Error(`Resend Error: ${error.message || JSON.stringify(error)}`);
       }
 
-      // Fallback después de fallos
-      logger.warn(`📧 Fallback a MOCK: ${lastError?.message}`);
-      return { success: false, mock: true, fallback: true, error: lastError?.message };
+      logger.info(`✅ Email enviado exitosamente a ${leader.email} (Message ID: ${data.id})`);
+      return { success: true, messageId: data.id, mock: false };
+
     } catch (error) {
       logger.error('❌ Error procesando email:', {
         message: error.message,
         stack: error.stack,
         leaderEmail: leader?.email,
       });
-      throw new Error(`No se pudo enviar el email: ${error.message}`);
+
+      // Intentar fallback a mock si falla el envío real para no detener el flujo totalmente en dev
+      if (!this.mockMode) {
+        logger.warn(`📧 Fallo en envío real, retornando error pero permitiendo flujo (fallback simulado no activo).`);
+      }
+
+      // Retornar estructura de error consistente
+      return {
+        success: false,
+        mock: this.mockMode,
+        fallback: false,
+        error: error.message
+      };
     }
   }
 
@@ -178,7 +137,7 @@ ${registrationLink}
    */
   generateEmailHTML(leaderName, registrationLink, qrDataUri) {
     const firstName = leaderName.split(' ')[0];
-    
+
     return `
     <!DOCTYPE html>
     <html lang="es">

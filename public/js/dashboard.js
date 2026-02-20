@@ -1,10 +1,37 @@
 const API_URL = window.location.origin;
-// Intentar leer token de sessionStorage primero (más seguro), luego localStorage
+
+// Read from URL params first (most reliable on first load after redirect),
+// then fall back to sessionStorage / localStorage
+const _urlParams = new URLSearchParams(window.location.search);
+const _urlEventId = _urlParams.get('eventId');
+const _urlEventName = _urlParams.get('eventName');
+
+if (_urlEventId) {
+    // Sync URL values into storage so all subsequent reads are consistent
+    sessionStorage.setItem('eventId', _urlEventId);
+    localStorage.setItem('eventId', _urlEventId);
+    if (_urlEventName) {
+        sessionStorage.setItem('eventName', _urlEventName);
+        localStorage.setItem('eventName', _urlEventName);
+    }
+    // Clean URL (remove query params) without reloading the page
+    history.replaceState(null, '', '/dashboard.html');
+}
+
 let currentToken = sessionStorage.getItem('token') || localStorage.getItem('token');
-let currentEventId = sessionStorage.getItem('eventId') || localStorage.getItem('eventId');
+let currentEventId = _urlEventId || sessionStorage.getItem('eventId') || localStorage.getItem('eventId');
 let allLeaders = [];
 let allRegistrations = [];
 let charts = {};
+
+// Set event name display IMMEDIATELY from storage so it never shows "Cargando evento..."
+document.addEventListener('DOMContentLoaded', () => {
+    const eventNameEl = document.getElementById('eventNameDisplay');
+    if (eventNameEl) {
+        const storedName = _urlEventName || sessionStorage.getItem('eventName') || localStorage.getItem('eventName');
+        eventNameEl.textContent = storedName || 'Evento';
+    }
+});
 
 // Paginación separada para cada pestaña
 let currentPageBogota = 1;
@@ -309,15 +336,24 @@ async function loadDashboard() {
     // Update Event Name in background (non-blocking)
     updateEventNameDisplay();
 
+    // At this point, log currentEventId for debugging
+    console.log('[DASHBOARD] loadDashboard called. currentEventId:', currentEventId, '| Token:', currentToken ? 'OK' : 'MISSING');
+
     try {
-        const leadersRes = await apiCall(`/api/leaders${currentEventId ? '?eventId=' + currentEventId : ''}`);
+        const leadersUrl = `/api/leaders${currentEventId ? '?eventId=' + currentEventId : ''}`;
+        console.log('[DASHBOARD] Fetching leaders:', leadersUrl);
+        const leadersRes = await apiCall(leadersUrl);
         const leadersData = await leadersRes.json();
         const rawLeaders = Array.isArray(leadersData) ? leadersData : (leadersData.data || []);
+        console.log('[DASHBOARD] Leaders received:', rawLeaders.length);
         allLeaders = processLeaders(rawLeaders);
 
-        const regsRes = await apiCall(`/api/registrations${currentEventId ? '?eventId=' + currentEventId + '&' : '?'}limit=1000`);
+        const regsUrl = `/api/registrations${currentEventId ? '?eventId=' + currentEventId + '&' : '?'}limit=1000`;
+        console.log('[DASHBOARD] Fetching registrations:', regsUrl);
+        const regsRes = await apiCall(regsUrl);
         const regsData = await regsRes.json();
         allRegistrations = Array.isArray(regsData) ? regsData : (regsData.data || []);
+        console.log('[DASHBOARD] Registrations received:', allRegistrations.length);
 
         updateStats();
         loadLeadersTable();
@@ -559,6 +595,13 @@ async function sendAccessEmail(leaderId, leaderName, leaderEmail) {
     // Guardar datos para usar después
     pendingEmailData = { leaderId, leaderName, leaderEmail };
 
+    // Reset Button State securely
+    const confirmBtn = document.querySelector('#sendEmailModal .btn-primary');
+    if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="bi bi-send-fill" style="margin-right: 6px;"></i> Enviar Correo';
+    }
+
     // Mostrar modal
     document.getElementById('sendEmailLeaderName').textContent = leaderName;
     document.getElementById('sendEmailLeaderEmail').textContent = leaderEmail;
@@ -566,7 +609,16 @@ async function sendAccessEmail(leaderId, leaderName, leaderEmail) {
 }
 
 function closeSendEmailModal() {
-    document.getElementById('sendEmailModal').classList.remove('active');
+    const modal = document.getElementById('sendEmailModal');
+    if (modal) {
+        modal.classList.remove('active');
+        // Double check reset to ensure clean state on close
+        const confirmBtn = modal.querySelector('.btn-primary');
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = '<i class="bi bi-send-fill" style="margin-right: 6px;"></i> Enviar Correo';
+        }
+    }
     pendingEmailData = null;
 }
 
@@ -574,11 +626,14 @@ async function confirmSendAccessEmail() {
     if (!pendingEmailData) return;
 
     const { leaderId, leaderName, leaderEmail } = pendingEmailData;
-    closeSendEmailModal();
+
+    // UI Feedback: Change button to loading state
+    const confirmBtn = document.querySelector('#sendEmailModal .btn-primary');
+    const originalBtnText = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<span class="loading-spinner"></span> Enviando...';
 
     try {
-        showAlert('Enviando correo...', 'info');
-
         const res = await apiCall(`/api/leaders/${leaderId}/send-access`, {
             method: 'POST'
         });
@@ -590,27 +645,35 @@ async function confirmSendAccessEmail() {
 
         const result = await res.json();
 
-        // Mostrar modal de resultado detallado según el status
+        // Close modal immediately on success (SLIENT SUCCESS as requested)
+        // This will now also reset the button state due to the update in closeSendEmailModal
+        closeSendEmailModal();
+
+        // Handle specific failure cases that should still notify
         if (result.success === false && result.fallback) {
-            // Es fallback - error SMTP
             showAlert(
-                `⚠️ Error SMTP: No se pudo enviar el correo a ${leaderEmail}\n\nDetalles: ${result.error}\n\nVerifica los logs del servidor para más información.`,
+                `⚠️ Error SMTP: No se pudo enviar el correo a ${leaderEmail}\n\nDetalles: ${result.error}`,
                 'warning'
             );
         } else if (result.mock) {
-            // Es modo mock
             showAlert(
-                `📋 Modo Simulado: El correo se simula pero no se envía\n\nDestinatario: ${leaderEmail}\n\nNota: Verifica que EMAIL_USER y EMAIL_PASS estén configurados.`,
+                `📋 Modo Simulacro (No enviado real)\n\nDestinatario: ${leaderEmail}`,
                 'info'
             );
         } else {
-            // Es real - exitoso
-            showAlert(`✅ Correo enviado exitosamente a ${leaderEmail}\n\nEl líder recibirá su enlace de registro.`, 'success');
+            // Success Case: Show confirmation popup
+            showSuccessModal('✅ Correo Enviado', `El correo fue enviado exitosamente a ${leaderEmail}`);
         }
 
     } catch (error) {
         console.error('Error al enviar correo:', error);
         showAlert(`❌ Error al enviar correo: ${error.message}`, 'error');
+
+        // Reset button state only on error (on success closeSendEmailModal does it)
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = originalBtnText; // Restore original text (with icon)
+        }
     }
 }
 
@@ -873,8 +936,11 @@ function renderRegistrationTable(tab, data) {
             <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
             <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
             <td>
-                <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${reg.confirmed}">
+                <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${reg.confirmed}" title="${reg.confirmed ? 'Desmarcar' : 'Confirmar'}">
                     <i class="bi bi-check-circle"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-primary edit-reg-btn" data-reg-id="${reg._id}" title="Editar Registro">
+                    <i class="bi bi-pencil"></i>
                 </button>
             </td>
         </tr>
@@ -889,9 +955,82 @@ function renderRegistrationTable(tab, data) {
     // Actualizar controles de paginación
     updatePaginationControls(tab, currentPage, totalPages);
 
-    // Agregar event listeners a botones de confirmación
+    // Agregar event listeners a botones
     document.querySelectorAll('.toggle-confirm-btn').forEach(btn => {
         btn.addEventListener('click', () => toggleConfirm(btn.dataset.regId, btn.dataset.confirmed === 'true'));
+    });
+
+    document.querySelectorAll('.edit-reg-btn').forEach(btn => {
+        btn.addEventListener('click', () => showEditRegistration(btn.dataset.regId));
+    });
+}
+
+// EDIT REGISTRATION LOGIC
+function showEditRegistration(regId) {
+    const reg = allRegistrations.find(r => r._id === regId);
+    if (!reg) return showAlert('Registro no encontrado', 'error');
+
+    document.getElementById('editRegId').value = regId;
+    document.getElementById('editRegFirstName').value = reg.firstName || '';
+    document.getElementById('editRegLastName').value = reg.lastName || '';
+    document.getElementById('editRegEmail').value = reg.email || '';
+    document.getElementById('editRegPhone').value = reg.phone || '';
+    document.getElementById('editRegVotingPlace').value = reg.votingPlace || '';
+    document.getElementById('editRegVotingTable').value = reg.votingTable || '';
+
+    document.getElementById('editRegModal').classList.add('active');
+}
+
+// Bind Save Edit Registration Button
+if (document.getElementById('saveEditRegBtn')) {
+    document.getElementById('saveEditRegBtn').addEventListener('click', async () => {
+        const id = document.getElementById('editRegId').value;
+        const firstName = document.getElementById('editRegFirstName').value;
+        const lastName = document.getElementById('editRegLastName').value;
+        const email = document.getElementById('editRegEmail').value;
+        const phone = document.getElementById('editRegPhone').value;
+        const votingPlace = document.getElementById('editRegVotingPlace').value;
+        const votingTable = document.getElementById('editRegVotingTable').value;
+
+        if (!firstName || !lastName) return showAlert('Nombre y Apellido son obligatorios', 'warning');
+
+        try {
+            const btn = document.getElementById('saveEditRegBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Guardando...';
+
+            const res = await apiCall(`/api/registrations/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    firstName,
+                    lastName,
+                    email,
+                    phone,
+                    votingPlace,
+                    votingTable
+                })
+            });
+
+            if (res.ok) {
+                document.getElementById('editRegModal').classList.remove('active');
+                // Reload data to reflect changes
+                loadDashboard();
+                showSuccessModal('¡Actualizado!', 'El registro ha sido actualizado correctamente.');
+            } else {
+                const data = await res.json();
+                showAlert('Error: ' + (data.error || 'No se pudo actualizar'), 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+
+        } catch (err) {
+            console.error(err);
+            showAlert('Error de conexión', 'error');
+            document.getElementById('saveEditRegBtn').disabled = false;
+            document.getElementById('saveEditRegBtn').textContent = 'Guardar Cambios';
+        }
     });
 }
 
@@ -1991,10 +2130,6 @@ function isBogotaRegistration(reg) {
     return bogotaLocalidades.includes(reg.localidad);
 }
 
-function loadRegistrationsTabbed() {
-    filterRegistrations();
-}
-
 // Global functions needed for HTML onclick attributes
 window.showRegistrationTab = function (tab) {
     currentTab = tab;
@@ -2022,7 +2157,15 @@ window.showRegistrationTab = function (tab) {
         bogotaRegs.style.display = 'none';
         restoRegs.style.display = 'block';
     }
+
+    // Refresh current view pagination/filter
+    if (tab === 'bogota') changePageBogota('current');
+    else changePageResto('current');
 };
+
+function loadRegistrationsTabbed() {
+    filterRegistrations();
+}
 
 addListener('exportBogotaBtn', 'click', () => {
     const bogota = allRegistrations.filter(r => bogotaLocalidades.includes(r.localidad));

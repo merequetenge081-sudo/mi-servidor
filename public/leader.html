@@ -2016,11 +2016,11 @@
             <form id="editForm" onsubmit="saveEditRegistration(event)">
                 <input type="hidden" id="editId">
                 <div class="form-group">
-                    <label class="form-label">Nombre</label>
+                    <label class="form-label required">Nombre</label>
                     <input type="text" class="form-input" id="editFirstName" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Apellido</label>
+                    <label class="form-label required">Apellido</label>
                     <input type="text" class="form-input" id="editLastName" required>
                 </div>
                 <div class="form-group">
@@ -2028,16 +2028,113 @@
                     <input type="email" class="form-input" id="editEmail">
                 </div>
                 <div class="form-group">
+                    <label class="form-label required">Cédula</label>
+                    <input type="text" class="form-input" id="editCedula" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Ubicación</label>
+                    <div class="ubicacion-selector">
+                        <div class="ubicacion-option">
+                            <input type="radio" name="editUbicacionTipo" id="editUbicacionBogota" value="bogota"
+                                onchange="toggleEditUbicacion('bogota')" checked>
+                            <label for="editUbicacionBogota" class="ubicacion-label">
+                                <i class="bi bi-buildings"></i>
+                                Bogotá D.C.
+                            </label>
+                        </div>
+                        <div class="ubicacion-option">
+                            <input type="radio" name="editUbicacionTipo" id="editUbicacionResto" value="resto"
+                                onchange="toggleEditUbicacion('resto')">
+                            <label for="editUbicacionResto" class="ubicacion-label">
+                                <i class="bi bi-geo-alt"></i>
+                                Resto del país
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="editBogotaContainer">
+                        <label class="form-label required">Localidad</label>
+                        <select class="form-input" id="editLocalidad" required>
+                            <option value="">Selecciona tu localidad</option>
+                            <option value="Usaquén">Usaquén</option>
+                            <option value="Chapinero">Chapinero</option>
+                            <option value="Santa Fe">Santa Fe</option>
+                            <option value="San Cristóbal">San Cristóbal</option>
+                            <option value="Usme">Usme</option>
+                            <option value="Tunjuelito">Tunjuelito</option>
+                            <option value="Bosa">Bosa</option>
+                            <option value="Kennedy">Kennedy</option>
+                            <option value="Fontibón">Fontibón</option>
+                            <option value="Engativá">Engativá</option>
+                            <option value="Suba">Suba</option>
+                            <option value="Barrios Unidos">Barrios Unidos</option>
+                            <option value="Teusaquillo">Teusaquillo</option>
+                            <option value="Los Mártires">Los Mártires</option>
+                            <option value="Antonio Nariño">Antonio Nariño</option>
+                            <option value="Puente Aranda">Puente Aranda</option>
+                            <option value="La Candelaria">La Candelaria</option>
+                            <option value="Rafael Uribe Uribe">Rafael Uribe Uribe</option>
+                            <option value="Ciudad Bolívar">Ciudad Bolívar</option>
+                            <option value="Sumapaz">Sumapaz</option>
+                        </select>
+                    </div>
+
+                    <div id="editRestoContainer" style="display: none;">
+                        <label class="form-label required">Departamento</label>
+                        <select class="form-input" id="editDepartamento" onchange="actualizarEditCapital()">
+                            <option value="">Selecciona tu departamento</option>
+                            <option value="Amazonas">Amazonas</option>
+                            <option value="Antioquia">Antioquia</option>
+                            <option value="Arauca">Arauca</option>
+                            <option value="Atlántico">Atlántico</option>
+                            <option value="Bolívar">Bolívar</option>
+                            <option value="Boyacá">Boyacá</option>
+                            <option value="Caldas">Caldas</option>
+                            <option value="Caquetá">Caquetá</option>
+                            <option value="Casanare">Casanare</option>
+                            <option value="Cauca">Cauca</option>
+                            <option value="Cesar">Cesar</option>
+                            <option value="Chocó">Chocó</option>
+                            <option value="Córdoba">Córdoba</option>
+                            <option value="Cundinamarca">Cundinamarca</option>
+                            <option value="Guainía">Guainía</option>
+                            <option value="Guaviare">Guaviare</option>
+                            <option value="Huila">Huila</option>
+                            <option value="La Guajira">La Guajira</option>
+                            <option value="Magdalena">Magdalena</option>
+                            <option value="Meta">Meta</option>
+                            <option value="Nariño">Nariño</option>
+                            <option value="Norte de Santander">Norte de Santander</option>
+                            <option value="Putumayo">Putumayo</option>
+                            <option value="Quindío">Quindío</option>
+                            <option value="Risaralda">Risaralda</option>
+                            <option value="San Andrés y Providencia">San Andrés y Providencia</option>
+                            <option value="Santander">Santander</option>
+                            <option value="Sucre">Sucre</option>
+                            <option value="Tolima">Tolima</option>
+                            <option value="Valle del Cauca">Valle del Cauca</option>
+                            <option value="Vaupés">Vaupés</option>
+                            <option value="Vichada">Vichada</option>
+                        </select>
+
+                        <div id="editCapitalContainer" style="margin-top: 12px; display: none;">
+                            <label class="form-label">Capital</label>
+                            <input type="text" class="form-input" id="editCapital" readonly
+                                style="background: #f5f5f5; cursor: not-allowed;">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Puesto de Votación</label>
+                    <input type="text" class="form-input" id="editVotingPlace" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Mesa</label>
+                    <input type="text" class="form-input" id="editVotingTable" required>
+                </div>
+                <div class="form-group">
                     <label class="form-label">Celular</label>
                     <input type="text" class="form-input" id="editPhone">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Puesto de Votación</label>
-                    <input type="text" class="form-input" id="editVotingPlace">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Mesa</label>
-                    <input type="text" class="form-input" id="editVotingTable">
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="button" class="btn-secondary" onclick="closeEditModal()"
@@ -2327,7 +2424,7 @@
                             <button class="action-btn action-btn-confirm" onclick="toggleConfirm('${reg._id}', ${reg.confirmed})" title="${reg.confirmed ? 'Marcar como pendiente' : 'Confirmar'}">
                                 <i class="bi bi-check-circle"></i>
                             </button>
-                            <button class="action-btn action-btn-edit" onclick="openEditModal('${reg._id}', '${reg.firstName}', '${reg.lastName}', '${reg.email || ''}', '${reg.phone || ''}', '${reg.votingPlace || ''}', '${reg.votingTable || ''}')">
+                            <button class="action-btn action-btn-edit" onclick="openEditModal('${reg._id}')">
                                 <i class="bi bi-pencil"></i>
                             </button>
                             <button class="action-btn action-btn-delete" onclick="confirmDelete('${reg._id}')">
@@ -2576,14 +2673,71 @@
         }
 
         // ============== EDIT MODAL ==============
-        function openEditModal(id, firstName, lastName, email, phone, place, table) {
-            document.getElementById('editId').value = id;
-            document.getElementById('editFirstName').value = firstName;
-            document.getElementById('editLastName').value = lastName;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editPhone').value = phone;
-            document.getElementById('editVotingPlace').value = place;
-            document.getElementById('editVotingTable').value = table;
+        function toggleEditUbicacion(tipo) {
+            const bogotaContainer = document.getElementById('editBogotaContainer');
+            const restoContainer = document.getElementById('editRestoContainer');
+            const localidadSelect = document.getElementById('editLocalidad');
+            const departamentoSelect = document.getElementById('editDepartamento');
+
+            if (tipo === 'bogota') {
+                bogotaContainer.style.display = 'block';
+                restoContainer.style.display = 'none';
+                localidadSelect.required = true;
+                departamentoSelect.required = false;
+                departamentoSelect.value = '';
+                document.getElementById('editCapital').value = '';
+                document.getElementById('editCapitalContainer').style.display = 'none';
+            } else {
+                bogotaContainer.style.display = 'none';
+                restoContainer.style.display = 'block';
+                localidadSelect.required = false;
+                localidadSelect.value = '';
+                departamentoSelect.required = true;
+                actualizarEditCapital();
+            }
+        }
+
+        function actualizarEditCapital() {
+            const departamento = document.getElementById('editDepartamento').value;
+            const capitalContainer = document.getElementById('editCapitalContainer');
+            const capitalInput = document.getElementById('editCapital');
+
+            if (departamento && capitalesColombia[departamento]) {
+                capitalInput.value = capitalesColombia[departamento];
+                capitalContainer.style.display = 'block';
+            } else {
+                capitalInput.value = '';
+                capitalContainer.style.display = 'none';
+            }
+        }
+
+        function openEditModal(id) {
+            const reg = myRegistrations.find(r => r._id === id);
+            if (!reg) {
+                alert('No se encontró el registro');
+                return;
+            }
+
+            document.getElementById('editId').value = reg._id;
+            document.getElementById('editFirstName').value = reg.firstName || '';
+            document.getElementById('editLastName').value = reg.lastName || '';
+            document.getElementById('editEmail').value = reg.email || '';
+            document.getElementById('editCedula').value = reg.cedula || '';
+            document.getElementById('editPhone').value = reg.phone || '';
+            document.getElementById('editVotingPlace').value = reg.votingPlace || '';
+            document.getElementById('editVotingTable').value = reg.votingTable || '';
+
+            const isResto = !!reg.departamento;
+            if (isResto) {
+                document.getElementById('editUbicacionResto').checked = true;
+                toggleEditUbicacion('resto');
+                document.getElementById('editDepartamento').value = reg.departamento || '';
+                actualizarEditCapital();
+            } else {
+                document.getElementById('editUbicacionBogota').checked = true;
+                toggleEditUbicacion('bogota');
+                document.getElementById('editLocalidad').value = reg.localidad || '';
+            }
 
             document.getElementById('editModal').classList.add('active');
         }
@@ -2595,14 +2749,27 @@
         function saveEditRegistration(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
+            const ubicacionTipo = document.querySelector('input[name="editUbicacionTipo"]:checked').value;
+            const departamento = ubicacionTipo === 'resto' ? document.getElementById('editDepartamento').value.trim() : '';
+            const localidad = ubicacionTipo === 'bogota' ? document.getElementById('editLocalidad').value : departamento;
+
             const data = {
-                firstName: document.getElementById('editFirstName').value,
-                lastName: document.getElementById('editLastName').value,
-                email: document.getElementById('editEmail').value,
-                phone: document.getElementById('editPhone').value,
-                votingPlace: document.getElementById('editVotingPlace').value,
-                votingTable: document.getElementById('editVotingTable').value
+                firstName: document.getElementById('editFirstName').value.trim(),
+                lastName: document.getElementById('editLastName').value.trim(),
+                email: document.getElementById('editEmail').value.trim(),
+                cedula: document.getElementById('editCedula').value.trim(),
+                phone: document.getElementById('editPhone').value.trim(),
+                localidad,
+                departamento: departamento || null,
+                capital: ubicacionTipo === 'resto' ? document.getElementById('editCapital').value : null,
+                votingPlace: document.getElementById('editVotingPlace').value.trim(),
+                votingTable: document.getElementById('editVotingTable').value.trim()
             };
+
+            if (!data.firstName || !data.lastName || !data.cedula || !data.localidad || !data.votingPlace || !data.votingTable) {
+                alert('Por favor completa todos los campos requeridos');
+                return;
+            }
 
             apiCall(`/api/registrations/${id}`, {
                 method: 'PUT',

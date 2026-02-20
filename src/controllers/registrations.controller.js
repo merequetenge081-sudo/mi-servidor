@@ -174,7 +174,7 @@ export async function updateRegistration(req, res) {
   try {
     const user = req.user;
     const orgId = req.user.organizationId; // Multi-tenant filter
-    const { firstName, lastName, email, phone, localidad, registeredToVote, votingPlace, votingTable } = req.body;
+    const { firstName, lastName, email, cedula, phone, localidad, departamento, capital, registeredToVote, votingPlace, votingTable } = req.body;
 
 
     const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId });
@@ -197,6 +197,13 @@ export async function updateRegistration(req, res) {
       }
     }
 
+    if (cedula !== undefined && cedula !== registration.cedula) {
+      const duplicate = await ValidationService.checkDuplicate(cedula, registration.eventId, registration._id);
+      if (duplicate) {
+        return res.status(400).json({ error: `Persona con cédula ${cedula} ya registrada en este evento` });
+      }
+    }
+
     const changes = {};
     if (firstName !== undefined && firstName !== registration.firstName) {
       changes.firstName = { old: registration.firstName, new: firstName };
@@ -210,6 +217,10 @@ export async function updateRegistration(req, res) {
       changes.email = { old: registration.email, new: email };
       registration.email = email;
     }
+    if (cedula !== undefined && cedula !== registration.cedula) {
+      changes.cedula = { old: registration.cedula, new: cedula };
+      registration.cedula = cedula;
+    }
     if (phone !== undefined && phone !== registration.phone) {
       changes.phone = { old: registration.phone, new: phone };
       registration.phone = phone;
@@ -217,6 +228,14 @@ export async function updateRegistration(req, res) {
     if (localidad !== undefined && localidad !== registration.localidad) {
       changes.localidad = { old: registration.localidad, new: localidad };
       registration.localidad = localidad;
+    }
+    if (departamento !== undefined && departamento !== registration.departamento) {
+      changes.departamento = { old: registration.departamento, new: departamento };
+      registration.departamento = departamento;
+    }
+    if (capital !== undefined && capital !== registration.capital) {
+      changes.capital = { old: registration.capital, new: capital };
+      registration.capital = capital;
     }
     if (registeredToVote !== undefined && registeredToVote !== registration.registeredToVote) {
       changes.registeredToVote = { old: registration.registeredToVote, new: registeredToVote };
