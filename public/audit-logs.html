@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema profesional de gestión de registros y líderes">
+    <meta name="theme-color" content="#0d6efd">
+    <title>Registro de Auditoría</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        select, input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #f5576c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-create {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-update {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .badge-delete {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .badge-login {
+            background: #e7d4f5;
+            color: #5a21b5;
+        }
+
+        .badge-export {
+            background: #fff3cd;
+            color: #664d03;
+        }
+
+        .badge-admin {
+            background: #f093fb;
+            color: white;
+        }
+
+        .badge-leader {
+            background: #4facfe;
+            color: white;
+        }
+
+        .timestamp {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #842029;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #f5576c;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .details-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .details-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-section {
+            margin: 20px 0;
+        }
+
+        .modal-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .change-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .change-old {
+            color: #dc3545;
+        }
+
+        .change-new {
+            color: #28a745;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Registro de Auditoría</h1>
+            <p>Monitoreo de acciones administrativas y ediciones de datos</p>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Tipo de Acción</label>
+                <select id="actionFilter">
+                    <option value="">Todos</option>
+                    <option value="LOGIN">Login</option>
+                    <option value="CREATE">Crear</option>
+                    <option value="UPDATE">Actualizar</option>
+                    <option value="DELETE">Eliminar</option>
+                    <option value="EXPORT">Exportar</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Tipo de Recurso</label>
+                <select id="resourceFilter">
+                    <option value="">Todos</option>
+                    <option value="registration">Registro</option>
+                    <option value="leader">Líder</option>
+                    <option value="event">Evento</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Búsqueda por Usuario</label>
+                <input type="text" id="userSearch" placeholder="Nombre o ID del usuario">
+            </div>
+
+            <div class="control-group btn-group">
+                <button class="btn-primary" onclick="loadLogs()">Filtrar</button>
+                <button class="btn-secondary" onclick="resetFilters()">Limpiar</button>
+                <button class="btn-secondary" onclick="exportAuditLog()">📥 Descargar</button>
+            </div>
+        </div>
+
+        <div id="statsContainer" class="stats-grid"></div>
+
+        <div id="logsContainer" class="table-wrapper">
+            <div class="loading">
+                <div class="spinner"></div>
+                Cargando datos...
+            </div>
+        </div>
+
+        <div class="pagination" id="paginationContainer" style="display: none;"></div>
+    </div>
+
+    <div id="detailsModal" class="details-modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let currentPage = 0;
+        const itemsPerPage = 50;
+
+        async function loadLogs() {
+            const action = document.getElementById('actionFilter').value;
+            const resourceType = document.getElementById('resourceFilter').value;
+            const userSearch = document.getElementById('userSearch').value;
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams({
+                    limit: itemsPerPage,
+                    skip: currentPage * itemsPerPage
+                });
+                if (action) params.append('action', action);
+                if (resourceType) params.append('resourceType', resourceType);
+                if (userSearch) params.append('userId', userSearch);
+
+                const response = await fetch(`${API_URL}/api/audit-logs?${params}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        document.getElementById('logsContainer').innerHTML = 
+                            '<div class="error">No tienes permisos para ver el registro de auditoría. Solo administradores pueden acceder.</div>';
+                        return;
+                    }
+                    throw new Error('Error al cargar los logs');
+                }
+
+                const data = await response.json();
+                renderLogs(data.logs);
+                renderPagination(data.total);
+                loadStats();
+            } catch (err) {
+                console.error('Error:', err);
+                document.getElementById('logsContainer').innerHTML = 
+                    `<div class="error">Error: ${err.message}</div>`;
+            }
+        }
+
+        function renderLogs(logs) {
+            const container = document.getElementById('logsContainer');
+
+            if (!logs || logs.length === 0) {
+                container.innerHTML = '<div class="empty">No hay registros de auditoría</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Acción</th>
+                            <th>Usuario</th>
+                            <th>Recurso</th>
+                            <th>Descripción</th>
+                            <th>Fecha</th>
+                            <th>Detalles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            logs.forEach(log => {
+                const date = new Date(log.timestamp);
+                const dateStr = date.toLocaleString('es-CO');
+                const actionBadge = `badge-${log.action.toLowerCase()}`;
+                const roleBadge = `badge-${log.userRole}`;
+
+                html += `
+                    <tr>
+                        <td><span class="badge ${actionBadge}">${log.action}</span></td>
+                        <td>
+                            <strong>${log.userName}</strong>
+                            <br><span class="timestamp"><span class="badge ${roleBadge}">${log.userRole}</span></span>
+                        </td>
+                        <td>${log.resourceType || '-'}</td>
+                        <td>${log.description || '-'}</td>
+                        <td><span class="timestamp">${dateStr}</span></td>
+                        <td><button class="btn-secondary" onclick="showDetails('${log._id}')">Ver</button></td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        async function loadStats() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/audit-stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) return;
+
+                const data = await response.json();
+                renderStats(data);
+            } catch (err) {
+                console.error('Error cargando estadísticas:', err);
+            }
+        }
+
+        function renderStats(stats) {
+            const container = document.getElementById('statsContainer');
+            let html = '';
+
+            stats.actionStats.forEach(stat => {
+                html += `
+                    <div class="stat-card">
+                        <h3>${stat._id}</h3>
+                        <div class="value">${stat.count}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderPagination(total) {
+            const container = document.getElementById('paginationContainer');
+            const totalPages = Math.ceil(total / itemsPerPage);
+
+            if (totalPages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'flex';
+            let html = '';
+
+            for (let i = 0; i < totalPages; i++) {
+                const active = i === currentPage ? 'active' : '';
+                html += `<button class="${active}" onclick="goToPage(${i})">${i + 1}</button>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadLogs();
+        }
+
+        function resetFilters() {
+            document.getElementById('actionFilter').value = '';
+            document.getElementById('resourceFilter').value = '';
+            document.getElementById('userSearch').value = '';
+            currentPage = 0;
+            loadLogs();
+        }
+
+        async function showDetails(logId) {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/audit-logs?limit=1&skip=0`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                const log = data.logs.find(l => l._id === logId);
+
+                if (!log) return;
+
+                let detailsHtml = `
+                    <h2>${log.action}</h2>
+                    <div class="modal-section">
+                        <h3>Información General</h3>
+                        <p><strong>Usuario:</strong> ${log.userName} (${log.userRole})</p>
+                        <p><strong>Acción:</strong> ${log.action}</p>
+                        <p><strong>Recurso:</strong> ${log.resourceType}</p>
+                        <p><strong>ID del Recurso:</strong> ${log.resourceId}</p>
+                        <p><strong>IP:</strong> ${log.ipAddress}</p>
+                        <p><strong>Fecha:</strong> ${new Date(log.timestamp).toLocaleString('es-CO')}</p>
+                    </div>
+                `;
+
+                if (log.description) {
+                    detailsHtml += `
+                        <div class="modal-section">
+                            <h3>Descripción</h3>
+                            <p>${log.description}</p>
+                        </div>
+                    `;
+                }
+
+                if (log.changes && typeof log.changes === 'object' && Object.keys(log.changes).length > 0) {
+                    detailsHtml += `
+                        <div class="modal-section">
+                            <h3>Cambios Realizados</h3>
+                    `;
+                    for (const [key, val] of Object.entries(log.changes)) {
+                        detailsHtml += `
+                            <div class="change-item">
+                                <strong>${key}:</strong> 
+                                <span class="change-old">antes: ${JSON.stringify(val.old)}</span>
+                                → 
+                                <span class="change-new">ahora: ${JSON.stringify(val.new)}</span>
+                            </div>
+                        `;
+                    }
+                    detailsHtml += `</div>`;
+                }
+
+                document.getElementById('modalBody').innerHTML = detailsHtml;
+                document.getElementById('detailsModal').classList.add('show');
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== document.getElementById('detailsModal')) return;
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        function exportAuditLog() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            // Crear CSV
+            const action = document.getElementById('actionFilter').value;
+            const resourceType = document.getElementById('resourceFilter').value;
+
+            let csv = 'Acción,Usuario,Rol,Recurso,ID Recurso,Descripción,Fecha,IP\n';
+            const rows = document.querySelectorAll('table tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const action = cells[0].textContent.trim();
+                const user = cells[1].textContent.trim().split('\n')[0];
+                const role = cells[1].textContent.trim().split('\n')[1];
+                const resource = cells[2].textContent.trim();
+                const desc = cells[3].textContent.trim();
+                const date = cells[4].textContent.trim();
+
+                csv += `"${action}","${user}","${role}","${resource}","","${desc}","${date}",""\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `audit_log_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        // Cargar logs al iniciar
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+            loadLogs();
+        });
+    </script>
+</body>
+</html>

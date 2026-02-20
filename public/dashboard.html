@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Gestión Política</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/modern.css?v=2.7.0">
+    <link rel="stylesheet" href="css/dashboard.css?v=2.7.0">
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-area">
+                <i class="bi bi-shield-check text-primary"></i>
+                <span class="logo-text">Panel Admin</span>
+            </div>
+            <!-- Toggle button removed from here, unified in Top Bar -->
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li>
+                    <a href="#" class="nav-link active" data-section="dashboard">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="leaders">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Líderes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="registrations">
+                        <i class="bi bi-table"></i>
+                        <span>Registros</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="analytics">
+                        <i class="bi bi-bar-chart-fill"></i>
+                        <span>Análisis</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="export">
+                        <i class="bi bi-cloud-download-fill"></i>
+                        <span>Exportar</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-mini-profile">
+                <div class="avatar-circle small">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="user-info">
+                    <span class="username" id="sidebarUsername">Admin</span>
+                    <span class="role">Administrador</span>
+                </div>
+            </div>
+            <button class="logout-btn-icon" onclick="document.getElementById('logoutModal').classList.add('active')"
+                title="Cerrar Sesión">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Top Navigation Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="action-btn sidebar-toggle-main" onclick="toggleSidebar()" title="Alternar Menú">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="page-title-area">
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                    <span class="current-date" id="currentDateDisplay"></span>
+                </div>
+            </div>
+
+            <div class="top-bar-center">
+                <div class="event-selector-pill" id="changeEventBtn" title="Cambiar Evento">
+                    <i class="bi bi-calendar-event-fill text-primary"></i>
+                    <span id="eventNameDisplay">Cargando evento...</span>
+                    <i class="bi bi-chevron-down small-icon"></i>
+                </div>
+            </div>
+
+            <div class="top-bar-right">
+                <button class="action-btn theme-toggle" onclick="toggleDarkMode()" title="Tema Oscuro/Claro">
+                    <i class="bi bi-moon-stars"></i>
+                </button>
+
+                <div class="notification-wrapper">
+                    <button class="action-btn" id="notificationsBtn" onclick="toggleNotificationsDropdown()"
+                        title="Notificaciones">
+                        <i class="bi bi-bell"></i>
+                        <span class="badge-notification" id="notificationsBadge" style="display: none;">0</span>
+                    </button>
+                    <!-- Dropdown -->
+                    <div class="notifications-dropdown" id="notificationsDropdown">
+                        <div class="dropdown-header">
+                            <span>Notificaciones</span>
+                            <button class="mark-read-btn" onclick="markAllRead()" style="display: none;">Leídas</button>
+                        </div>
+                        <div class="dropdown-body" id="notificationsContent">
+                            <div class="empty-state">
+                                <i class="bi bi-bell-slash"></i>
+                                <p>Sin novedades</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="action-btn" onclick="toggleHelpDrawer()" title="Ayuda">
+                    <i class="bi bi-question-circle"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="main-scrollable-content">
+
+            <!-- DASHBOARD SECTION -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2>Resumen General</h2>
+                    <p class="section-subtitle">Vista rápida del estado de tu evento.</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary-soft text-primary">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalLeaders">0</h3>
+                            <span>Líderes Activos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success-soft text-success">
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalRegistrations">0</h3>
+                            <span>Total Registros</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning-soft text-warning">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="confirmedCount">0</h3>
+                            <span>Confirmados</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-info-soft text-info">
+                            <i class="bi bi-pie-chart-fill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="confirmRate">0%</h3>
+                            <span>Tasa Confirmación</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="dashboard-row">
+                    <div class="chart-container half-width">
+                        <div class="card-header-chart">
+                            <h3><i class="bi bi-pie-chart"></i> Estado de Asistencia</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="confirmationChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container half-width">
+                        <div class="card-header-chart">
+                            <h3><i class="bi bi-trophy"></i> Top 5 Líderes</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="topLeadersChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="table-container fade-in-up">
+                    <div class="table-header">
+                        <h3><i class="bi bi-clock-history"></i> Registros Recientes</h3>
+                        <button class="btn btn-sm btn-outline"
+                            onclick="document.querySelector('[data-section=\'registrations\']').click()">Ver
+                            Todos</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Cédula</th>
+                                    <th>Líder</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentRegistrations">
+                                <!-- JS populates this -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEADERS SECTION -->
+            <section id="leaders" class="section">
+                <div class="section-header">
+                    <h2>Gestión de Líderes</h2>
+                    <div class="header-actions">
+                        <input type="text" id="leaderSearchInput" class="search-input" placeholder="Buscar líder...">
+                        <button class="btn btn-primary" id="newLeaderBtn">
+                            <i class="bi bi-plus-lg"></i> Nuevo Líder
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Registros</th>
+                                    <th>Estado Pass</th>
+                                    <th>Credenciales</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadersTable">
+                                <!-- JS populates this -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- REGISTRATIONS SECTION -->
+            <section id="registrations" class="section">
+                <div class="section-header">
+                    <h2>Registros de Asistencia</h2>
+                    <div class="filter-bar">
+                        <input type="text" id="searchInput" class="search-input"
+                            placeholder="Buscar por nombre, info...">
+                        <select id="leaderFilter" class="form-select">
+                            <option value="">Todos los Líderes</option>
+                            <!-- Populated by JS -->
+                        </select>
+                        <select id="statusFilter" class="form-select">
+                            <option value="">Todos los Estados</option>
+                            <option value="confirmed">Confirmados</option>
+                            <option value="pending">Pendientes</option>
+                        </select>
+                        <button class="btn btn-primary" id="newRegistrationBtn">
+                            <i class="bi bi-plus-lg"></i> Nuevo
+                        </button>
+                        <button class="btn btn-secondary" id="exportRegsMainBtn">
+                            <i class="bi bi-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs-container">
+                    <button class="tab-btn active" id="bogotaTab" onclick="showRegistrationTab('bogota')">
+                        <i class="bi bi-building"></i> Bogotá D.C.
+                    </button>
+                    <button class="tab-btn" id="restoTab" onclick="showRegistrationTab('resto')">
+                        <i class="bi bi-geo-alt"></i> Resto del País
+                    </button>
+                </div>
+
+                <!-- Bogotá Table -->
+                <div id="bogotaRegistrations" class="tab-content active">
+                    <div class="table-container">
+                        <div class="table-header-actions">
+                            <h4>Registros Bogotá</h4>
+                            <button class="btn btn-sm btn-outline-success" id="exportBogotaBtn">
+                                <i class="bi bi-file-earmark-excel"></i> Exportar Bogotá
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Cédula</th>
+                                        <th>Localidad</th>
+                                        <th>Líder</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bogotaTable">
+                                    <!-- JS populates -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Pagination -->
+                        <div class="pagination-container">
+                            <button id="firstPageBogotaBtn" class="page-btn"><i
+                                    class="bi bi-chevron-double-left"></i></button>
+                            <button id="prevPageBogotaBtn" class="page-btn"><i class="bi bi-chevron-left"></i></button>
+                            <span id="pageIndicatorBogota" class="page-indicator">Página 1 de 1</span>
+                            <button id="nextPageBogotaBtn" class="page-btn"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resto Table -->
+                <div id="restoRegistrations" class="tab-content" style="display: none;">
+                    <div class="table-container">
+                        <div class="table-header-actions">
+                            <h4>Registros Nacionales</h4>
+                            <button class="btn btn-sm btn-outline-success" id="exportRestoBtn">
+                                <i class="bi bi-file-earmark-excel"></i> Exportar Nacional
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Cédula</th>
+                                        <th>Departamento</th>
+                                        <th>Líder</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="restoTable">
+                                    <!-- JS populates -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Pagination -->
+                        <div class="pagination-container">
+                            <button id="firstPageRestoBtn" class="page-btn"><i
+                                    class="bi bi-chevron-double-left"></i></button>
+                            <button id="prevPageRestoBtn" class="page-btn"><i class="bi bi-chevron-left"></i></button>
+                            <span id="pageIndicatorResto" class="page-indicator">Página 1 de 1</span>
+                            <button id="nextPageRestoBtn" class="page-btn"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ANALYTICS SECTION -->
+            <section id="analytics" class="section">
+                <div class="section-header">
+                    <h2>Análisis y Reportes</h2>
+                    <div class="filter-bar">
+                        <select id="analyticsRegionFilter" class="form-select">
+                            <option value="all">Todo el País</option>
+                            <option value="bogota">Solo Bogotá</option>
+                            <option value="resto">Resto del País</option>
+                        </select>
+                        <select id="analyticsLeaderFilter" class="form-select">
+                            <!-- Populated -->
+                        </select>
+                        <button class="btn btn-primary" id="applyAnalyticsFilterBtn">Aplicar</button>
+                        <button class="btn btn-outline" id="clearAnalyticsFilterBtn">Limpiar</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="avgConfirmRate">0%</h3>
+                            <span>Tasa Confirmación Promedio</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="avgRegsPerLeader">0</h3>
+                            <span>Promedio Regs/Líder</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="bogotaCount">0</h3>
+                            <span>Total Bogotá</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="restoCount">0</h3>
+                            <span>Total Resto País</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-row">
+                    <div class="chart-container full-width">
+                        <h3><i class="bi bi-bar-chart"></i> Desempeño por Líder (Bogotá vs Nacional)</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="leaderRegistrationsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-row">
+                    <div class="chart-container half-width">
+                        <h3><i class="bi bi-geo-alt"></i> Top 10 Localidades/Dptos</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="localityChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="table-container half-width">
+                        <h3><i class="bi bi-list-ol"></i> Detalle por Líder</h3>
+                        <div class="table-responsive small-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Líder</th>
+                                        <th>Total</th>
+                                        <th>Conf.</th>
+                                        <th>Pend.</th>
+                                        <th>%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderDetailTable"></tbody>
+                            </table>
+                        </div>
+                        <div class="pagination-container small">
+                            <button id="prevLeaderPageBtn" class="page-btn"><i class="bi bi-chevron-left"></i></button>
+                            <span id="leaderPageIndicator">Pág 1</span>
+                            <button id="nextLeaderPageBtn" class="page-btn"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EXPORT SECTION -->
+            <section id="export" class="section">
+                <div class="section-header">
+                    <h2>Centro de Descargas</h2>
+                    <p>Exporta la información de tu evento en formato Excel.</p>
+                </div>
+
+                <div class="export-grid">
+                    <div class="export-card">
+                        <div class="export-icon"><i class="bi bi-people-fill"></i></div>
+                        <h3>Líderes</h3>
+                        <p>Descarga la lista completa de líderes con sus estadísticas.</p>
+                        <button class="btn btn-outline" id="exportLeadersMainBtn">Exportar Líderes</button>
+                    </div>
+                    <div class="export-card">
+                        <div class="export-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
+                        <h3>Todos los Registros</h3>
+                        <p>Base de datos completa de asistentes confirmados y pendientes.</p>
+                        <button class="btn btn-outline" id="exportRegsBtn">Exportar Completo</button>
+                    </div>
+                    <div class="export-card">
+                        <div class="export-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                        <h3>Estadísticas</h3>
+                        <p>Detalle analítico del desempeño por líder.</p>
+                        <button class="btn btn-outline" id="exportLeaderStatsBtn">Exportar Stats</button>
+                    </div>
+                    <div class="export-card">
+                        <div class="export-icon"><i class="bi bi-person-lines-fill"></i></div>
+                        <h3>Por Líder Específico</h3>
+                        <p>Descarga registros de un solo líder.</p>
+                        <select id="exportLeaderSelect" class="form-select mb-2"></select>
+                        <button class="btn btn-outline" id="exportByLeaderBtn">Exportar Filtrado</button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- MODALS -->
+
+            <!-- New Leader Modal -->
+            <div class="modal-overlay" id="leaderModal">
+                <div class="modal-card">
+                    <div class="modal-header"
+                        style="border: none; display: flex; justify-content: space-between; align-items: center; padding-bottom: 0;">
+                        <h3 style="font-size: 1.5rem; margin: 0; display: flex; align-items: center; gap: 12px;">
+                            <div
+                                style="width: 40px; height: 40px; border-radius: 12px; background: rgba(102, 126, 234, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person-plus-fill"></i>
+                            </div>
+                            Nuevo Líder
+                        </h3>
+                        <button class="close-btn" id="closeLeaderModal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+
+                    <div class="modal-body" style="padding-top: 10px;">
+                        <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">Ingresa la
+                            información del nuevo líder para habilitar su acceso.</p>
+
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-person"></i>
+                                <input type="text" id="leaderName" placeholder="Ej: Juan Pérez">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Email (Opcional)</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-envelope"></i>
+                                <input type="email" id="leaderEmail" placeholder="juan@ejemplo.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono (Opcional)</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-telephone"></i>
+                                <input type="tel" id="leaderPhone" placeholder="300 123 4567">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Usuario Personalizado (Opcional)</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-person-badge"></i>
+                                <input type="text" id="leaderUsername" placeholder="Ej: juan.perez">
+                            </div>
+                            <small style="color: var(--text-muted); font-size: 12px; margin-top: 6px; display: block;">
+                                <i class="bi bi-info-circle"></i> Si se deja vacío, se generará uno automáticamente.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="border: none; padding-top: 0;">
+                        <button class="btn btn-secondary"
+                            onclick="document.getElementById('leaderModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-primary" id="saveLiderBtn">Crear Líder</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Modal -->
+            <div class="modal-overlay" id="qrModal">
+                <div class="modal-card" style="max-width: 400px;">
+                    <div class="modal-header"
+                        style="border: none; display: flex; justify-content: space-between; align-items: center; padding-bottom: 0;">
+                        <h3
+                            style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 12px; color: var(--text-dark);">
+                            <div
+                                style="width: 40px; height: 40px; border-radius: 12px; background: rgba(139, 92, 246, 0.1); color: #8b5cf6; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-qr-code"></i>
+                            </div>
+                            Código QR
+                        </h3>
+                        <button class="close-btn" id="closeQrModal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+
+                    <div class="modal-body text-center" style="padding-top: 10px;">
+                        <div id="qrCode" class="qr-container"
+                            style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin: 0 auto 20px auto; width: fit-content; border: 1px solid #f3f4f6;">
+                        </div>
+
+                        <p class="mt-3" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">
+                            Escanea este código para acceder al formulario de registro.
+                        </p>
+
+                        <div class="input-group mt-3"
+                            style="background: #f1f5f9; padding: 6px; border-radius: 12px; display: flex; align-items: center; border: 1px solid #e2e8f0;">
+                            <input type="text" id="qrLink" readonly class="form-control-sm"
+                                style="flex: 1; border: none; background: transparent; padding: 8px 12px; font-size: 0.9rem; color: var(--text-muted); outline: none;">
+                            <button class="btn btn-sm" id="copyQrBtn"
+                                style="background: white; border: 1px solid #e2e8f0; color: var(--text-dark); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-weight: 500;">
+                                <i class="bi bi-clipboard"></i> Copiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Modal -->
+            <div class="modal-overlay" id="successModal" style="z-index: 10010;">
+                <div class="modal-card">
+                    <div class="modal-body text-center" style="padding: 40px 20px;">
+                        <div class="success-animation">
+                            <i class="bi bi-check-circle-fill" style="font-size: 60px; color: #28a745;"></i>
+                        </div>
+                        <h3 id="successTitle" style="margin: 20px 0 10px;">¡Éxito!</h3>
+                        <p id="successMessage" style="color: #666; font-size: 16px;">Operación completada correctamente.
+                        </p>
+                        <button class="btn btn-primary mt-4" id="closeSuccessModalBtn"
+                            style="width: 100%;">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Event Modal -->
+            <div class="modal-overlay" id="changeEventModal">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h3><i class="bi bi-calendar-event"></i> Cambiar Evento Activo</h3>
+                        <button class="close-btn" id="closeChangeEventModal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Selecciona el evento que deseas gestionar:</p>
+                        <select id="eventSelect" class="form-select full-width"></select>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary"
+                            onclick="document.getElementById('changeEventModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-primary" id="confirmChangeEventBtn">Cambiar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Registration Modal -->
+            <div class="modal-overlay" id="newRegModal">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h3><i class="bi bi-person-plus"></i> Nuevo Registro Manual</h3>
+                        <button class="close-btn" id="closeNewRegModal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nombre *</label>
+                                <input type="text" id="regFirstName">
+                            </div>
+                            <div class="form-group">
+                                <label>Apellido *</label>
+                                <input type="text" id="regLastName">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cédula *</label>
+                            <input type="text" id="regCedula">
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="regPhone">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="regEmail">
+                        </div>
+                        <div class="form-group">
+                            <label>Localidad / Municipio</label>
+                            <input type="text" id="regLocalidad">
+                        </div>
+                        <div class="form-group">
+                            <label>Asignar a Líder</label>
+                            <select id="regLeaderSelect" class="form-select full-width">
+                                <!-- Populated -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary"
+                            onclick="document.getElementById('newRegModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-primary" id="saveRegBtn">Guardar Registro</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reset Password Modal -->
+            <div class="modal-overlay" id="resetPasswordModal">
+                <div class="modal-card" style="max-width: 450px;">
+                    <div class="modal-header"
+                        style="border: none; display: flex; justify-content: space-between; align-items: center; padding-bottom: 0;">
+                        <h3
+                            style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 12px; color: var(--text-dark);">
+                            <i class="bi bi-key-fill" style="color: var(--text-dark);"></i>
+                            Gestionar Acceso
+                        </h3>
+                        <button class="close-btn" id="closeResetPassModal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+
+                    <div class="modal-body" style="padding-top: 10px;">
+                        <input type="hidden" id="resetPassLeaderId">
+
+                        <div class="form-group">
+                            <label>Líder</label>
+                            <input type="text" id="resetPassLeaderName" readonly
+                                style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; width: 100%; font-weight: 500; color: var(--text-dark);">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Usuario</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-person-badge"></i>
+                                <input type="text" id="resetPassUsername" placeholder="Usuario">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nueva Contraseña Temporal</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="resetPassPassword" class="form-control"
+                                    style="flex: 1; border-radius: 12px; border: 2px solid #e2e8f0; padding: 10px 14px; font-family: monospace; font-size: 1rem;">
+                                <button type="button" id="generatePassBtn" title="Generar Aleatoria"
+                                    style="background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 12px; width: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dark); transition: all 0.2s;">
+                                    <i class="bi bi-shuffle"></i>
+                                </button>
+                            </div>
+                            <small
+                                style="color: var(--text-muted); font-size: 0.85rem; margin-top: 6px; display: block;">El
+                                líder deberá cambiarla al ingresar.</small>
+                        </div>
+
+                        <!-- Result Area (Success) -->
+                        <div id="resetPassResult"
+                            style="display: none; background: #ecfdf5; color: #065f46; padding: 16px; border-radius: 12px; margin-top: 20px; border: 1px solid #a7f3d0;">
+                            <h4
+                                style="margin: 0 0 10px 0; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                                <i class="bi bi-check-circle-fill" style="color: #059669;"></i>
+                                ¡Credenciales Actualizadas!
+                            </h4>
+                            <div
+                                style="background: rgba(255,255,255,0.6); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                                <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Usuario:</strong> <span
+                                        id="resultUsername" style="font-family: monospace; font-weight: 600;"></span>
+                                </p>
+                                <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Contraseña:</strong> <span
+                                        id="resultPassword"
+                                        style="font-family: monospace; color: #dc2626; font-weight: 700;"></span></p>
+                            </div>
+                            <button class="btn btn-sm" id="copyCredsBtn"
+                                style="width: 100%; background: white; border: 1px solid #d1fae5; color: #059669; font-weight: 600;">
+                                <i class="bi bi-clipboard"></i> Copiar credenciales
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="border: none; padding-top: 10px;">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="document.getElementById('resetPasswordModal').classList.remove('active')">Cerrar</button>
+                        <button type="button" class="btn btn-primary" id="confirmResetPassBtn"
+                            style="background: #6366f1; border-color: #6366f1;">
+                            <i class="bi bi-check-lg" style="margin-right: 6px;"></i> Guardar y Restablecer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Leader Modal -->
+            <div class="modal-overlay" id="editLeaderModal">
+                <div class="modal-card">
+                    <div class="modal-header"
+                        style="border: none; display: flex; justify-content: space-between; align-items: center; padding-bottom: 0;">
+                        <h3
+                            style="font-size: 1.5rem; margin: 0; display: flex; align-items: center; gap: 12px; color: var(--text-dark);">
+                            <div
+                                style="width: 40px; height: 40px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-pencil-square"></i>
+                            </div>
+                            Editar Líder
+                        </h3>
+                        <button class="close-btn" id="closeEditLeaderModal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+
+                    <div class="modal-body" style="padding-top: 10px;">
+                        <input type="hidden" id="editLeaderId">
+
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-person"></i>
+                                <input type="text" id="editLeaderName" class="form-control"
+                                    placeholder="Nombre completo">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-envelope"></i>
+                                <input type="email" id="editLeaderEmail" class="form-control"
+                                    placeholder="correo@ejemplo.com">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-telephone"></i>
+                                <input type="tel" id="editLeaderPhone" class="form-control" placeholder="300 123 4567">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="border: none; padding-top: 0;">
+                        <button class="btn btn-secondary"
+                            onclick="document.getElementById('editLeaderModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-primary" id="saveEditLeaderBtn"
+                            style="background: #f59e0b; border-color: #f59e0b;">
+                            <i class="bi bi-check-lg" style="margin-right: 6px;"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Modal (Detail View) -->
+            <div class="modal-overlay" id="notificationsModal">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h3><i class="bi bi-bell-fill"></i> Notificaciones</h3>
+                        <button class="close-btn" id="closeNotificationsModal"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <div class="modal-body" id="notificationsModalBody">
+                        <!-- Same content as dropdown but bigger -->
+                        <div id="notificationsContent"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary"
+                            onclick="document.getElementById('notificationsModal').classList.remove('active')">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal (Unified) -->
+            <div class="modal-overlay" id="deleteConfirmModal" style="z-index: 10000;">
+                <div class="modal-card small-card" style="text-align: center;">
+                    <div class="modal-header" style="justify-content: center; display: flex; border-bottom: none;">
+                        <h3 class="text-danger" style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Eliminar Líder
+                        </h3>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color: var(--text-muted);">¿Estás seguro de que deseas eliminar este líder?<br>Esta
+                            acción no se puede deshacer.</p>
+                    </div>
+                    <div class="modal-footer" style="justify-content: center; display: flex; border-top: none;">
+                        <button class="btn btn-secondary" id="cancelDeleteBtn">Cancelar</button>
+                        <button class="btn btn-danger" id="confirmDeleteBtn">Eliminar Definitivamente</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logout Confirmation Modal -->
+            <div class="modal-overlay" id="logoutModal" style="z-index: 10002;">
+                <div class="modal-card small-card" style="text-align: center;">
+                    <div class="modal-header" style="justify-content: center; display: flex; border-bottom: none;">
+                        <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </h3>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color: var(--text-muted);">¿Seguro que deseas salir del sistema?</p>
+                    </div>
+                    <div class="modal-footer" style="justify-content: center; display: flex; border-top: none;">
+                        <button class="btn btn-secondary"
+                            onclick="document.getElementById('logoutModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-danger" onclick="confirmLogout()">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Send Email Modal -->
+            <div class="modal-overlay" id="sendEmailModal">
+                <div class="modal-card" style="max-width: 500px;">
+                    <div class="modal-header"
+                        style="border: none; display: flex; justify-content: space-between; align-items: center; padding-bottom: 0;">
+                        <h3
+                            style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 12px; color: var(--text-dark);">
+                            <div
+                                style="width: 40px; height: 40px; border-radius: 12px; background: rgba(34, 197, 94, 0.1); color: #22c55e; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-envelope-paper-fill"></i>
+                            </div>
+                            Enviar Correos
+                        </h3>
+                        <button class="close-btn" onclick="closeSendEmailModal()"><i class="bi bi-x-lg"></i></button>
+                    </div>
+
+                    <div class="modal-body" style="padding-top: 10px;">
+                        <div
+                            style="background: #f8fafc; padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: flex; gap: 12px; align-items: center;">
+                            <div
+                                style="width: 48px; height: 48px; border-radius: 50%; background: #e0e7ff; color: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <p style="margin: 0; font-weight: 600; color: var(--text-dark); font-size: 1rem;"
+                                    id="sendEmailLeaderName"></p>
+                                <p style="margin: 2px 0 0 0; color: var(--text-muted); font-size: 0.9rem;"
+                                    id="sendEmailLeaderEmail"></p>
+                            </div>
+                        </div>
+
+                        <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.95rem;">
+                            Selecciona los correos que deseas enviar:
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                            <label style="display: flex; align-items: start; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
+                                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                                <input type="checkbox" id="dashboard-send-welcome-check" style="margin-top: 4px;">
+                                <div>
+                                    <p style="margin: 0; font-weight: 600; color: var(--text-dark);">📧 Bienvenida</p>
+                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Email de bienvenida al sistema</p>
+                                </div>
+                            </label>
+
+                            <label style="display: flex; align-items: start; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
+                                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                                <input type="checkbox" id="dashboard-send-credentials-check" style="margin-top: 4px;">
+                                <div>
+                                    <p style="margin: 0; font-weight: 600; color: var(--text-dark);">🔑 Credenciales</p>
+                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Usuario y contraseña de acceso</p>
+                                </div>
+                            </label>
+
+                            <label style="display: flex; align-items: start; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
+                                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                                <input type="checkbox" id="dashboard-send-qr-check" checked style="margin-top: 4px;">
+                                <div>
+                                    <p style="margin: 0; font-weight: 600; color: var(--text-dark);">📲 Código QR</p>
+                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">QR del enlace de registro</p>
+                                </div>
+                            </label>
+
+                            <label style="display: flex; align-items: start; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
+                                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                                <input type="checkbox" id="dashboard-send-warning-check" style="margin-top: 4px;">
+                                <div>
+                                    <p style="margin: 0; font-weight: 600; color: var(--text-dark);">⚠️ Aviso/Recordatorio</p>
+                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Mensaje de recordatorio o alerta</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="dashboard-send-emails-result" style="display: none; padding: 12px; border-radius: 8px; margin-top: 12px;"></div>
+
+                        <div
+                            style="background: #eff6ff; border-radius: 8px; padding: 12px; border-left: 4px solid #3b82f6; display: flex; gap: 10px;">
+                            <i class="bi bi-info-circle-fill" style="color: #3b82f6; margin-top: 2px;"></i>
+                            <p style="margin: 0; font-size: 0.85rem; color: #1e40af; line-height: 1.4;">
+                                Si el servidor de correos no está configurado, el sistema simulará el envío o mostrará
+                                un error.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="border: none; padding-top: 10px;">
+                        <button class="btn btn-secondary" onclick="closeSendEmailModal()">Cancelar</button>
+                        <button class="btn btn-primary" id="dashboard-send-emails-btn" onclick="confirmSendAccessEmail()"
+                            style="background: #22c55e; border-color: #22c55e;">
+                            <i class="bi bi-send-fill" style="margin-right: 6px;"></i> Enviar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Help Drawer -->
+        <div class="help-drawer" id="helpDrawer">
+            <div class="help-drawer-header">
+                <h2><i class="bi bi-question-circle"></i> Ayuda</h2>
+                <button class="close-btn" onclick="closeHelpDrawer()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="help-drawer-body" id="helpDrawerBody">
+                <!-- Content will be loaded dynamically -->
+                <div class="help-section">
+                    <div class="help-section-title"><i class="bi bi-speedometer2"></i> Dashboard General</div>
+                    <div class="help-section-content">
+                        <p>El Dashboard te muestra las métricas más importantes de tus eventos en tiempo real.</p>
+                        <h4>¿Qué puedes hacer aquí?</h4>
+                        <ul>
+                            <li>Ver el total de líderes activos y registros</li>
+                            <li>Monitorear la tasa de confirmación</li>
+                            <li>Analizar gráficos de estado de registros</li>
+                            <li>Ver la actividad reciente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Overlay -->
+        <div class="help-overlay" id="helpOverlay" onclick="closeHelpDrawer()"></div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js?v=2.7.1"></script>
+</body>
+
+</html>
