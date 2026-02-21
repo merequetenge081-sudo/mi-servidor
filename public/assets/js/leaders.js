@@ -12,6 +12,7 @@ let currentQRLeader = null;
 let currentQRData = null;
 let dailyTrendChart = null;
 let topLeadersChart = null;
+const API_BASE = window.location.origin;
 
 // ==================== UX UTILITIES ====================
 
@@ -970,15 +971,6 @@ async function generatePasswordForLeader(leaderId) {
   } finally {
     hideLoader();
   }
-}
-        showToast('Error al generar contraseña', 'error');
-      } finally {
-        hideLoader();
-      }
-    },
-    'fa-key',
-    'text-yellow-500'
-  );
 }
 
 // ==================== SEND EMAILS MODAL ====================

@@ -628,6 +628,12 @@ body {
 /* Action Menu Dropdown */
 .action-menu-container {
     position: relative !important;
+    z-index: 10;
+    isolation: isolate;
+}
+
+.action-menu-container.is-open {
+    z-index: 5000;
 }
 
 .action-menu-btn {
@@ -651,14 +657,39 @@ body {
     position: absolute;
     right: 0;
     top: 100%;
+    bottom: auto;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     min-width: 200px;
-    z-index: 100;
-    margin-top: 4px;
-    overflow: hidden;
+    z-index: 6000;
+    margin-top: 6px;
+    overflow-y: auto;
+    max-height: 280px;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+.action-menu-dropdown.open-up {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+.action-menu-dropdown.open-down {
+    top: 100%;
+    bottom: auto;
+    margin-top: 6px;
+    margin-bottom: 0;
+}
+
+/* Ensure dropdown menus are not clipped by table wrappers */
+.table-container,
+.table-responsive,
+.table {
+    overflow: visible;
 }
 
 .action-menu-dropdown .menu-item {
@@ -683,6 +714,47 @@ body {
 
 .action-menu-dropdown .menu-item:hover {
     background: #f9fafb;
+}
+
+.action-menu-dropdown .menu-item.menu-scroll {
+    background: #f8fafc;
+    color: var(--text-muted);
+    font-size: 13px;
+    position: sticky;
+    z-index: 2;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+
+.action-menu-dropdown .menu-item.menu-scroll.menu-scroll-up {
+    top: 0;
+}
+
+.action-menu-dropdown .menu-item.menu-scroll.menu-scroll-down {
+    bottom: 0;
+    box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
+}
+
+.action-menu-dropdown .menu-item.menu-scroll:hover {
+    background: #eef2f7;
+}
+
+.action-menu-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.action-menu-dropdown::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+
+.action-menu-dropdown::-webkit-scrollbar-thumb {
+    background: #cbd5f5;
+    border-radius: 8px;
+    border: 2px solid #f1f5f9;
+}
+
+.action-menu-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #a5b4fc;
 }
 
 .action-menu-dropdown .menu-item a {
@@ -1668,4 +1740,137 @@ body.dark-mode .page-btn {
 body.dark-mode .page-btn:hover {
     background: #667eea;
     color: #fff;
+}
+
+/* ============== EMAIL CARD SELECTOR ============== */
+.email-card {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    border-radius: 14px;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.email-card-check {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.email-card-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.email-card:hover .email-card-inner {
+    border-color: #c7d2fe;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+    transform: translateY(-1px);
+}
+
+.email-card-check:checked ~ .email-card-inner {
+    border-color: #818cf8;
+    background: #eef2ff;
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.12);
+}
+
+.email-card-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: transform 0.22s ease;
+}
+
+.email-card:hover .email-card-icon {
+    transform: scale(1.08);
+}
+
+.email-card-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.email-card-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #1e293b;
+    line-height: 1.3;
+}
+
+.email-card-desc {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    font-weight: 400;
+    line-height: 1.3;
+}
+
+.email-card-indicator {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.email-card-check-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: transparent;
+    background: #fff;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.email-card-check:checked ~ .email-card-inner .email-card-check-circle {
+    border-color: #6366f1;
+    background: #6366f1;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* Dark mode email cards */
+body.dark-mode .email-card-inner {
+    background: #1e1e2f;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .email-card:hover .email-card-inner {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.12);
+}
+
+body.dark-mode .email-card-check:checked ~ .email-card-inner {
+    border-color: #818cf8;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+body.dark-mode .email-card-title {
+    color: #e2e8f0;
+}
+
+body.dark-mode .email-card-desc {
+    color: #64748b;
+}
+
+body.dark-mode .email-card-check-circle {
+    border-color: #475569;
+    background: #1a1a2e;
 }

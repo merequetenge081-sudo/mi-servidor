@@ -3,6 +3,7 @@ import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 import { Admin } from "../models/Admin.js";
 import { Leader } from "../models/Leader.js";
+import { Organization } from "../models/Organization.js";
 import { AuditService } from "../services/audit.service.js";
 import { emailService } from "../services/emailService.js";
 import { config } from "../config/env.js";
@@ -29,12 +30,28 @@ export async function adminLogin(req, res) {
       return res.status(401).json({ error: "Credenciales inválidas" });
     }
 
+    let organizationId = admin.organizationId || null;
+    if (!organizationId) {
+      let defaultOrg = await Organization.findOne({ slug: "default" });
+      if (!defaultOrg) {
+        defaultOrg = new Organization({
+          name: "Default Organization",
+          slug: "default",
+          description: "Organizacion por defecto para admins",
+          status: "active",
+          plan: "pro"
+        });
+        await defaultOrg.save();
+      }
+      organizationId = defaultOrg._id.toString();
+    }
+
     const token = jwt.sign(
       {
         userId: admin._id,
         role: "admin",
         username: admin.username,
-        organizationId: admin.organizationId || null, // Multi-tenant context
+        organizationId, // Multi-tenant context
         source // Indica si proviene de MongoDB o memoria
       },
       config.jwtSecret,
@@ -180,7 +197,7 @@ export async function adminResetPassword(req, res) {
     const adminUser = req.user;
 
     // Only Admins (Middleware should already handle this, but double check role if mixed file)
-    if (adminUser.role !== 'admin' && adminUser.role !== 'superadmin') {
+    if (adminUser.role !== 'admin') {
       return res.status(403).json({ error: "No autorizado" });
     }
 
@@ -401,7 +418,7 @@ export async function adminGenerateNewPassword(req, res) {
     const { leaderId } = req.body;
     const adminUser = req.user;
 
-    if (adminUser.role !== 'admin' && adminUser.role !== 'superadmin') {
+    if (adminUser.role !== 'admin') {
       return res.status(403).json({ error: "No autorizado" });
     }
 
@@ -557,6 +574,26 @@ function decrypt(encryptedText) {
   } catch (error) {
     logger.error('Error desencriptando:', error.message);
     return encryptedText; // Fallback: retornar texto original si falla
+  }
+}
+
+export async function logout(req, res) {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "No autenticado" });
+    }
+
+    try {
+      await AuditService.log("LOGOUT", user.role === "admin" ? "Admin" : "Leader", user.userId, user, {}, "Logout exitoso");
+    } catch (auditError) {
+      logger.warn("Audit log error (esperado sin MongoDB):", { error: auditError.message });
+    }
+
+    res.json({ success: true, message: "Logout exitoso" });
+  } catch (error) {
+    logger.error("Logout error:", { error: error.message });
+    res.status(500).json({ error: "Error al cerrar sesion" });
   }
 }
 

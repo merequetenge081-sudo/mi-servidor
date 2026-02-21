@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Gestión Política</title>
+    <title>Panel de Administración - Red Social y Política</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Icons -->
@@ -931,40 +931,80 @@
                             Selecciona los correos que deseas enviar:
                         </p>
 
-                        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-                            <label style="display: flex; align-items: start; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
-                                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
-                                <input type="checkbox" id="dashboard-send-welcome-check" style="margin-top: 4px;">
-                                <div>
-                                    <p style="margin: 0; font-weight: 600; color: var(--text-dark);">📧 Bienvenida</p>
-                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Email de bienvenida al sistema</p>
+                        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                            <!-- Card: Bienvenida -->
+                            <label class="email-card" id="card-welcome">
+                                <input type="checkbox" id="dashboard-send-welcome-check" class="email-card-check">
+                                <div class="email-card-inner">
+                                    <div class="email-card-icon" style="background: rgba(99,102,241,0.08); color: #6366f1;">
+                                        <i class="bi bi-envelope-heart"></i>
+                                    </div>
+                                    <div class="email-card-text">
+                                        <span class="email-card-title">Bienvenida</span>
+                                        <span class="email-card-desc">Email de bienvenida al sistema</span>
+                                    </div>
+                                    <div class="email-card-indicator">
+                                        <div class="email-card-check-circle">
+                                            <i class="bi bi-check2"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </label>
 
-                            <label style="display: flex; align-items: start; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
-                                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
-                                <input type="checkbox" id="dashboard-send-credentials-check" style="margin-top: 4px;">
-                                <div>
-                                    <p style="margin: 0; font-weight: 600; color: var(--text-dark);">🔑 Credenciales</p>
-                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Usuario y contraseña de acceso</p>
+                            <!-- Card: Credenciales -->
+                            <label class="email-card" id="card-credentials">
+                                <input type="checkbox" id="dashboard-send-credentials-check" class="email-card-check">
+                                <div class="email-card-inner">
+                                    <div class="email-card-icon" style="background: rgba(245,158,11,0.08); color: #f59e0b;">
+                                        <i class="bi bi-key"></i>
+                                    </div>
+                                    <div class="email-card-text">
+                                        <span class="email-card-title">Credenciales</span>
+                                        <span class="email-card-desc">Usuario y contraseña de acceso</span>
+                                    </div>
+                                    <div class="email-card-indicator">
+                                        <div class="email-card-check-circle">
+                                            <i class="bi bi-check2"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </label>
 
-                            <label style="display: flex; align-items: start; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
-                                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
-                                <input type="checkbox" id="dashboard-send-qr-check" checked style="margin-top: 4px;">
-                                <div>
-                                    <p style="margin: 0; font-weight: 600; color: var(--text-dark);">📲 Código QR</p>
-                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">QR del enlace de registro</p>
+                            <!-- Card: Código QR -->
+                            <label class="email-card" id="card-qr">
+                                <input type="checkbox" id="dashboard-send-qr-check" checked class="email-card-check">
+                                <div class="email-card-inner">
+                                    <div class="email-card-icon" style="background: rgba(16,185,129,0.08); color: #10b981;">
+                                        <i class="bi bi-qr-code"></i>
+                                    </div>
+                                    <div class="email-card-text">
+                                        <span class="email-card-title">Código QR</span>
+                                        <span class="email-card-desc">QR del enlace de registro</span>
+                                    </div>
+                                    <div class="email-card-indicator">
+                                        <div class="email-card-check-circle">
+                                            <i class="bi bi-check2"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </label>
 
-                            <label style="display: flex; align-items: start; gap: 12px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s;" 
-                                   onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
-                                <input type="checkbox" id="dashboard-send-warning-check" style="margin-top: 4px;">
-                                <div>
-                                    <p style="margin: 0; font-weight: 600; color: var(--text-dark);">⚠️ Aviso/Recordatorio</p>
-                                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Mensaje de recordatorio o alerta</p>
+                            <!-- Card: Aviso/Recordatorio -->
+                            <label class="email-card" id="card-warning">
+                                <input type="checkbox" id="dashboard-send-warning-check" class="email-card-check">
+                                <div class="email-card-inner">
+                                    <div class="email-card-icon" style="background: rgba(239,68,68,0.08); color: #ef4444;">
+                                        <i class="bi bi-bell"></i>
+                                    </div>
+                                    <div class="email-card-text">
+                                        <span class="email-card-title">Aviso / Recordatorio</span>
+                                        <span class="email-card-desc">Mensaje de recordatorio o alerta</span>
+                                    </div>
+                                    <div class="email-card-indicator">
+                                        <div class="email-card-check-circle">
+                                            <i class="bi bi-check2"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </label>
                         </div>

@@ -32,7 +32,7 @@ export async function initMemoryAuth() {
         username: "admin",
         passwordHash: adminHash,
         email: "admin@example.com",
-        role: "super_admin"
+        role: "admin"
       }
     ];
 
@@ -132,7 +132,7 @@ export function getTestCredentials() {
       {
         username: "admin",
         password: "admin123",
-        role: "super_admin",
+        role: "admin",
         email: "admin@example.com",
         source: "memory"
       }
