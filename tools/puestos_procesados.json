@@ -1,0 +1,93 @@
+[
+  {
+    "codigoPuesto": "160010805",
+    "nombre": "Salón Comunal Casablanca 32",
+    "localidad": "Kennedy",
+    "direccion": "Carrera 79 F No. 46 - 16 Sur",
+    "mesas": [
+      5
+    ],
+    "coordinates": {
+      "longitude": -74.1679,
+      "latitude": 4.6184
+    }
+  },
+  {
+    "codigoPuesto": "160010806",
+    "nombre": "Colegio Distrital Gran Britalia - Sede B",
+    "localidad": "Kennedy",
+    "direccion": "Calle 47 A Sur No. 82 - 99",
+    "mesas": [
+      6
+    ],
+    "coordinates": {
+      "longitude": -74.173,
+      "latitude": 4.6253
+    }
+  },
+  {
+    "codigoPuesto": "160010907",
+    "nombre": "Colegio Distrital República de Costa Rica - Sede C",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 101 No. 23 - 42",
+    "mesas": [
+      7
+    ],
+    "coordinates": {
+      "longitude": -74.1603,
+      "latitude": 4.6729
+    }
+  },
+  {
+    "codigoPuesto": "160010919",
+    "nombre": "Salón Social Conjunto Residencial Fontibón Reservado",
+    "localidad": "Fontibon",
+    "direccion": "Calle 14 B No. 119 A - 17",
+    "mesas": [
+      19
+    ],
+    "coordinates": {
+      "longitude": -74.1661,
+      "latitude": 4.6805
+    }
+  },
+  {
+    "codigoPuesto": "160011001",
+    "nombre": "Colegio Distrital Boyacá",
+    "localidad": "Engativá",
+    "direccion": "Calle 71 No. 75 - 11",
+    "mesas": [
+      1
+    ],
+    "coordinates": {
+      "longitude": -74.0944,
+      "latitude": 4.6712
+    }
+  },
+  {
+    "codigoPuesto": "160011005",
+    "nombre": "Colegio Cafam Básica Primaria",
+    "localidad": "Engativá",
+    "direccion": "Av. Calle 64 C No. 68 F - 29",
+    "mesas": [
+      5
+    ],
+    "coordinates": {
+      "longitude": -74.0944,
+      "latitude": 4.6712
+    }
+  },
+  {
+    "codigoPuesto": "160011006",
+    "nombre": "Colegio Distrital Robert Kennedy - Sede A",
+    "localidad": "Engativá",
+    "direccion": "Avenida Boyacá No. 64 H - 39 / Avenida Carrera 72 No. 64 H - 39",
+    "mesas": [
+      6
+    ],
+    "coordinates": {
+      "longitude": -74.1015,
+      "latitude": 4.6789
+    }
+  }
+]

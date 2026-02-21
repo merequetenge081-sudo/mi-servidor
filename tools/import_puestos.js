@@ -1,15 +1,21 @@
 /**
- * Script para importar datos de puestos de votación desde IDECA
+ * Script para importar datos de puestos de votación desde IDECA o archivo JSON
  * 
  * Uso:
- * - Desarrollo: node tools/import_puestos.js
- * - Producción: node tools/import_puestos.js --file ruta/archivo.json
+ * - Con datos predeterminados: node tools/import_puestos.js
+ * - Con archivo GeoJSON procesado: node tools/import_puestos.js --file puestos_procesados.json
+ * - Descargar y procesar GeoJSON oficial: node tools/procesar_geojson_puestos.cjs
  */
 
 import mongoose from "mongoose";
 import { Puestos } from "../src/models/index.js";
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import logger from "../src/config/logger.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Conectar directamente a MongoDB Atlas, no a localhost
 const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://admin:m1s3rv1d0r@cluster0.mongodb.net/mi-servidor?retryWrites=true&w=majority";
