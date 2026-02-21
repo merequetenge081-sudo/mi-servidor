@@ -12,6 +12,7 @@ import * as whatsappController from "../controllers/whatsapp.controller.js";
 import * as organizationController from "../controllers/organization.controller.js";
 import * as puestosController from "../controllers/puestos.controller.js";
 import * as adminController from "../controllers/admin.controller.js";
+import { importarPuestosSimpleHandler } from "../controllers/puestos.admin.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { roleMiddleware } from "../middleware/role.middleware.js";
 import { organizationRoleMiddleware } from "../middleware/organization.middleware.js";
@@ -214,6 +215,7 @@ router.post("/puestos/import", authMiddleware, roleMiddleware("admin"), puestosC
 
 // Admin - Importación vía API (para Render Free sin SSH)
 router.post("/admin/import-puestos", authMiddleware, roleMiddleware("admin"), adminController.importarPuestosAPIHandler);
+router.post("/admin/import-puestos-simple", authMiddleware, roleMiddleware("admin"), importarPuestosSimpleHandler);
 
 // ==================== LÍDERES ====================
 router.post("/leaders", authMiddleware, roleMiddleware("admin"), leaderController.createLeader);

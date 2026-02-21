@@ -3427,3 +3427,605 @@
 {"level":"error","message":"❌ Error al importar puestos: querySrv ENOTFOUND _mongodb._tcp.cluster0.mongodb.net","service":"mi-servidor","timestamp":"2026-02-21 02:18:51"}
 {"level":"error","message":"❌ Error al importar puestos: querySrv ENOTFOUND _mongodb._tcp.cluster0.mongodb.net","service":"mi-servidor","timestamp":"2026-02-21 02:35:06"}
 {"level":"error","message":"❌ Error al importar puestos: querySrv ENOTFOUND _mongodb._tcp.cluster0.mongodb.net","service":"mi-servidor","timestamp":"2026-02-21 02:44:47"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 03:57:44"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 03:57:44"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 03:57:44"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 03:57:44"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 03:57:44"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 03:57:44"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 03:57:44"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 03:57:46"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 03:58:31"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 03:58:31"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 03:58:31"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 03:58:31"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 03:58:32"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 03:58:32"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 03:58:32"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 03:58:33"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 03:58:33"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 87ms","service":"mi-servidor","timestamp":"2026-02-21 03:58:47"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 74ms","service":"mi-servidor","timestamp":"2026-02-21 03:58:48"}
+{"level":"info","message":"GET /registrations 200 153ms","service":"mi-servidor","timestamp":"2026-02-21 03:58:48"}
+{"level":"info","message":"GET /registrations 304 153ms","service":"mi-servidor","timestamp":"2026-02-21 03:58:49"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 76ms","service":"mi-servidor","timestamp":"2026-02-21 03:59:00"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 200 78ms","service":"mi-servidor","timestamp":"2026-02-21 03:59:00"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 03:59:00"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 03:59:00"}
+{"level":"info","message":"GET /registrations 200 145ms","service":"mi-servidor","timestamp":"2026-02-21 03:59:00"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 82ms","service":"mi-servidor","timestamp":"2026-02-21 04:00:41"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:00:42"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:00:42"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:00:42"}
+{"level":"info","message":"GET /registrations 200 150ms","service":"mi-servidor","timestamp":"2026-02-21 04:00:42"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 79ms","service":"mi-servidor","timestamp":"2026-02-21 04:02:14"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 200 74ms","service":"mi-servidor","timestamp":"2026-02-21 04:02:14"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:02:14"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:02:14"}
+{"level":"info","message":"GET /registrations 200 140ms","service":"mi-servidor","timestamp":"2026-02-21 04:02:14"}
+{"level":"info","message":"Cargados 1 puestos para Rafael Uribe Uribe","service":"mi-servidor","timestamp":"2026-02-21 04:04:39"}
+{"level":"info","message":"GET /public/puestos 200 81ms","service":"mi-servidor","timestamp":"2026-02-21 04:04:39"}
+{"level":"info","message":"GET /public/puestos/69997ec438ae8a5714b13225 200 72ms","service":"mi-servidor","timestamp":"2026-02-21 04:04:44"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:04:49"}
+{"level":"info","message":"GET /public/puestos 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:04:49"}
+{"level":"info","message":"GET /public/puestos/69997ec438ae8a5714b13210 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:04:56"}
+{"level":"info","message":"Cargados 1 puestos para San Cristóbal","service":"mi-servidor","timestamp":"2026-02-21 04:05:19"}
+{"level":"info","message":"GET /public/puestos 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:05:19"}
+{"level":"info","message":"GET /public/puestos/69997ec438ae8a5714b13214 200 72ms","service":"mi-servidor","timestamp":"2026-02-21 04:05:22"}
+{"level":"error","message":"❌ Error al importar puestos: querySrv ENOTFOUND _mongodb._tcp.cluster0.mongodb.net","service":"mi-servidor","timestamp":"2026-02-21 04:06:22"}
+{"level":"info","message":"POST /admin/import-puestos 401 3ms","service":"mi-servidor","timestamp":"2026-02-21 04:07:18"}
+{"level":"warn","message":"Route not found: POST /api/admin/login","service":"mi-servidor","timestamp":"2026-02-21 04:08:32"}
+{"level":"info","message":"POST /api/admin/login 404 3ms","service":"mi-servidor","timestamp":"2026-02-21 04:08:32"}
+{"level":"info","message":"POST /auth/admin-login 400 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:09:15"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:09:27","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 360ms","service":"mi-servidor","timestamp":"2026-02-21 04:09:27"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:09:27"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:09:27"}
+{"level":"info","message":"✅ Se importaron 25 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:09:28"}
+{"level":"info","message":"POST /admin/import-puestos 200 185ms","service":"mi-servidor","timestamp":"2026-02-21 04:09:28"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:09:48"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:09:48"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 155ms","service":"mi-servidor","timestamp":"2026-02-21 04:09:48"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:09:53"}
+{"level":"info","message":"GET /public/puestos 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 04:09:53"}
+{"level":"info","message":"GET /public/puestos/69998457353fca69e4c8464e 200 69ms","service":"mi-servidor","timestamp":"2026-02-21 04:09:58"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 139ms","service":"mi-servidor","timestamp":"2026-02-21 04:10:01"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:10:01"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:10:01"}
+{"level":"info","message":"Cargados 1 puestos para Ciudad Bolívar","service":"mi-servidor","timestamp":"2026-02-21 04:10:04"}
+{"level":"info","message":"GET /public/puestos 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 04:10:04"}
+{"level":"info","message":"GET /public/puestos/69998457353fca69e4c84665 200 69ms","service":"mi-servidor","timestamp":"2026-02-21 04:10:06"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:10:46"}
+{"level":"info","message":"GET /public/puestos 304 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:10:46"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:11:19"}
+{"level":"info","message":"GET /public/puestos 200 76ms","service":"mi-servidor","timestamp":"2026-02-21 04:11:19"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:12:37"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:12:37"}
+{"level":"info","message":"GET /public/puestos/69998457353fca69e4c8464e 304 82ms","service":"mi-servidor","timestamp":"2026-02-21 04:12:47"}
+{"level":"info","message":"Cargados 1 puestos para Santa Fe","service":"mi-servidor","timestamp":"2026-02-21 04:12:51"}
+{"level":"info","message":"GET /public/puestos 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 04:12:51"}
+{"level":"info","message":"GET /public/puestos/69998457353fca69e4c84652 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:12:52"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:12:55"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:12:55"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 144ms","service":"mi-servidor","timestamp":"2026-02-21 04:12:55"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:12:56"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:12:56"}
+{"level":"info","message":"Cargados 1 puestos para San Cristóbal","service":"mi-servidor","timestamp":"2026-02-21 04:12:58"}
+{"level":"info","message":"GET /public/puestos 200 69ms","service":"mi-servidor","timestamp":"2026-02-21 04:12:58"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:13:08"}
+{"level":"info","message":"GET /public/puestos 304 71ms","service":"mi-servidor","timestamp":"2026-02-21 04:13:08"}
+{"level":"info","message":"GET /public/localidades 200 100ms","service":"mi-servidor","timestamp":"2026-02-21 04:14:26"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"GET /public/puestos 200 73ms","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"Cargados 1 puestos para San Cristóbal","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"GET /public/puestos 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"Cargados 3 puestos para Kennedy","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"GET /public/puestos 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"Cargados 2 puestos para Chapinero","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"GET /public/puestos 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"Cargados 2 puestos para Bosa","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"GET /public/puestos 200 72ms","service":"mi-servidor","timestamp":"2026-02-21 04:14:38"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:14:55"}
+{"level":"info","message":"GET /public/puestos 200 83ms","service":"mi-servidor","timestamp":"2026-02-21 04:14:55"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:16:26","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 305ms","service":"mi-servidor","timestamp":"2026-02-21 04:16:26"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:16:26"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:16:26"}
+{"level":"info","message":"✅ Se importaron 25 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:16:26"}
+{"level":"info","message":"POST /admin/import-puestos 200 164ms","service":"mi-servidor","timestamp":"2026-02-21 04:16:26"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:16:50"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 3ms","service":"mi-servidor","timestamp":"2026-02-21 04:16:50"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 145ms","service":"mi-servidor","timestamp":"2026-02-21 04:16:51"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:16:51"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:16:51"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:16:53"}
+{"level":"info","message":"GET /public/puestos 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 04:16:53"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:17:59","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 271ms","service":"mi-servidor","timestamp":"2026-02-21 04:17:59"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:17:59"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:17:59"}
+{"level":"info","message":"✅ Se importaron 25 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:17:59"}
+{"level":"info","message":"POST /admin/import-puestos 200 157ms","service":"mi-servidor","timestamp":"2026-02-21 04:17:59"}
+{"level":"info","message":"Cargados 2 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:18:08"}
+{"level":"info","message":"GET /public/puestos 200 74ms","service":"mi-servidor","timestamp":"2026-02-21 04:18:08"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:18:31","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 279ms","service":"mi-servidor","timestamp":"2026-02-21 04:18:31"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:18:31"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:18:31"}
+{"level":"info","message":"✅ Se importaron 25 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:18:31"}
+{"level":"info","message":"POST /admin/import-puestos 200 161ms","service":"mi-servidor","timestamp":"2026-02-21 04:18:31"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:19:11","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 276ms","service":"mi-servidor","timestamp":"2026-02-21 04:19:11"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:19:11"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:19:11"}
+{"level":"info","message":"✅ Se importaron 25 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:19:11"}
+{"level":"info","message":"POST /admin/import-puestos 200 173ms","service":"mi-servidor","timestamp":"2026-02-21 04:19:11"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:19:33","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 270ms","service":"mi-servidor","timestamp":"2026-02-21 04:19:33"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:19:33"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:19:34"}
+{"level":"info","message":"✅ Se importaron 25 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:19:34"}
+{"level":"info","message":"POST /admin/import-puestos 200 155ms","service":"mi-servidor","timestamp":"2026-02-21 04:19:34"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:21:15","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 295ms","service":"mi-servidor","timestamp":"2026-02-21 04:21:15"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:21:15"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:21:15"}
+{"level":"info","message":"✅ Se importaron 25 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:21:15"}
+{"level":"info","message":"POST /admin/import-puestos 200 174ms","service":"mi-servidor","timestamp":"2026-02-21 04:21:15"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:22:05","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 268ms","service":"mi-servidor","timestamp":"2026-02-21 04:22:05"}
+{"level":"warn","message":"Route not found: POST /api/admin/import-puestos-simple","service":"mi-servidor","timestamp":"2026-02-21 04:22:05"}
+{"level":"info","message":"POST /api/admin/import-puestos-simple 404 5ms","service":"mi-servidor","timestamp":"2026-02-21 04:22:05"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:22:40","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 267ms","service":"mi-servidor","timestamp":"2026-02-21 04:22:40"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:22:40"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:22:40"}
+{"level":"info","message":"✅ Se importaron 25 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:22:40"}
+{"level":"info","message":"POST /admin/import-puestos 200 186ms","service":"mi-servidor","timestamp":"2026-02-21 04:22:40"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 04:26:02"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 04:26:02"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 04:26:02"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 04:26:02"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 04:26:03"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 04:26:03"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 04:26:03"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 04:26:04"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 04:26:04"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:27:30","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 297ms","service":"mi-servidor","timestamp":"2026-02-21 04:27:30"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:27:30"}
+{"level":"info","message":"📦 Recibidos 75 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:27:30"}
+{"level":"info","message":"📦 Validados 75 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:27:30"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:27:30"}
+{"level":"info","message":"✅ Se importaron 75 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:27:30"}
+{"level":"info","message":"POST /admin/import-puestos 200 177ms","service":"mi-servidor","timestamp":"2026-02-21 04:27:30"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:27:50"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:27:50"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 166ms","service":"mi-servidor","timestamp":"2026-02-21 04:27:51"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:27:51"}
+{"level":"info","message":"GET /favicon.ico 404 7ms","service":"mi-servidor","timestamp":"2026-02-21 04:27:51"}
+{"level":"info","message":"Cargados 4 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:27:55"}
+{"level":"info","message":"GET /public/puestos 200 191ms","service":"mi-servidor","timestamp":"2026-02-21 04:27:55"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:29:22","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 294ms","service":"mi-servidor","timestamp":"2026-02-21 04:29:22"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:29:22"}
+{"level":"info","message":"📦 Recibidos 875 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:29:22"}
+{"level":"info","message":"📦 Validados 875 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:29:22"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:29:22"}
+{"level":"info","message":"✅ Se importaron 875 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:29:22"}
+{"level":"info","message":"POST /admin/import-puestos 200 480ms","service":"mi-servidor","timestamp":"2026-02-21 04:29:22"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:29:45","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 281ms","service":"mi-servidor","timestamp":"2026-02-21 04:29:45"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:29:45"}
+{"level":"info","message":"📦 Recibidos 1055 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:29:45"}
+{"level":"info","message":"📦 Validados 1055 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:29:45"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:29:45"}
+{"level":"info","message":"✅ Se importaron 1055 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:29:46"}
+{"level":"info","message":"POST /admin/import-puestos 200 384ms","service":"mi-servidor","timestamp":"2026-02-21 04:29:46"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:30:29","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 283ms","service":"mi-servidor","timestamp":"2026-02-21 04:30:29"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:30:29"}
+{"level":"info","message":"📦 Recibidos 797 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:30:29"}
+{"level":"info","message":"📦 Validados 797 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:30:29"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:30:29"}
+{"level":"info","message":"✅ Se importaron 797 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:30:29"}
+{"level":"info","message":"POST /admin/import-puestos 200 341ms","service":"mi-servidor","timestamp":"2026-02-21 04:30:29"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:30:54","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 279ms","service":"mi-servidor","timestamp":"2026-02-21 04:30:54"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:30:54"}
+{"level":"info","message":"📦 Recibidos 907 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:30:54"}
+{"level":"info","message":"📦 Validados 907 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:30:54"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:30:54"}
+{"level":"info","message":"✅ Se importaron 907 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:30:54"}
+{"level":"info","message":"POST /admin/import-puestos 200 320ms","service":"mi-servidor","timestamp":"2026-02-21 04:30:54"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:31:13"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:31:13"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 150ms","service":"mi-servidor","timestamp":"2026-02-21 04:31:14"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:31:14"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:31:14"}
+{"level":"info","message":"Cargados 45 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:31:16"}
+{"level":"info","message":"GET /public/puestos 200 82ms","service":"mi-servidor","timestamp":"2026-02-21 04:31:16"}
+{"level":"info","message":"GET /public/puestos/6999895ef330e5ac14a5cdce 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 04:31:24"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:34:56","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 318ms","service":"mi-servidor","timestamp":"2026-02-21 04:34:56"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:34:56"}
+{"level":"info","message":"📦 Recibidos 907 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:34:56"}
+{"level":"info","message":"📦 Validados 907 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:34:56"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:34:56"}
+{"level":"info","message":"✅ Se importaron 907 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:34:56"}
+{"level":"info","message":"POST /admin/import-puestos 200 408ms","service":"mi-servidor","timestamp":"2026-02-21 04:34:56"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:35:19"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:35:19"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 144ms","service":"mi-servidor","timestamp":"2026-02-21 04:35:19"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:35:19"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:35:19"}
+{"level":"info","message":"Cargados 45 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:35:24"}
+{"level":"info","message":"GET /public/puestos 200 323ms","service":"mi-servidor","timestamp":"2026-02-21 04:35:24"}
+{"level":"info","message":"GET /public/puestos/69998a50f330e5ac14a5d16e 200 69ms","service":"mi-servidor","timestamp":"2026-02-21 04:36:17"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:39:10","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 363ms","service":"mi-servidor","timestamp":"2026-02-21 04:39:10"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:39:10"}
+{"level":"info","message":"📦 Recibidos 965 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:39:10"}
+{"level":"info","message":"📦 Validados 965 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:39:10"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:39:10"}
+{"level":"info","message":"✅ Se importaron 965 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:39:11"}
+{"level":"info","message":"POST /admin/import-puestos 200 520ms","service":"mi-servidor","timestamp":"2026-02-21 04:39:11"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:40:03"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:40:03"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 158ms","service":"mi-servidor","timestamp":"2026-02-21 04:40:03"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:40:03"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:40:03"}
+{"level":"info","message":"Cargados 48 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:40:06"}
+{"level":"info","message":"GET /public/puestos 200 75ms","service":"mi-servidor","timestamp":"2026-02-21 04:40:06"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:43:57","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 336ms","service":"mi-servidor","timestamp":"2026-02-21 04:43:57"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:43:57"}
+{"level":"info","message":"📦 Recibidos 959 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:43:57"}
+{"level":"info","message":"📦 Validados 959 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:43:57"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:43:57"}
+{"level":"info","message":"✅ Se importaron 959 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:43:57"}
+{"level":"info","message":"POST /admin/import-puestos 200 390ms","service":"mi-servidor","timestamp":"2026-02-21 04:43:57"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:45:08"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:45:08"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:45:09"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:45:09"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 144ms","service":"mi-servidor","timestamp":"2026-02-21 04:45:09"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:45:13"}
+{"level":"info","message":"GET /public/puestos 200 144ms","service":"mi-servidor","timestamp":"2026-02-21 04:45:13"}
+{"level":"info","message":"GET /public/puestos/69998c6df330e5ac14a5d9e3 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 04:45:40"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 04:49:14","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 332ms","service":"mi-servidor","timestamp":"2026-02-21 04:49:14"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-21 04:49:14"}
+{"level":"info","message":"📦 Recibidos 965 puestos del request","service":"mi-servidor","timestamp":"2026-02-21 04:49:14"}
+{"level":"info","message":"📦 Validados 965 puestos","service":"mi-servidor","timestamp":"2026-02-21 04:49:14"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-21 04:49:14"}
+{"level":"info","message":"✅ Se importaron 965 puestos de votación","service":"mi-servidor","timestamp":"2026-02-21 04:49:15"}
+{"level":"info","message":"POST /admin/import-puestos 200 403ms","service":"mi-servidor","timestamp":"2026-02-21 04:49:15"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:49:35"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:49:35"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 141ms","service":"mi-servidor","timestamp":"2026-02-21 04:49:36"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:49:36"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 04:49:36"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:49:39"}
+{"level":"info","message":"GET /public/puestos 200 144ms","service":"mi-servidor","timestamp":"2026-02-21 04:49:39"}
+{"level":"info","message":"GET /public/puestos/69998dabf330e5ac14a5ddb2 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 04:49:45"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 04:53:46"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 04:53:46"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 04:53:46"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 04:53:46"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 04:53:46"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 04:53:46"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 04:53:46"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 04:53:48"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 04:53:48"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 04:55:31"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 3ms","service":"mi-servidor","timestamp":"2026-02-21 04:55:31"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 04:55:31"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 04:55:31"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 157ms","service":"mi-servidor","timestamp":"2026-02-21 04:55:31"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 04:55:39"}
+{"level":"info","message":"GET /public/puestos 304 143ms","service":"mi-servidor","timestamp":"2026-02-21 04:55:39"}
+{"level":"info","message":"GET /public/puestos/69998dabf330e5ac14a5ddb2 304 69ms","service":"mi-servidor","timestamp":"2026-02-21 04:55:51"}
+{"level":"info","message":"GET /public/puestos/69998dabf330e5ac14a5ddb2 304 69ms","service":"mi-servidor","timestamp":"2026-02-21 04:56:16"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 05:03:17"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 14ms","service":"mi-servidor","timestamp":"2026-02-21 05:03:17"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 476ms","service":"mi-servidor","timestamp":"2026-02-21 05:03:18"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 05:03:18"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 05:03:18"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 05:03:24"}
+{"level":"info","message":"GET /public/puestos 304 147ms","service":"mi-servidor","timestamp":"2026-02-21 05:03:24"}
+{"level":"info","message":"POST /registrations 400 289ms","service":"mi-servidor","timestamp":"2026-02-21 05:03:57"}
+{"level":"info","message":"POST /registrations 400 278ms","service":"mi-servidor","timestamp":"2026-02-21 05:04:06"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 05:05:57"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 13ms","service":"mi-servidor","timestamp":"2026-02-21 05:05:57"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 157ms","service":"mi-servidor","timestamp":"2026-02-21 05:05:57"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 05:05:57"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 05:05:57"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 05:06:05"}
+{"level":"info","message":"GET /public/puestos 304 144ms","service":"mi-servidor","timestamp":"2026-02-21 05:06:05"}
+{"level":"info","message":"POST /registrations 400 279ms","service":"mi-servidor","timestamp":"2026-02-21 05:06:14"}
+{"level":"info","message":"POST /registrations 400 276ms","service":"mi-servidor","timestamp":"2026-02-21 05:06:27"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 05:07:16"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 05:07:16"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 05:07:16"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 05:07:16"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 05:07:16"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 05:07:17"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 05:07:17"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 05:07:17"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 05:07:17"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 142ms","service":"mi-servidor","timestamp":"2026-02-21 05:07:17"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 05:07:18"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 05:07:18"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 05:07:18"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 05:07:25"}
+{"level":"info","message":"GET /public/puestos 304 145ms","service":"mi-servidor","timestamp":"2026-02-21 05:07:25"}
+{"level":"info","message":"POST /registrations 400 275ms","service":"mi-servidor","timestamp":"2026-02-21 05:07:34"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 05:09:24"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 05:09:24"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 05:09:24"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 05:09:24"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 05:09:24"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 05:09:24"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 05:09:24"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 05:09:25"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 05:09:25"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-21 05:09:35"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 4ms","service":"mi-servidor","timestamp":"2026-02-21 05:09:35"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 200 160ms","service":"mi-servidor","timestamp":"2026-02-21 05:09:35"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 05:09:35"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 05:09:35"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 05:09:43"}
+{"level":"info","message":"GET /public/puestos 304 142ms","service":"mi-servidor","timestamp":"2026-02-21 05:09:43"}
+{"level":"info","message":"Consent log: citizen_registered by leader 699815fdcad687256e453105, citizen 69999280295edd92fdbef710","service":"mi-servidor","timestamp":"2026-02-21 05:09:52"}
+{"level":"info","message":"POST /registrations 201 707ms","service":"mi-servidor","timestamp":"2026-02-21 05:09:52"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 304 189ms","service":"mi-servidor","timestamp":"2026-02-21 05:09:58"}
+{"level":"info","message":"GET /auth/legal-terms-status 401 9ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:31"}
+{"level":"info","message":"GET /leaders/null 401 3ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:31"}
+{"level":"info","message":"GET /registrations 401 1ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:31"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 05:10:35","user":"cleader"}
+{"level":"info","message":"POST /auth/leader-login 200 131ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:35"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 73ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:35"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 200 73ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:35"}
+{"level":"info","message":"GET /registrations 200 146ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:36"}
+{"level":"info","message":"GET /registrations 304 141ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:36"}
+{"level":"info","message":"GET /registro/8039dac33aa9c684569ea0397bde8c11 304 141ms","service":"mi-servidor","timestamp":"2026-02-21 05:10:56"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 05:19:57"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 05:19:57"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 05:19:57"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 05:19:57"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 05:19:57"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 05:19:58"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 05:19:58"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 05:19:59"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 05:19:59"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 97ms","service":"mi-servidor","timestamp":"2026-02-21 05:20:11"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 77ms","service":"mi-servidor","timestamp":"2026-02-21 05:20:12"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 05:20:12"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 05:20:12"}
+{"level":"info","message":"GET /registrations 200 245ms","service":"mi-servidor","timestamp":"2026-02-21 05:20:12"}
+{"level":"info","message":"GET /registrations 304 228ms","service":"mi-servidor","timestamp":"2026-02-21 05:20:13"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 100ms","service":"mi-servidor","timestamp":"2026-02-21 05:22:48"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 05:22:48"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 05:22:48"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 74ms","service":"mi-servidor","timestamp":"2026-02-21 05:22:49"}
+{"level":"info","message":"GET /registrations 304 211ms","service":"mi-servidor","timestamp":"2026-02-21 05:22:49"}
+{"level":"info","message":"GET /registrations 304 215ms","service":"mi-servidor","timestamp":"2026-02-21 05:22:50"}
+{"level":"info","message":"Cargados 60 puestos para Rafael Uribe Uribe","service":"mi-servidor","timestamp":"2026-02-21 05:22:51"}
+{"level":"info","message":"GET /public/puestos 200 144ms","service":"mi-servidor","timestamp":"2026-02-21 05:22:51"}
+{"level":"info","message":"Cargados 60 puestos para Rafael Uribe Uribe","service":"mi-servidor","timestamp":"2026-02-21 05:23:03"}
+{"level":"info","message":"GET /public/puestos 304 141ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:03"}
+{"level":"info","message":"Cargados 60 puestos para Rafael Uribe Uribe","service":"mi-servidor","timestamp":"2026-02-21 05:23:08"}
+{"level":"info","message":"GET /public/puestos 304 141ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:08"}
+{"level":"info","message":"PUT /registrations/69981aa990d96beaae5f4a81 200 326ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:14"}
+{"level":"info","message":"GET /registrations 200 211ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:14"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 05:23:32","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 281ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:32"}
+{"level":"info","message":"GET /events 200 76ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:32"}
+{"level":"info","message":"GET /events 200 72ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:33"}
+{"level":"info","message":"GET /events 200 74ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:35"}
+{"level":"info","message":"GET /leaders 200 85ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:35"}
+{"level":"info","message":"GET /registrations 200 564ms","service":"mi-servidor","timestamp":"2026-02-21 05:23:36"}
+{"level":"info","message":"POST /auth/logout 200 142ms","service":"mi-servidor","timestamp":"2026-02-21 05:33:15"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 05:33:20","user":"cleader"}
+{"level":"info","message":"POST /auth/leader-login 200 189ms","service":"mi-servidor","timestamp":"2026-02-21 05:33:20"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 82ms","service":"mi-servidor","timestamp":"2026-02-21 05:33:21"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 84ms","service":"mi-servidor","timestamp":"2026-02-21 05:33:21"}
+{"level":"info","message":"GET /registrations 304 237ms","service":"mi-servidor","timestamp":"2026-02-21 05:33:21"}
+{"level":"info","message":"GET /registrations 304 234ms","service":"mi-servidor","timestamp":"2026-02-21 05:33:23"}
+{"level":"info","message":"Cargados 60 puestos para Rafael Uribe Uribe","service":"mi-servidor","timestamp":"2026-02-21 05:33:28"}
+{"level":"info","message":"GET /public/puestos 304 142ms","service":"mi-servidor","timestamp":"2026-02-21 05:33:28"}
+{"level":"info","message":"Cargados 112 puestos para Kennedy","service":"mi-servidor","timestamp":"2026-02-21 05:33:32"}
+{"level":"info","message":"GET /public/puestos 200 225ms","service":"mi-servidor","timestamp":"2026-02-21 05:33:32"}
+{"level":"info","message":"Cargados 60 puestos para Rafael Uribe Uribe","service":"mi-servidor","timestamp":"2026-02-21 05:34:04"}
+{"level":"info","message":"GET /public/puestos 304 137ms","service":"mi-servidor","timestamp":"2026-02-21 05:34:04"}
+{"level":"info","message":"GET /registrations 304 216ms","service":"mi-servidor","timestamp":"2026-02-21 05:34:34"}
+{"level":"info","message":"GET /registrations 304 219ms","service":"mi-servidor","timestamp":"2026-02-21 05:34:47"}
+{"level":"info","message":"GET /registrations 304 208ms","service":"mi-servidor","timestamp":"2026-02-21 05:34:58"}
+{"level":"info","message":"Cargados 60 puestos para Rafael Uribe Uribe","service":"mi-servidor","timestamp":"2026-02-21 05:34:59"}
+{"level":"info","message":"GET /public/puestos 304 142ms","service":"mi-servidor","timestamp":"2026-02-21 05:34:59"}
+{"level":"info","message":"Cargados 69 puestos para Ciudad Bolívar","service":"mi-servidor","timestamp":"2026-02-21 05:37:02"}
+{"level":"info","message":"GET /public/puestos 200 144ms","service":"mi-servidor","timestamp":"2026-02-21 05:37:02"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 103ms","service":"mi-servidor","timestamp":"2026-02-21 05:44:57"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 200 72ms","service":"mi-servidor","timestamp":"2026-02-21 05:44:57"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 05:44:57"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 05:44:57"}
+{"level":"info","message":"GET /registrations 200 220ms","service":"mi-servidor","timestamp":"2026-02-21 05:44:57"}
+{"level":"info","message":"Cargados 31 puestos para Chapinero","service":"mi-servidor","timestamp":"2026-02-21 05:45:01"}
+{"level":"info","message":"GET /public/puestos 200 471ms","service":"mi-servidor","timestamp":"2026-02-21 05:45:01"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 104ms","service":"mi-servidor","timestamp":"2026-02-21 05:46:57"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 75ms","service":"mi-servidor","timestamp":"2026-02-21 05:46:57"}
+{"level":"info","message":"GET /registrations 304 216ms","service":"mi-servidor","timestamp":"2026-02-21 05:46:57"}
+{"level":"info","message":"GET /registrations 304 209ms","service":"mi-servidor","timestamp":"2026-02-21 05:46:59"}
+{"level":"info","message":"Cargados 69 puestos para Ciudad Bolívar","service":"mi-servidor","timestamp":"2026-02-21 05:47:11"}
+{"level":"info","message":"GET /public/puestos 304 183ms","service":"mi-servidor","timestamp":"2026-02-21 05:47:11"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 05:51:48"}
+{"level":"info","message":"GET /public/puestos 304 162ms","service":"mi-servidor","timestamp":"2026-02-21 05:51:49"}
+{"level":"info","message":"GET /registrations 304 265ms","service":"mi-servidor","timestamp":"2026-02-21 06:06:45"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 73ms","service":"mi-servidor","timestamp":"2026-02-21 06:06:47"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 200 73ms","service":"mi-servidor","timestamp":"2026-02-21 06:06:47"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 06:06:47"}
+{"level":"info","message":"GET /favicon.ico 404 1ms","service":"mi-servidor","timestamp":"2026-02-21 06:06:47"}
+{"level":"info","message":"GET /registrations 200 210ms","service":"mi-servidor","timestamp":"2026-02-21 06:06:47"}
+{"level":"info","message":"GET /registrations 304 230ms","service":"mi-servidor","timestamp":"2026-02-21 06:06:48"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 06:07:01","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 304ms","service":"mi-servidor","timestamp":"2026-02-21 06:07:01"}
+{"level":"info","message":"GET /events 200 75ms","service":"mi-servidor","timestamp":"2026-02-21 06:07:01"}
+{"level":"info","message":"GET /events 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 06:07:03"}
+{"level":"info","message":"GET /events 200 73ms","service":"mi-servidor","timestamp":"2026-02-21 06:07:04"}
+{"level":"info","message":"GET /leaders 200 81ms","service":"mi-servidor","timestamp":"2026-02-21 06:07:04"}
+{"level":"info","message":"GET /registrations 200 1685ms","service":"mi-servidor","timestamp":"2026-02-21 06:07:06"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 06:08:14"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 06:08:14"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 06:08:14"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 06:08:14"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 06:08:14"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 06:08:14"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 06:08:14"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 06:08:15"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 06:08:15"}
+{"level":"info","message":"GET /events 200 90ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:23"}
+{"level":"info","message":"GET /leaders 200 79ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:23"}
+{"level":"info","message":"GET /registrations 200 710ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:24"}
+{"level":"info","message":"POST /auth/logout 200 84ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:44"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 06:08:51","user":"cleader"}
+{"level":"info","message":"POST /auth/leader-login 200 134ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:51"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 71ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:51"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 71ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:51"}
+{"level":"info","message":"GET /registrations 200 286ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:52"}
+{"level":"info","message":"GET /registrations 304 283ms","service":"mi-servidor","timestamp":"2026-02-21 06:08:55"}
+{"level":"info","message":"GET /registrations 304 287ms","service":"mi-servidor","timestamp":"2026-02-21 06:09:48"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 06:10:22"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 06:10:22"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 06:10:22"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 06:10:22"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 06:10:23"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 06:10:23"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 06:10:23"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 06:10:24"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 06:10:57"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 06:10:57"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 06:10:57"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 06:10:58"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 06:10:58"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 06:10:58"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 06:10:58"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 06:10:59"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 06:10:59"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 88ms","service":"mi-servidor","timestamp":"2026-02-21 06:11:50"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 06:11:50"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 06:11:50"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 79ms","service":"mi-servidor","timestamp":"2026-02-21 06:11:50"}
+{"level":"info","message":"GET /registrations 304 293ms","service":"mi-servidor","timestamp":"2026-02-21 06:11:50"}
+{"level":"info","message":"GET /registrations 304 295ms","service":"mi-servidor","timestamp":"2026-02-21 06:11:51"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 06:12:12","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 289ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:12"}
+{"level":"info","message":"GET /events 200 74ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:12"}
+{"level":"info","message":"GET /events 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:14"}
+{"level":"info","message":"GET /events 200 74ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:15"}
+{"level":"info","message":"GET /leaders 200 78ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:15"}
+{"level":"info","message":"GET /registrations 304 698ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:16"}
+{"level":"info","message":"POST /registrations/69999280295edd92fdbef710/confirm 200 220ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:50"}
+{"level":"info","message":"POST /registrations/69999280295edd92fdbef710/confirm 200 219ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:50"}
+{"level":"info","message":"GET /events 200 91ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:50"}
+{"level":"info","message":"GET /leaders 200 90ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:50"}
+{"level":"info","message":"GET /events 200 72ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:50"}
+{"level":"info","message":"GET /leaders 200 77ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:50"}
+{"level":"info","message":"GET /registrations 200 744ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:51"}
+{"level":"info","message":"GET /registrations 304 585ms","service":"mi-servidor","timestamp":"2026-02-21 06:12:51"}
+{"level":"info","message":"GET /registrations 401 6ms","service":"mi-servidor","timestamp":"2026-02-21 06:15:06"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 06:15:36"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 06:15:36"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 06:15:36"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 06:15:37"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 06:15:38"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 06:15:38"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 06:15:38"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 06:15:38"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 06:15:38"}
+{"level":"info","message":"GET /events 200 94ms","service":"mi-servidor","timestamp":"2026-02-21 06:16:43"}
+{"level":"info","message":"GET /leaders 200 105ms","service":"mi-servidor","timestamp":"2026-02-21 06:16:43"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-21 06:16:43"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-21 06:16:43"}
+{"level":"info","message":"GET /registrations 200 785ms","service":"mi-servidor","timestamp":"2026-02-21 06:16:44"}
+{"level":"info","message":"GET /events 200 76ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:17"}
+{"level":"info","message":"GET /leaders 200 154ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:17"}
+{"level":"info","message":"GET /registrations 200 298ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:18"}
+{"level":"info","message":"GET /leaders 200 144ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:29"}
+{"level":"info","message":"GET /registrations 200 214ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:29"}
+{"level":"info","message":"GET /registrations 200 207ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:29"}
+{"level":"info","message":"GET /registrations 304 207ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:30"}
+{"level":"info","message":"GET /registrations 304 207ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:30"}
+{"level":"info","message":"GET /registrations 304 215ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:30"}
+{"level":"info","message":"GET /registrations 200 274ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:30"}
+{"level":"info","message":"GET /registrations 200 209ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:31"}
+{"level":"info","message":"GET /registrations 304 206ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:31"}
+{"level":"info","message":"GET /registrations 200 286ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:31"}
+{"level":"info","message":"GET /registrations 304 205ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:31"}
+{"level":"info","message":"GET /registrations 304 204ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:32"}
+{"level":"info","message":"GET /registrations 200 312ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:32"}
+{"level":"info","message":"GET /registrations 200 399ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:32"}
+{"level":"info","message":"GET /registrations 200 298ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:33"}
+{"level":"info","message":"GET /registrations 304 209ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:33"}
+{"level":"info","message":"GET /registrations 200 318ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:33"}
+{"level":"info","message":"GET /registrations 304 214ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:33"}
+{"level":"info","message":"GET /registrations 304 205ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:34"}
+{"level":"info","message":"GET /registrations 200 280ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:34"}
+{"level":"info","message":"GET /registrations 200 205ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:34"}
+{"level":"info","message":"GET /registrations 304 206ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:34"}
+{"level":"info","message":"GET /registrations 200 285ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:35"}
+{"level":"info","message":"GET /registrations 304 204ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:35"}
+{"level":"info","message":"GET /registrations 304 210ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:35"}
+{"level":"info","message":"GET /registrations 200 285ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:35"}
+{"level":"info","message":"GET /registrations 304 208ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:35"}
+{"level":"info","message":"GET /registrations 304 207ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:36"}
+{"level":"info","message":"GET /registrations 200 355ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:36"}
+{"level":"info","message":"GET /registrations 304 209ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:36"}
+{"level":"info","message":"GET /registrations 304 206ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:36"}
+{"level":"info","message":"GET /registrations 200 207ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:37"}
+{"level":"info","message":"GET /registrations 304 214ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:37"}
+{"level":"info","message":"GET /registrations 200 273ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:37"}
+{"level":"info","message":"GET /registrations 304 214ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:37"}
+{"level":"info","message":"GET /registrations 304 206ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:38"}
+{"level":"info","message":"GET /registrations 200 204ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:38"}
+{"level":"info","message":"GET /registrations 304 211ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:38"}
+{"level":"info","message":"GET /registrations 304 204ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:38"}
+{"level":"info","message":"GET /registrations 200 207ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:38"}
+{"level":"info","message":"GET /registrations 304 207ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:39"}
+{"level":"info","message":"GET /registrations 200 206ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:39"}
+{"level":"info","message":"GET /registrations 200 205ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:39"}
+{"level":"info","message":"GET /registrations 200 205ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:39"}
+{"level":"info","message":"GET /registrations 304 206ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:39"}
+{"level":"info","message":"GET /registrations 200 274ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:40"}
+{"level":"info","message":"GET /stats 200 214ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:40"}
+{"level":"info","message":"GET /stats/daily 200 74ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:40"}
+{"level":"info","message":"GET /registrations 200 276ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:40"}
+{"level":"info","message":"GET /events 200 71ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:47"}
+{"level":"info","message":"GET /events 200 70ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:49"}
+{"level":"info","message":"GET /leaders 200 76ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:49"}
+{"level":"info","message":"GET /registrations 304 754ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:50"}
+{"level":"info","message":"GET /events 200 72ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:56"}
+{"level":"info","message":"GET /leaders 200 141ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:56"}
+{"level":"info","message":"GET /registrations 304 275ms","service":"mi-servidor","timestamp":"2026-02-21 06:17:57"}
+{"level":"info","message":"GET /events 200 72ms","service":"mi-servidor","timestamp":"2026-02-21 06:18:56"}
+{"level":"info","message":"GET /leaders 200 79ms","service":"mi-servidor","timestamp":"2026-02-21 06:18:56"}
+{"level":"info","message":"GET /registrations 304 758ms","service":"mi-servidor","timestamp":"2026-02-21 06:18:57"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 06:21:11"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 06:21:11"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 06:21:11"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 06:21:11"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 06:21:11"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 06:21:11"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 06:21:11"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 06:21:12"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 06:21:12"}
+{"level":"info","message":"GET /leaders 200 107ms","service":"mi-servidor","timestamp":"2026-02-21 06:21:46"}
+{"level":"info","message":"GET /events 200 89ms","service":"mi-servidor","timestamp":"2026-02-21 06:21:46"}
+{"level":"info","message":"GET /registrations 304 788ms","service":"mi-servidor","timestamp":"2026-02-21 06:21:47"}
+{"level":"info","message":"POST /auth/logout 200 94ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:21"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 06:22:27","user":"cleader"}
+{"level":"info","message":"POST /auth/leader-login 200 154ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:27"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 73ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:27"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 71ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:27"}
+{"level":"info","message":"GET /registrations 200 286ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:28"}
+{"level":"info","message":"GET /registrations 304 279ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:31"}

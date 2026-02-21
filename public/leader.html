@@ -521,6 +521,60 @@
             color: #92400e;
         }
 
+        .badge-revision {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Alerta de revisión */
+        .alert-revision {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+        }
+
+        .alert-revision i {
+            font-size: 24px;
+            color: #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .alert-revision strong {
+            display: block;
+            color: #92400e;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .alert-revision p {
+            color: #92400e;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .btn-alert {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-alert:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
+
         .action-btn {
             padding: 6px 12px;
             border: none;
@@ -1689,6 +1743,16 @@
                     </h2>
                 </div>
 
+                <!-- ALERTA DE REVISIÓN -->
+                <div id="alertaRevision" class="alert-revision" style="display: none;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <div>
+                        <strong>Registros pendientes de revisión</strong>
+                        <p>Algunos de tus registros tienen puestos de votación que requieren verificación. Por favor revisa y confirma la información.</p>
+                    </div>
+                    <button class="btn-alert" onclick="filtrarRegistrosRevision()">Ver registros</button>
+                </div>
+
                 <!-- QR/LINK SECTION -->
                 <div class="qr-section">
                     <h4>
@@ -1875,7 +1939,7 @@
                             <!-- Localidades de Bogotá -->
                             <div id="bogotaContainer">
                                 <label class="form-label required">Localidad</label>
-                                <select class="form-input" id="localidad" required>
+                                <select class="form-input" id="localidad" required onchange="handleLocalidadChange()">
                                     <option value="">Selecciona tu localidad</option>
                                     <option value="Usaquén">Usaquén</option>
                                     <option value="Chapinero">Chapinero</option>
@@ -1957,8 +2021,16 @@
 
                         <div class="form-group">
                             <label class="form-label required">Puesto de Votación</label>
-                            <input type="text" class="form-input" id="votingPlace"
-                                placeholder="Ej: Colegio San José, Salón 101" required>
+                            <div id="puestoCatalogo">
+                                <input type="text" class="form-input" id="puestoBusquedaLeader" placeholder="🔍 Busca por nombre..." onkeyup="filtrarPuestosLeader()" style="margin-bottom: 8px;">
+                                <select class="form-input" id="puestoId" required>
+                                    <option value="">Selecciona tu puesto de votación</option>
+                                </select>
+                            </div>
+                            <div id="puestoManual" style="display: none;">
+                                <input type="text" class="form-input" id="votingPlace"
+                                    placeholder="Ej: Colegio San José, Salón 101">
+                            </div>
                             <div class="form-text">El lugar donde debes ir a votar</div>
                         </div>
 
@@ -2111,8 +2183,108 @@
                     <input type="text" class="form-input" id="editPhone">
                 </div>
                 <div class="form-group">
+                    <label class="form-label required">Ubicación</label>
+                    <div class="ubicacion-selector">
+                        <div class="ubicacion-option">
+                            <input type="radio" name="editUbicacionTipo" id="editUbicacionBogota" value="bogota"
+                                onchange="toggleEditUbicacion('bogota')">
+                            <label for="editUbicacionBogota" class="ubicacion-label">
+                                <i class="bi bi-buildings"></i>
+                                Bogotá D.C.
+                            </label>
+                        </div>
+                        <div class="ubicacion-option">
+                            <input type="radio" name="editUbicacionTipo" id="editUbicacionResto" value="resto"
+                                onchange="toggleEditUbicacion('resto')">
+                            <label for="editUbicacionResto" class="ubicacion-label">
+                                <i class="bi bi-geo-alt"></i>
+                                Resto del país
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="editBogotaContainer">
+                        <label class="form-label required">Localidad</label>
+                        <select class="form-input" id="editLocalidad" onchange="handleEditLocalidadChange()">
+                            <option value="">Selecciona tu localidad</option>
+                            <option value="Usaquén">Usaquén</option>
+                            <option value="Chapinero">Chapinero</option>
+                            <option value="Santa Fe">Santa Fe</option>
+                            <option value="San Cristóbal">San Cristóbal</option>
+                            <option value="Usme">Usme</option>
+                            <option value="Tunjuelito">Tunjuelito</option>
+                            <option value="Bosa">Bosa</option>
+                            <option value="Kennedy">Kennedy</option>
+                            <option value="Fontibón">Fontibón</option>
+                            <option value="Engativá">Engativá</option>
+                            <option value="Suba">Suba</option>
+                            <option value="Barrios Unidos">Barrios Unidos</option>
+                            <option value="Teusaquillo">Teusaquillo</option>
+                            <option value="Los Mártires">Los Mártires</option>
+                            <option value="Antonio Nariño">Antonio Nariño</option>
+                            <option value="Puente Aranda">Puente Aranda</option>
+                            <option value="La Candelaria">La Candelaria</option>
+                            <option value="Rafael Uribe Uribe">Rafael Uribe Uribe</option>
+                            <option value="Ciudad Bolívar">Ciudad Bolívar</option>
+                            <option value="Sumapaz">Sumapaz</option>
+                        </select>
+                    </div>
+
+                    <div id="editRestoContainer" style="display: none;">
+                        <label class="form-label required">Departamento</label>
+                        <select class="form-input" id="editDepartamento" onchange="actualizarEditCapital()">
+                            <option value="">Selecciona tu departamento</option>
+                            <option value="Amazonas">Amazonas</option>
+                            <option value="Antioquia">Antioquia</option>
+                            <option value="Arauca">Arauca</option>
+                            <option value="Atlántico">Atlántico</option>
+                            <option value="Bolívar">Bolívar</option>
+                            <option value="Boyacá">Boyacá</option>
+                            <option value="Caldas">Caldas</option>
+                            <option value="Caquetá">Caquetá</option>
+                            <option value="Casanare">Casanare</option>
+                            <option value="Cauca">Cauca</option>
+                            <option value="Cesar">Cesar</option>
+                            <option value="Chocó">Chocó</option>
+                            <option value="Córdoba">Córdoba</option>
+                            <option value="Cundinamarca">Cundinamarca</option>
+                            <option value="Guainía">Guainía</option>
+                            <option value="Guaviare">Guaviare</option>
+                            <option value="Huila">Huila</option>
+                            <option value="La Guajira">La Guajira</option>
+                            <option value="Magdalena">Magdalena</option>
+                            <option value="Meta">Meta</option>
+                            <option value="Nariño">Nariño</option>
+                            <option value="Norte de Santander">Norte de Santander</option>
+                            <option value="Putumayo">Putumayo</option>
+                            <option value="Quindío">Quindío</option>
+                            <option value="Risaralda">Risaralda</option>
+                            <option value="San Andrés y Providencia">San Andrés y Providencia</option>
+                            <option value="Santander">Santander</option>
+                            <option value="Sucre">Sucre</option>
+                            <option value="Tolima">Tolima</option>
+                            <option value="Valle del Cauca">Valle del Cauca</option>
+                            <option value="Vaupés">Vaupés</option>
+                            <option value="Vichada">Vichada</option>
+                        </select>
+
+                        <div id="editCapitalContainer" style="margin-top: 12px; display: none;">
+                            <label class="form-label">Capital</label>
+                            <input type="text" class="form-input" id="editCapital" readonly
+                                style="background: #f5f5f5; cursor: not-allowed;">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="form-label">Puesto de Votación</label>
-                    <input type="text" class="form-input" id="editVotingPlace">
+                    <div id="editPuestoCatalogo">
+                        <select class="form-input" id="editPuestoId">
+                            <option value="">Selecciona tu puesto de votación</option>
+                        </select>
+                    </div>
+                    <div id="editPuestoManual" style="display: none;">
+                        <input type="text" class="form-input" id="editVotingPlace">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Mesa</label>
@@ -2294,6 +2466,7 @@
         let currentPage = 1;
         const itemsPerPage = 10;
         let isRedirecting = false;
+        let puestosLeaderCache = [];
 
         // Capitales de Colombia para el formulario
         const capitalesColombia = {
@@ -2330,6 +2503,45 @@
             'Vaupés': 'Mitú',
             'Vichada': 'Puerto Carreño'
         };
+
+        function normalizePuestoTexto(value) {
+            return (value || '')
+                .normalize('NFD')
+                .replace(/\p{Diacritic}/gu, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function buildPuestoSearchText(puesto) {
+            const aliases = Array.isArray(puesto.aliases) ? puesto.aliases.join(' ') : '';
+            const base = `${puesto.nombre || ''} ${puesto.codigoPuesto || ''} ${aliases}`;
+            return normalizePuestoTexto(base);
+        }
+
+        const bogotaLocalidades = [
+            'Usaquén',
+            'Chapinero',
+            'Santa Fe',
+            'San Cristóbal',
+            'Usme',
+            'Tunjuelito',
+            'Bosa',
+            'Kennedy',
+            'Fontibón',
+            'Engativá',
+            'Suba',
+            'Barrios Unidos',
+            'Teusaquillo',
+            'Los Mártires',
+            'Antonio Nariño',
+            'Puente Aranda',
+            'La Candelaria',
+            'Rafael Uribe Uribe',
+            'Ciudad Bolívar',
+            'Sumapaz'
+        ];
 
         // ============== API CALL HELPER ==============
         async function apiCall(endpoint, options = {}) {
@@ -2468,6 +2680,20 @@
 
                 filteredRegistrations = [...myRegistrations];
                 currentPage = 1;
+                
+                // Debug: mostrar primer registro con campos de revisión
+                if (myRegistrations.length > 0) {
+                    console.log('[DEBUG] Primer registro:', {
+                        cedula: myRegistrations[0].cedula,
+                        requiereRevisionPuesto: myRegistrations[0].requiereRevisionPuesto,
+                        revisionPuestoResuelta: myRegistrations[0].revisionPuestoResuelta,
+                        votingPlace: myRegistrations[0].votingPlace
+                    });
+                }
+                
+                // Verificar si hay registros con revisión pendiente
+                checkRevisionPendiente();
+                
                 renderRegistrations();
             } catch (error) {
                 console.error('Error al cargar registros:', error);
@@ -2482,6 +2708,31 @@
                     `;
                 }
             }
+        }
+
+        function checkRevisionPendiente() {
+            const conRevision = myRegistrations.filter(r => r.requiereRevisionPuesto && !r.revisionPuestoResuelta);
+            const alertaDiv = document.getElementById('alertaRevision');
+            
+            console.log('[DEBUG] checkRevisionPendiente:', {
+                totalRegistros: myRegistrations.length,
+                conRevision: conRevision.length,
+                alertaDivExiste: !!alertaDiv
+            });
+            
+            if (conRevision.length > 0 && alertaDiv) {
+                console.log('[DEBUG] Mostrando alerta de revisión');
+                alertaDiv.style.display = 'flex';
+            } else if (alertaDiv) {
+                console.log('[DEBUG] Ocultando alerta de revisión');
+                alertaDiv.style.display = 'none';
+            }
+        }
+
+        function filtrarRegistrosRevision() {
+            filteredRegistrations = myRegistrations.filter(r => r.requiereRevisionPuesto && !r.revisionPuestoResuelta);
+            currentPage = 1;
+            renderRegistrations();
         }
 
         function renderRegistrations() {
@@ -2513,12 +2764,13 @@
                             <span class="badge ${reg.confirmed ? 'badge-success' : 'badge-warning'}">
                                 ${reg.confirmed ? '✓ Confirmado' : '⏱ Pendiente'}
                             </span>
+                            ${reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta ? '<span class="badge badge-revision">⚠ Revisar puesto</span>' : ''}
                         </td>
                         <td>
                             <button class="action-btn action-btn-confirm" onclick="toggleConfirm('${reg._id}', ${reg.confirmed})" title="${reg.confirmed ? 'Marcar como pendiente' : 'Confirmar'}">
                                 <i class="bi bi-check-circle"></i>
                             </button>
-                            <button class="action-btn action-btn-edit" onclick="openEditModal('${reg._id}', '${reg.firstName}', '${reg.lastName}', '${reg.email || ''}', '${reg.phone || ''}', '${reg.votingPlace || ''}', '${reg.votingTable || ''}')">
+                            <button class="action-btn action-btn-edit" onclick="openEditModal('${reg._id}')">
                                 <i class="bi bi-pencil"></i>
                             </button>
                             <button class="action-btn action-btn-delete" onclick="confirmDelete('${reg._id}')">
@@ -2767,14 +3019,115 @@
         }
 
         // ============== EDIT MODAL ==============
-        function openEditModal(id, firstName, lastName, email, phone, place, table) {
+        async function cargarEditPuestos(localidad, selectedId = '') {
+            const select = document.getElementById('editPuestoId');
+            select.innerHTML = '<option value="">Selecciona tu puesto de votación</option>';
+
+            if (!localidad) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/public/puestos?localidad=${encodeURIComponent(localidad)}`);
+                if (!response.ok) {
+                    console.error('Error al cargar puestos:', response.status, response.statusText);
+                    return;
+                }
+
+                const data = await response.json();
+                const puestos = data.data || [];
+
+                select.innerHTML = '<option value="">Selecciona tu puesto de votación</option>' +
+                    puestos.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('');
+
+                if (selectedId) {
+                    select.value = selectedId;
+                }
+            } catch (error) {
+                console.error('Error al cargar puestos:', error);
+            }
+        }
+
+        function handleEditLocalidadChange() {
+            const localidad = document.getElementById('editLocalidad').value;
+            cargarEditPuestos(localidad);
+        }
+
+        function toggleEditUbicacion(tipo) {
+            const bogotaContainer = document.getElementById('editBogotaContainer');
+            const restoContainer = document.getElementById('editRestoContainer');
+            const localidadSelect = document.getElementById('editLocalidad');
+            const departamentoSelect = document.getElementById('editDepartamento');
+            const puestoCatalogo = document.getElementById('editPuestoCatalogo');
+            const puestoManual = document.getElementById('editPuestoManual');
+
+            if (tipo === 'bogota') {
+                bogotaContainer.style.display = 'block';
+                restoContainer.style.display = 'none';
+                localidadSelect.required = true;
+                departamentoSelect.required = false;
+                departamentoSelect.value = '';
+                document.getElementById('editCapitalContainer').style.display = 'none';
+                puestoCatalogo.style.display = 'block';
+                puestoManual.style.display = 'none';
+            } else {
+                bogotaContainer.style.display = 'none';
+                restoContainer.style.display = 'block';
+                localidadSelect.required = false;
+                departamentoSelect.required = true;
+                localidadSelect.value = '';
+                puestoCatalogo.style.display = 'none';
+                puestoManual.style.display = 'block';
+            }
+        }
+
+        function actualizarEditCapital() {
+            const departamento = document.getElementById('editDepartamento').value;
+            const capitalContainer = document.getElementById('editCapitalContainer');
+            const capitalInput = document.getElementById('editCapital');
+
+            if (departamento && capitalesColombia[departamento]) {
+                capitalInput.value = capitalesColombia[departamento];
+                capitalContainer.style.display = 'block';
+            } else {
+                capitalInput.value = '';
+                capitalContainer.style.display = 'none';
+            }
+        }
+
+        function openEditModal(id) {
+            const reg = filteredRegistrations.find(r => r._id === id);
+            if (!reg) {
+                alert('Registro no encontrado');
+                return;
+            }
+
             document.getElementById('editId').value = id;
-            document.getElementById('editFirstName').value = firstName;
-            document.getElementById('editLastName').value = lastName;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editPhone').value = phone;
-            document.getElementById('editVotingPlace').value = place;
-            document.getElementById('editVotingTable').value = table;
+            document.getElementById('editFirstName').value = reg.firstName || '';
+            document.getElementById('editLastName').value = reg.lastName || '';
+            document.getElementById('editEmail').value = reg.email || '';
+            document.getElementById('editPhone').value = reg.phone || '';
+            document.getElementById('editVotingPlace').value = reg.votingPlace || '';
+            document.getElementById('editVotingTable').value = reg.votingTable || reg.mesa || '';
+
+            const isBogota = bogotaLocalidades.includes(reg.localidad);
+            if (isBogota) {
+                document.getElementById('editUbicacionBogota').checked = true;
+                toggleEditUbicacion('bogota');
+                document.getElementById('editLocalidad').value = reg.localidad || '';
+                const selectedPuestoId = reg.puestoId && typeof reg.puestoId === 'object'
+                    ? reg.puestoId._id
+                    : reg.puestoId;
+                cargarEditPuestos(reg.localidad, selectedPuestoId);
+            } else {
+                document.getElementById('editUbicacionResto').checked = true;
+                toggleEditUbicacion('resto');
+                document.getElementById('editDepartamento').value = reg.departamento || reg.localidad || '';
+                actualizarEditCapital();
+                if (reg.capital) {
+                    document.getElementById('editCapital').value = reg.capital;
+                }
+            }
 
             document.getElementById('editModal').classList.add('active');
         }
@@ -2786,13 +3139,53 @@
         function saveEditRegistration(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
+
+            const ubicacionTipo = document.querySelector('input[name="editUbicacionTipo"]:checked')?.value;
+            let localidad = '';
+            let departamento = '';
+            let capital = '';
+
+            if (ubicacionTipo === 'bogota') {
+                localidad = document.getElementById('editLocalidad').value;
+            } else {
+                departamento = document.getElementById('editDepartamento').value;
+                capital = document.getElementById('editCapital').value;
+                localidad = departamento;
+            }
+
+            const votingPlace = document.getElementById('editVotingPlace').value.trim();
+            const votingTable = document.getElementById('editVotingTable').value.trim();
+            const puestoId = document.getElementById('editPuestoId').value;
+
+            const localidadValida = ubicacionTipo === 'bogota' ? localidad : departamento;
+            if (!localidadValida) {
+                alert('Por favor completa la Localidad/Departamento');
+                return;
+            }
+
+            if (ubicacionTipo === 'bogota' && (!puestoId || !votingTable)) {
+                alert('Por favor selecciona el Puesto de Votación y la Mesa');
+                return;
+            }
+
+            if (ubicacionTipo !== 'bogota' && (!votingPlace || !votingTable)) {
+                alert('Por favor completa Puesto de Votación y Mesa');
+                return;
+            }
+
             const data = {
                 firstName: document.getElementById('editFirstName').value,
                 lastName: document.getElementById('editLastName').value,
                 email: document.getElementById('editEmail').value,
                 phone: document.getElementById('editPhone').value,
-                votingPlace: document.getElementById('editVotingPlace').value,
-                votingTable: document.getElementById('editVotingTable').value
+                localidad,
+                departamento: departamento || null,
+                capital: capital || null,
+                registeredToVote: ubicacionTipo === 'bogota',
+                puestoId: ubicacionTipo === 'bogota' ? puestoId : null,
+                mesa: ubicacionTipo === 'bogota' ? parseInt(votingTable) : null,
+                votingPlace: ubicacionTipo === 'bogota' ? null : votingPlace,
+                votingTable: ubicacionTipo === 'bogota' ? null : votingTable
             };
 
             apiCall(`/api/registrations/${id}`, {
@@ -2856,11 +3249,70 @@
         }
 
         // ============== NEW REGISTRATION ==============
+        async function cargarPuestosLeader(localidad) {
+            const select = document.getElementById('puestoId');
+            select.innerHTML = '<option value="">Selecciona tu puesto de votación</option>';
+
+            if (!localidad) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/public/puestos?localidad=${encodeURIComponent(localidad)}`);
+                if (!response.ok) {
+                    console.error('Error al cargar puestos:', response.status, response.statusText);
+                    return;
+                }
+
+                const data = await response.json();
+                puestosLeaderCache = data.data || [];
+                mostrarPuestosLeader();
+                document.getElementById('puestoBusquedaLeader').value = '';
+            } catch (error) {
+                console.error('Error al cargar puestos:', error);
+            }
+        }
+
+        function mostrarPuestosLeader() {
+            const select = document.getElementById('puestoId');
+            select.innerHTML = '<option value="">Selecciona tu puesto de votación</option>' +
+                puestosLeaderCache.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('');
+        }
+
+        function filtrarPuestosLeader() {
+            const terminoRaw = document.getElementById('puestoBusquedaLeader').value;
+            const termino = normalizePuestoTexto(terminoRaw);
+
+            if (!termino) {
+                mostrarPuestosLeader();
+                return;
+            }
+
+            const puestosFiltrados = puestosLeaderCache.filter(p =>
+                buildPuestoSearchText(p).includes(termino)
+            );
+
+            const select = document.getElementById('puestoId');
+            select.innerHTML = puestosFiltrados.length > 0
+                ? '<option value="">Selecciona tu puesto</option>' +
+                  puestosFiltrados.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('')
+                : '<option value="">No hay resultados</option>';
+        }
+
+        function handleLocalidadChange() {
+            const localidad = document.getElementById('localidad').value;
+            cargarPuestosLeader(localidad);
+        }
+
         function toggleUbicacion(tipo) {
             const bogotaContainer = document.getElementById('bogotaContainer');
             const restoContainer = document.getElementById('restoContainer');
             const localidadSelect = document.getElementById('localidad');
             const departamentoSelect = document.getElementById('departamento');
+            const puestoCatalogo = document.getElementById('puestoCatalogo');
+            const puestoManual = document.getElementById('puestoManual');
+            const puestoIdSelect = document.getElementById('puestoId');
+            const votingPlaceInput = document.getElementById('votingPlace');
 
             if (tipo === 'bogota') {
                 bogotaContainer.style.display = 'block';
@@ -2869,12 +3321,30 @@
                 departamentoSelect.required = false;
                 departamentoSelect.value = '';
                 document.getElementById('capitalContainer').style.display = 'none';
+                puestoCatalogo.style.display = 'block';
+                puestoManual.style.display = 'none';
+                puestoIdSelect.required = true;
+                puestosLeaderCache = [];
+                document.getElementById('puestoBusquedaLeader').value = '';
+                if (votingPlaceInput) {
+                    votingPlaceInput.required = false;
+                    votingPlaceInput.value = '';
+                }
             } else {
                 bogotaContainer.style.display = 'none';
                 restoContainer.style.display = 'block';
                 localidadSelect.required = false;
                 departamentoSelect.required = true;
                 localidadSelect.value = '';
+                puestoCatalogo.style.display = 'none';
+                puestoManual.style.display = 'block';
+                puestoIdSelect.required = false;
+                puestoIdSelect.value = '';
+                puestosLeaderCache = [];
+                document.getElementById('puestoBusquedaLeader').value = '';
+                if (votingPlaceInput) {
+                    votingPlaceInput.required = true;
+                }
             }
         }
 
@@ -2927,13 +3397,24 @@
                 localidad = departamento;
             }
 
-            const votingPlace = document.getElementById('votingPlace').value.trim();
+            const votingPlace = document.getElementById('votingPlace')?.value.trim() || '';
             const votingTable = document.getElementById('votingTable').value.trim();
             const phone = document.getElementById('phone').value.trim();
+            const puestoId = document.getElementById('puestoId').value.trim();
 
             const localidadValida = ubicacionTipo === 'bogota' ? localidad : departamento;
-            if (!firstName || !lastName || !cedula || !localidadValida || !votingPlace || !votingTable) {
+            if (!firstName || !lastName || !cedula || !localidadValida || !votingTable) {
                 alert('Por favor completa todos los campos requeridos');
+                return;
+            }
+
+            if (ubicacionTipo === 'bogota' && !puestoId) {
+                alert('Selecciona el puesto de votación');
+                return;
+            }
+
+            if (ubicacionTipo !== 'bogota' && !votingPlace) {
+                alert('Ingresa el puesto de votación');
                 return;
             }
 
@@ -2948,8 +3429,11 @@
                     localidad,
                     departamento: departamento || null,
                     capital: capital || null,
-                    votingPlace,
-                    votingTable,
+                    registeredToVote: ubicacionTipo === 'bogota',
+                    puestoId: ubicacionTipo === 'bogota' ? puestoId : null,
+                    mesa: ubicacionTipo === 'bogota' ? parseInt(votingTable) : null,
+                    votingPlace: ubicacionTipo === 'bogota' ? null : votingPlace,
+                    votingTable: ubicacionTipo === 'bogota' ? null : votingTable,
                     date: new Date().toISOString(),
                     hasConsentToRegister: true
                 };

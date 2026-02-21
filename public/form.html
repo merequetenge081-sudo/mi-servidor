@@ -393,11 +393,9 @@
 
                 <div class="form-group">
                     <label class="required">Número de Mesa</label>
-                    <select id="mesa" required>
-                        <option value="">Selecciona tu número de mesa</option>
-                    </select>
+                    <input type="number" id="mesa" required placeholder="Ingresa tu número de mesa" min="1">
                     <div class="form-text">
-                        Tu número de mesa de votación
+                        Consulta el número en tu documento de identidad
                     </div>
                 </div>
 
@@ -527,9 +525,12 @@
             const localidad = document.getElementById('localidad').value;
             const ubicacionTipo = document.querySelector('input[name="ubicacionTipo"]:checked')?.value;
             
+            console.log('🔍 cargarPuestos llamada:', {localidad, ubicacionTipo});
+            
             if (!localidad || ubicacionTipo !== 'bogota') {
+                console.log('❌ Localidad vacía o no es Bogotá');
                 document.getElementById('puestoId').innerHTML = '<option value="">Selecciona tu puesto de votación</option>';
-                document.getElementById('mesa').innerHTML = '<option value="">Selecciona tu número de mesa</option>';
+                document.getElementById('mesa').value = '';
                 document.getElementById('puestoBusqueda').value = '';
                 puestosCache = [];
                 return;
@@ -537,10 +538,12 @@
             
             try {
                 // Usar la ruta pública sin token
-                const response = await fetch(`/api/public/puestos?localidad=${encodeURIComponent(localidad)}`);
+                const url = `/api/public/puestos?localidad=${encodeURIComponent(localidad)}`;
+                console.log('📡 Llamando API:', url);
+                const response = await fetch(url);
                 
                 if (!response.ok) {
-                    console.error('Error al cargar puestos:', response.status, response.statusText);
+                    console.error('❌ Error (status):', response.status, response.statusText);
                     if (response.status === 404) {
                         showError('No se encontraron puestos para esta localidad. Por favor intenta más tarde.');
                     } else {
@@ -550,84 +553,83 @@
                 }
                 
                 const data = await response.json();
+                console.log('✅ API Response:', data);
                 puestosCache = data.data || [];
+                console.log('📦 Puestos en cache:', puestosCache.length);
                 
                 if (puestosCache.length === 0) {
+                    console.log('⚠️  Sin puestos para esta localidad');
                     document.getElementById('puestoId').innerHTML = '<option value="">No hay puestos disponibles</option>';
                     return;
                 }
                 
                 // Mostrar puestos
+                console.log('🎯 Llamando mostrarPuestosFiltrables()');
                 mostrarPuestosFiltrables();
                 document.getElementById('puestoBusqueda').value = '';
-                document.getElementById('mesa').innerHTML = '<option value="">Selecciona tu número de mesa</option>';
+                document.getElementById('mesa').value = '';
             } catch (error) {
                 console.error('Error al cargar puestos:', error);
                 showError('Error de conexión al cargar puestos');
             }
         }
         
+        function normalizePuestoTexto(value) {
+            return (value || '')
+                .normalize('NFD')
+                .replace(/\p{Diacritic}/gu, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function buildPuestoSearchText(puesto) {
+            const aliases = Array.isArray(puesto.aliases) ? puesto.aliases.join(' ') : '';
+            const base = `${puesto.nombre || ''} ${puesto.codigoPuesto || ''} ${aliases}`;
+            return normalizePuestoTexto(base);
+        }
+
         // Filtrar puestos por nombre
         function filtrarPuestos() {
-            const termino = document.getElementById('puestoBusqueda').value.toLowerCase();
+            const terminoRaw = document.getElementById('puestoBusqueda').value;
+            const termino = normalizePuestoTexto(terminoRaw);
             
             if (!termino) {
                 mostrarPuestosFiltrables();
                 return;
             }
             
-            const puestosFiltrables = puestosCache.filter(p => 
-                p.nombre.toLowerCase().includes(termino) || 
-                p.codigoPuesto.toLowerCase().includes(termino)
+            const puestosFiltrables = puestosCache.filter(p =>
+                buildPuestoSearchText(p).includes(termino)
             );
             
             const select = document.getElementById('puestoId');
-            select.innerHTML = puestosFiltrales.length > 0 
+            select.innerHTML = puestosFiltrables.length > 0 
                 ? '<option value="">Selecciona tu puesto</option>' +
-                  puestosFiltrales.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('')
+                  puestosFiltrables.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('')
                 : '<option value="">No hay resultados</option>';
         }
         
         // Mostrar todos los puestos sin filtro
         function mostrarPuestosFiltrables() {
+            console.log('📝 mostrarPuestosFiltrables: puestosCache=', puestosCache);
             const select = document.getElementById('puestoId');
-            select.innerHTML = '<option value="">Selecciona tu puesto de votación</option>' +
+            const html = '<option value="">Selecciona tu puesto de votación</option>' +
                 puestosCache.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('');
+            console.log('🏗️  HTML generado:', html.substring(0, 100));
+            select.innerHTML = html;
+            console.log('✨ Select actualizado. Opciones:', select.options.length);
         }
         
         // Cargar mesas según puesto seleccionado
         async function cargarMesas() {
+            // La validación de mesas se realiza al enviar el formulario
+            // Solo limpiamos el campo si no hay puesto seleccionado
             const puestoId = document.getElementById('puestoId').value;
             
             if (!puestoId) {
-                document.getElementById('mesa').innerHTML = '<option value="">Selecciona tu número de mesa</option>';
-                return;
-            }
-            
-            try {
-                // Usar la ruta pública sin token
-                const response = await fetch(`/api/public/puestos/${puestoId}`);
-                
-                if (!response.ok) {
-                    console.error('Error al cargar mesas:', response.status, response.statusText);
-                    showError('Error al cargar mesas de votación');
-                    return;
-                }
-                
-                const data = await response.json();
-                const mesas = data.data?.mesas || [];
-                
-                if (mesas.length === 0) {
-                    document.getElementById('mesa').innerHTML = '<option value="">No hay mesas disponibles</option>';
-                    return;
-                }
-                
-                const select = document.getElementById('mesa');
-                select.innerHTML = '<option value="">Selecciona tu número de mesa</option>' +
-                    mesas.map(m => `<option value="${m}">Mesa ${m}</option>`).join('');
-            } catch (error) {
-                console.error('Error al cargar mesas:', error);
-                showError('Error de conexión al cargar mesas');
+                document.getElementById('mesa').value = '';
             }
         }
         

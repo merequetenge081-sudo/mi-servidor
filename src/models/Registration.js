@@ -13,6 +13,10 @@ const registrationSchema = new mongoose.Schema({
   departamento: String,
   capital: String,
   registeredToVote: { type: Boolean, default: false },
+
+  // Campos libres para puesto/mesa cuando no se usa catálogo de Bogotá
+  votingPlace: String,
+  votingTable: String,
   
   // Referencia a puesto de votación (antes era texto libre: votingPlace)
   puestoId: {
@@ -40,6 +44,10 @@ const registrationSchema = new mongoose.Schema({
   // Consent field (Ley 1581 de 2012)
   hasConsentToRegister: { type: Boolean, default: false },
   
+  // Revisión de puesto de votación
+  requiereRevisionPuesto: { type: Boolean, default: false },
+  revisionPuestoResuelta: { type: Boolean, default: false },
+  
   organizationId: { 
     type: String,
     required: true,
@@ -59,6 +67,10 @@ registrationSchema.pre('save', function(next) {
   if (this.email) this.email = this.email.trim();
   if (this.phone) this.phone = this.phone.trim();
   if (this.localidad) this.localidad = this.localidad.trim();
+  if (this.departamento) this.departamento = this.departamento.trim();
+  if (this.capital) this.capital = this.capital.trim();
+  if (this.votingPlace) this.votingPlace = this.votingPlace.trim();
+  if (this.votingTable) this.votingTable = this.votingTable.trim();
   if (this.leaderName) this.leaderName = this.leaderName.trim();
   next();
 });
@@ -73,6 +85,8 @@ registrationSchema.index({ createdAt: -1 });
 registrationSchema.index({ confirmed: 1, eventId: 1 });
 registrationSchema.index({ organizationId: 1, eventId: 1 });
 registrationSchema.index({ organizationId: 1, leaderId: 1 });
+registrationSchema.index({ requiereRevisionPuesto: 1, organizationId: 1 });
+registrationSchema.index({ requiereRevisionPuesto: 1, leaderId: 1 });
 
 export const Registration = mongoose.model("Registration", registrationSchema);
 

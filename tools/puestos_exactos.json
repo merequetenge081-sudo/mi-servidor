@@ -1,0 +1,552 @@
+[
+  {
+    "codigoPuesto": "001001",
+    "nombre": "Colegio Distrital República de Costa Rica - Sede C",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 101 No. 23 - 42",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 7,
+    "codigoOriginal": "160010907"
+  },
+  {
+    "codigoPuesto": "001002",
+    "nombre": "Vía Pública Salón Múltiple Comunitario",
+    "localidad": "Fontibon",
+    "direccion": "Calle 25 B No. 81 - 41 / Carrera 81C No. 24D 60 *",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 8,
+    "codigoOriginal": "160010908"
+  },
+  {
+    "codigoPuesto": "001003",
+    "nombre": "Colegio Distrital Santa Cecilia",
+    "localidad": "Fontibon",
+    "direccion": "Calle 25 B No. 83 - 14",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 9,
+    "codigoOriginal": "160010909"
+  },
+  {
+    "codigoPuesto": "001004",
+    "nombre": "Colegio Distrital Rodrigo Arenas Betancourt",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 97 No. 16 J - 15",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 10,
+    "codigoOriginal": "160010910"
+  },
+  {
+    "codigoPuesto": "001005",
+    "nombre": "Colegio Distrital Pablo Neruda",
+    "localidad": "Fontibon",
+    "direccion": "Calle 16 F BIS No. 102 - 70",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 11,
+    "codigoOriginal": "160010911"
+  },
+  {
+    "codigoPuesto": "001006",
+    "nombre": "Concentración Escolar Batavia",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 114 No. 17 C - 07",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 12,
+    "codigoOriginal": "160010912"
+  },
+  {
+    "codigoPuesto": "001007",
+    "nombre": "Subdirección de Integración Social",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 104 B No. 22 J - 15 / Calle 23 No. 104 B - 15",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 13,
+    "codigoOriginal": "160010913"
+  },
+  {
+    "codigoPuesto": "001008",
+    "nombre": "Colegio Distrital Costa Rica - Sede C",
+    "localidad": "Fontibon",
+    "direccion": "Calle 25 C Bis B No 96 - 56",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 14,
+    "codigoOriginal": "160010914"
+  },
+  {
+    "codigoPuesto": "001009",
+    "nombre": "Parqueadero Almacén Los Tres Elefantes",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 72 A No. 23 - 55",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 16,
+    "codigoOriginal": "160010916"
+  },
+  {
+    "codigoPuesto": "001010",
+    "nombre": "Liceo Juvenil Moravia",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 137 A No. 17 D - 31",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 17,
+    "codigoOriginal": "160010917"
+  },
+  {
+    "codigoPuesto": "001011",
+    "nombre": "Colegio Distrital Carlo Federici",
+    "localidad": "Fontibon",
+    "direccion": "Calle 14 A No. 108 - 78",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 18,
+    "codigoOriginal": "160010918"
+  },
+  {
+    "codigoPuesto": "001012",
+    "nombre": "Salón Social Conjunto Residencial Fontibón Reservado",
+    "localidad": "Fontibon",
+    "direccion": "Calle 14 B No. 119 A - 17",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 19,
+    "codigoOriginal": "160010919"
+  },
+  {
+    "codigoPuesto": "001013",
+    "nombre": "Colegio Parroquial San Pedro Claver",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 99 Calle 17 A Esquina / Carrera 99 No. 17A -  62 *",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 1,
+    "codigoOriginal": "160010901"
+  },
+  {
+    "codigoPuesto": "001014",
+    "nombre": "Colegio Distrital Villemar El Carmen",
+    "localidad": "Fontibon",
+    "direccion": "Calle 20 D No. 96 G - 51",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 2,
+    "codigoOriginal": "160010902"
+  },
+  {
+    "codigoPuesto": "001015",
+    "nombre": "Centro Comercial Hayuelos",
+    "localidad": "Fontibon",
+    "direccion": "Calle 20 No. 82 - 52",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 3,
+    "codigoOriginal": "160010903"
+  },
+  {
+    "codigoPuesto": "001016",
+    "nombre": "Colegio Integrado de Fontibón",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 106 No. 18 - 77",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 4,
+    "codigoOriginal": "160010904"
+  },
+  {
+    "codigoPuesto": "001017",
+    "nombre": "Colegio Distrital Antonio Van Üden",
+    "localidad": "Fontibon",
+    "direccion": "Calle 17 D No. 123 B - 37",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 5,
+    "codigoOriginal": "160010905"
+  },
+  {
+    "codigoPuesto": "001018",
+    "nombre": "Colegio Distrital Internacional",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 112 No. 23 - 05",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 6,
+    "codigoOriginal": "160010906"
+  },
+  {
+    "codigoPuesto": "001019",
+    "nombre": "Colegio Agustiniano Salitre",
+    "localidad": "Fontibon",
+    "direccion": "Calle 23 C No. 69 B – 01",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 15,
+    "codigoOriginal": "160010915"
+  },
+  {
+    "codigoPuesto": "001020",
+    "nombre": "Colegio Distrital Atahualpa",
+    "localidad": "Fontibon",
+    "direccion": "Avenida Carrera 116  No. 22I - 56",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 26,
+    "codigoOriginal": "160010926"
+  },
+  {
+    "codigoPuesto": "001021",
+    "nombre": "Parqueadero Supermercado JUMBO",
+    "localidad": "Fontibon",
+    "direccion": "Avenida Carrera 86  No. 19A - 50",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 27,
+    "codigoOriginal": "160010927"
+  },
+  {
+    "codigoPuesto": "001022",
+    "nombre": "Colegio Distrital La Felicidad",
+    "localidad": "Fontibon",
+    "direccion": "Calle 19 No. 79 - 37",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 21,
+    "codigoOriginal": "160010921"
+  },
+  {
+    "codigoPuesto": "001023",
+    "nombre": "Liceo Navarra",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 74 No. 24 B - 80",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 22,
+    "codigoOriginal": "160010922"
+  },
+  {
+    "codigoPuesto": "001024",
+    "nombre": "Colegio Gimnasio Modelia Real",
+    "localidad": "Fontibon",
+    "direccion": "Calle 24 D No. 82 - 13\n / Carrera 82 No. 24 C - 29 *",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 23,
+    "codigoOriginal": "160010923"
+  },
+  {
+    "codigoPuesto": "001025",
+    "nombre": "Colegio Santa Teresa Centro",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 99 No. 19 -72",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 20,
+    "codigoOriginal": "160010920"
+  },
+  {
+    "codigoPuesto": "001026",
+    "nombre": "Colegio Distrital Antonio Van Uden Sede C",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 124 No. 17 - 05",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 25,
+    "codigoOriginal": "160010925"
+  },
+  {
+    "codigoPuesto": "001027",
+    "nombre": "Salón Comunal la Aldea",
+    "localidad": "Fontibon",
+    "direccion": "Calle 22 G No. 117 A - 38",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 24,
+    "codigoOriginal": "160010924"
+  },
+  {
+    "codigoPuesto": "001028",
+    "nombre": "Colegio Distrital Integrado - Sede B",
+    "localidad": "Fontibon",
+    "direccion": "Calle 22 F No. 110 - 05\r\nCalle 22 F No. 109 B - 29 *\r\n",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 28,
+    "codigoOriginal": "160010928"
+  },
+  {
+    "codigoPuesto": "001029",
+    "nombre": "Jardín Infantil ACUNAR Sabana Grande",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 104 No. 13 D - 35",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 29,
+    "codigoOriginal": "160010929"
+  },
+  {
+    "codigoPuesto": "001030",
+    "nombre": "Casa de Pensamiento Intercultural",
+    "localidad": "Fontibon",
+    "direccion": "Diagonal 15 D  No. 98 - 40",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 30,
+    "codigoOriginal": "160010930"
+  },
+  {
+    "codigoPuesto": "001031",
+    "nombre": "Colegio Distrital Luis Ángel Arango",
+    "localidad": "Fontibon",
+    "direccion": "Calle  23 G  No. 103 - 60 /\r\nCarrera 103  No. 23 G - 01 *",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 31,
+    "codigoOriginal": "160010931"
+  },
+  {
+    "codigoPuesto": "001032",
+    "nombre": "Vía Pública Colegio Distrital Villemar El Carmen Sede C",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 97 No. 22 G - 15",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 32,
+    "codigoOriginal": "160010932"
+  },
+  {
+    "codigoPuesto": "001033",
+    "nombre": "Colegio Distrital Antonio Van Üden Sede B",
+    "localidad": "Fontibon",
+    "direccion": "Calle 17 F  No. 128 - 45",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 33,
+    "codigoOriginal": "160010933"
+  },
+  {
+    "codigoPuesto": "001034",
+    "nombre": "Centro Comercial Multiplaza",
+    "localidad": "Fontibon",
+    "direccion": "Calle 19 A  No. 72 - 57",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 34,
+    "codigoOriginal": "160010934"
+  },
+  {
+    "codigoPuesto": "001035",
+    "nombre": "Centro Comercial Salitre Plaza",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 68 B  No. 24 - 39",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 35,
+    "codigoOriginal": "160010935"
+  },
+  {
+    "codigoPuesto": "001036",
+    "nombre": "Colegio Distrital Pablo Neruda Sede B",
+    "localidad": "Fontibon",
+    "direccion": "Calle 16 J  No. 99 - 95",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 36,
+    "codigoOriginal": "160010936"
+  },
+  {
+    "codigoPuesto": "001037",
+    "nombre": "Casa de La Cultura de Fontibón Cacique Hyntiba",
+    "localidad": "Fontibon",
+    "direccion": "Calle 17A  No. 99 - 53",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 37,
+    "codigoOriginal": "160010937"
+  },
+  {
+    "codigoPuesto": "001038",
+    "nombre": "Salón Comunal Tres Estancias",
+    "localidad": "Fontibon",
+    "direccion": "Calle 15  No. 119 - 14 /\r\nCalle 15  No. 119 A - 90 *",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 38,
+    "codigoOriginal": "160010938"
+  },
+  {
+    "codigoPuesto": "001039",
+    "nombre": "Colegio Privado Parroquial San José",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 100 No. 24 - 60",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 39,
+    "codigoOriginal": "160010939"
+  },
+  {
+    "codigoPuesto": "001040",
+    "nombre": "Salón Comunal San José - El Jardín",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 100 No. 24 D - 65",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 40,
+    "codigoOriginal": "160010940"
+  },
+  {
+    "codigoPuesto": "001041",
+    "nombre": "Jardín Infantil Villa Andrea",
+    "localidad": "Fontibon",
+    "direccion": "Calle 17 C No. 134 - 70 Manzana 1",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 41,
+    "codigoOriginal": "160010941"
+  },
+  {
+    "codigoPuesto": "001042",
+    "nombre": "Centro Comercial Trebolis",
+    "localidad": "Fontibon",
+    "direccion": "Carrera 90 No 17 - 95 / Cl 19A 91 05",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 42,
+    "codigoOriginal": "160010942"
+  },
+  {
+    "codigoPuesto": "001043",
+    "nombre": "Colegio Distrital Manuela Ayala de Gaitán - Sede A",
+    "localidad": "Engativá",
+    "direccion": "Calle 71 No. 75 - 11",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 1,
+    "codigoOriginal": "160011001"
+  },
+  {
+    "codigoPuesto": "001044",
+    "nombre": "Colegio Distrital General Santander",
+    "localidad": "Engativá",
+    "direccion": "Carrera 123 No. 65 A - 03 / Calle 65A No. 123 - 38",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 2,
+    "codigoOriginal": "160011002"
+  },
+  {
+    "codigoPuesto": "001045",
+    "nombre": "Colegio Privado Instituto Técnico Industrial Centro Don Bosco",
+    "localidad": "Engativá",
+    "direccion": "Diagonal 44 No. 69 - 96",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 3,
+    "codigoOriginal": "160011003"
+  },
+  {
+    "codigoPuesto": "001046",
+    "nombre": "Colegio Distrital Instituto Técnico Industrial Francisco Jose de Caldas - Sede A",
+    "localidad": "Engativá",
+    "direccion": "Carrera 68 F No 63 B - 02",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 4,
+    "codigoOriginal": "160011004"
+  },
+  {
+    "codigoPuesto": "001047",
+    "nombre": "Colegio Cafam Básica Primaria",
+    "localidad": "Engativá",
+    "direccion": "Av. Calle 64 C No. 68 F - 29",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 5,
+    "codigoOriginal": "160011005"
+  },
+  {
+    "codigoPuesto": "001048",
+    "nombre": "Colegio Distrital Robert Kennedy - Sede A",
+    "localidad": "Engativá",
+    "direccion": "Avenida Boyacá No. 64 H - 39 / Avenida Carrera 72 No. 64 H - 39",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 6,
+    "codigoOriginal": "160011006"
+  },
+  {
+    "codigoPuesto": "001049",
+    "nombre": "Gimnasio Los Alerces",
+    "localidad": "Engativá",
+    "direccion": "Calle 64 C No. 76 - 23 / Calle 64 C No. 76 - 43 *",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 7,
+    "codigoOriginal": "160011007"
+  },
+  {
+    "codigoPuesto": "001050",
+    "nombre": "Colegio Cooperativo Los Álamos - \"COALAMOS\"",
+    "localidad": "Engativá",
+    "direccion": "Calle 66 A No. 97 A - 15",
+    "mesas": [
+      1
+    ],
+    "puestoOriginal": 8,
+    "codigoOriginal": "160011008"
+  }
+]

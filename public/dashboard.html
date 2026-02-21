@@ -286,6 +286,11 @@
                             <option value="confirmed">Confirmados</option>
                             <option value="pending">Pendientes</option>
                         </select>
+                        <select id="revisionFilter" class="form-select">
+                            <option value="">Todos (Revisión)</option>
+                            <option value="true">Requiere revisión</option>
+                            <option value="false">Sin revisión</option>
+                        </select>
                         <button class="btn btn-primary" id="newRegistrationBtn">
                             <i class="bi bi-plus-lg"></i> Nuevo
                         </button>
@@ -322,6 +327,7 @@
                                         <th>Email</th>
                                         <th>Cédula</th>
                                         <th>Localidad</th>
+                                        <th>Puesto</th>
                                         <th>Líder</th>
                                         <th>Fecha</th>
                                         <th>Estado</th>
@@ -361,6 +367,7 @@
                                         <th>Email</th>
                                         <th>Cédula</th>
                                         <th>Departamento</th>
+                                        <th>Puesto</th>
                                         <th>Líder</th>
                                         <th>Fecha</th>
                                         <th>Estado</th>
