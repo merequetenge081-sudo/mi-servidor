@@ -1,0 +1,138 @@
+{
+  "type": "FeatureCollection",
+  "name": "pvo",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "OBJECTID": 1,
+        "LOCCODIGO": "09",
+        "LOCNOMBRE": "Fontibon",
+        "PVODIRECCI": "Carrera 101 No. 23 - 42",
+        "PVONSITIO": "Veracruz",
+        "PVONOMBRE": "Colegio Distrital República de Costa Rica - Sede C",
+        "PVONPUESTO": 7,
+        "PVOCODIGO": "160010907",
+        "PVONPUES_1": "7"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.1603, 4.6729]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "OBJECTID": 2,
+        "LOCCODIGO": "09",
+        "LOCNOMBRE": "Fontibon",
+        "PVODIRECCI": "Calle 14 B No. 119 A - 17",
+        "PVONSITIO": "Recodo",
+        "PVONOMBRE": "Salón Social Conjunto Residencial Fontibón Reservado",
+        "PVONPUESTO": 19,
+        "PVOCODIGO": "160010919",
+        "PVONPUES_1": "19"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.1661, 4.6805]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "OBJECTID": 13,
+        "LOCCODIGO": "10",
+        "LOCNOMBRE": "Engativá",
+        "PVODIRECCI": "Calle 71 No. 75 - 11",
+        "PVONSITIO": "Boyacá",
+        "PVONOMBRE": "Colegio Distrital Boyacá",
+        "PVONPUESTO": 1,
+        "PVOCODIGO": "160011001",
+        "PVONPUES_1": "1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.0944, 4.6712]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "OBJECTID": 17,
+        "LOCCODIGO": "10",
+        "LOCNOMBRE": "Engativá",
+        "PVODIRECCI": "Av. Calle 64 C No. 68 F - 29",
+        "PVONSITIO": "El Gualí",
+        "PVONOMBRE": "Colegio Cafam Básica Primaria",
+        "PVONPUESTO": 5,
+        "PVOCODIGO": "160011005",
+        "PVONPUES_1": "5"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.0944, 4.6712]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "OBJECTID": 18,
+        "LOCCODIGO": "10",
+        "LOCNOMBRE": "Engativá",
+        "PVODIRECCI": "Avenida Boyacá No. 64 H - 39 / Avenida Carrera 72 No. 64 H - 39",
+        "PVONSITIO": "El Luján",
+        "PVONOMBRE": "Colegio Distrital Robert Kennedy - Sede A",
+        "PVONPUESTO": 6,
+        "PVOCODIGO": "160011006",
+        "PVONPUES_1": "6"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.1015, 4.6789]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "OBJECTID": 70,
+        "LOCCODIGO": "08",
+        "LOCNOMBRE": "Kennedy",
+        "PVODIRECCI": "Carrera 79 F No. 46 - 16 Sur",
+        "PVONSITIO": "Casablanca 32",
+        "PVONOMBRE": "Salón Comunal Casablanca 32",
+        "PVONPUESTO": 5,
+        "PVOCODIGO": "160010805",
+        "PVONPUES_1": "5"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.1679, 4.6184]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "OBJECTID": 71,
+        "LOCCODIGO": "08",
+        "LOCNOMBRE": "Kennedy",
+        "PVODIRECCI": "Calle 47 A Sur No. 82 - 99",
+        "PVONSITIO": "Britalia",
+        "PVONOMBRE": "Colegio Distrital Gran Britalia - Sede B",
+        "PVONPUESTO": 6,
+        "PVOCODIGO": "160010806",
+        "PVONPUES_1": "6"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.173, 4.6253]
+      }
+    }
+  ]
+}
