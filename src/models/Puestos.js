@@ -27,8 +27,8 @@ const puestoSchema = new mongoose.Schema({
 });
 
 // Índices para optimización (sin duplicados)
+// Nota: codigoPuesto ya tiene índice único por 'unique: true'
 puestoSchema.index({ localidad: 1, activo: 1 });
-puestoSchema.index({ codigoPuesto: 1 });
 puestoSchema.index({ nombre: 1 });
 
 export const Puestos = mongoose.model("Puestos", puestoSchema);
