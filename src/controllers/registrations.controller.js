@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
 import { Organization } from "../models/Organization.js";
+import { Puestos } from "../models/index.js";
 import { AuditService } from "../services/audit.service.js";
 import { ValidationService } from "../services/validation.service.js";
 import { ConsentLogService } from "../services/consentLog.service.js";
@@ -11,7 +13,7 @@ import { buildOrgFilter } from "../middleware/organization.middleware.js";
 export async function createRegistration(req, res) {
   try {
     const user = req.user;
-    const { leaderId, leaderToken, leaderName, eventId, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace, votingTable, date, hasConsentToRegister } = req.body;
+    const { leaderId, leaderToken, leaderName, eventId, firstName, lastName, cedula, email, phone, localidad, registeredToVote, puestoId, mesa, date, hasConsentToRegister } = req.body;
 
     // Verificar consentimiento del líder (Ley 1581 de 2012)
     if (!hasConsentToRegister) {
@@ -66,7 +68,7 @@ export async function createRegistration(req, res) {
       resolvedEventId = fallbackEvent?._id?.toString();
     }
 
-    const validation = ValidationService.validateRegistration({ leaderId: resolvedLeaderId, eventId: resolvedEventId, firstName, lastName, cedula, registeredToVote, votingPlace, votingTable });
+    const validation = ValidationService.validateRegistration({ leaderId: resolvedLeaderId, eventId: resolvedEventId, firstName, lastName, cedula, registeredToVote, puestoId, mesa });
     if (!validation.valid) {
       return res.status(400).json({ error: validation.error });
     }
@@ -90,6 +92,33 @@ export async function createRegistration(req, res) {
       return res.status(400).json({ error: "organizationId es requerido" });
     }
 
+    const normalizedMesa = mesa !== undefined && mesa !== null ? Number(mesa) : null;
+    let resolvedPuestoId = puestoId || null;
+    let resolvedMesa = normalizedMesa;
+    let resolvedLocalidad = localidad;
+
+    if (registeredToVote) {
+      if (!resolvedPuestoId || !mongoose.Types.ObjectId.isValid(resolvedPuestoId)) {
+        return res.status(400).json({ error: "puestoId inválido o requerido" });
+      }
+      if (resolvedMesa === null || Number.isNaN(resolvedMesa)) {
+        return res.status(400).json({ error: "mesa inválida o requerida" });
+      }
+
+      const puesto = await Puestos.findById(resolvedPuestoId).lean();
+      if (!puesto || puesto.activo === false) {
+        return res.status(400).json({ error: "puestoId no existe o no está activo" });
+      }
+      if (!Array.isArray(puesto.mesas) || !puesto.mesas.includes(resolvedMesa)) {
+        return res.status(400).json({ error: "mesa no pertenece al puesto seleccionado" });
+      }
+
+      resolvedLocalidad = puesto.localidad || resolvedLocalidad;
+    } else {
+      resolvedPuestoId = null;
+      resolvedMesa = null;
+    }
+
     const registration = new Registration({
       leaderId: resolvedLeaderId,
       leaderName: leaderName || leader.name,
@@ -99,10 +128,10 @@ export async function createRegistration(req, res) {
       cedula,
       email,
       phone,
-      localidad,
+      localidad: resolvedLocalidad,
       registeredToVote,
-      votingPlace,
-      votingTable,
+      puestoId: resolvedPuestoId,
+      mesa: resolvedMesa,
       date: date || new Date().toISOString(),
       notifications: {
         emailSent: false,
@@ -187,7 +216,7 @@ export async function updateRegistration(req, res) {
   try {
     const user = req.user;
     const orgId = req.user.organizationId; // Multi-tenant filter
-    const { firstName, lastName, email, phone, localidad, registeredToVote, votingPlace, votingTable } = req.body;
+    const { firstName, lastName, email, phone, localidad, registeredToVote, puestoId, mesa } = req.body;
 
 
     const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId });
@@ -203,11 +232,35 @@ export async function updateRegistration(req, res) {
     }
 
     // Check voting data if needed
-    if (registeredToVote !== undefined) {
-      const votingValidation = ValidationService.validateVotingData(registeredToVote, votingPlace, votingTable);
+    const nextRegisteredToVote = registeredToVote !== undefined ? registeredToVote : registration.registeredToVote;
+    const nextPuestoId = puestoId !== undefined ? puestoId : registration.puestoId;
+    const nextMesaRaw = mesa !== undefined ? mesa : registration.mesa;
+    const nextMesa = nextMesaRaw !== undefined && nextMesaRaw !== null ? Number(nextMesaRaw) : null;
+
+    if (nextRegisteredToVote) {
+      const votingValidation = ValidationService.validateVotingData(nextRegisteredToVote, nextPuestoId, nextMesa);
       if (!votingValidation.valid) {
         return res.status(400).json({ error: votingValidation.error });
       }
+
+      if (!mongoose.Types.ObjectId.isValid(nextPuestoId)) {
+        return res.status(400).json({ error: "puestoId inválido" });
+      }
+
+      const puesto = await Puestos.findById(nextPuestoId).lean();
+      if (!puesto || puesto.activo === false) {
+        return res.status(400).json({ error: "puestoId no existe o no está activo" });
+      }
+      if (!Array.isArray(puesto.mesas) || !puesto.mesas.includes(nextMesa)) {
+        return res.status(400).json({ error: "mesa no pertenece al puesto seleccionado" });
+      }
+
+      registration.puestoId = nextPuestoId;
+      registration.mesa = nextMesa;
+      registration.localidad = puesto.localidad || registration.localidad;
+    } else if (registeredToVote === false) {
+      registration.puestoId = null;
+      registration.mesa = null;
     }
 
     const changes = {};
@@ -227,7 +280,7 @@ export async function updateRegistration(req, res) {
       changes.phone = { old: registration.phone, new: phone };
       registration.phone = phone;
     }
-    if (localidad !== undefined && localidad !== registration.localidad) {
+    if (!nextRegisteredToVote && localidad !== undefined && localidad !== registration.localidad) {
       changes.localidad = { old: registration.localidad, new: localidad };
       registration.localidad = localidad;
     }
@@ -235,15 +288,6 @@ export async function updateRegistration(req, res) {
       changes.registeredToVote = { old: registration.registeredToVote, new: registeredToVote };
       registration.registeredToVote = registeredToVote;
     }
-    if (votingPlace !== undefined && votingPlace !== registration.votingPlace) {
-      changes.votingPlace = { old: registration.votingPlace, new: votingPlace };
-      registration.votingPlace = votingPlace;
-    }
-    if (votingTable !== undefined && votingTable !== registration.votingTable) {
-      changes.votingTable = { old: registration.votingTable, new: votingTable };
-      registration.votingTable = votingTable;
-    }
-
     registration.updatedAt = new Date();
     await registration.save();
 
@@ -410,7 +454,9 @@ export async function bulkCreateRegistrations(req, res) {
       if (!reg.cedula) missing.push("Cédula");
       if (!reg.email) missing.push("Email");
       if (!reg.phone) missing.push("Celular");
-      if (!reg.votingTable) missing.push("Mesa");
+      if (!reg.puestoId) missing.push("Puesto");
+      const mesaValue = reg.mesa !== undefined && reg.mesa !== null ? Number(reg.mesa) : null;
+      if (mesaValue === null || Number.isNaN(mesaValue)) missing.push("Mesa");
 
       if (missing.length > 0) {
         errors.push({
@@ -431,6 +477,33 @@ export async function bulkCreateRegistrations(req, res) {
         });
         continue;
       }
+      if (!mongoose.Types.ObjectId.isValid(reg.puestoId)) {
+        errors.push({
+          row: rowNum,
+          name: `${reg.firstName} ${reg.lastName}`,
+          error: "puestoId inválido"
+        });
+        continue;
+      }
+
+      const puesto = await Puestos.findById(reg.puestoId).lean();
+      if (!puesto || puesto.activo === false) {
+        errors.push({
+          row: rowNum,
+          name: `${reg.firstName} ${reg.lastName}`,
+          error: "puestoId no existe o no está activo"
+        });
+        continue;
+      }
+      if (!Array.isArray(puesto.mesas) || !puesto.mesas.includes(mesaValue)) {
+        errors.push({
+          row: rowNum,
+          name: `${reg.firstName} ${reg.lastName}`,
+          error: "mesa no pertenece al puesto seleccionado"
+        });
+        continue;
+      }
+
       validRegistrations.push({
         leaderId: leader.leaderId,
         leaderName: leader.name,
@@ -440,9 +513,10 @@ export async function bulkCreateRegistrations(req, res) {
         cedula: reg.cedula,
         email: reg.email,
         phone: reg.phone,
-        votingPlace: reg.votingPlace || '',
-        votingTable: reg.votingTable,
-        localidad: reg.localidad || '',
+        puestoId: reg.puestoId,
+        mesa: mesaValue,
+        localidad: puesto.localidad || reg.localidad || '',
+        registeredToVote: true,
         date: new Date().toISOString(),
         confirmed: false,
         organizationId: leader.organizationId

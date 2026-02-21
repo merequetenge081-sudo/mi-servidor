@@ -1,6 +1,7 @@
 import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
+import { Puestos } from "../models/index.js";
 import { AuditService } from "../services/audit.service.js";
 import ExcelJS from "exceljs";
 import logger from "../config/logger.js";
@@ -19,7 +20,12 @@ export async function exportData(req, res) {
     if (type === "registrations" || type === "all") {
       const worksheet = workbook.addWorksheet("Registros");
       const filter = eventId ? { eventId } : {};
-      const registrations = await Registration.find(filter);
+      const registrations = await Registration.find(filter).lean();
+      const puestoIds = [...new Set(registrations.map(reg => reg.puestoId).filter(Boolean).map(id => id.toString()))];
+      const puestos = puestoIds.length > 0
+        ? await Puestos.find({ _id: { $in: puestoIds } }).lean()
+        : [];
+      const puestoById = new Map(puestos.map(puesto => [puesto._id.toString(), puesto]));
 
       worksheet.columns = [
         { header: "Cédula", key: "cedula", width: 15 },
@@ -29,13 +35,14 @@ export async function exportData(req, res) {
         { header: "Teléfono", key: "phone", width: 15 },
         { header: "Localidad", key: "localidad", width: 20 },
         { header: "Registrado a Votar", key: "registeredToVote", width: 20 },
-        { header: "Centro de Votación", key: "votingPlace", width: 20 },
-        { header: "Mesa", key: "votingTable", width: 10 },
+        { header: "Puesto de Votación", key: "puestoNombre", width: 30 },
+        { header: "Mesa", key: "mesa", width: 10 },
         { header: "Confirmado", key: "confirmed", width: 15 },
         { header: "Fecha de Registro", key: "date", width: 15 }
       ];
 
       registrations.forEach(reg => {
+        const puesto = reg.puestoId ? puestoById.get(reg.puestoId.toString()) : null;
         worksheet.addRow({
           cedula: reg.cedula,
           firstName: reg.firstName,
@@ -44,8 +51,8 @@ export async function exportData(req, res) {
           phone: reg.phone,
           localidad: reg.localidad,
           registeredToVote: reg.registeredToVote ? "Sí" : "No",
-          votingPlace: reg.votingPlace || "-",
-          votingTable: reg.votingTable || "-",
+          puestoNombre: puesto?.nombre || "-",
+          mesa: reg.mesa ?? "-",
           confirmed: reg.confirmed ? "Confirmado" : "Pendiente",
           date: reg.date
         });
