@@ -1,5 +1,5 @@
 import express from "express";
-import { adminLogin, leaderLogin, leaderLoginById, changePassword, adminResetPassword, requestPasswordReset, adminGenerateNewPassword, leaderChangePassword } from "../controllers/auth.js";
+import { adminLogin, leaderLogin, leaderLoginById, changePassword, adminResetPassword, requestPasswordReset, adminGenerateNewPassword, leaderChangePassword, logout, acceptLegalTerms, checkLegalTermsStatus } from "../controllers/auth.js";
 import { getTestCredentials } from "../utils/authFallback.js";
 import * as leaderController from "../controllers/leaders.controller.js";
 import * as registrationController from "../controllers/registrations.controller.js";
@@ -13,7 +13,7 @@ import * as organizationController from "../controllers/organization.controller.
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { roleMiddleware } from "../middleware/role.middleware.js";
 import { organizationRoleMiddleware } from "../middleware/organization.middleware.js";
-import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
+import { rateLimitMiddleware, loginRateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
 import logger from "../config/logger.js";
 
 const router = express.Router();
@@ -176,14 +176,19 @@ router.post("/migrate", async (req, res) => {
 });
 
 // ==================== AUTENTICACIÓN ====================
-router.post("/auth/admin-login", adminLogin);
-router.post("/auth/leader-login", leaderLogin);
-router.post("/auth/leader-login-id", leaderLoginById);
+router.post("/auth/admin-login", loginRateLimitMiddleware, adminLogin);
+router.post("/auth/leader-login", loginRateLimitMiddleware, leaderLogin);
+router.post("/auth/leader-login-id", loginRateLimitMiddleware, leaderLoginById);
+router.post("/auth/logout", authMiddleware, logout);
 router.post("/auth/change-password", authMiddleware, changePassword);
 router.post("/auth/admin-reset-password", authMiddleware, roleMiddleware("admin"), adminResetPassword);
-router.post("/auth/request-password-reset", requestPasswordReset); // Líder solicita reset (sin auth)
-router.post("/auth/admin-generate-password", authMiddleware, roleMiddleware("admin"), adminGenerateNewPassword); // Admin genera nueva temp
-router.post("/auth/leader-change-password", authMiddleware, leaderChangePassword); // Líder cambia su contraseña
+router.post("/auth/request-password-reset", requestPasswordReset);
+router.post("/auth/admin-generate-password", authMiddleware, roleMiddleware("admin"), adminGenerateNewPassword);
+router.post("/auth/leader-change-password", authMiddleware, leaderChangePassword);
+
+// ==================== TÉRMINOS LEGALES (Ley 1581) ====================
+router.post("/auth/accept-legal-terms", authMiddleware, acceptLegalTerms);
+router.get("/auth/legal-terms-status", authMiddleware, checkLegalTermsStatus);
 
 // ==================== ORGANIZACIONES (MULTI-TENANT) ====================
 router.post("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.createOrganization);

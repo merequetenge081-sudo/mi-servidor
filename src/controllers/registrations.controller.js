@@ -4,13 +4,22 @@ import { Event } from "../models/Event.js";
 import { Organization } from "../models/Organization.js";
 import { AuditService } from "../services/audit.service.js";
 import { ValidationService } from "../services/validation.service.js";
+import { ConsentLogService } from "../services/consentLog.service.js";
 import logger from "../config/logger.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
 
 export async function createRegistration(req, res) {
   try {
     const user = req.user;
-    const { leaderId, leaderToken, leaderName, eventId, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace, votingTable, date } = req.body;
+    const { leaderId, leaderToken, leaderName, eventId, firstName, lastName, cedula, email, phone, localidad, registeredToVote, votingPlace, votingTable, date, hasConsentToRegister } = req.body;
+
+    // Verificar consentimiento del líder (Ley 1581 de 2012)
+    if (!hasConsentToRegister) {
+      return res.status(400).json({ 
+        error: "Debes declarar que tienes autorización del titular para registrar esta información.",
+        code: "CONSENT_REQUIRED"
+      });
+    }
 
     let leader = null;
     if (leaderId) {
@@ -57,13 +66,11 @@ export async function createRegistration(req, res) {
       resolvedEventId = fallbackEvent?._id?.toString();
     }
 
-    // Validate
     const validation = ValidationService.validateRegistration({ leaderId: resolvedLeaderId, eventId: resolvedEventId, firstName, lastName, cedula, registeredToVote, votingPlace, votingTable });
     if (!validation.valid) {
       return res.status(400).json({ error: validation.error });
     }
 
-    // Get event to inherit organizationId
     const event = await Event.findById(resolvedEventId);
     if (!event) {
       return res.status(404).json({ error: "Evento no encontrado" });
@@ -73,7 +80,6 @@ export async function createRegistration(req, res) {
       await Event.updateOne({ _id: event._id }, { $set: { organizationId: orgId } });
     }
 
-    // Check duplicate by cedula + eventId
     const duplicate = await ValidationService.checkDuplicate(cedula, resolvedEventId);
     if (duplicate) {
       return res.status(400).json({ error: `Persona con cédula ${cedula} ya registrada en este evento` });
@@ -104,15 +110,22 @@ export async function createRegistration(req, res) {
         whatsappSent: false
       },
       confirmed: false,
-      organizationId: organizationId // Multi-tenant: Heredar organizationId del líder o evento
+      organizationId: organizationId,
+      hasConsentToRegister: true
     });
 
     await registration.save();
 
-    // Increment leader registration count
     await Leader.updateOne({ _id: leader._id }, { $inc: { registrations: 1 } });
 
     await AuditService.log("CREATE", "Registration", registration._id.toString(), user, { cedula, leaderId: resolvedLeaderId }, `Registro de ${firstName} ${lastName} creado`);
+
+    await ConsentLogService.logCitizenRegistered(req, leader._id, registration._id, {
+      cedula,
+      firstName,
+      lastName,
+      eventId: resolvedEventId
+    });
 
     res.status(201).json(registration);
   } catch (error) {
