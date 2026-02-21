@@ -589,17 +589,6 @@ function decrypt(encryptedText) {
 
 export async function logout(req, res) {
   try {
-    await AuditService.log("LOGOUT", "User", req.user?.userId || 'unknown', req.user, {}, `Usuario cerró sesión`);
-    logger.info(`✅ Logout exitoso`, { userId: req.user?.userId });
-    res.json({ message: "Sesión cerrada exitosamente" });
-  } catch (error) {
-    logger.error("Logout error:", { error: error.message });
-    res.json({ message: "Sesión cerrada exitosamente" });
-  }
-}
-
-export async function logout(req, res) {
-  try {
     const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "No autenticado" });
