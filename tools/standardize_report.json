@@ -1,0 +1,4160 @@
+[
+  {
+    "id": "697036774a9c99f1e35bc5e0",
+    "cedula": "11797008",
+    "localidad": "Suba",
+    "original": "Colegio villa Guadalupe",
+    "bestMatch": "Colegio Villa Elisa Sedes C y D",
+    "score": 0.425,
+    "action": "review"
+  },
+  {
+    "id": "6980f6e03730b5358b0a3277",
+    "cedula": "1015993990",
+    "localidad": "Fontibón",
+    "original": "Costa rica",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 0.643,
+    "action": "review"
+  },
+  {
+    "id": "6980feae3730b5358b0a33a5",
+    "cedula": "80230930",
+    "localidad": "Suba",
+    "original": "Chapinero Universidad Distrital",
+    "bestMatch": "Universidad UDCA",
+    "score": 0.21,
+    "action": "review"
+  },
+  {
+    "id": "698105833730b5358b0a34b4",
+    "cedula": "1056411425",
+    "localidad": "Usaquén",
+    "original": "COLEGIO GENERAL SANTANDER USAQUEN",
+    "bestMatch": "Colegio Distrital General Santander",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698107693730b5358b0a3574",
+    "cedula": "1015418628",
+    "localidad": "Usaquén",
+    "original": "COLEGIO EUCARISTICO VILLA GUADALUPE",
+    "bestMatch": "Salón Comunal Villa Nidia",
+    "score": 0.357,
+    "action": "review"
+  },
+  {
+    "id": "6981082c3730b5358b0a35f8",
+    "cedula": "1014240659",
+    "localidad": "Suba",
+    "original": "EL MUELLE",
+    "bestMatch": "Parque El Batán",
+    "score": 0.417,
+    "action": "review"
+  },
+  {
+    "id": "698109b53730b5358b0a36be",
+    "cedula": "52863830",
+    "localidad": "barranquilla ",
+    "original": "Salitre plaza ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698111183730b5358b0a37b6",
+    "cedula": "1020768745",
+    "localidad": "Usaquén",
+    "original": "COLEGIO EUCARISTICO VILLA GUADALUPE",
+    "bestMatch": "Salón Comunal Villa Nidia",
+    "score": 0.357,
+    "action": "review"
+  },
+  {
+    "id": "6981112e3730b5358b0a37df",
+    "cedula": "66654998",
+    "localidad": "Chía",
+    "original": "Centro cial Fontanar",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6981119a3730b5358b0a3825",
+    "cedula": "1056411508",
+    "localidad": "cajica",
+    "original": "ESCUELA EL MISTERIO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698112463730b5358b0a3873",
+    "cedula": "51795993",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "SAN JOSE RAFAEL URIBE",
+    "bestMatch": "Colegio Distrital Gustavo Restrepo - Sedes B y C",
+    "score": 0.524,
+    "action": "review"
+  },
+  {
+    "id": "698112ca3730b5358b0a38aa",
+    "cedula": "80191428",
+    "localidad": "Suba",
+    "original": "PUESTO CENSO(FERIA EXPOSICION)",
+    "bestMatch": "Parqueadero Centro Comercial Bulevar Niza",
+    "score": 0.195,
+    "action": "review"
+  },
+  {
+    "id": "6981137b3730b5358b0a38fb",
+    "cedula": "1063492496",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "PUESTO CABECERA MUNICIPAL",
+    "bestMatch": "Colegio Distrital Manuel del Socorro Rodríguez - Sede A",
+    "score": 0.16,
+    "action": "review"
+  },
+  {
+    "id": "698114043730b5358b0a396e",
+    "cedula": "1001043560",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "PRIMAVERA Y GORGONZOLA",
+    "bestMatch": "Colegio Distrital Marruecos y Molinos - Sede A",
+    "score": 0.268,
+    "action": "review"
+  },
+  {
+    "id": "698114933730b5358b0a39ac",
+    "cedula": "1021671769",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "EL MIRADOR RAFAEL URIBE",
+    "bestMatch": "Colegio Distrital Alfredo Iriarte Sede B",
+    "score": 0.551,
+    "action": "review"
+  },
+  {
+    "id": "698115043730b5358b0a39e8",
+    "cedula": "52448874",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "ALEXANDER FLEMING SAN JORGE",
+    "bestMatch": "Colegio Distrital Alexander Fleming - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698116ac3730b5358b0a3ac7",
+    "cedula": "41650051",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "ALCALDIA QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia de Caycedo",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698117123730b5358b0a3af5",
+    "cedula": "19100987",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "ALCALDIA QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia de Caycedo",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698117913730b5358b0a3b35",
+    "cedula": "41667737",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "CIUDAD BOCHICA SUR",
+    "bestMatch": "Colegio Distrital Alfredo Iriarte - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698117fe3730b5358b0a3b62",
+    "cedula": "20904046",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "LA VALVANERA",
+    "bestMatch": "Integración Social Mi Taller Creativo",
+    "score": 0.5,
+    "action": "review"
+  },
+  {
+    "id": "698118c73730b5358b0a3bac",
+    "cedula": "51848148",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "LA ESTANCIA",
+    "bestMatch": "Integración Social Mi Taller Creativo",
+    "score": 0.432,
+    "action": "review"
+  },
+  {
+    "id": "698119613730b5358b0a3be7",
+    "cedula": "41667439",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "SAN JOSE RAFAEL URIBE",
+    "bestMatch": "Colegio Distrital Gustavo Restrepo - Sedes B y C",
+    "score": 0.524,
+    "action": "review"
+  },
+  {
+    "id": "698119e43730b5358b0a3c1c",
+    "cedula": "41730126",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "MARRUECOS APARTAMENTOS",
+    "bestMatch": "Salón Comunal Marruecos",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69811a503730b5358b0a3c6d",
+    "cedula": "41489769",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "MOLINOS DEL SUR",
+    "bestMatch": "Colegio Distrital Marruecos y Molinos - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69811acf3730b5358b0a3cbd",
+    "cedula": "1019062857",
+    "localidad": "Suba",
+    "original": "SECTOR NOVATERRA",
+    "bestMatch": "Centro Comercial Portoalegre",
+    "score": 0.188,
+    "action": "review"
+  },
+  {
+    "id": "69811b413730b5358b0a3cea",
+    "cedula": "52447368",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "LAS MERCEDES",
+    "bestMatch": "Colegio Distrital José Marti - Sede B",
+    "score": 0.458,
+    "action": "review"
+  },
+  {
+    "id": "69811c1d3730b5358b0a3d3b",
+    "cedula": "80266777",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "BRAVO PAEZ",
+    "bestMatch": "Colegio Distrital Rafael Delgado Salguero (General Paez) - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69811ce83730b5358b0a3d83",
+    "cedula": "63361899",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "I.E. LEON XIII - CHILOE",
+    "bestMatch": "IDIPRON UPI Molinos (Unidad de Prevención Infantil)",
+    "score": 0.175,
+    "action": "review"
+  },
+  {
+    "id": "69811ded3730b5358b0a3dd0",
+    "cedula": "1083464093",
+    "localidad": "SANTA MARTA",
+    "original": "I.E.MANUEL J. DEL CASTILLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69811ee83730b5358b0a3e0f",
+    "cedula": "79873145",
+    "localidad": "Suba",
+    "original": "PUESTO CENSO(FERIA EXPOSICION)",
+    "bestMatch": "Parqueadero Centro Comercial Bulevar Niza",
+    "score": 0.195,
+    "action": "review"
+  },
+  {
+    "id": "69811f5c3730b5358b0a3e38",
+    "cedula": "20750429",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "COLEGIO NACIONAL EMILIO CIFUENTES FACATATIVÁ",
+    "bestMatch": "Colegio Distrital Estados Unidos de América",
+    "score": 0.205,
+    "action": "review"
+  },
+  {
+    "id": "6981209f3730b5358b0a3e95",
+    "cedula": "20136927",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "INGLES",
+    "bestMatch": "Colegio Distrital Restrepo Millán - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69813721f1808233bcf1bef2",
+    "cedula": "53113574",
+    "localidad": "Kennedy",
+    "original": "CARVAJAL II SEDE ANTONIA SANTOS I",
+    "bestMatch": "Colegio Distrital Antonia Santos",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69813d99f1808233bcf1bfa7",
+    "cedula": "1019021265",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "FE Y ALEGRIA JOSE MARIA VELAZ - IED",
+    "bestMatch": "Colegio Distrital José Marti - Sede D",
+    "score": 0.325,
+    "action": "review"
+  },
+  {
+    "id": "69813e48f1808233bcf1bfe7",
+    "cedula": "1000953145",
+    "localidad": "Suba",
+    "original": "PRADO SUR",
+    "bestMatch": "Colegio Distrital Gustavo Morales Morales",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69813f8bf1808233bcf1c049",
+    "cedula": "41769397",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "JUAN DEL RIZZO",
+    "bestMatch": "Colegio Distrital Marruecos y Molinos - Sede A",
+    "score": 0.3,
+    "action": "review"
+  },
+  {
+    "id": "69814027f1808233bcf1c085",
+    "cedula": "51673090",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "INGLES",
+    "bestMatch": "Colegio Distrital Restrepo Millán - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69814145f1808233bcf1c0df",
+    "cedula": "51615875",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "CLARET",
+    "bestMatch": "Colegio Distrital Manuel del Socorro Rodríguez - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698141aef1808233bcf1c10c",
+    "cedula": "41543063",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "CLARET",
+    "bestMatch": "Colegio Distrital Manuel del Socorro Rodríguez - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698143d5f1808233bcf1c1a9",
+    "cedula": "41757428",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "INGLES",
+    "bestMatch": "Colegio Distrital Restrepo Millán - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6981649cf1808233bcf1c741",
+    "cedula": "11317192",
+    "localidad": "Suba",
+    "original": "oulet floresta",
+    "bestMatch": "Centro Comercial Outlet La Floresta",
+    "score": 0.4,
+    "action": "review"
+  },
+  {
+    "id": "69816546f1808233bcf1c774",
+    "cedula": "1014858018",
+    "localidad": "Suba",
+    "original": "oulet floresta",
+    "bestMatch": "Centro Comercial Outlet La Floresta",
+    "score": 0.4,
+    "action": "review"
+  },
+  {
+    "id": "698165faf1808233bcf1c7a7",
+    "cedula": "4092075",
+    "localidad": "",
+    "original": "girardot",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69816650f1808233bcf1c7c4",
+    "cedula": "32001292",
+    "localidad": "",
+    "original": "Girardot",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69816900f1808233bcf1c80e",
+    "cedula": "52551664",
+    "localidad": "Suba",
+    "original": "Colegio Máximo poiters",
+    "bestMatch": "Colegio Máximino Poitiers",
+    "score": 0.44,
+    "action": "review"
+  },
+  {
+    "id": "6982332246da5966256101e6",
+    "cedula": "79243422 ",
+    "localidad": "Suba",
+    "original": "GERARDO PAREDES - IED",
+    "bestMatch": "Colegio Distrital Gerardo Paredes - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6982337c46da59662561020e",
+    "cedula": "1014221715",
+    "localidad": "Suba",
+    "original": "SANTA HELENITA\t",
+    "bestMatch": "Salón Comunal Santa Cecilia",
+    "score": 0.398,
+    "action": "review"
+  },
+  {
+    "id": "698233df46da59662561023d",
+    "cedula": "1014227084",
+    "localidad": "Engativá",
+    "original": "BOYACA",
+    "bestMatch": "Colegio Distrital Manuela Ayala de Gaitán - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6982343d46da59662561026b",
+    "cedula": "1001315847",
+    "localidad": "Usaquén",
+    "original": "ALMACEN ÉXITO LA COLINA",
+    "bestMatch": "Colegio La Estrellita (antes Don Bosco III)",
+    "score": 0.319,
+    "action": "review"
+  },
+  {
+    "id": "6982354f46da5966256102ef",
+    "cedula": "11291345",
+    "localidad": "Bosa",
+    "original": "NUEVA ESTACION",
+    "bestMatch": "Institución Educativa Distrital La Concepción - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698235bc46da59662561031e",
+    "cedula": "",
+    "localidad": "la calera",
+    "original": "ESCUELA JUAN XXIII",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6983623240c2deaa13d58a66",
+    "cedula": "1026581981",
+    "localidad": "SUBA",
+    "original": "37 - UNIVERSIDAD UDCA SUBA",
+    "bestMatch": "Universidad UDCA",
+    "score": 0.583,
+    "action": "review"
+  },
+  {
+    "id": "6983646140c2deaa13d58ae0",
+    "cedula": "52879639",
+    "localidad": "Los Mártires",
+    "original": "Santa fe",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_no_puestos"
+  },
+  {
+    "id": "698373af3a2ed5ed5cc02030",
+    "cedula": "Patiño",
+    "localidad": "Suba",
+    "original": "Balbanera ",
+    "bestMatch": "Colegio Distrital Salitre Sede B",
+    "score": 0.227,
+    "action": "review"
+  },
+  {
+    "id": "698388ee679e0ddede601212",
+    "cedula": "51909892",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "698399f7852d2cf850a9a69f",
+    "cedula": "79883880",
+    "localidad": "Barrios Unidos",
+    "original": "SIMON BOLIVAR",
+    "bestMatch": "Colegio Distrital Tomás Carrasquilla - sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69839a5b852d2cf850a9a6bf",
+    "cedula": "1019045167",
+    "localidad": "Engativá",
+    "original": "BONAVISTA",
+    "bestMatch": "Colegio Distrital Técnico República de Guatemala",
+    "score": 0.278,
+    "action": "review"
+  },
+  {
+    "id": "69839aac852d2cf850a9a6de",
+    "cedula": "1010061359",
+    "localidad": "Engativá",
+    "original": "LOS CEREZOS",
+    "bestMatch": "Polideportivo",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69839c01852d2cf850a9a71b",
+    "cedula": "1014251147",
+    "localidad": "Engativá",
+    "original": "MINUTO DE DIOS",
+    "bestMatch": "Colegio Minuto de Dios",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69839e94852d2cf850a9a79f",
+    "cedula": "1000856781",
+    "localidad": "Kennedy",
+    "original": "Floralia",
+    "bestMatch": "Salón Comunal Floralia",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69839ee3852d2cf850a9a7c9",
+    "cedula": "20489086",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "6983aaef852d2cf850a9a926",
+    "cedula": "51900092",
+    "localidad": "Kennedy",
+    "original": "Liceo Reinel",
+    "bestMatch": "Liceo Reynel",
+    "score": 0.458,
+    "action": "review"
+  },
+  {
+    "id": "6983af71852d2cf850a9a9db",
+    "cedula": "52935028",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "6983b161852d2cf850a9aa2f",
+    "cedula": "24099638",
+    "localidad": "Engativá",
+    "original": "Luis Carlos   Galan",
+    "bestMatch": "Colegio Distrital Jorge Gaitán Sede B",
+    "score": 0.206,
+    "action": "review"
+  },
+  {
+    "id": "6983b217852d2cf850a9aa7c",
+    "cedula": "79539320",
+    "localidad": "Fontibón",
+    "original": "Ciudad  sslitre",
+    "bestMatch": "Colegio Agustiniano Salitre",
+    "score": 0.237,
+    "action": "review"
+  },
+  {
+    "id": "6983b26a852d2cf850a9aab1",
+    "cedula": "19225293",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "6983b2dc852d2cf850a9aaee",
+    "cedula": "93124493",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "6983b327852d2cf850a9ab1c",
+    "cedula": "79326392",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "6983c068852d2cf850a9ac8a",
+    "cedula": "39796816",
+    "localidad": "Tunjuelito",
+    "original": "Colegio piloto Fatima",
+    "bestMatch": "Colegio Distrital Instituto Técnico Piloto Sede C",
+    "score": 0.444,
+    "action": "review"
+  },
+  {
+    "id": "6983c0d0852d2cf850a9acd6",
+    "cedula": "79056256",
+    "localidad": "Tunjuelito",
+    "original": "Colegio piloto Fatima",
+    "bestMatch": "Colegio Distrital Instituto Técnico Piloto Sede C",
+    "score": 0.444,
+    "action": "review"
+  },
+  {
+    "id": "6983c0db852d2cf850a9ace8",
+    "cedula": "51800915",
+    "localidad": "San Cristóbal",
+    "original": "Colegio san isidro",
+    "bestMatch": "Colegio Distrital San isidro Sur Oriental - Sede A",
+    "score": 0.778,
+    "action": "review"
+  },
+  {
+    "id": "6983c745852d2cf850a9ad97",
+    "cedula": "1010014123",
+    "localidad": "Kennedy",
+    "original": "Centro comercial Tintal ",
+    "bestMatch": "Centro Comercial Tintal Plaza",
+    "score": 0.73,
+    "action": "review"
+  },
+  {
+    "id": "6983c7b3852d2cf850a9add4",
+    "cedula": "41741839",
+    "localidad": "San Cristóbal",
+    "original": "Colegio san isidro",
+    "bestMatch": "Colegio Distrital San isidro Sur Oriental - Sede A",
+    "score": 0.778,
+    "action": "review"
+  },
+  {
+    "id": "6983c7fc852d2cf850a9ae08",
+    "cedula": "5983110",
+    "localidad": "San Cristóbal",
+    "original": "Colegio san isidro",
+    "bestMatch": "Colegio Distrital San isidro Sur Oriental - Sede A",
+    "score": 0.778,
+    "action": "review"
+  },
+  {
+    "id": "6983cab3852d2cf850a9ae68",
+    "cedula": "80233602",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "6983d02c852d2cf850a9aeb6",
+    "cedula": "1013261413",
+    "localidad": "Suba",
+    "original": "Salitre",
+    "bestMatch": "Colegio Distrital Salitre Sede B",
+    "score": 0.443,
+    "action": "review"
+  },
+  {
+    "id": "6983d45f852d2cf850a9af34",
+    "cedula": "79532142",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "6983d9d0852d2cf850a9afac",
+    "cedula": "51970100",
+    "localidad": "Ciudad Bolívar",
+    "original": "La cazona",
+    "bestMatch": "Colegio Distrital La Acacia II - Sede A",
+    "score": 0.528,
+    "action": "review"
+  },
+  {
+    "id": "6984de7f999b0033b470749a",
+    "cedula": "1045734597",
+    "localidad": "Usaquén",
+    "original": "Colegio Toberin \"B\"",
+    "bestMatch": "Colegio Distrital Toberín Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6984defa999b0033b47074c2",
+    "cedula": "8644617",
+    "localidad": "Atlantico",
+    "original": "IE San José de Aguada de Pablo ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984df59999b0033b47074e0",
+    "cedula": "32852465",
+    "localidad": "Atlantico",
+    "original": "IE San Jose de Aguada de Pablo ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984dfe4999b0033b470750f",
+    "cedula": "1043589235",
+    "localidad": "Atlantico",
+    "original": "IE San Jose de Aguada de Pablo ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e0a5999b0033b4707546",
+    "cedula": "50904157",
+    "localidad": "Atlantico",
+    "original": "I.E.BICENTENARIO DE SOLEDAD",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e0ea999b0033b470755f",
+    "cedula": "8644536",
+    "localidad": "",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e137999b0033b470757d",
+    "cedula": "3758248",
+    "localidad": "Atlantico",
+    "original": "COLEGIO DISTRITAL MARIE POUSSEPIN",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e179999b0033b4707599",
+    "cedula": "1042969805",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e1bd999b0033b47075b6",
+    "cedula": "1043006810",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e1ff999b0033b47075d2",
+    "cedula": "1007205396",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e248999b0033b47075f0",
+    "cedula": "8644618",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e293999b0033b470760e",
+    "cedula": "32852352",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e30d999b0033b4707639",
+    "cedula": "1042971548",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e54f999b0033b47076e1",
+    "cedula": "1043017879",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e5d7999b0033b470770b",
+    "cedula": "1043018515",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e65d999b0033b4707735",
+    "cedula": "1043664702",
+    "localidad": "ATLANTICO",
+    "original": " C.DTAL.EL SILENCIO(ANT CEB 050",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e696999b0033b470774b",
+    "cedula": "1143244335",
+    "localidad": "ATLANTICO",
+    "original": "IE DISTRITAL LA MERCED",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e74b999b0033b4707783",
+    "cedula": "1019603832",
+    "localidad": "ATLANTICO",
+    "original": "IED LA ESMERALDA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e79c999b0033b470779e",
+    "cedula": "8795691",
+    "localidad": "ATLANTICO",
+    "original": "COLEGIO HILDA MUÑOZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e84c999b0033b47077d4",
+    "cedula": "1079887289",
+    "localidad": "ATLANTICO",
+    "original": "PUESTO CABECERA MUNICIPAL",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e886999b0033b47077eb",
+    "cedula": "32711656",
+    "localidad": "ATLANTICO",
+    "original": "C.DIST.SARIT ARTETA DE VASQUEZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e903999b0033b4707817",
+    "cedula": "22417700",
+    "localidad": "ATLANTICO",
+    "original": " C.DIST.SARIT ARTETA DE VASQUEZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e97c999b0033b470783c",
+    "cedula": "32783179",
+    "localidad": "ATLANTICO",
+    "original": "IE LA ESPERANZA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e9b5999b0033b4707854",
+    "cedula": "8738510",
+    "localidad": "ATLANTICO",
+    "original": "INST EDUC DIST SIMON BOLIVAR",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984e9eb999b0033b470786a",
+    "cedula": "1140840419",
+    "localidad": "ATLANTICO",
+    "original": "INST EDUC DIST SIMON BOLIVAR",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ea23999b0033b4707884",
+    "cedula": "32681027",
+    "localidad": "ATLANTICO",
+    "original": "INST EDUC DIST SIMON BOLIVAR",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ea54999b0033b470789d",
+    "cedula": "32756616",
+    "localidad": "ATLANTICO",
+    "original": "I.E.MUNDO BOLIVARIANO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ea8c999b0033b47078b7",
+    "cedula": "1004094624",
+    "localidad": "COL.MIGUEL ANGEL BUILES BLQ1",
+    "original": "28",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984eabd999b0033b47078d0",
+    "cedula": "1045232026",
+    "localidad": "ATLANTICO",
+    "original": "I.E.MUNDO BOLIVARIANO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984eaee999b0033b47078e9",
+    "cedula": "1043589653",
+    "localidad": "ATLANTICO",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984eb75999b0033b470791b",
+    "cedula": "1043444342",
+    "localidad": "ATLANTICO",
+    "original": "IED LA ESMERALDA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ebc9999b0033b4707937",
+    "cedula": "1002129714",
+    "localidad": "ATLANTICO",
+    "original": " I.E.ESC.NORMAL SUPERIOR SRA FA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ec1c999b0033b4707956",
+    "cedula": "22425842",
+    "localidad": "ATLANTICO",
+    "original": "IED SANTA BERNARDITA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ec6f999b0033b4707976",
+    "cedula": "1092371681",
+    "localidad": "ATLANTICO",
+    "original": "I.E.MUNDO BOLIVARIANO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ecc0999b0033b4707995",
+    "cedula": "1007964280",
+    "localidad": "ATLANTICO",
+    "original": "I.E.MUNDO BOLIVARIANO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ed00999b0033b47079b1",
+    "cedula": "32762907",
+    "localidad": "ATLANTICO",
+    "original": "COLEGIO DISTRITAL MARIE POUSSEPIN",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ed46999b0033b47079ce",
+    "cedula": "1043671161",
+    "localidad": "ATLANTICO",
+    "original": " I.E.D. JAVIER SANCHEZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ed8b999b0033b47079eb",
+    "cedula": "1020112181",
+    "localidad": "ATLANTICO",
+    "original": "I.E. HERNAN TORO AGUDELO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984edc2999b0033b4707a05",
+    "cedula": "26286267",
+    "localidad": "ATLANTICO",
+    "original": "C.DIST.SARIT ARTETA DE VASQUEZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984edfd999b0033b4707a1b",
+    "cedula": "8749149",
+    "localidad": "ATLANTICO",
+    "original": "COLEGIO DISTRITAL MARIE POUSSEPIN",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ee32999b0033b4707a35",
+    "cedula": "8634626",
+    "localidad": "ATLANTICO",
+    "original": "IED LA LUZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984ee69999b0033b4707a4f",
+    "cedula": "32734161",
+    "localidad": "ATLANTICO",
+    "original": "I.D.E.STA.MARIA(MEGACOLEGIO)",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984fa64999b0033b4707bdd",
+    "cedula": "1072652429",
+    "localidad": "ATLANTICO",
+    "original": "COLEGIO DISTRITAL DIVINO MAESTRO SEDE A",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6984fb0a999b0033b4707c0e",
+    "cedula": "1124052773",
+    "localidad": "Usaquén",
+    "original": "COLEGIO GENERAL SANTANDER USAQUEN",
+    "bestMatch": "Colegio Distrital General Santander",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6984fb78999b0033b4707c3a",
+    "cedula": "1046429282",
+    "localidad": "Usaquén",
+    "original": "CEDRO GOLF",
+    "bestMatch": "Parque Cedro Golf",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6984fc31999b0033b4707c9b",
+    "cedula": "1047424463",
+    "localidad": "Usaquén",
+    "original": "GERARDO MOLINA RAMIREZ - IED",
+    "bestMatch": "Colegio Distrital Agustín Fernández - Sede A",
+    "score": 0.156,
+    "action": "review"
+  },
+  {
+    "id": "6984fdfe999b0033b4707cfe",
+    "cedula": "39547437",
+    "localidad": "Engativá",
+    "original": "GRAN GRANADA",
+    "bestMatch": "Costado Almacén Éxito de Occidente",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6984fe65999b0033b4707d35",
+    "cedula": "411554129",
+    "localidad": "Engativá",
+    "original": "GRAN GRANADA",
+    "bestMatch": "Costado Almacén Éxito de Occidente",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6984ff2f999b0033b4707dad",
+    "cedula": "79547925",
+    "localidad": "Usaquén",
+    "original": "VEINTIUN ANGELES SEDE A - IED",
+    "bestMatch": "Colegio Distrital Toberín - Sede A",
+    "score": 0.307,
+    "action": "review"
+  },
+  {
+    "id": "6984ff4f999b0033b4707dcc",
+    "cedula": "1022975435",
+    "localidad": "Usme",
+    "original": "LA ALBORADA",
+    "bestMatch": "Colegio Distrital Estanislao Zuleta Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6984ffad999b0033b4707e05",
+    "cedula": "1003802221",
+    "localidad": "SOACHA",
+    "original": "CENTRO COMERCIAL GRAN PLAZA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6985000e999b0033b4707e3e",
+    "cedula": "1018428896",
+    "localidad": "San Cristóbal",
+    "original": "MORALBA",
+    "bestMatch": "Colegio Distrital Moralba Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69850052999b0033b4707e6d",
+    "cedula": "52115525",
+    "localidad": "San Cristóbal",
+    "original": "PRIMERA DE MAYO",
+    "bestMatch": "Colegio Distrital José Félix Restrepo - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69850098999b0033b4707e9c",
+    "cedula": "1010095741",
+    "localidad": "Teusaquillo",
+    "original": "FE Y ALEGRIA JOSE MARIA VELAZ - IED",
+    "bestMatch": "Colegio Santa Clara",
+    "score": 0.167,
+    "action": "review"
+  },
+  {
+    "id": "698500bf999b0033b4707ebb",
+    "cedula": "52731154",
+    "localidad": "San Cristóbal",
+    "original": "SAN ISIDRO",
+    "bestMatch": "Colegio Distrital San isidro Sur Oriental - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69850160999b0033b4707f16",
+    "cedula": "80206256",
+    "localidad": "CHIA",
+    "original": "CONCHA ACUSTICA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69850196999b0033b4707f3b",
+    "cedula": "1000835305",
+    "localidad": "Usaquén",
+    "original": "SALON COMUNAL SANTA ISABEL",
+    "bestMatch": "Colegio Santa María",
+    "score": 0.442,
+    "action": "review"
+  },
+  {
+    "id": "6985025d999b0033b4707fa1",
+    "cedula": "1030606394",
+    "localidad": "Kennedy",
+    "original": "COL DISTRITAL JAIRO ANIBAL NIÑO",
+    "bestMatch": "Colegio Distrital Patio Bonito",
+    "score": 0.703,
+    "action": "review"
+  },
+  {
+    "id": "698502f5999b0033b4707ff1",
+    "cedula": "51551235",
+    "localidad": "Bosa",
+    "original": "TABORA",
+    "bestMatch": "Colegio Distrital Argelia",
+    "score": 0.25,
+    "action": "review"
+  },
+  {
+    "id": "6985039b999b0033b4708046",
+    "cedula": "1010217475",
+    "localidad": "Ciudad Bolívar",
+    "original": "JERUSALEN EL TANQUE",
+    "bestMatch": "Colegio Distrital Tanque Laguna - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698503c2999b0033b4708065",
+    "cedula": "1020834161",
+    "localidad": "Usaquén",
+    "original": "SERVITA",
+    "bestMatch": "Centro de Atención Distrital Especializado Servitá",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69850414999b0033b4708098",
+    "cedula": "1000459220",
+    "localidad": "Usaquén",
+    "original": "COLEGIO TOBERIN \"B\"",
+    "bestMatch": "Colegio Distrital Toberín Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69850445999b0033b47080bf",
+    "cedula": "39791676",
+    "localidad": "Chapinero",
+    "original": "CRA. 6 A ENTRE CLL. 118 Y 119 PARQUE DE USAQUEN",
+    "bestMatch": "Centro Comercial de la 93",
+    "score": 0.216,
+    "action": "review"
+  },
+  {
+    "id": "6985046d999b0033b47080de",
+    "cedula": "1010020679",
+    "localidad": "Usaquén",
+    "original": "COLEGIO TOBERIN \"B\"",
+    "bestMatch": "Colegio Distrital Toberín Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6985047f999b0033b47080f4",
+    "cedula": "1010115164",
+    "localidad": "Usme",
+    "original": "LA FISCALA",
+    "bestMatch": "Colegio Distrital Fabio Lozano Simonelli",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6985049f999b0033b4708114",
+    "cedula": "1001219217",
+    "localidad": "Usaquén",
+    "original": "COLEGIO TOBERIN \"B\"",
+    "bestMatch": "Colegio Distrital Toberín Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69850527999b0033b4708187",
+    "cedula": "1020839313",
+    "localidad": "Usaquén",
+    "original": "COLEGIO FRIEDRICH NAUMANN SEDE B",
+    "bestMatch": "Colegio Distrital Friedrich Nauman Sede B",
+    "score": 0.818,
+    "action": "review"
+  },
+  {
+    "id": "69850573999b0033b47081cc",
+    "cedula": "1192787610",
+    "localidad": "Usaquén",
+    "original": "COLEGIO FRIEDRICH NAUMANN SEDE B",
+    "bestMatch": "Colegio Distrital Friedrich Nauman Sede B",
+    "score": 0.818,
+    "action": "review"
+  },
+  {
+    "id": "69850a9d999b0033b4708369",
+    "cedula": "449951",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "69850b34999b0033b47083be",
+    "cedula": "41472713",
+    "localidad": "Tunjuelito",
+    "original": "San Benito",
+    "bestMatch": "Colegio Distrital José Antonio Ricaurte",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69850bf4999b0033b47083f9",
+    "cedula": "1031173787",
+    "localidad": "Ciudad Bolívar",
+    "original": "Colegio san Francisco",
+    "bestMatch": "Colegio Distrital Nicolas Gómez Dávila",
+    "score": 0.81,
+    "action": "review"
+  },
+  {
+    "id": "69850f55999b0033b4708446",
+    "cedula": "415488866",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "6985395968142609f3694d64",
+    "cedula": "1012399299",
+    "localidad": "Bosa",
+    "original": "La estacion ",
+    "bestMatch": "Colegio Colombo Japonés",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698539b268142609f3694dbc",
+    "cedula": "52587056",
+    "localidad": "Bosa",
+    "original": "JOSE ANTONIO GALAN ",
+    "bestMatch": "Colegio Distrital José Antonio Galán",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698539f168142609f3694dfe",
+    "cedula": "79465038",
+    "localidad": "Bosa",
+    "original": "JOSE ANTONIO GALAN ",
+    "bestMatch": "Colegio Distrital José Antonio Galán",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69853c8e68142609f3694f88",
+    "cedula": "1021393234",
+    "localidad": "Bosa",
+    "original": "GRAN PLAZA BOSA ",
+    "bestMatch": "Centro Comercial Gran Plaza Bosa",
+    "score": 0.895,
+    "action": "updated"
+  },
+  {
+    "id": "698635dfa994f4ef9e60765a",
+    "cedula": "79532548",
+    "localidad": "Tunjuelito",
+    "original": "San Benito",
+    "bestMatch": "Colegio Distrital José Antonio Ricaurte",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69863637a994f4ef9e60768b",
+    "cedula": "79532549",
+    "localidad": "Tunjuelito",
+    "original": "San benito",
+    "bestMatch": "Colegio Distrital José Antonio Ricaurte",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69867a8caa4f2ae042e456cb",
+    "cedula": "10323977081",
+    "localidad": "Usaquén",
+    "original": "UNIVERSIDAD DEL BOSQUE ",
+    "bestMatch": "Universidad El Bosque",
+    "score": 0.727,
+    "action": "review"
+  },
+  {
+    "id": "69867c31aa4f2ae042e4570e",
+    "cedula": "1023928851",
+    "localidad": "San Cristóbal",
+    "original": "SAN BLAS ",
+    "bestMatch": "Colegio Distrital Manuelita Sáenz",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69873fdb4e9887d338b2b570",
+    "cedula": "80064008",
+    "localidad": "Suba",
+    "original": "Colegio Nueva Zelandia ",
+    "bestMatch": "Colegio Distrital Nueva Zelandia",
+    "score": 0.844,
+    "action": "review"
+  },
+  {
+    "id": "6987415f4e9887d338b2b597",
+    "cedula": "79962220",
+    "localidad": "Suba",
+    "original": "Colegio Nueva Zelandia",
+    "bestMatch": "Colegio Distrital Nueva Zelandia",
+    "score": 0.844,
+    "action": "review"
+  },
+  {
+    "id": "6987422a4e9887d338b2b5ce",
+    "cedula": "41635829",
+    "localidad": "Suba",
+    "original": "Colegio Nueva Zelandia ",
+    "bestMatch": "Colegio Distrital Nueva Zelandia",
+    "score": 0.844,
+    "action": "review"
+  },
+  {
+    "id": "69878e6d4a2d965fa4c41a29",
+    "cedula": "Tovar",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "Maria Cano",
+    "bestMatch": "Colegio Distrital María Cano",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6987acb2d92f75a00564fe1b",
+    "cedula": "22468965",
+    "localidad": "Kennedy",
+    "original": "Francisco Miranda",
+    "bestMatch": "Colegio Distrital Francisco Miranda",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6987ad71d92f75a00564fe41",
+    "cedula": "79517183",
+    "localidad": "Kennedy",
+    "original": "Jhon F. Kennedy ",
+    "bestMatch": "Colegio Distrital Jhon F. Kennedy",
+    "score": 0.762,
+    "action": "review"
+  },
+  {
+    "id": "6987b5a1d976d8a9266b12ec",
+    "cedula": "31146756",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "El Portal",
+    "bestMatch": "Colegio Distrital Alfredo Iriarte Sede B",
+    "score": 0.45,
+    "action": "review"
+  },
+  {
+    "id": "6987b73ad976d8a9266b135a",
+    "cedula": "51949878",
+    "localidad": "Engativá",
+    "original": "Almanza Engativá ",
+    "bestMatch": "Colegio Distrital Tomás Cipriano de Mosquera",
+    "score": 0.688,
+    "action": "review"
+  },
+  {
+    "id": "6987b821d976d8a9266b1397",
+    "cedula": "79343625",
+    "localidad": "Engativá",
+    "original": "Almanza Engativá ",
+    "bestMatch": "Colegio Distrital Tomás Cipriano de Mosquera",
+    "score": 0.688,
+    "action": "review"
+  },
+  {
+    "id": "6988063751df9be9fe1ae751",
+    "cedula": "1009338",
+    "localidad": "Puente Aranda",
+    "original": "Salazar Gómez ",
+    "bestMatch": "Colegio Distrital Francisco José de Sucre",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698806fd51df9be9fe1ae77f",
+    "cedula": "46671403",
+    "localidad": "Puente Aranda",
+    "original": "Salazar Gómez ",
+    "bestMatch": "Colegio Distrital Francisco José de Sucre",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6988b2aba6686f91b4d0fed6",
+    "cedula": "23497005",
+    "localidad": "Suba",
+    "original": "Villa del Prado Uniagraria",
+    "bestMatch": "UNIAGRARIA",
+    "score": 0.815,
+    "action": "review"
+  },
+  {
+    "id": "6988eea0f201d0552595c87b",
+    "cedula": "53067583",
+    "localidad": "Bosa",
+    "original": "Colegio Llano Oriental",
+    "bestMatch": "Colegio Distrital Llano Oriental",
+    "score": 0.844,
+    "action": "review"
+  },
+  {
+    "id": "69894ae716ab8b7a079e278b",
+    "cedula": "796383117",
+    "localidad": "Usaquén",
+    "original": "CONCHA ACUSTICA CHIA",
+    "bestMatch": "Colegio Distrital Agustín Fernández - Sede A",
+    "score": 0.172,
+    "action": "review"
+  },
+  {
+    "id": "69894b9f16ab8b7a079e27bf",
+    "cedula": "1007015472",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "UNIVALLE SEDE MELENDEZ",
+    "bestMatch": "Colegio Distrital Reino de Holanda - Sede B",
+    "score": 0.182,
+    "action": "review"
+  },
+  {
+    "id": "69894c2716ab8b7a079e27e9",
+    "cedula": "1007015473",
+    "localidad": "Usaquén",
+    "original": "COLEGIO AQUILEO PARRA SEDE BACHILLERATO",
+    "bestMatch": "Colegio Distrital Aquileo Parra Sede Primaria",
+    "score": 0.611,
+    "action": "review"
+  },
+  {
+    "id": "69894cf416ab8b7a079e281c",
+    "cedula": "1032487989",
+    "localidad": "Engativá",
+    "original": "HAYUELOS CENTRO COMERCIAL",
+    "bestMatch": "Salón Comunal",
+    "score": 0.2,
+    "action": "review"
+  },
+  {
+    "id": "69894e3316ab8b7a079e287a",
+    "cedula": "52875632",
+    "localidad": "CAJICA",
+    "original": "IED POMPILIO MARTINEZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69894f5416ab8b7a079e28b7",
+    "cedula": "52242723",
+    "localidad": "Bosa",
+    "original": "I.E. VIDA NUEVA",
+    "bestMatch": "Colegio Distrital CEDID San Pablo Sede C",
+    "score": 0.274,
+    "action": "review"
+  },
+  {
+    "id": "69894fb116ab8b7a079e28d4",
+    "cedula": "52242724",
+    "localidad": "Bosa",
+    "original": "GRAN PLAZA EL ENSUEÑO",
+    "bestMatch": "Centro Comercial Gran Plaza Bosa",
+    "score": 0.476,
+    "action": "review"
+  },
+  {
+    "id": "6989501116ab8b7a079e28f7",
+    "cedula": "52242725",
+    "localidad": "Kennedy",
+    "original": "CIUDADELA EL PORVENIR",
+    "bestMatch": "Colegio Distrital El Japón",
+    "score": 0.343,
+    "action": "review"
+  },
+  {
+    "id": "698950ef16ab8b7a079e292d",
+    "cedula": "52242726",
+    "localidad": "Kennedy",
+    "original": "LICEO SANTA BERNARDITA",
+    "bestMatch": "Salón Comunal Santa Catalina",
+    "score": 0.429,
+    "action": "review"
+  },
+  {
+    "id": "6989518c16ab8b7a079e295b",
+    "cedula": "52242727",
+    "localidad": "SOACHA",
+    "original": "I.E. LUIS CARLOS GALAN",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698952ce16ab8b7a079e2999",
+    "cedula": "1032798900",
+    "localidad": "Kennedy",
+    "original": "LOS ALCAZARES",
+    "bestMatch": "Colegio Distrital Los Héroes",
+    "score": 0.481,
+    "action": "review"
+  },
+  {
+    "id": "698953d816ab8b7a079e29d4",
+    "cedula": "1032798901",
+    "localidad": "Usme",
+    "original": "CLARETIANO",
+    "bestMatch": "Colegio Distrital El Destino",
+    "score": 0.25,
+    "action": "review"
+  },
+  {
+    "id": "6989549516ab8b7a079e2a00",
+    "cedula": "1032798902",
+    "localidad": "Usme",
+    "original": "COLEGIO FE Y ALEGRIA",
+    "bestMatch": "Colegio Distrital Brasilia",
+    "score": 0.25,
+    "action": "review"
+  },
+  {
+    "id": "6989556516ab8b7a079e2a38",
+    "cedula": "1032798903",
+    "localidad": "Usaquén",
+    "original": "BOLIVIA",
+    "bestMatch": "Colegio Distrital Nuevo Horizonte Sede A",
+    "score": 0.2,
+    "action": "review"
+  },
+  {
+    "id": "6989565016ab8b7a079e2a75",
+    "cedula": "30016945",
+    "localidad": "Tunjuelito",
+    "original": "TOLOTA",
+    "bestMatch": "Colegio Distrital Rufino José de Cuervo - Sede A",
+    "score": 0.167,
+    "action": "review"
+  },
+  {
+    "id": "69895b7a16ab8b7a079e2aae",
+    "cedula": "1070009755",
+    "localidad": "CAJICA",
+    "original": "ESCUELA EL MISTERIO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69895c7116ab8b7a079e2ae4",
+    "cedula": "1070010831",
+    "localidad": "CAJICA",
+    "original": "COLEGIO ANTONIO NARIÑO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69895d9d16ab8b7a079e2b2c",
+    "cedula": "1109380511",
+    "localidad": "Bosa",
+    "original": "PUESTO CABECERA MUNICIPAL",
+    "bestMatch": "Colegio Distrital Brasilia",
+    "score": 0.16,
+    "action": "review"
+  },
+  {
+    "id": "69895e3b16ab8b7a079e2b59",
+    "cedula": "1023928524",
+    "localidad": "San Cristóbal",
+    "original": "CDC LA VICTORIA",
+    "bestMatch": "Centro de Desarrollo Comunitario La Victoria",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69895eb316ab8b7a079e2b7d",
+    "cedula": "1023880006",
+    "localidad": "San Cristóbal",
+    "original": "LOS LIBERTADORES",
+    "bestMatch": "Colegio Distrital Los Libertadores",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69895f9216ab8b7a079e2bba",
+    "cedula": "1013110815",
+    "localidad": "San Cristóbal",
+    "original": "COLEGIO CIUDAD DE FOMEQUE",
+    "bestMatch": "Colegio Distrital 20 de Julio",
+    "score": 0.374,
+    "action": "review"
+  },
+  {
+    "id": "6989617d16ab8b7a079e2c11",
+    "cedula": "1032936768",
+    "localidad": "Teusaquillo",
+    "original": "\tLA GLORIA- ESCUELA ALTAMIRA",
+    "bestMatch": "Colegio Calazanz Femenino",
+    "score": 0.373,
+    "action": "review"
+  },
+  {
+    "id": "698962eb16ab8b7a079e2c44",
+    "cedula": "1032467530",
+    "localidad": "Usaquén",
+    "original": "IEM SAN JUAN BAUTISTA DE SALLE SD PRIMAR",
+    "bestMatch": "Colegio San Francisco de Asis",
+    "score": 0.329,
+    "action": "review"
+  },
+  {
+    "id": "698a4c8c0b49a08441de5334",
+    "cedula": "39573332",
+    "localidad": "",
+    "original": "SENA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698a4dc20b49a08441de54b8",
+    "cedula": "1000953821",
+    "localidad": "Usaquén",
+    "original": "COLEGIO TOBERIN \"B\"",
+    "bestMatch": "Colegio Distrital Toberín Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698a53980b49a08441de5a16",
+    "cedula": "80118620",
+    "localidad": "Kennedy",
+    "original": "COUNTRY SUR",
+    "bestMatch": "Colegio Distrital Saludcoop Sur",
+    "score": 0.379,
+    "action": "review"
+  },
+  {
+    "id": "698a61980b49a08441de5d73",
+    "cedula": "11314851",
+    "localidad": "AGUA DE DIOS",
+    "original": " IED SALESIANO MIGUEL UNIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698a621f0b49a08441de5d9d",
+    "cedula": "79288790",
+    "localidad": "Engativá",
+    "original": " EL CORTIJO ENGATIVA",
+    "bestMatch": "Colegio Distrital Tomás Cipriano de Mosquera",
+    "score": 0.463,
+    "action": "review"
+  },
+  {
+    "id": "698a629c0b49a08441de5dc5",
+    "cedula": "52130895",
+    "localidad": "San Cristóbal",
+    "original": "SAN ISIDRO",
+    "bestMatch": "Colegio Distrital San isidro Sur Oriental - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698a62e70b49a08441de5ddf",
+    "cedula": "10265333",
+    "localidad": "Kennedy",
+    "original": "COLEGIO NUEVA CASTILLA",
+    "bestMatch": "Colegio Distrital Nueva Castilla",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698a637f0b49a08441de5e10",
+    "cedula": "32002269",
+    "localidad": "MOSQUERA",
+    "original": " COLEGIO LA PAZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698a76c10b49a08441de5ec0",
+    "cedula": "11315842",
+    "localidad": "GIRARDOT",
+    "original": "COLEGIO AMERICANO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698a7c240b49a08441de5f20",
+    "cedula": "1022396396",
+    "localidad": "Puente Aranda",
+    "original": "Colegio el tejar ",
+    "bestMatch": "Colegio Distrital Luis Vargas Tejada - Sede B",
+    "score": 0.75,
+    "action": "review"
+  },
+  {
+    "id": "698a7f030b49a08441de5f51",
+    "cedula": "60309153",
+    "localidad": "Teusaquillo",
+    "original": "CIUDAD SALITRE",
+    "bestMatch": "Plazoleta Centro Comercial Gran Estación",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698a7f650b49a08441de5f70",
+    "cedula": "14249689",
+    "localidad": "MELGAR",
+    "original": "INST.EDUC.TEC.SUMAPAZ SED 1 P",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698a7fb20b49a08441de5f8e",
+    "cedula": "65822136",
+    "localidad": "MELGAR",
+    "original": "INST.EDUC.TEC.SUMAPAZ SED 17",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698a80000b49a08441de5fad",
+    "cedula": "63395581",
+    "localidad": "Barrios Unidos",
+    "original": "BENJAMIN HERRERA",
+    "bestMatch": "Colegio Distrital Francisco Primero Sede Alemania",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698a804c0b49a08441de5fcb",
+    "cedula": "11185548",
+    "localidad": "AGUA DE DIOS",
+    "original": " IED SALESIANO MIGUEL UNIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698a80a00b49a08441de5feb",
+    "cedula": "80272235",
+    "localidad": "Suba",
+    "original": "CARULLA RINCON DE LA COLINA",
+    "bestMatch": "Parqueadero Carulla Rincón de la Colina",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698a881d0b49a08441de606f",
+    "cedula": "65754336",
+    "localidad": "Puente Aranda",
+    "original": "Colon",
+    "bestMatch": "Colegio José Allamano",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698a88d60b49a08441de609d",
+    "cedula": "1020835639",
+    "localidad": "Usaquén",
+    "original": "Lijaca",
+    "bestMatch": "Colegio Distrital Unión Colombia - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698a89700b49a08441de60ca",
+    "cedula": "39742702",
+    "localidad": "Ubaté ",
+    "original": "Instituto Bolivar",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698a8a430b49a08441de6104",
+    "cedula": "37891983",
+    "localidad": "Guadalupe ",
+    "original": "Instituto técnico agropecuario ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b888736a16ffcda98ccf2",
+    "cedula": "1053812203",
+    "localidad": "Barrios Unidos",
+    "original": " ISERRA 100",
+    "bestMatch": "Centro Comercial ISERRA 100",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698b88ed36a16ffcda98cd18",
+    "cedula": "79555961",
+    "localidad": "Engativá",
+    "original": "CIUDADELA COLSUBSIDIO",
+    "bestMatch": "Colegio Centro Educativo Integral Colsubsidio",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698b899136a16ffcda98cd54",
+    "cedula": "52157549",
+    "localidad": "Engativá",
+    "original": "CIUDADELA COLSUBSIDIO",
+    "bestMatch": "Colegio Centro Educativo Integral Colsubsidio",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698b8a2e36a16ffcda98cd8a",
+    "cedula": "8001338",
+    "localidad": "AGUA DE DIOS",
+    "original": "IED SALESIANO MIGUEL UNIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b8aa136a16ffcda98cdb2",
+    "cedula": "32001915",
+    "localidad": "AGUA DE DIOS",
+    "original": " IED SALESIANO MIGUEL UNIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b8b0236a16ffcda98cddc",
+    "cedula": "32002395",
+    "localidad": "AGUA DE DIOS",
+    "original": "IED SALESIANO MIGUEL UNIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b8b6236a16ffcda98ce05",
+    "cedula": "1071988253",
+    "localidad": "AGUA DE DIOS",
+    "original": "CEN. CULTURAL ARMANDO RODRIGUEZ JIMENEZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b8bed36a16ffcda98ce35",
+    "cedula": "1032472714",
+    "localidad": "AGUA DE DIOS",
+    "original": "CEN. CULTURAL ARMANDO RODRIGUEZ JIMENEZ",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b8c4b36a16ffcda98ce5a",
+    "cedula": "11314921",
+    "localidad": "AGUA DE DIOS",
+    "original": "IED SALESIANO MIGUEL UNIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b90e336a16ffcda98cecd",
+    "cedula": "28642399",
+    "localidad": "GIRARDOT",
+    "original": "ESC. NORMAL SUPERIOR MARIA AUX",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b922436a16ffcda98cf1b",
+    "cedula": "13953189",
+    "localidad": "GIRARDOT",
+    "original": " SEDE FRANCISCO J DE CALDAS",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b92f336a16ffcda98cf5a",
+    "cedula": "3045586",
+    "localidad": "GIRARDOT",
+    "original": "ESC. NORMAL SUPERIOR MARIA AUX",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698b9b6e36a16ffcda98d019",
+    "cedula": "52374864",
+    "localidad": "Tunjuelito",
+    "original": "San Benito",
+    "bestMatch": "Colegio Distrital José Antonio Ricaurte",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698b9bdc36a16ffcda98d05c",
+    "cedula": "52296510",
+    "localidad": "Tunjuelito",
+    "original": "San Benito",
+    "bestMatch": "Colegio Distrital José Antonio Ricaurte",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "698b9c5536a16ffcda98d08e",
+    "cedula": "52209977",
+    "localidad": "Kennedy",
+    "original": "Alqueria la fragua",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.389,
+    "action": "review"
+  },
+  {
+    "id": "698bbd85418bedaee4233180",
+    "cedula": "1026593955",
+    "localidad": "Puente Aranda",
+    "original": "Colegio el tejar ",
+    "bestMatch": "Colegio Distrital Luis Vargas Tejada - Sede B",
+    "score": 0.75,
+    "action": "review"
+  },
+  {
+    "id": "698bbf18418bedaee42331ec",
+    "cedula": "72144513",
+    "localidad": "Kennedy",
+    "original": "No me acuerdo ",
+    "bestMatch": "Colegio Distrital Alquería",
+    "score": 0.188,
+    "action": "review"
+  },
+  {
+    "id": "698bf034418bedaee42333ae",
+    "cedula": "1001327590",
+    "localidad": "Puente Aranda",
+    "original": "Colegio silveria espinosa ",
+    "bestMatch": "Colegio Distrital Silveria Espinosa Rendon - Sede B",
+    "score": 0.588,
+    "action": "review"
+  },
+  {
+    "id": "698c9a4320f60bdeb52bafbb",
+    "cedula": "41656278",
+    "localidad": "Usaquén",
+    "original": "COLEGIO AQUILEO PARRA SEDE BACHILLERATO",
+    "bestMatch": "Colegio Distrital Aquileo Parra Sede Primaria",
+    "score": 0.611,
+    "action": "review"
+  },
+  {
+    "id": "698c9bec20f60bdeb52baff7",
+    "cedula": "19080455",
+    "localidad": "Usaquén",
+    "original": "BOYACA",
+    "bestMatch": "Colegio Distrital Unión Colombia - Sede B",
+    "score": 0.25,
+    "action": "review"
+  },
+  {
+    "id": "698fb3b9c7030d76dc2ef1a4",
+    "cedula": "1072650981",
+    "localidad": "Suba",
+    "original": "81 - SAN JOSE BAVARIA-ABRAHAM LINCOLN",
+    "bestMatch": "Colegio Abraham Lincoln Sede Bachillerato",
+    "score": 0.912,
+    "action": "updated"
+  },
+  {
+    "id": "698fb525c7030d76dc2ef209",
+    "cedula": "30080098",
+    "localidad": "",
+    "original": "01 - IE ANTHONY A. PHIPPS",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fb5b6c7030d76dc2ef235",
+    "cedula": "52183518",
+    "localidad": "Suba",
+    "original": "29 - TEJARES NORTE",
+    "bestMatch": "Universidad Pedagógica Nacional",
+    "score": 0.806,
+    "action": "review"
+  },
+  {
+    "id": "698fb685c7030d76dc2ef26f",
+    "cedula": "52074060",
+    "localidad": "Usaquén",
+    "original": "01 - PUESTO CENSO(FERIA EXPOSICION)",
+    "bestMatch": "Parqueadero Centro Comercial Cedritos 151",
+    "score": 0.195,
+    "action": "review"
+  },
+  {
+    "id": "698fb729c7030d76dc2ef2a1",
+    "cedula": "1072645357",
+    "localidad": "CHIA",
+    "original": "01 - INST. EDUC. DIVERSIFICADA SANTA LUCIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fb77ec7030d76dc2ef2bd",
+    "cedula": "1072665405",
+    "localidad": "CHIA",
+    "original": "02 - COLEGIO NACIONAL DIVERSIFICADO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fb7d5c7030d76dc2ef2dd",
+    "cedula": "79523104",
+    "localidad": "Suba",
+    "original": "56 - NIZA CENTRO COMERCIAL NIZA",
+    "bestMatch": "Parqueadero Centro Comercial Niza",
+    "score": 0.782,
+    "action": "review"
+  },
+  {
+    "id": "698fb81dc7030d76dc2ef2fb",
+    "cedula": "52977113",
+    "localidad": "Suba",
+    "original": "56 - NIZA CENTRO COMERCIAL NIZA",
+    "bestMatch": "Parqueadero Centro Comercial Niza",
+    "score": 0.782,
+    "action": "review"
+  },
+  {
+    "id": "698fb872c7030d76dc2ef31b",
+    "cedula": "1023083974",
+    "localidad": "Suba",
+    "original": "61 - CANCHA MULTIPLE VILLA DELIA",
+    "bestMatch": "Salón Comunal Villa Maria",
+    "score": 0.36,
+    "action": "review"
+  },
+  {
+    "id": "698fb8c1c7030d76dc2ef339",
+    "cedula": "1020797240",
+    "localidad": "Suba",
+    "original": "61 - CANCHA MULTIPLE VILLA DELIA",
+    "bestMatch": "Salón Comunal Villa Maria",
+    "score": 0.36,
+    "action": "review"
+  },
+  {
+    "id": "698fb915c7030d76dc2ef359",
+    "cedula": "52057947",
+    "localidad": "SOACHA",
+    "original": "05 - COLISEO LEON XIII",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fb967c7030d76dc2ef379",
+    "cedula": "1012353754",
+    "localidad": "SOACHA",
+    "original": "05 - I.E. LICEO MAYOR DE SOACHA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fb9b7c7030d76dc2ef398",
+    "cedula": "1053607147",
+    "localidad": "CHIA",
+    "original": "07 - CENTRO COMERCIAL FONTANAR",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fba14c7030d76dc2ef3b9",
+    "cedula": "1018464803",
+    "localidad": "SOACHA",
+    "original": "02 - I.E. EL BOSQUE",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fba57c7030d76dc2ef3d6",
+    "cedula": "1020755677",
+    "localidad": "Suba",
+    "original": "78 - CC PARQUE LA COLINA",
+    "bestMatch": "Centro Comercial Parque La Colina",
+    "score": 0.876,
+    "action": "updated"
+  },
+  {
+    "id": "698fba98c7030d76dc2ef3f2",
+    "cedula": "1016071136",
+    "localidad": "Fontibón",
+    "original": "09 - SANTA CECILIA - MODELIA",
+    "bestMatch": "Colegio Distrital Santa Cecilia",
+    "score": 0.866,
+    "action": "updated"
+  },
+  {
+    "id": "698fbb38c7030d76dc2ef41c",
+    "cedula": "1020719098",
+    "localidad": "ZIPAQUIRA",
+    "original": "05 - COLEGIO DE LA PRESENTACION",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fc2973e504e8c928af2db",
+    "cedula": "19472362",
+    "localidad": "SOACHA",
+    "original": "02 - I.E. EL BOSQUE",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fc3953e504e8c928af31c",
+    "cedula": "1090430942",
+    "localidad": "CUCUTA",
+    "original": "03 - ESC FRANCISCO DE PAULA ANDRADE No 9",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fc4af3e504e8c928af35d",
+    "cedula": "41348508",
+    "localidad": "Suba",
+    "original": "01 - PUESTO CENSO(FERIA EXPOSICION)",
+    "bestMatch": "Parqueadero Centro Comercial Bulevar Niza",
+    "score": 0.183,
+    "action": "review"
+  },
+  {
+    "id": "698fc53a3e504e8c928af383",
+    "cedula": "11201094",
+    "localidad": "CAJICA",
+    "original": "03 - COLEGIO ANTONIO NARIÑO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fc5b03e504e8c928af3a5",
+    "cedula": "1071986509",
+    "localidad": "CHIA",
+    "original": "05 - CONCHA ACUSTICA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fc6123e504e8c928af3c7",
+    "cedula": "80655704",
+    "localidad": "FUNZA",
+    "original": "05 - COL CRISTIANO INTEGRAL",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "698fc7be3e504e8c928af3ff",
+    "cedula": "1000722977",
+    "localidad": "CHIA",
+    "original": "05 - CONCHA ACUSTICA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69925975f0a49d80b8d45c26",
+    "cedula": "1024537695",
+    "localidad": "Tunjuelito",
+    "original": "Nuevo muzu",
+    "bestMatch": "Colegio Distrital Venecia - Sede B",
+    "score": 0.817,
+    "action": "review"
+  },
+  {
+    "id": "6992599ff0a49d80b8d45c3a",
+    "cedula": "80142201",
+    "localidad": "Ciudad Bolívar",
+    "original": "MADELENA ",
+    "bestMatch": "Colegio Distrital El Ensueño",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6992641183a0a9cf40edb9f5",
+    "cedula": "1018484355",
+    "localidad": "Ciudad Bolívar",
+    "original": "Madelena ",
+    "bestMatch": "Colegio Distrital El Ensueño",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6992641583a0a9cf40edb9fe",
+    "cedula": "1010230479",
+    "localidad": "Suba",
+    "original": "Colegio alvaro gomez",
+    "bestMatch": "Colegio Distrital Álvaro Gómez Hurtado",
+    "score": 0.663,
+    "action": "review"
+  },
+  {
+    "id": "69926c586276567704660d5a",
+    "cedula": "3223909505",
+    "localidad": "Ciudad Bolívar",
+    "original": "Rogelio salmona ",
+    "bestMatch": "Colegio Distrital Rogelio Salmona",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6995db52c5bdf6325638344f",
+    "cedula": "1015407047",
+    "localidad": "Barrios Unidos",
+    "original": "26 - JORGE ELIECER GAITAN SEDE B PRIMARIA",
+    "bestMatch": "Colegio Distrital Jorge Eliecer Gaitán - Sede B",
+    "score": 0.916,
+    "action": "updated"
+  },
+  {
+    "id": "6995e8d177f1235a16eebebf",
+    "cedula": "72239807",
+    "localidad": "Teusaquillo",
+    "original": "universidad ecci",
+    "bestMatch": "Universidad ECCI - Sede G",
+    "score": 0.681,
+    "action": "review"
+  },
+  {
+    "id": "6995ff5083ebced6b2b933c5",
+    "cedula": "123123123",
+    "localidad": "Guainía",
+    "original": "asdasd",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6996119ef6480e6c2de58e02",
+    "cedula": "39538651",
+    "localidad": "Fontibón",
+    "original": "Escuela costa rica sede b",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 0.686,
+    "action": "review"
+  },
+  {
+    "id": "69961499f6480e6c2de58e10",
+    "cedula": "35325859",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69961560f6480e6c2de58e1c",
+    "cedula": "1000588983",
+    "localidad": "Usme",
+    "original": "alfonso lopez",
+    "bestMatch": "Colegio Distrital Estanislao Zuleta Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69961624f6480e6c2de58e26",
+    "cedula": "5751250",
+    "localidad": "Rafael Uribe",
+    "original": "COVIVIENDA DEL SUR ORIENTE",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6996185bf6480e6c2de58e30",
+    "cedula": "53101594",
+    "localidad": "Rafael Uribe",
+    "original": "COVIVIENDA DEL SUR ORIENTE",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6996193ef6480e6c2de58e3a",
+    "cedula": "19269706",
+    "localidad": "Bosa",
+    "original": "PIAMONTE",
+    "bestMatch": "Colegio Distrital Fernando Mazuera Villegas",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69961db203479fe877c47c6f",
+    "cedula": "52313546551",
+    "localidad": "pepa",
+    "original": "Colegio Toberin",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69961f1303479fe877c47c83",
+    "cedula": "39641960",
+    "localidad": "Bosa",
+    "original": "LACONCEPCION",
+    "bestMatch": "Colegio Distrital La Concepción Sede C",
+    "score": 0.462,
+    "action": "review"
+  },
+  {
+    "id": "69961f447a53d877cb416d0d",
+    "cedula": "1000953821222",
+    "localidad": "Antioquia",
+    "original": "asdasd",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69963177e95c1c6f9462a3ca",
+    "cedula": "61856168585",
+    "localidad": "test",
+    "original": "test",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69963239e95c1c6f9462a3d6",
+    "cedula": "123412312",
+    "localidad": "Simmonds",
+    "original": "Colegio Toberin",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69963685b28637f38ccaa769",
+    "cedula": "1000953821222123",
+    "localidad": "La Candelaria",
+    "original": "asdasd",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_no_puestos"
+  },
+  {
+    "id": "699636f92fa2cbb640b7ae89",
+    "cedula": "test",
+    "localidad": "Fontibón",
+    "original": "test",
+    "bestMatch": "Salón Comunal Tres Estancias",
+    "score": 0.143,
+    "action": "review"
+  },
+  {
+    "id": "69963a32bf3503bd7f7176b6",
+    "cedula": "123124242",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "asdasd",
+    "bestMatch": "Colegio Distrital Misael Pastrana Borrero",
+    "score": 0.167,
+    "action": "review"
+  },
+  {
+    "id": "69963a87bf3503bd7f7176c2",
+    "cedula": "1235555",
+    "localidad": "Guaviare",
+    "original": "test1",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69963dd4a74c33be82465a84",
+    "cedula": "79493833",
+    "localidad": "Bosa",
+    "original": "Jiménez de quesada",
+    "bestMatch": "Colegio Distrital Fernando Mazuera Villegas - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69965a7dadba981f9a5115d0",
+    "cedula": "39531902",
+    "localidad": "Cundinamarca",
+    "original": "12 - CENTRO CULTURAL Y ARTISTICO JUMBO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965ae1adba981f9a5115da",
+    "cedula": "32893293",
+    "localidad": "Atlántico",
+    "original": "01 - I.E.BICENTENARIO DE SOLEDAD",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965b3fadba981f9a5115e4",
+    "cedula": "1049796005",
+    "localidad": "Boyacá",
+    "original": "00 - PUESTO CABECERA MUNICIPAL",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965be3adba981f9a5115ee",
+    "cedula": "19190812",
+    "localidad": "Cundinamarca",
+    "original": "03 - COLEGIO STELLA MATUTINA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965cabadba981f9a5115f8",
+    "cedula": "35459703",
+    "localidad": "Cundinamarca",
+    "original": "01 - INST.EDUC.LAURA VICUÑA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965cf9adba981f9a511602",
+    "cedula": "33368487",
+    "localidad": "Boyacá",
+    "original": "01 - PUESTO CENSO (COL. BOY SAN AGUSTIN)",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965d33adba981f9a51160c",
+    "cedula": "35476229",
+    "localidad": "Cundinamarca",
+    "original": "01 - INST.EDUC.LAURA VICUÑA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965d81adba981f9a511616",
+    "cedula": "1112769303",
+    "localidad": "Valle del Cauca",
+    "original": "04 - I E LASTENIA DURAN VERNAZA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965e1aadba981f9a511620",
+    "cedula": "1020724054",
+    "localidad": "Usaquén",
+    "original": "12 - CENTRO COMERCIAL UNICENTRO",
+    "bestMatch": "Parqueadero Unicentro",
+    "score": 0.782,
+    "action": "review"
+  },
+  {
+    "id": "69965e8dadba981f9a51162a",
+    "cedula": "25214482",
+    "localidad": "Caldas",
+    "original": "01 - IE SUPIA ININSU",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965ed8adba981f9a511634",
+    "cedula": "1014182706",
+    "localidad": "Engativá",
+    "original": "39 - LOS CEREZOS",
+    "bestMatch": "Polideportivo",
+    "score": 0.793,
+    "action": "review"
+  },
+  {
+    "id": "69965f3badba981f9a51163e",
+    "cedula": "86059590",
+    "localidad": "Meta",
+    "original": "02 - IE GILBERTO ALZATE AVENDAÑO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69965ffcadba981f9a511648",
+    "cedula": "1123804575",
+    "localidad": "Bosa",
+    "original": "27 - EL RECUERDO SANTAFE",
+    "bestMatch": "Colegio Distrital El Porvenir - Sede B",
+    "score": 0.86,
+    "action": "updated"
+  },
+  {
+    "id": "69966084adba981f9a511652",
+    "cedula": "1193329348",
+    "localidad": "Cundinamarca",
+    "original": "07 - CENTRO COMERCIAL FONTANAR",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69966110adba981f9a51165e",
+    "cedula": "1011082592",
+    "localidad": "Cundinamarca",
+    "original": "10 - COLEGIO CELESTIN FREINET",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69966176adba981f9a511668",
+    "cedula": "1007185303",
+    "localidad": "Cundinamarca",
+    "original": "06 - INSTITUCION EDUCATIVA CERCA DE PIEDRA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699661ccadba981f9a511672",
+    "cedula": "79425976",
+    "localidad": "Cundinamarca",
+    "original": "01 - INST. EDUC. DIVERSIFICADA SANTA LUCIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6996622dadba981f9a51167c",
+    "cedula": "1033100014",
+    "localidad": "Cundinamarca",
+    "original": "01 - INST. EDUC. DIVERSIFICADA SANTA LUCIA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69966284adba981f9a511686",
+    "cedula": "1193566260",
+    "localidad": "Cundinamarca",
+    "original": "06 - INSTITUCION EDUCATIVA CERCA DE PIEDRA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699662ceadba981f9a511690",
+    "cedula": "11523290",
+    "localidad": "Cundinamarca",
+    "original": "01 - COLISEO CUBIERTO LORENZO DE TERRONES",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6996632aadba981f9a51169a",
+    "cedula": "52273644",
+    "localidad": "Cundinamarca",
+    "original": "05 - CONCHA ACUSTICA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699663cdadba981f9a5116a4",
+    "cedula": "3188562",
+    "localidad": "Norte de Santander",
+    "original": "01 - COL. INT DEL CARARE SEC PRIMARIA \"CICA\"",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69966872c3dc358ec72c215f",
+    "cedula": "1032938075",
+    "localidad": "Cundinamarca",
+    "original": "07 - INSTITUCION EDUCATIVA FONQUETA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6996698ac3dc358ec72c216c",
+    "cedula": "1072671981",
+    "localidad": "Kennedy",
+    "original": "02 - IE JOSE ESCRIVA BALAGUER",
+    "bestMatch": "Colegio Distrital San José",
+    "score": 0.272,
+    "action": "review"
+  },
+  {
+    "id": "6996d6875195ace35e2269c6",
+    "cedula": "12321312412",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "Colegio Toberin",
+    "bestMatch": "Colegio Distrital Toribio de Mogrovejo",
+    "score": 0.232,
+    "action": "review"
+  },
+  {
+    "id": "6996d6f85195ace35e2269e6",
+    "cedula": "10009538214as",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "Colegio Toberin",
+    "bestMatch": "Colegio Distrital Toribio de Mogrovejo",
+    "score": 0.232,
+    "action": "review"
+  },
+  {
+    "id": "69971a51f8b5d0b4c55d5fc6",
+    "cedula": "41733884",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69971acdf8b5d0b4c55d5fd0",
+    "cedula": "20167764",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69971b42f8b5d0b4c55d5fda",
+    "cedula": "41474044",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69971ba4f8b5d0b4c55d5fe4",
+    "cedula": "60321450",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69971d0ff8b5d0b4c55d5fee",
+    "cedula": "1016072758",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69972026f8b5d0b4c55d600c",
+    "cedula": "52783352",
+    "localidad": "Teusaquillo",
+    "original": "PUESTO CENSO(FERIA EXPOSICION)",
+    "bestMatch": "CORFERIAS",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6997215ff8b5d0b4c55d6016",
+    "cedula": "41469595",
+    "localidad": "Ciudad Bolívar",
+    "original": "CASONA LIBERTADOR COL DIS MARIA CURREA M",
+    "bestMatch": "Facultad Tecnológica Universidad Distrital",
+    "score": 0.375,
+    "action": "review"
+  },
+  {
+    "id": "699722b9f8b5d0b4c55d6022",
+    "cedula": "1000087764",
+    "localidad": "Puente Aranda",
+    "original": "LA PRADERA",
+    "bestMatch": "Colegio Distrital Silveria Espinosa Rendon - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69972324f8b5d0b4c55d602c",
+    "cedula": "1020731320",
+    "localidad": "Valle del Cauca",
+    "original": "MANUELA BELTRAN",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699723ecf8b5d0b4c55d6040",
+    "cedula": "79139698",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6997249cf8b5d0b4c55d604a",
+    "cedula": "1123321246",
+    "localidad": "Usaquén",
+    "original": "COLEGIO PUREZA DE MARIA",
+    "bestMatch": "Colegio Privado Pureza de María",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699724a4f8b5d0b4c55d6054",
+    "cedula": "79857658",
+    "localidad": "Bosa",
+    "original": "PIAMONTE",
+    "bestMatch": "Colegio Distrital Fernando Mazuera Villegas",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6997255df8b5d0b4c55d605e",
+    "cedula": "1007381544",
+    "localidad": "Boyacá",
+    "original": "03 - U.P.T.C.",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699726c6f8b5d0b4c55d6072",
+    "cedula": "1082956596",
+    "localidad": "Magdalena",
+    "original": "LICEO PIVIJAY",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6997276cf8b5d0b4c55d607c",
+    "cedula": "1012465754",
+    "localidad": "Tunjuelito",
+    "original": "NUEVO MUZO \"B\"",
+    "bestMatch": "Polideportivo Nuevo Muzu",
+    "score": 0.792,
+    "action": "review"
+  },
+  {
+    "id": "699727f4f8b5d0b4c55d6086",
+    "cedula": "1067885701",
+    "localidad": "Córdoba",
+    "original": "IE EL DORADO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69972904f8b5d0b4c55d6090",
+    "cedula": "1064108143",
+    "localidad": "Cesar",
+    "original": "LA PALMITA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69972adcf8b5d0b4c55d609a",
+    "cedula": "1006851195",
+    "localidad": "Usaquén",
+    "original": "COLEGIO GENERAL SANTANDER USAQUEN",
+    "bestMatch": "Colegio Distrital General Santander",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69972c96f8b5d0b4c55d60a4",
+    "cedula": "1065839272",
+    "localidad": "Cesar",
+    "original": "UNIV. POPULAR DEL CESAR(SD SABANAS)",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69972d26f8b5d0b4c55d60b2",
+    "cedula": "24201856",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "MOLINOS DEL SUR",
+    "bestMatch": "Colegio Distrital Marruecos y Molinos - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69972d76f8b5d0b4c55d60bc",
+    "cedula": "1006653605",
+    "localidad": "Cesar",
+    "original": "COL CARLOS RESTREPO ARAUJO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69972d9df8b5d0b4c55d60c6",
+    "cedula": "51581209",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "SECTOR LOS MOLINOS II",
+    "bestMatch": "Colegio Distrital Colombia Viva - Sede A",
+    "score": 0.667,
+    "action": "review"
+  },
+  {
+    "id": "69972ec3f8b5d0b4c55d60e0",
+    "cedula": "41762154",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "PRIMERA DE MAYO",
+    "bestMatch": "Salón Comunal Mirador de Marrocos",
+    "score": 0.377,
+    "action": "review"
+  },
+  {
+    "id": "69972f18f8b5d0b4c55d60ea",
+    "cedula": "35486170",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "MOLINOS DEL SUR",
+    "bestMatch": "Colegio Distrital Marruecos y Molinos - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69972f90f8b5d0b4c55d60f4",
+    "cedula": "51578388",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "SANTA LUCÍA",
+    "bestMatch": "Colegio Distrital Manuel del Socorro Rodríguez - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69972ff8f8b5d0b4c55d60fe",
+    "cedula": "51647256",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "MOLINOS DEL SUR",
+    "bestMatch": "Colegio Distrital Marruecos y Molinos - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6997304af8b5d0b4c55d6108",
+    "cedula": "51774672",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "SAN JOSÉ RAFAEL URIBE",
+    "bestMatch": "Colegio Distrital Gustavo Restrepo - Sedes B y C",
+    "score": 0.524,
+    "action": "review"
+  },
+  {
+    "id": "699730abf8b5d0b4c55d611c",
+    "cedula": "79309377",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "LAS COLINAS",
+    "bestMatch": "Colegio Distrital José Marti - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699730f7f8b5d0b4c55d6126",
+    "cedula": "51613376",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "ALEJANDRO OBREGON GUSTAVO DESCANSO",
+    "bestMatch": "Colegio Distrital Alejandro Obregón",
+    "score": 0.801,
+    "action": "review"
+  },
+  {
+    "id": "69973132f8b5d0b4c55d6130",
+    "cedula": "2972144",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "SAN JOSÉ RAFAEL URIBE",
+    "bestMatch": "Colegio Distrital Gustavo Restrepo - Sedes B y C",
+    "score": 0.524,
+    "action": "review"
+  },
+  {
+    "id": "69973144f8b5d0b4c55d613a",
+    "cedula": "40801119",
+    "localidad": "La Guajira",
+    "original": "IE INMACULADA LIÑAN",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699731bff8b5d0b4c55d6144",
+    "cedula": "1006653705",
+    "localidad": "Cesar",
+    "original": "I.E. BELLO HORIZONTE",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69973277f8b5d0b4c55d614e",
+    "cedula": "79764254",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "SANTA LUCÍA",
+    "bestMatch": "Colegio Distrital Manuel del Socorro Rodríguez - Sede A",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699732ccf8b5d0b4c55d6158",
+    "cedula": "1032418867",
+    "localidad": "Ciudad Bolívar",
+    "original": "SAN JOAQUÍN DEL VATICANO",
+    "bestMatch": "Colegio Distrital Don Bosco La Joya",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699732eff8b5d0b4c55d6162",
+    "cedula": "1033096678",
+    "localidad": "Usaquén",
+    "original": "COLEGIO GENERAL SANTANDER USAQUEN",
+    "bestMatch": "Colegio Distrital General Santander",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69973398f8b5d0b4c55d616f",
+    "cedula": "17036887",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "INGLÉS",
+    "bestMatch": "Colegio Distrital Restrepo Millán - Sede B",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69973400f8b5d0b4c55d6179",
+    "cedula": "1043585291",
+    "localidad": "Usaquén",
+    "original": "SERVITA",
+    "bestMatch": "Centro de Atención Distrital Especializado Servitá",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69973405f8b5d0b4c55d6181",
+    "cedula": "52323308",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69973437f8b5d0b4c55d618d",
+    "cedula": "41499180",
+    "localidad": "Tolima",
+    "original": "IE SUMAPAZ SD GABRIELA MISTRAL",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699735c3f8b5d0b4c55d6197",
+    "cedula": "1065124897",
+    "localidad": "Cesar",
+    "original": "I.E. AGRICOLA SEDE LA ESPERANZA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69973666f8b5d0b4c55d61a1",
+    "cedula": "1003081926",
+    "localidad": "Usaquén",
+    "original": "COLEGIO GENERAL SANTANDER USAQUEN",
+    "bestMatch": "Colegio Distrital General Santander",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69973729f8b5d0b4c55d61ae",
+    "cedula": "1007891455",
+    "localidad": "Atlántico",
+    "original": "I E SAN JOSE DE AGUADA DE PABLO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699737d3f8b5d0b4c55d61b8",
+    "cedula": "1020770913",
+    "localidad": "Usaquén",
+    "original": "COLEGIO GENERAL SANTANDER USAQUEN",
+    "bestMatch": "Colegio Distrital General Santander",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699737f6f8b5d0b4c55d61c2",
+    "cedula": "39531183",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "68 - MARGARITA BOSCO",
+    "bestMatch": "Colegio Distrital María Cano",
+    "score": 0.194,
+    "action": "review"
+  },
+  {
+    "id": "699738fff8b5d0b4c55d61ce",
+    "cedula": "22640433",
+    "localidad": "Usaquén",
+    "original": "COLEGIO GENERAL SANTANDER USAQUEN",
+    "bestMatch": "Colegio Distrital General Santander",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699739a2f8b5d0b4c55d61d8",
+    "cedula": "1020798705",
+    "localidad": "Usaquén",
+    "original": "CANAIMA",
+    "bestMatch": "Vía Pública",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699740ab0de7ef803ace6514",
+    "cedula": "41747364",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "37 - SALÓN COMUNAL CLARET",
+    "bestMatch": "Salón Comunal Claret",
+    "score": 0.768,
+    "action": "review"
+  },
+  {
+    "id": "699741980de7ef803ace6521",
+    "cedula": "26562200",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "06 - OLAYA",
+    "bestMatch": "Colegio Distrital Antonio Baraya -  Sede A",
+    "score": 0.646,
+    "action": "review"
+  },
+  {
+    "id": "699741ea0de7ef803ace652b",
+    "cedula": "41455869",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "14 - PAÍS SUR",
+    "bestMatch": "Colegio Distrital Palermo Sur",
+    "score": 0.382,
+    "action": "review"
+  },
+  {
+    "id": "699742510de7ef803ace6535",
+    "cedula": "51640662",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "08 - ALEJANDRO OBREGON GUSTAVO DESCANSO",
+    "bestMatch": "Colegio Distrital Alejandro Obregón",
+    "score": 0.725,
+    "action": "review"
+  },
+  {
+    "id": "699744370de7ef803ace6553",
+    "cedula": "24462584",
+    "localidad": "Cundinamarca",
+    "original": "02 - IE EL BOSQUE Colina baja",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699744910de7ef803ace655d",
+    "cedula": "20568302",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "07 - SAN JOSÉ RAFAEL URIBE",
+    "bestMatch": "Localidad Rafaél Uribe Uribe",
+    "score": 0.464,
+    "action": "review"
+  },
+  {
+    "id": "699745ac0de7ef803ace6567",
+    "cedula": "41636194",
+    "localidad": "Cundinamarca",
+    "original": "06 - Los Ángeles - San Diego",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699746060de7ef803ace6571",
+    "cedula": "51579796",
+    "localidad": "Ciudad Bolívar",
+    "original": "31 - CASONA LIBERTADOR COL DIS MARIA CURREA M",
+    "bestMatch": "Facultad Tecnológica Universidad Distrital",
+    "score": 0.345,
+    "action": "review"
+  },
+  {
+    "id": "699746770de7ef803ace657b",
+    "cedula": "41756848",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "07 - SAN JOSÉ RAFAEL URIBE",
+    "bestMatch": "Localidad Rafaél Uribe Uribe",
+    "score": 0.464,
+    "action": "review"
+  },
+  {
+    "id": "699747040de7ef803ace6585",
+    "cedula": "24294154",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "07 - SAN JOSÉ RAFAEL URIBE",
+    "bestMatch": "Localidad Rafaél Uribe Uribe",
+    "score": 0.464,
+    "action": "review"
+  },
+  {
+    "id": "699747c60de7ef803ace658f",
+    "cedula": "28190385",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "25 - GRANJAS DE SAN PABLO",
+    "bestMatch": "Colegio Distrital José Marti - Sede C",
+    "score": 0.879,
+    "action": "updated"
+  },
+  {
+    "id": "699748670de7ef803ace6599",
+    "cedula": "41509077",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "07 - SAN JOSÉ RAFAEL URIBE",
+    "bestMatch": "Localidad Rafaél Uribe Uribe",
+    "score": 0.464,
+    "action": "review"
+  },
+  {
+    "id": "699749360de7ef803ace65a6",
+    "cedula": "28926803",
+    "localidad": "Risaralda",
+    "original": "03 - INST TECNG SANTA ROSA DE CABAL",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699749d70de7ef803ace65b0",
+    "cedula": "51660322",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "08 - ALEJANDRO OBREGON GUSTAVO DESCANSO",
+    "bestMatch": "Colegio Distrital Alejandro Obregón",
+    "score": 0.725,
+    "action": "review"
+  },
+  {
+    "id": "69974a610de7ef803ace65ba",
+    "cedula": "41306581",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "16 - ALEXANDER FLEMING SAN JORGE",
+    "bestMatch": "Colegio Distrital Alexander Fleming - Sede B",
+    "score": 0.894,
+    "action": "updated"
+  },
+  {
+    "id": "69974b460de7ef803ace65c4",
+    "cedula": "51553325",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "08 - ALEJANDRO OBREGON GUSTAVO DESCANSO",
+    "bestMatch": "Colegio Distrital Alejandro Obregón",
+    "score": 0.725,
+    "action": "review"
+  },
+  {
+    "id": "69974bb20de7ef803ace65ce",
+    "cedula": "35491139",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "09 - QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia Holguín de Urdaneta",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "69974cd30de7ef803ace65e2",
+    "cedula": "35335021",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "20 - MOLINOS DEL SUR",
+    "bestMatch": "Colegio Distrital Marruecos y Molinos - Sede A",
+    "score": 0.845,
+    "action": "review"
+  },
+  {
+    "id": "69974f440de7ef803ace65ec",
+    "cedula": "19093567",
+    "localidad": "Chapinero",
+    "original": "10 - UNIVERSIDAD KONRAD LORENZ",
+    "bestMatch": "Fundación Universitaria Konrad Lorenz",
+    "score": 0.846,
+    "action": "review"
+  },
+  {
+    "id": "699750120de7ef803ace65fc",
+    "cedula": "19342202",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "10 - ALCALDÍA QUIROG",
+    "bestMatch": "Colegio Distrital Clemencia de Caycedo",
+    "score": 0.589,
+    "action": "review"
+  },
+  {
+    "id": "699753170de7ef803ace6620",
+    "cedula": "1072673376",
+    "localidad": "Cundinamarca",
+    "original": "04 - COLEGIO MARIA AUXILIADORA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699757a945035b815f087cf6",
+    "cedula": "41491005",
+    "localidad": "Fontibón",
+    "original": "VILLEMAR",
+    "bestMatch": "Colegio Distrital Villemar El Carmen",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6997580a45035b815f087d00",
+    "cedula": "51605226",
+    "localidad": "Fontibón",
+    "original": "HAYUELOS CENTRO COMERCIAL",
+    "bestMatch": "Centro Comercial Hayuelos",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6997585445035b815f087d0a",
+    "cedula": "35329575",
+    "localidad": "Fontibón",
+    "original": "VERSALLES",
+    "bestMatch": "Colegio Distrital Internacional",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699758f545035b815f087d14",
+    "cedula": "53029352",
+    "localidad": "Kennedy",
+    "original": "COLEGIO LUZ Y VIDA",
+    "bestMatch": "Gimnasio Cristiano Luz y Vida Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6997593e45035b815f087d1e",
+    "cedula": "39699595",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6997596845035b815f087d28",
+    "cedula": "41642374",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "07 - SAN JOSE RAFAEL URIBE",
+    "bestMatch": "Localidad Rafaél Uribe Uribe",
+    "score": 0.464,
+    "action": "review"
+  },
+  {
+    "id": "6997597f45035b815f087d32",
+    "cedula": "35321549",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699759c745035b815f087d3c",
+    "cedula": "20119952",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69975a2645035b815f087d46",
+    "cedula": "51637553",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "10 - ALCALDIA QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia de Caycedo",
+    "score": 0.821,
+    "action": "review"
+  },
+  {
+    "id": "69975a2945035b815f087d4e",
+    "cedula": "28861955",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69975a7345035b815f087d5a",
+    "cedula": "17198008",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "09 - QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia Holguín de Urdaneta",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "69975af045035b815f087d64",
+    "cedula": "41431403",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69975afd45035b815f087d6e",
+    "cedula": "51718717",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "16 - ALEXANDER FLEMING SAN JORGE",
+    "bestMatch": "Colegio Distrital Alexander Fleming - Sede B",
+    "score": 0.894,
+    "action": "updated"
+  },
+  {
+    "id": "69975b5c45035b815f087d78",
+    "cedula": "41369810",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "10 - ALCALDIA QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia de Caycedo",
+    "score": 0.821,
+    "action": "review"
+  },
+  {
+    "id": "69975bb445035b815f087d82",
+    "cedula": "20753207",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69975bb845035b815f087d8a",
+    "cedula": "41585409",
+    "localidad": "Usaquén",
+    "original": "48 - CENTRO COMERCIAL PALATINO",
+    "bestMatch": "Centro Comercial Palatino",
+    "score": 0.78,
+    "action": "review"
+  },
+  {
+    "id": "69975c1145035b815f087d96",
+    "cedula": "17172278",
+    "localidad": "Engativá",
+    "original": "54 - BOLIVIA",
+    "bestMatch": "Colegio Distrital Rodolfo Llinas",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "69975c5245035b815f087da0",
+    "cedula": "19290584",
+    "localidad": "Kennedy",
+    "original": "04 - CATALINA",
+    "bestMatch": "Colegio Distrital Las Américas - Sede B (San Rafaél)",
+    "score": 0.697,
+    "action": "review"
+  },
+  {
+    "id": "69975ccd45035b815f087dad",
+    "cedula": "39697364",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69975d0e45035b815f087db7",
+    "cedula": "17699116",
+    "localidad": "San Cristóbal",
+    "original": "05 - SAN BLAS",
+    "bestMatch": "Colegio Distrital Manuelita Sáenz",
+    "score": 0.764,
+    "action": "review"
+  },
+  {
+    "id": "69975db545035b815f087dc4",
+    "cedula": "20565417",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "10 - ALCALDIA QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia de Caycedo",
+    "score": 0.821,
+    "action": "review"
+  },
+  {
+    "id": "69975e6245035b815f087dd1",
+    "cedula": "39748619",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69975ea545035b815f087ddb",
+    "cedula": "52908299",
+    "localidad": "Cundinamarca",
+    "original": "04 - ESCUELA EL DIAMANTE",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69975eae45035b815f087de5",
+    "cedula": "79761689",
+    "localidad": "Teusaquillo",
+    "original": "PUESTO CENSO(FERIA EXPOSICION)",
+    "bestMatch": "CORFERIAS",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69975f0145035b815f087def",
+    "cedula": "28891420",
+    "localidad": "Cundinamarca",
+    "original": "04 - COLISEO GENERAL SANTANDER",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69975f4745035b815f087df9",
+    "cedula": "80748893",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "22 - LOS MOLINOS II SECTOR",
+    "bestMatch": "Colegio Distrital Colombia Viva - Sede A",
+    "score": 0.882,
+    "action": "updated"
+  },
+  {
+    "id": "69975fa745035b815f087e03",
+    "cedula": "41673241",
+    "localidad": "Cundinamarca",
+    "original": "01 - IED IGNACIO PESCADOR",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "6997606745035b815f087e10",
+    "cedula": "51686404",
+    "localidad": "Cundinamarca",
+    "original": "07 - COLEGIO RICAURTE",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699760ea45035b815f087e1a",
+    "cedula": "35336587",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "28 - SAN AGUSTIN SUR",
+    "bestMatch": "Colegio Distrital San Agustín - Sede A",
+    "score": 0.845,
+    "action": "review"
+  },
+  {
+    "id": "6997615d45035b815f087e24",
+    "cedula": "41509943",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "47 - MARIA CANO",
+    "bestMatch": "Colegio Distrital María Cano",
+    "score": 0.785,
+    "action": "review"
+  },
+  {
+    "id": "6997629d45035b815f087e31",
+    "cedula": "19461569",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "06 - OLAYA",
+    "bestMatch": "Colegio Distrital Antonio Baraya -  Sede A",
+    "score": 0.646,
+    "action": "review"
+  },
+  {
+    "id": "6997634345035b815f087e3b",
+    "cedula": "35336008",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "29 - COVIVIENDA DEL SUR ORIENTE",
+    "bestMatch": "Colegio Distrital Diana Turbay - Sede A",
+    "score": 0.893,
+    "action": "updated"
+  },
+  {
+    "id": "699763d945035b815f087e45",
+    "cedula": "41679438",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "09 - QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia Holguín de Urdaneta",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "6997670045035b815f087e4f",
+    "cedula": "51604605",
+    "localidad": "Barrios Unidos",
+    "original": "02 - RIONEGRO",
+    "bestMatch": "Colegio Distrital Faustino Sarmiento - Sede A",
+    "score": 0.697,
+    "action": "review"
+  },
+  {
+    "id": "6997687d45035b815f087e5c",
+    "cedula": "41706328",
+    "localidad": "Tunjuelito",
+    "original": "04 - ARCHIVO DISTRITAL",
+    "bestMatch": "Colegio Distrital Rafaél Uribe Uribe - Sede B",
+    "score": 0.15,
+    "action": "review"
+  },
+  {
+    "id": "69976f1345035b815f087ed8",
+    "cedula": "1033097185",
+    "localidad": "Tolima",
+    "original": "00 - PUESTO CABECERA MUNICIPAL",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69976fa8ac095d707b9903a4",
+    "cedula": "123213124123",
+    "localidad": "La Candelaria",
+    "original": "Colegio Toberin",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_no_puestos"
+  },
+  {
+    "id": "699781642ae3ff516173e709",
+    "cedula": "41758996",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "16 - ALEXAN35 - Gustavo RestrepoDER FLEMING SAN JORGE",
+    "bestMatch": "Colegio Distrital Alexander Fleming - Sede B",
+    "score": 0.548,
+    "action": "review"
+  },
+  {
+    "id": "699781d92ae3ff516173e713",
+    "cedula": "26452588",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "12 - SANTA LUCÍA",
+    "bestMatch": "Colegio Distrital Manuel del Socorro Rodríguez - Sede A",
+    "score": 0.793,
+    "action": "review"
+  },
+  {
+    "id": "6997829f2ae3ff516173e738",
+    "cedula": "41716951",
+    "localidad": "Usaquén",
+    "original": "19 - CEDRO GOLF",
+    "bestMatch": "Parque Cedro Golf",
+    "score": 0.785,
+    "action": "review"
+  },
+  {
+    "id": "699783082ae3ff516173e745",
+    "cedula": "51732258",
+    "localidad": "Barrios Unidos",
+    "original": "25 - CAFAM AV. 68",
+    "bestMatch": "Centro Comercial CAFAM Floresta",
+    "score": 0.821,
+    "action": "review"
+  },
+  {
+    "id": "699783be2ae3ff516173e750",
+    "cedula": "41798074",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "09 - QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia Holguín de Urdaneta",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "699784102ae3ff516173e75a",
+    "cedula": "51678799",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "13 - LAS COLINAS",
+    "bestMatch": "Colegio Distrital José Marti - Sede B",
+    "score": 0.793,
+    "action": "review"
+  },
+  {
+    "id": "699784942ae3ff516173e764",
+    "cedula": "51562126",
+    "localidad": "San Cristóbal",
+    "original": "09 - MONTEBELLO",
+    "bestMatch": "Colegio Distrital Montebello",
+    "score": 0.718,
+    "action": "review"
+  },
+  {
+    "id": "699785142ae3ff516173e770",
+    "cedula": "41763310",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "09 - QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia Holguín de Urdaneta",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "6997856a2ae3ff516173e77a",
+    "cedula": "19361416",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "09 - QUIROGA",
+    "bestMatch": "Colegio Distrital Clemencia Holguín de Urdaneta",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "699785ff2ae3ff516173e784",
+    "cedula": "41498582",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "35 - Gustavo Restrepo",
+    "bestMatch": "Colegio Distrital Gustavo Restrepo - Sede A",
+    "score": 0.821,
+    "action": "review"
+  },
+  {
+    "id": "699786692ae3ff516173e78e",
+    "cedula": "2313724",
+    "localidad": "Tolima",
+    "original": "79 - Rincón Santo",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699786d52ae3ff516173e798",
+    "cedula": "19163355",
+    "localidad": "Suba",
+    "original": "13 - SAN NICOLÁS-AGUSTINIANO NORTE",
+    "bestMatch": "Colegio Agustiniano Norte",
+    "score": 0.898,
+    "action": "updated"
+  },
+  {
+    "id": "6997880d2ae3ff516173e7a8",
+    "cedula": "41381520",
+    "localidad": "San Cristóbal",
+    "original": "13 - PARQUEADERO GUACAMAYAS",
+    "bestMatch": "Colegio Distrital Alemania Unificada - Sede B",
+    "score": 0.773,
+    "action": "review"
+  },
+  {
+    "id": "699788982ae3ff516173e7b2",
+    "cedula": "24216831",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "07 - SAN JOSÉ RAFAEL URIBE",
+    "bestMatch": "Localidad Rafaél Uribe Uribe",
+    "score": 0.464,
+    "action": "review"
+  },
+  {
+    "id": "699789792ae3ff516173e7bc",
+    "cedula": "41707588",
+    "localidad": "San Cristóbal",
+    "original": "6 - PRIMERA DE MAYO",
+    "bestMatch": "Colegio Distrital José Félix Restrepo - Sede A",
+    "score": 0.87,
+    "action": "updated"
+  },
+  {
+    "id": "6997aa7fdb3250ef6fac9f73",
+    "cedula": "41613858",
+    "localidad": "San Cristóbal",
+    "original": "5 - SAN BLAS",
+    "bestMatch": "Colegio Distrital Manuelita Sáenz",
+    "score": 0.8,
+    "action": "review"
+  },
+  {
+    "id": "6997b898f554fb6cc84e8ef4",
+    "cedula": "52817790",
+    "localidad": "Suba",
+    "original": "Cc santafe",
+    "bestMatch": "Centro Comercial Santafé",
+    "score": 0.542,
+    "action": "review"
+  },
+  {
+    "id": "6997d1de7331f33291e4467e",
+    "cedula": "79851063",
+    "localidad": "Fontibón",
+    "original": "Plaza del Salitre",
+    "bestMatch": "Centro Comercial Salitre Plaza",
+    "score": 0.583,
+    "action": "review"
+  },
+  {
+    "id": "699874f91fff1cf48f7d3aa6",
+    "cedula": "52834796",
+    "localidad": "Kennedy",
+    "original": "LA FLORESTA SUR",
+    "bestMatch": "Colegio Distrital La Floresta Sur - Sede 1",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699875611fff1cf48f7d3ab0",
+    "cedula": "41726177",
+    "localidad": "Kennedy",
+    "original": "FLORESTA SUR",
+    "bestMatch": "Colegio Distrital La Floresta Sur - Sede 1",
+    "score": 0.8,
+    "action": "review"
+  },
+  {
+    "id": "6998794f1fff1cf48f7d3ad1",
+    "cedula": "17990466",
+    "localidad": "Santa Fe",
+    "original": "1 - CAMILO TORRES",
+    "bestMatch": "Colegio Distrital Externado Camilo Torres",
+    "score": 0.833,
+    "action": "review"
+  },
+  {
+    "id": "6998799d1fff1cf48f7d3adb",
+    "cedula": "19461958",
+    "localidad": "Suba",
+    "original": "35 - REPÚBLICA DOMINICANA SEDE A - IED",
+    "bestMatch": "Colegio Distrital República Dominicana",
+    "score": 0.9,
+    "action": "updated"
+  },
+  {
+    "id": "69987a4c1fff1cf48f7d3ae8",
+    "cedula": "39692963",
+    "localidad": "Suba",
+    "original": "23 - SAN CIPRIANO",
+    "bestMatch": "Colegio Distrital Vista Bella - Sede B",
+    "score": 0.8,
+    "action": "review"
+  },
+  {
+    "id": "69987b2d1fff1cf48f7d3af2",
+    "cedula": "45577274",
+    "localidad": "Bolívar",
+    "original": "02 - IE ESPÍRITU SANTO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69987b661fff1cf48f7d3afc",
+    "cedula": "39644821",
+    "localidad": "Bosa",
+    "original": "LA AMISTAD",
+    "bestMatch": "Colegio Distrital Luis López de Meza",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69987b8c1fff1cf48f7d3b06",
+    "cedula": "80074593",
+    "localidad": "Caldas",
+    "original": "04 - IEARANJUEZ SEDE A",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "69987bce1fff1cf48f7d3b10",
+    "cedula": "80411010",
+    "localidad": "Usaquén",
+    "original": "02 - SERVITA",
+    "bestMatch": "Centro de Atención Distrital Especializado Servitá",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "69987c171fff1cf48f7d3b1a",
+    "cedula": "41519556",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69987c361fff1cf48f7d3b24",
+    "cedula": "52618632",
+    "localidad": "Usaquén",
+    "original": "02 - SERVITA",
+    "bestMatch": "Centro de Atención Distrital Especializado Servitá",
+    "score": 0.683,
+    "action": "review"
+  },
+  {
+    "id": "69987cc31fff1cf48f7d3b31",
+    "cedula": "20549290",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69987cf51fff1cf48f7d3b3b",
+    "cedula": "79388281",
+    "localidad": "Suba",
+    "original": "27 - HAYUELOS JUMBO",
+    "bestMatch": "Centro Comercial Parque La Colina",
+    "score": 0.132,
+    "action": "review"
+  },
+  {
+    "id": "69987d0d1fff1cf48f7d3b45",
+    "cedula": "37915805",
+    "localidad": "Fontibón",
+    "original": "FONTIBON",
+    "bestMatch": "Colegio Parroquial San Pedro Claver",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69987d841fff1cf48f7d3b4f",
+    "cedula": "3003530055",
+    "localidad": "Kennedy",
+    "original": "01 - PUESTO CENSO (FERIA EXPOSICIÓN)",
+    "bestMatch": "Colegio Próspero Pinzón",
+    "score": 0.172,
+    "action": "review"
+  },
+  {
+    "id": "69987dfa1fff1cf48f7d3b59",
+    "cedula": "41452705",
+    "localidad": "Suba",
+    "original": "76 - Colegio Caro y Cuervo",
+    "bestMatch": "Colegio Externado Caro y Cuervo",
+    "score": 0.866,
+    "action": "updated"
+  },
+  {
+    "id": "69987e2b1fff1cf48f7d3b63",
+    "cedula": "53028131",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69987ebf1fff1cf48f7d3b70",
+    "cedula": "39581432",
+    "localidad": "Tunjuelito",
+    "original": "36 - SALÓN COMUNAL VENECIA",
+    "bestMatch": "Colegio Cooperativo Venecia",
+    "score": 0.472,
+    "action": "review"
+  },
+  {
+    "id": "69987f051fff1cf48f7d3b7a",
+    "cedula": "35329467",
+    "localidad": "Fontibón",
+    "original": "VERACRUZ",
+    "bestMatch": "Colegio Distrital República de Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69987f7e1fff1cf48f7d3b84",
+    "cedula": "79131313",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699880d11fff1cf48f7d3b8e",
+    "cedula": "1016094116",
+    "localidad": "Fontibón",
+    "original": "SALON COMUNAL PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 0.75,
+    "action": "review"
+  },
+  {
+    "id": "6998811e1fff1cf48f7d3b98",
+    "cedula": "1015459620",
+    "localidad": "Rafael Uribe Uribe",
+    "original": "MARRUECOS APARTAMENTOS",
+    "bestMatch": "Salón Comunal Marruecos",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699881ac1fff1cf48f7d3bac",
+    "cedula": "1022359491",
+    "localidad": "Barrios Unidos",
+    "original": "21 - POLIDEPORTIVO POLO",
+    "bestMatch": "Polideportivo Polo",
+    "score": 0.829,
+    "action": "review"
+  },
+  {
+    "id": "699881e51fff1cf48f7d3bb6",
+    "cedula": "52324865",
+    "localidad": "Teusaquillo",
+    "original": "PUESTO CENSO(FERIA EXPOSICION)",
+    "bestMatch": "CORFERIAS",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699881fb1fff1cf48f7d3bc0",
+    "cedula": "52067583",
+    "localidad": "Bosa",
+    "original": "36 - LLANO ORIENTAL",
+    "bestMatch": "Colegio Distrital Llano Oriental",
+    "score": 0.812,
+    "action": "review"
+  },
+  {
+    "id": "699882bc1fff1cf48f7d3bca",
+    "cedula": "1016037180",
+    "localidad": "Fontibón",
+    "original": "PUERTA DE TEJA",
+    "bestMatch": "Colegio Distrital Costa Rica - Sede C",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "699882cc1fff1cf48f7d3bd4",
+    "cedula": "1012368928",
+    "localidad": "Bosa",
+    "original": "05 - CARLOS ALBAN",
+    "bestMatch": "Colegio Distrital Carlos Albán Holguín - Sede A",
+    "score": 0.8,
+    "action": "review"
+  },
+  {
+    "id": "6998835f1fff1cf48f7d3bde",
+    "cedula": "1075282698",
+    "localidad": "Huila",
+    "original": "4 - IE ENRIQUE OLAYA HERRERA",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699884201fff1cf48f7d3be8",
+    "cedula": "6506134",
+    "localidad": "Valle del Cauca",
+    "original": "03 - IE BARTOLOME LOBOGUERRERO",
+    "bestMatch": "",
+    "score": 0,
+    "action": "skip_non_bogota"
+  },
+  {
+    "id": "699890a029b270962950e319",
+    "cedula": "1025532252",
+    "localidad": "Bosa",
+    "original": "NUEVO CARLOS ALBAN",
+    "bestMatch": "Colegio Distrital Gran Colombiano Sede D",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "6999118c581f968b5385bd74",
+    "cedula": "80138251",
+    "localidad": "Ciudad Bolívar",
+    "original": "Gran plaza el ensueño",
+    "bestMatch": "Centro Comercial Gran Plaza El Ensueño",
+    "score": 1,
+    "action": "updated"
+  },
+  {
+    "id": "69991223581f968b5385bd81",
+    "cedula": "52543109",
+    "localidad": "Ciudad Bolívar",
+    "original": "Arborizadora baja",
+    "bestMatch": "Colegio Distrital Arborizadora Baja",
+    "score": 1,
+    "action": "updated"
+  }
+]

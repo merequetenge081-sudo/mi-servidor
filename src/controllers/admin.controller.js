@@ -39,9 +39,23 @@ const PUESTOS_BOGOTA_EJEMPLO = [
 export async function importarPuestosAPIHandler(req, res) {
   try {
     logger.info("📍 Iniciando importación de puestos vía API...");
+    
+    // Requerir puestos del request
+    const { puestos: puestosRequest } = req.body || {};
+    
+    if (!Array.isArray(puestosRequest) || puestosRequest.length === 0) {
+      logger.warn("⚠️  No se enviaron puestos en el request body");
+      return res.status(400).json({
+        success: false,
+        message: "Debe enviar array 'puestos' en el body",
+        receivedBody: req.body ? Object.keys(req.body) : "empty"
+      });
+    }
+
+    logger.info(`📦 Recibidos ${puestosRequest.length} puestos del request`);
 
     // Validar datos
-    const puestosValidos = PUESTOS_BOGOTA_EJEMPLO.filter(p => 
+    const puestosValidos = puestosRequest.filter(p => 
       p.codigoPuesto && p.nombre && p.localidad && Array.isArray(p.mesas)
     );
 
@@ -51,6 +65,8 @@ export async function importarPuestosAPIHandler(req, res) {
         message: "No hay puestos válidos para importar"
       });
     }
+
+    logger.info(`📦 Validados ${puestosValidos.length} puestos`);
 
     // Limpiar colección anterior
     await Puestos.deleteMany({});
@@ -83,6 +99,7 @@ export async function importarPuestosAPIHandler(req, res) {
 
     return res.status(200).json({
       success: true,
+      imported: resultado.length,
       message: `✅ Se importaron ${resultado.length} puestos de votación exitosamente`,
       data: {
         totalPuestos: resultado.length,

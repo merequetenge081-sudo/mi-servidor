@@ -10,10 +10,32 @@ import { ConsentLogService } from "../services/consentLog.service.js";
 import logger from "../config/logger.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
 
+const normalizeRegistration = (registration) => {
+  if (!registration) return registration;
+  const puesto = registration.puestoId && typeof registration.puestoId === "object"
+    ? registration.puestoId
+    : null;
+  const puestoNombre = puesto?.nombre || null;
+  const votingPlaceValue = registration.votingPlace || puestoNombre || "";
+  const votingTableValue = registration.votingTable !== undefined && registration.votingTable !== null && registration.votingTable !== ""
+    ? registration.votingTable
+    : (registration.mesa ?? "");
+
+  return {
+    ...registration,
+    puestoNombre,
+    votingPlace: votingPlaceValue,
+    votingTable: votingTableValue,
+    // Asegurar que los campos de revisión estén presentes
+    requiereRevisionPuesto: registration.requiereRevisionPuesto || false,
+    revisionPuestoResuelta: registration.revisionPuestoResuelta || false
+  };
+};
+
 export async function createRegistration(req, res) {
   try {
     const user = req.user;
-    const { leaderId, leaderToken, leaderName, eventId, firstName, lastName, cedula, email, phone, localidad, registeredToVote, puestoId, mesa, date, hasConsentToRegister } = req.body;
+    const { leaderId, leaderToken, leaderName, eventId, firstName, lastName, cedula, email, phone, localidad, departamento, capital, registeredToVote, puestoId, mesa, votingPlace, votingTable, date, hasConsentToRegister } = req.body;
 
     // Verificar consentimiento del líder (Ley 1581 de 2012)
     if (!hasConsentToRegister) {
@@ -109,9 +131,6 @@ export async function createRegistration(req, res) {
       if (!puesto || puesto.activo === false) {
         return res.status(400).json({ error: "puestoId no existe o no está activo" });
       }
-      if (!Array.isArray(puesto.mesas) || !puesto.mesas.includes(resolvedMesa)) {
-        return res.status(400).json({ error: "mesa no pertenece al puesto seleccionado" });
-      }
 
       resolvedLocalidad = puesto.localidad || resolvedLocalidad;
     } else {
@@ -129,9 +148,13 @@ export async function createRegistration(req, res) {
       email,
       phone,
       localidad: resolvedLocalidad,
+      departamento: departamento || null,
+      capital: capital || null,
       registeredToVote,
       puestoId: resolvedPuestoId,
       mesa: resolvedMesa,
+      votingPlace: votingPlace || null,
+      votingTable: votingTable || null,
       date: date || new Date().toISOString(),
       notifications: {
         emailSent: false,
@@ -165,13 +188,17 @@ export async function createRegistration(req, res) {
 
 export async function getRegistrations(req, res) {
   try {
-    const { eventId, leaderId, confirmed, cedula, page = 1, limit = 50 } = req.query;
+    const { eventId, leaderId, confirmed, cedula, requiereRevisionPuesto, page = 1, limit = 50 } = req.query;
     const filter = buildOrgFilter(req); // Multi-tenant filtering
 
     if (eventId) filter.eventId = eventId;
     if (leaderId) filter.leaderId = leaderId;
     if (confirmed !== undefined) filter.confirmed = confirmed === "true";
     if (cedula) filter.cedula = cedula;
+    if (requiereRevisionPuesto !== undefined) {
+      filter.requiereRevisionPuesto = requiereRevisionPuesto === "true";
+      filter.revisionPuestoResuelta = false;
+    }
 
     // Force maximum limit of 100
     let parsedLimit = parseInt(limit) || 50;
@@ -179,15 +206,19 @@ export async function getRegistrations(req, res) {
 
     const skip = (page - 1) * parsedLimit;
     const registrations = await Registration.find(filter)
+      .populate("puestoId", "nombre codigoPuesto localidad")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parsedLimit);
+      .limit(parsedLimit)
+      .lean();
 
     const total = await Registration.countDocuments(filter);
+    const confirmedCount = await Registration.countDocuments({ ...filter, confirmed: true });
 
     res.json({
-      data: registrations,
+      data: registrations.map(normalizeRegistration),
       total,
+      confirmedCount,
       page: parseInt(page),
       limit: parsedLimit,
       pages: Math.ceil(total / parsedLimit)
@@ -201,11 +232,13 @@ export async function getRegistrations(req, res) {
 export async function getRegistration(req, res) {
   try {
     const orgId = req.user.organizationId; // Multi-tenant filter
-    const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId });
+    const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId })
+      .populate("puestoId", "nombre codigoPuesto localidad")
+      .lean();
     if (!registration) {
       return res.status(404).json({ error: "Registro no encontrado" });
     }
-    res.json(registration);
+    res.json(normalizeRegistration(registration));
   } catch (error) {
     logger.error("Get registration error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener registro" });
@@ -216,7 +249,7 @@ export async function updateRegistration(req, res) {
   try {
     const user = req.user;
     const orgId = req.user.organizationId; // Multi-tenant filter
-    const { firstName, lastName, email, phone, localidad, registeredToVote, puestoId, mesa } = req.body;
+    const { firstName, lastName, email, phone, localidad, departamento, capital, registeredToVote, puestoId, mesa, votingPlace, votingTable } = req.body;
 
 
     const registration = await Registration.findOne({ _id: req.params.id, organizationId: orgId });
@@ -251,9 +284,6 @@ export async function updateRegistration(req, res) {
       if (!puesto || puesto.activo === false) {
         return res.status(400).json({ error: "puestoId no existe o no está activo" });
       }
-      if (!Array.isArray(puesto.mesas) || !puesto.mesas.includes(nextMesa)) {
-        return res.status(400).json({ error: "mesa no pertenece al puesto seleccionado" });
-      }
 
       registration.puestoId = nextPuestoId;
       registration.mesa = nextMesa;
@@ -279,6 +309,26 @@ export async function updateRegistration(req, res) {
     if (phone !== undefined && phone !== registration.phone) {
       changes.phone = { old: registration.phone, new: phone };
       registration.phone = phone;
+    }
+    if (localidad !== undefined && localidad !== registration.localidad) {
+      changes.localidad = { old: registration.localidad, new: localidad };
+      registration.localidad = localidad;
+    }
+    if (departamento !== undefined && departamento !== registration.departamento) {
+      changes.departamento = { old: registration.departamento, new: departamento };
+      registration.departamento = departamento;
+    }
+    if (capital !== undefined && capital !== registration.capital) {
+      changes.capital = { old: registration.capital, new: capital };
+      registration.capital = capital;
+    }
+    if (votingPlace !== undefined && votingPlace !== registration.votingPlace) {
+      changes.votingPlace = { old: registration.votingPlace, new: votingPlace };
+      registration.votingPlace = votingPlace;
+    }
+    if (votingTable !== undefined && votingTable !== registration.votingTable) {
+      changes.votingTable = { old: registration.votingTable, new: votingTable };
+      registration.votingTable = votingTable;
     }
     if (!nextRegisteredToVote && localidad !== undefined && localidad !== registration.localidad) {
       changes.localidad = { old: registration.localidad, new: localidad };
@@ -403,15 +453,17 @@ export async function getRegistrationsByLeader(req, res) {
 
     const skip = (page - 1) * limit;
     const registrations = await Registration.find(filter)
+      .populate("puestoId", "nombre codigoPuesto localidad")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(parseInt(limit))
+      .lean();
 
     const total = await Registration.countDocuments(filter);
     const confirmedCount = await Registration.countDocuments({ ...filter, confirmed: true });
 
     res.json({
-      data: registrations,
+      data: registrations.map(normalizeRegistration),
       total,
       confirmedCount,
       page: parseInt(page),
@@ -492,14 +544,6 @@ export async function bulkCreateRegistrations(req, res) {
           row: rowNum,
           name: `${reg.firstName} ${reg.lastName}`,
           error: "puestoId no existe o no está activo"
-        });
-        continue;
-      }
-      if (!Array.isArray(puesto.mesas) || !puesto.mesas.includes(mesaValue)) {
-        errors.push({
-          row: rowNum,
-          name: `${reg.firstName} ${reg.lastName}`,
-          error: "mesa no pertenece al puesto seleccionado"
         });
         continue;
       }

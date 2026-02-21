@@ -125,7 +125,7 @@ function renderTable(registrations) {
   if (!registrations || registrations.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
           <i class="fas fa-inbox text-5xl mb-4 text-gray-300"></i>
           <p class="text-lg font-semibold">No se encontraron registros</p>
           <p class="text-sm mt-2">Intenta cambiar los filtros o realiza una nueva búsqueda</p>
@@ -138,6 +138,8 @@ function renderTable(registrations) {
   tbody.innerHTML = registrations.map(reg => {
     const leaderName = allLeaders.find(l => l.leaderId === reg.leaderId)?.name || reg.leaderId || 'Sin líder';
     const eventName = allEvents.find(e => e._id === reg.eventId)?.name || reg.eventId || 'Sin evento';
+    const votingPlace = reg.puestoId?.nombre || reg.votingPlace || 'Sin puesto';
+    const requiereRevision = reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta;
     
     return `
       <tr class="border-b hover:bg-gray-50 transition" data-id="${reg._id}">
@@ -145,6 +147,10 @@ function renderTable(registrations) {
         <td class="px-6 py-4 text-sm text-gray-600">${reg.cedula || 'Sin cédula'}</td>
         <td class="px-6 py-4 text-sm text-gray-600">${leaderName}</td>
         <td class="px-6 py-4 text-sm text-gray-600">${eventName}</td>
+        <td class="px-6 py-4 text-sm text-gray-600">
+          ${votingPlace}
+          ${requiereRevision ? '<span class="ml-2 px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">⚠ Revisar</span>' : ''}
+        </td>
         <td class="px-6 py-4 text-center">
           <span class="px-3 py-1 rounded-full text-xs font-semibold ${
             reg.confirmed 
@@ -199,11 +205,13 @@ function applyFilters() {
   const leaderId = document.getElementById('filter-leader').value;
   const eventId = document.getElementById('filter-event').value;
   const confirmed = document.getElementById('filter-confirmed').value;
+  const revision = document.getElementById('filter-revision').value;
   const cedula = document.getElementById('filter-cedula').value;
   
   if (leaderId) currentFilters.leaderId = leaderId;
   if (eventId) currentFilters.eventId = eventId;
   if (confirmed) currentFilters.confirmed = confirmed;
+  if (revision) currentFilters.requiereRevisionPuesto = revision;
   if (cedula) currentFilters.cedula = cedula;
   
   currentPage = 1;
@@ -214,6 +222,7 @@ function clearFilters() {
   document.getElementById('filter-leader').value = '';
   document.getElementById('filter-event').value = '';
   document.getElementById('filter-confirmed').value = '';
+  document.getElementById('filter-revision').value = '';
   document.getElementById('filter-cedula').value = '';
   
   currentFilters = {};

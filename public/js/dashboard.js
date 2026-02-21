@@ -1023,8 +1023,9 @@ function filterRegistrations() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const leaderId = document.getElementById('leaderFilter').value;
     const status = document.getElementById('statusFilter').value;
+    const revision = document.getElementById('revisionFilter')?.value || '';
 
-    // Filtrar registros por búsqueda, líder y estado
+    // Filtrar registros por búsqueda, líder, estado y revisión
     const filtered = allRegistrations.filter(r => {
         const matchSearch = !search ||
             `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
@@ -1032,7 +1033,8 @@ function filterRegistrations() {
             r.cedula.includes(search);
         const matchLeader = !leaderId || r.leaderId === leaderId;
         const matchStatus = !status || (status === 'confirmed' ? r.confirmed : !r.confirmed);
-        return matchSearch && matchLeader && matchStatus;
+        const matchRevision = !revision || (revision === 'true' ? (r.requiereRevisionPuesto && !r.revisionPuestoResuelta) : !(r.requiereRevisionPuesto && !r.revisionPuestoResuelta));
+        return matchSearch && matchLeader && matchStatus && matchRevision;
     });
 
     // Separar por región
@@ -1061,12 +1063,16 @@ function renderRegistrationTable(tab, data) {
 
     // Renderizar tabla según el tab
     const tableId = tab === 'bogota' ? 'bogotaTable' : 'restoTable';
-    const html = paginated.map(reg => `
+    const html = paginated.map(reg => {
+        const requiereRevision = reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta;
+        const puestoDisplay = reg.votingPlace || (reg.puestoId?.nombre || '-');
+        return `
         <tr>
             <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
             <td>${reg.email || '-'}</td>
             <td>${reg.cedula || '-'}</td>
             <td>${tab === 'bogota' ? (reg.localidad || '-') : (reg.departamento || '-')}</td>
+            <td>${puestoDisplay}${requiereRevision ? ' <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.75rem; padding: 2px 8px;">⚠ Revisar</span>' : ''}</td>
             <td>${reg.leaderName || '-'}</td>
             <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
             <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
@@ -1076,11 +1082,12 @@ function renderRegistrationTable(tab, data) {
                 </button>
             </td>
         </tr>
-    `).join('');
+    `;
+    }).join('');
 
     const emptyMessage = tab === 'bogota'
-        ? '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogotá</td></tr>'
-        : '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td></tr>';
+        ? '<tr><td colspan="9" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogotá</td></tr>'
+        : '<tr><td colspan="9" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td></tr>';
 
     document.getElementById(tableId).innerHTML = html || emptyMessage;
 
@@ -2144,6 +2151,13 @@ if (document.getElementById('leaderFilter')) {
 }
 if (document.getElementById('statusFilter')) {
     document.getElementById('statusFilter').addEventListener('change', () => {
+        currentPageBogota = 1;
+        currentPageResto = 1;
+        filterRegistrations();
+    });
+}
+if (document.getElementById('revisionFilter')) {
+    document.getElementById('revisionFilter').addEventListener('change', () => {
         currentPageBogota = 1;
         currentPageResto = 1;
         filterRegistrations();

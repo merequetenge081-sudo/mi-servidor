@@ -109,6 +109,16 @@
               </select>
             </div>
 
+            <!-- Filtro Revisión Puesto -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Revisión Puesto</label>
+              <select id="filter-revision" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Todos</option>
+                <option value="true">Requiere revisión</option>
+                <option value="false">Sin revisión</option>
+              </select>
+            </div>
+
             <!-- Búsqueda por cédula -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Buscar por Cédula</label>
@@ -144,13 +154,14 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cédula</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Líder</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Evento</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Confirmado</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puesto</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                   <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
               <tbody id="registrations-tbody" class="bg-white divide-y divide-gray-200">
                 <tr>
-                  <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                  <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                     <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
                     <p>Cargando registros...</p>
                   </td>

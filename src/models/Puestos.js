@@ -16,6 +16,7 @@ const puestoSchema = new mongoose.Schema({
   },
   direccion: String,
   mesas: [Number], // Array de números de mesa, ej: [1, 2, 3, 4, ...]
+  aliases: [String], // Alias conocidos del lugar (sitio, nombres populares)
   
   // Metadata
   activo: { type: Boolean, default: true },
