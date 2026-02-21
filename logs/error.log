@@ -108,3 +108,4 @@
 {"level":"error","message":"❌ Error al importar puestos: Operation `puestos.deleteMany()` buffering timed out after 10000ms","service":"mi-servidor","timestamp":"2026-02-21 02:18:27"}
 {"level":"error","message":"❌ Error al importar puestos: querySrv ENOTFOUND _mongodb._tcp.cluster0.mongodb.net","service":"mi-servidor","timestamp":"2026-02-21 02:18:51"}
 {"level":"error","message":"❌ Error al importar puestos: querySrv ENOTFOUND _mongodb._tcp.cluster0.mongodb.net","service":"mi-servidor","timestamp":"2026-02-21 02:35:06"}
+{"level":"error","message":"❌ Error al importar puestos: querySrv ENOTFOUND _mongodb._tcp.cluster0.mongodb.net","service":"mi-servidor","timestamp":"2026-02-21 02:44:47"}
