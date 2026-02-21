@@ -65,14 +65,14 @@ export function requireOrganization(req, res, next) {
 
 /**
  * Advanced role middleware with organization scope
- * Supports dynamic roles: super_admin, org_admin, leader, viewer
+ * Supports dynamic roles: admin, org_admin, leader, viewer
  */
 export function organizationRoleMiddleware(...allowedRoles) {
   return (req, res, next) => {
     const userRole = req.user?.role || req.user?.userRole;
     
-    // super_admin can do anything
-    if (userRole === 'super_admin') {
+    // admin can do anything
+    if (userRole === 'admin') {
       return next();
     }
     

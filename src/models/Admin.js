@@ -9,7 +9,7 @@ const adminSchema = new mongoose.Schema({
     ref: 'Organization',
     sparse: true // Permite null para admins globales
   },
-  role: { type: String, enum: ['super_admin', 'org_admin'], default: 'super_admin' },
+  role: { type: String, enum: ['admin', 'org_admin'], default: 'admin' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

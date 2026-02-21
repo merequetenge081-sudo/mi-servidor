@@ -1,5 +1,6 @@
 import { Event } from "../models/Event.js";
 import { Registration } from "../models/Registration.js";
+import { Organization } from "../models/Organization.js";
 import { AuditService } from "../services/audit.service.js";
 import logger from "../config/logger.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
@@ -13,6 +14,28 @@ export async function createEvent(req, res) {
       return res.status(400).json({ error: "name es requerido" });
     }
 
+    let organizationId = req.user?.organizationId || req.organizationId;
+    if (!organizationId) {
+      let defaultOrg = await Organization.findOne({ slug: "default" });
+      if (!defaultOrg) {
+        defaultOrg = new Organization({
+          name: "Default Organization",
+          slug: "default",
+          description: "Organizacion por defecto para eventos",
+          status: "active",
+          plan: "pro"
+        });
+        await defaultOrg.save();
+      }
+      organizationId = defaultOrg._id.toString();
+    }
+
+    if (!organizationId) {
+      organizationId = "default";
+    }
+
+    const resolvedOrganizationId = organizationId || "default";
+
     const event = new Event({
       name,
       description,
@@ -21,7 +44,7 @@ export async function createEvent(req, res) {
       active: true,
       registrationCount: 0,
       confirmedCount: 0,
-      organizationId: req.user.organizationId // Multi-tenant: asignar org automáticamente
+      organizationId: resolvedOrganizationId
     });
 
     await event.save();
