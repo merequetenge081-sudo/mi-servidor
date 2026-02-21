@@ -25,7 +25,9 @@ const registrationSchema = new mongoose.Schema({
   confirmedBy: String,
   confirmedAt: Date,
   
-  // Multi-tenant support (REQUIRED for isolation)
+  // Consent field (Ley 1581 de 2012)
+  hasConsentToRegister: { type: Boolean, default: false },
+  
   organizationId: { 
     type: String,
     required: true,

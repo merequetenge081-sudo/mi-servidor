@@ -8,24 +8,29 @@ const leaderSchema = new mongoose.Schema({
   area: String,
 
   // Security fields
-  username: { type: String, unique: true, sparse: true }, // Auto-generated
+  username: { type: String, unique: true, sparse: true },
   passwordHash: String,
   isTemporaryPassword: { type: Boolean, default: false },
   passwordResetRequested: { type: Boolean, default: false },
-  passwordCanBeChanged: { type: Boolean, default: true }, // Flag para bloquear cambios después del primer cambio
-  tempPasswordPlaintext: String, // Última contraseña temporal generada por admin (solo para referencia)
+  passwordCanBeChanged: { type: Boolean, default: true },
+  tempPasswordPlaintext: String,
 
   token: { type: String, required: true },
   active: { type: Boolean, default: true },
   eventId: String,
   registrations: { type: Number, default: 0 },
 
-  // Multi-tenant support (REQUIRED for isolation)
+  // Multi-tenant support
   organizationId: {
     type: String,
     required: true,
     index: true
   },
+
+  // Legal consent fields (Ley 1581 de 2012)
+  hasAcceptedLegalTerms: { type: Boolean, default: false },
+  legalTermsAcceptedAt: { type: Date, default: null },
+  legalTermsAcceptedIp: { type: String, default: null },
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
