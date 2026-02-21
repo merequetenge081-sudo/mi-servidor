@@ -4,18 +4,15 @@ const puestoSchema = new mongoose.Schema({
   codigoPuesto: {
     type: String,
     required: true,
-    unique: true,
-    index: true
+    unique: true
   },
   nombre: {
     type: String,
-    required: true,
-    index: true
+    required: true
   },
   localidad: {
     type: String,
-    required: true,
-    index: true
+    required: true
   },
   direccion: String,
   mesas: [Number], // Array de números de mesa, ej: [1, 2, 3, 4, ...]
@@ -29,7 +26,7 @@ const puestoSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-// Índices para optimización
+// Índices para optimización (sin duplicados)
 puestoSchema.index({ localidad: 1, activo: 1 });
 puestoSchema.index({ codigoPuesto: 1 });
 puestoSchema.index({ nombre: 1 });

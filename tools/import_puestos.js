@@ -240,13 +240,14 @@ const PUESTOS_BOGOTA_EJEMPLO = [
 
 async function importarPuestos() {
   try {
+    // Conectar a MongoDB
     await mongoose.connect(MONGO_URL, {
       connectTimeoutMS: 15000,
       serverSelectionTimeoutMS: 15000,
       socketTimeoutMS: 45000,
       family: 4
     });
-    logger.info("📍 Iniciando importación de puestos de votación...");
+    logger.info("📍 Conectado a MongoDB");
 
     // Obtener datos de archivo si se especifica
     let puestos = PUESTOS_BOGOTA_EJEMPLO;
@@ -261,7 +262,7 @@ async function importarPuestos() {
         puestos = JSON.parse(fileContent);
         logger.info(`📂 Cargados ${puestos.length} puestos desde ${filePath}`);
       } else {
-        logger.warn(`⚠️ Archivo no encontrado: ${filePath}`);
+        logger.warn(`⚠️  Archivo no encontrado: ${filePath}`);
         logger.info("Usando datos de ejemplo...");
       }
     }
@@ -298,7 +299,7 @@ async function importarPuestos() {
     console.log("\n📊 Estadísticas por localidad:");
     console.log("═══════════════════════════════════════════════════════");
     Object.entries(stats).sort().forEach(([localidad, data]) => {
-      console.log(`  ${localidad.padEnd(25)} → ${data.count} puesto(s) | ${data.mesas} mesa(s)`);
+      console.log(`  ${localidad.padEnd(25)} → ${data.count.toString().padStart(3)} puesto(s) | ${data.mesas.toString().padStart(3)} mesa(s)`);
     });
     console.log("═══════════════════════════════════════════════════════\n");
 
@@ -310,4 +311,5 @@ async function importarPuestos() {
   }
 }
 
+// Ejecutar el script
 importarPuestos();
