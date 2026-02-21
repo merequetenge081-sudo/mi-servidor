@@ -9,12 +9,12 @@ export class ValidationService {
     return await Registration.findOne(query);
   }
 
-  static validateVotingData(registeredToVote, votingPlace, votingTable) {
-    if (registeredToVote && !votingPlace) {
-      return { valid: false, error: "votingPlace es requerido cuando registeredToVote es true" };
+  static validateVotingData(registeredToVote, puestoId, mesa) {
+    if (registeredToVote && !puestoId) {
+      return { valid: false, error: "puestoId es requerido cuando registeredToVote es true" };
     }
-    if (registeredToVote && !votingTable) {
-      return { valid: false, error: "votingTable es requerido cuando registeredToVote es true" };
+    if (registeredToVote && (mesa === undefined || mesa === null)) {
+      return { valid: false, error: "mesa es requerida cuando registeredToVote es true" };
     }
     return { valid: true };
   }
@@ -30,8 +30,8 @@ export class ValidationService {
     if (data.registeredToVote) {
       const votingValidation = this.validateVotingData(
         data.registeredToVote,
-        data.votingPlace,
-        data.votingTable
+        data.puestoId,
+        data.mesa
       );
       if (!votingValidation.valid) {
         return votingValidation;
