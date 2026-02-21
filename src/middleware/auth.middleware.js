@@ -13,10 +13,11 @@ export function authMiddleware(req, res, next) {
     req.user = {
       userId: decoded.userId,
       email: decoded.email,
-      role: decoded.role || 'super_admin', // Default to super_admin for BC
+      role: decoded.role,
       organizationId: decoded.organizationId || null, // Multi-tenant org context
       leaderId: decoded.leaderId // Pass leaderId from token
     };
+    req.organizationId = decoded.organizationId || null;
     next();
   } catch (error) {
     return res.status(401).json({ error: "Token inválido" });

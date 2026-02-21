@@ -1,9 +1,9 @@
 // API.js - Cliente HTTP centralizado con autenticación
 const baseUrl = window.location.origin;
 
-// Obtener token de localStorage
+// Obtener token de sessionStorage o localStorage
 function getToken() {
-  return localStorage.getItem("token");
+  return sessionStorage.getItem("token") || localStorage.getItem("token");
 }
 
 // Verificar autenticación
@@ -11,23 +11,43 @@ function isAuthenticated() {
   return !!getToken();
 }
 
-// Obtener usuario de localStorage
+// Obtener usuario de storage (compatible con sesiones antiguas)
 function getUser() {
-  const userStr = localStorage.getItem("user");
-  return userStr ? JSON.parse(userStr) : null;
+  const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
+  if (userStr) {
+    try {
+      return JSON.parse(userStr);
+    } catch (error) {
+      console.warn("No se pudo parsear user en storage:", error);
+    }
+  }
+
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
+  const username = sessionStorage.getItem("username") || localStorage.getItem("username");
+  if (!role && !username) {
+    return null;
+  }
+
+  return { role, username };
 }
 
 // Logout y redirección
 function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  window.location.href = "/login.html";
+  localStorage.removeItem("role");
+  localStorage.removeItem("username");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
+  sessionStorage.removeItem("role");
+  sessionStorage.removeItem("username");
+  window.location.href = "/";
 }
 
 // Verificar si el usuario está autenticado antes de cargar la página
 function requireAuth() {
   if (!isAuthenticated()) {
-    window.location.href = "/login.html";
+    window.location.href = "/";
     return false;
   }
   return true;
@@ -35,7 +55,7 @@ function requireAuth() {
 
 // Función fetchWithAuth solicitada por el usuario
 async function fetchWithAuth(url, options = {}) {
-  const token = localStorage.getItem("token");
+  const token = getToken();
 
   const response = await fetch(url, {
     ...options,
@@ -48,7 +68,8 @@ async function fetchWithAuth(url, options = {}) {
 
   if (response.status === 401) {
     localStorage.removeItem("token");
-    window.location.href = "/login.html";
+    sessionStorage.removeItem("token");
+    window.location.href = "/";
     return;
   }
 

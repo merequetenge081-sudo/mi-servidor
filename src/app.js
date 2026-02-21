@@ -9,8 +9,6 @@ import { dirname, join } from "path";
 import logger from "./config/logger.js";
 import apiRoutes from "./routes/index.js";
 import { organizationMiddleware } from "./middleware/organization.middleware.js";
-import { superadminSecretMiddleware } from "./middleware/superadmin.middleware.js";
-import * as controlCenterController from "./controllers/control-center.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -142,13 +140,6 @@ app.get("/app", (req, res) => {
 app.get("/leader", (req, res) => {
   res.sendFile(join(__dirname, "../public/leader.html"));
 });
-
-// ==================== CONTROL CENTER SECRETO ====================
-// Ruta ultra-restringida, completamente separada
-// No expuesta en frontend, solo accesible con credentials múltiples
-app.get("/internal/control-center", superadminSecretMiddleware, controlCenterController.getControlCenter);
-app.get("/internal/control-center/logs", superadminSecretMiddleware, controlCenterController.getControlCenterLogs);
-app.get("/internal/control-center/stats", superadminSecretMiddleware, controlCenterController.getControlCenterStats);
 
 // ==================== ORGANIZATION MIDDLEWARE ====================
 // Multi-tenant context (extracts and validates org from JWT)

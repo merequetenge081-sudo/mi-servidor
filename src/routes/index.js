@@ -191,12 +191,12 @@ router.post("/auth/accept-legal-terms", authMiddleware, acceptLegalTerms);
 router.get("/auth/legal-terms-status", authMiddleware, checkLegalTermsStatus);
 
 // ==================== ORGANIZACIONES (MULTI-TENANT) ====================
-router.post("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.createOrganization);
-router.get("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.getOrganizations);
-router.get("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin", "org_admin"), organizationController.getOrganizationDetails);
-router.put("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.updateOrganization);
-router.delete("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.deleteOrganization);
-router.get("/organizations/:orgId/stats", authMiddleware, organizationRoleMiddleware("super_admin", "org_admin"), organizationController.getOrganizationStats);
+router.post("/organizations", authMiddleware, organizationRoleMiddleware("admin"), organizationController.createOrganization);
+router.get("/organizations", authMiddleware, organizationRoleMiddleware("admin"), organizationController.getOrganizations);
+router.get("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("admin", "org_admin"), organizationController.getOrganizationDetails);
+router.put("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("admin"), organizationController.updateOrganization);
+router.delete("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("admin"), organizationController.deleteOrganization);
+router.get("/organizations/:orgId/stats", authMiddleware, organizationRoleMiddleware("admin", "org_admin"), organizationController.getOrganizationStats);
 
 // ==================== LÍDERES ====================
 router.post("/leaders", authMiddleware, roleMiddleware("admin"), leaderController.createLeader);
