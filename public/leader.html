@@ -857,7 +857,6 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
             animation: fadeIn 0.3s ease;
         }
 
@@ -968,6 +967,72 @@
         .modal-icon.warning {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
+        }
+
+        /* ============== FORCED MODAL (Legal Terms) ============== */
+        .forced-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .forced-modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            width: 95%;
+            max-width: 650px;
+            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body.dark-mode .forced-modal-content {
+            background: #1e293b;
+        }
+
+        body.dark-mode .forced-modal-content h2 {
+            color: #f1f5f9;
+        }
+
+        body.dark-mode .forced-modal-content p {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .forced-modal-body {
+            background: #334155 !important;
+            border-color: #475569 !important;
+        }
+
+        body.dark-mode .forced-modal-body p {
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-mode .forced-modal-checkbox {
+            background: linear-gradient(135deg, #422006 0%, #78350f 100%) !important;
+            border-color: #f59e0b !important;
+        }
+
+        body.dark-mode .forced-modal-checkbox span {
+            color: #fef3c7 !important;
+        }
+
+        #acceptLegalTermsBtn:not(:disabled) {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4) !important;
+        }
+
+        #acceptLegalTermsBtn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5) !important;
         }
 
         /* ============== LOADING STATE ============== */
@@ -1908,6 +1973,20 @@
                             <input type="tel" class="form-input" id="phone" placeholder="+57 3XX XXX XXXX">
                         </div>
 
+                        <!-- CONSENT CHECKBOX (Ley 1581 de 2012) -->
+                        <div class="consent-section" style="background: linear-gradient(135deg, #fff9e6 0%, #fff5cc 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                            <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-weight: normal;">
+                                <input type="checkbox" id="hasConsentToRegisterLeader" required style="width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: #667eea; flex-shrink: 0;">
+                                <span style="font-size: 13px; color: #495057; line-height: 1.6;">
+                                    <strong style="color: #92400e;">Declaro bajo juramento</strong> que tengo la autorización previa e informada del titular para registrar su información, incluyendo sus preferencias para fines de estudio estadístico. <strong style="color: #92400e;">Asumo la responsabilidad legal.</strong>
+                                    <a href="#" onclick="showConsentPolicyModalForm(event)" style="color: #667eea; font-weight: 600; display: inline-block; margin-top: 4px;">[Leer Políticas]</a>
+                                </span>
+                            </label>
+                            <div id="consentErrorLeader" style="display: none; color: #dc2626; font-size: 12px; margin-top: 8px; padding: 8px; background: #fee2e2; border-radius: 6px; text-align: center;">
+                                <i class="bi bi-exclamation-triangle"></i> Marca esta casilla de campo obligatorio si quieres continuar
+                            </div>
+                        </div>
+
                         <div class="form-actions">
                             <button type="button" class="btn-secondary" onclick="goToView('welcome')">
                                 <i class="bi bi-x-lg"></i> Cancelar
@@ -2112,6 +2191,94 @@
                 </button>
                 <button class="btn-modern btn-logout" onclick="confirmLogout()" style="flex: 1;">
                     <i class="bi bi-check-circle"></i> Sí, Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORCED LEGAL TERMS MODAL (Ley 1581 de 2012) -->
+    <div id="legalTermsModal" class="forced-modal" style="display: none;">
+        <div class="forced-modal-content" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+            <div class="forced-modal-header" style="text-align: center; margin-bottom: 24px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);">
+                    <i class="bi bi-shield-check" style="font-size: 32px; color: white;"></i>
+                </div>
+                <h2 style="color: #1a1a2e; font-size: 22px; font-weight: 700; margin: 0;">Actualización de Políticas y Uso de Datos</h2>
+                <p style="color: #6c757d; font-size: 14px; margin-top: 8px;">Ley 1581 de 2012 - Protección de Datos Personales</p>
+            </div>
+            
+            <div class="forced-modal-body" style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+                <p style="color: #495057; font-size: 14px; line-height: 1.7; margin-bottom: 16px;">
+                    De conformidad con la <strong>Ley 1581 de 2012</strong> (Ley de Protección de Datos Personales) y su decreto reglamentario 1377 de 2013, es necesario que aceptes los términos antes de continuar usando esta plataforma.
+                </p>
+                <p style="color: #495057; font-size: 14px; line-height: 1.7; margin-bottom: 0;">
+                    Al aceptar, declaras que garantizarás el cumplimiento de la normativa de protección de datos en todas las actividades de recolección de información que realices a través de esta plataforma.
+                </p>
+            </div>
+
+            <div class="forced-modal-checkbox" style="background: linear-gradient(135deg, #fff9e6 0%, #fff5cc 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+                    <input type="checkbox" id="acceptLegalTermsCheckbox" style="width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: #667eea;">
+                    <span style="font-size: 13px; color: #495057; line-height: 1.6; text-align: justify;">
+                        <strong>Declaro bajo gravedad de juramento</strong> que he leído y acepto los <a href="#" onclick="showPolicyModal(event)" style="color: #667eea; font-weight: 600;">Términos de Uso</a> y la <a href="#" onclick="showPolicyModal(event)" style="color: #667eea; font-weight: 600;">Política de Tratamiento de Datos</a>. 
+                        Ratifico que toda la información registrada por mí, incluyendo aquella que pueda revelar preferencias o afinidades de carácter electoral (datos sensibles), ha sido recolectada contando con la autorización previa, expresa e informada de cada titular. 
+                        Garantizo que el titular comprende que esta información será utilizada exclusivamente con fines de estudio de información, análisis estadístico y consolidación de métricas, y que no será comercializada. 
+                        <strong>Asumo la responsabilidad legal frente a cualquier reclamación.</strong>
+                    </span>
+                </label>
+            </div>
+
+            <div id="legalTermsError" style="display: none; background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; text-align: center; border: 1px solid #fecaca;">
+                <i class="bi bi-exclamation-triangle"></i> Debes aceptar los términos para continuar usando la plataforma.
+            </div>
+
+            <div style="text-align: center;">
+                <button id="acceptLegalTermsBtn" onclick="acceptLegalTerms()" disabled style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); color: white; border: none; padding: 14px 40px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: not-allowed; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);">
+                    <i class="bi bi-check-circle"></i> Aceptar y Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POLICY INFO MODAL -->
+    <div id="policyModal" class="modal" style="z-index: 100000;">
+        <div class="modal-content" style="max-width: 700px; max-height: 85vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e9ecef;">
+                <h3 style="color: #1a1a2e; font-size: 20px; font-weight: 700; margin: 0;">Política de Tratamiento de Datos</h3>
+                <button onclick="closePolicyModal()" style="background: none; border: none; font-size: 24px; color: #6c757d; cursor: pointer;">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div style="color: #495057; font-size: 14px; line-height: 1.7;">
+                <h4 style="color: #667eea; margin-bottom: 12px;">1. Responsable del Tratamiento</h4>
+                <p style="margin-bottom: 16px;">Los datos personales recolectados a través de esta plataforma son tratados bajo la responsabilidad del administrador del sistema, quien actúa como responsable del tratamiento de datos.</p>
+                
+                <h4 style="color: #667eea; margin-bottom: 12px;">2. Finalidad del Tratamiento</h4>
+                <p style="margin-bottom: 16px;">Los datos personales serán utilizados exclusivamente para:</p>
+                <ul style="margin-bottom: 16px; padding-left: 20px;">
+                    <li>Estudio de información y análisis estadístico</li>
+                    <li>Consolidación de métricas</li>
+                    <li>Gestión de participación ciudadana</li>
+                </ul>
+                
+                <h4 style="color: #667eea; margin-bottom: 12px;">3. Datos Sensibles</h4>
+                <p style="margin-bottom: 16px;">De conformidad con el artículo 7 de la Ley 1581 de 2012, se informa que podrían recolectarse datos que revelen preferencias o afinidades de carácter electoral. Estos datos requieren autorización previa, expresa e informada del titular.</p>
+                
+                <h4 style="color: #667eea; margin-bottom: 12px;">4. Derechos del Titular</h4>
+                <p style="margin-bottom: 16px;">Como titular de datos personales, tienes derecho a:</p>
+                <ul style="margin-bottom: 16px; padding-left: 20px;">
+                    <li>Conocer, actualizar y rectificar tus datos</li>
+                    <li>Solicitar prueba de la autorización otorgada</li>
+                    <li>Revocar la autorización y/o suprimir el dato</li>
+                    <li>Presentar quejas ante la SIC</li>
+                </ul>
+                
+                <h4 style="color: #667eea; margin-bottom: 12px;">5. Seguridad</h4>
+                <p>Se implementan medidas técnicas y administrativas para proteger los datos personales contra acceso no autorizado, pérdida o alteración.</p>
+            </div>
+            <div style="text-align: center; margin-top: 24px;">
+                <button onclick="closePolicyModal()" class="btn-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    Entendido
                 </button>
             </div>
         </div>
@@ -2704,6 +2871,20 @@
         async function handleSubmit(event) {
             event.preventDefault();
 
+            // Verificar consentimiento (Ley 1581 de 2012)
+            const consentCheckbox = document.getElementById('hasConsentToRegisterLeader');
+            const consentError = document.getElementById('consentErrorLeader');
+            
+            if (!consentCheckbox.checked) {
+                consentError.style.display = 'block';
+                consentCheckbox.parentElement.parentElement.style.borderColor = '#dc2626';
+                consentCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            } else {
+                consentError.style.display = 'none';
+                consentCheckbox.parentElement.parentElement.style.borderColor = '#f59e0b';
+            }
+
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -2745,7 +2926,8 @@
                     capital: capital || null,
                     votingPlace,
                     votingTable,
-                    date: new Date().toISOString()
+                    date: new Date().toISOString(),
+                    hasConsentToRegister: true
                 };
 
                 const response = await apiCall(`/api/registrations`, {
@@ -2756,6 +2938,7 @@
                 if (response.ok) {
                     showSuccessModal('¡Registro Exitoso!', 'La persona ha sido agregada correctamente a tu equipo');
                     document.getElementById('newRegistrationForm').reset();
+                    consentCheckbox.checked = false;
                     toggleUbicacion('bogota');
                     setTimeout(() => {
                         goToView('registrations');
@@ -2768,6 +2951,12 @@
                 console.error('Error:', err);
                 alert('Error de conexión. Por favor intenta de nuevo.');
             }
+        }
+
+        // Policy modal for form
+        function showConsentPolicyModalForm(event) {
+            if (event) event.preventDefault();
+            showPolicyModal(event);
         }
 
         // ============== STATISTICS ==============
@@ -2954,11 +3143,103 @@
             });
         }
 
+        // ============== LEGAL TERMS MODAL (Ley 1581) ==============
+        async function checkLegalTermsStatus() {
+            try {
+                const response = await apiCall('/api/auth/legal-terms-status');
+                if (!response.ok) return true;
+                const data = await response.json();
+                return data.hasAccepted;
+            } catch (error) {
+                console.error('Error checking legal terms status:', error);
+                return true;
+            }
+        }
+
+        function showLegalTermsModal() {
+            document.getElementById('legalTermsModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            const checkbox = document.getElementById('acceptLegalTermsCheckbox');
+            const btn = document.getElementById('acceptLegalTermsBtn');
+            
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    btn.disabled = false;
+                    btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    btn.style.cursor = 'pointer';
+                    document.getElementById('legalTermsError').style.display = 'none';
+                } else {
+                    btn.disabled = true;
+                    btn.style.background = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)';
+                    btn.style.cursor = 'not-allowed';
+                }
+            });
+        }
+
+        function closeLegalTermsModal() {
+            document.getElementById('legalTermsModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function showPolicyModal(event) {
+            if (event) event.preventDefault();
+            document.getElementById('policyModal').classList.add('active');
+        }
+
+        function closePolicyModal() {
+            document.getElementById('policyModal').classList.remove('active');
+        }
+
+        async function acceptLegalTerms() {
+            const checkbox = document.getElementById('acceptLegalTermsCheckbox');
+            const btn = document.getElementById('acceptLegalTermsBtn');
+            const errorDiv = document.getElementById('legalTermsError');
+            
+            if (!checkbox.checked) {
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Procesando...';
+            
+            try {
+                const response = await apiCall('/api/auth/accept-legal-terms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closeLegalTermsModal();
+                    showSuccessModal('Términos Aceptados', 'Has aceptado los términos y condiciones. Ya puedes usar la plataforma.');
+                } else {
+                    errorDiv.textContent = data.error || 'Error al aceptar términos';
+                    errorDiv.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-circle"></i> Aceptar y Continuar';
+                }
+            } catch (error) {
+                console.error('Error accepting legal terms:', error);
+                errorDiv.textContent = 'Error de conexión. Intenta nuevamente.';
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle"></i> Aceptar y Continuar';
+            }
+        }
+
         // ============== INIT ==============
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             loadDarkMode();
             initializeTooltips();
             if (!checkAuth()) return;
+
+            const hasAcceptedTerms = await checkLegalTermsStatus();
+            if (!hasAcceptedTerms) {
+                showLegalTermsModal();
+            }
 
             loadLeaderData();
             loadRegistrations();

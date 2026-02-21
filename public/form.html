@@ -402,6 +402,20 @@
                     </div>
                 </div>
 
+                <!-- CONSENT CHECKBOX (Ley 1581 de 2012) -->
+                <div class="consent-section" style="background: linear-gradient(135deg, #fff9e6 0%, #fff5cc 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                    <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-weight: normal;">
+                        <input type="checkbox" id="hasConsentToRegister" required style="width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: #667eea; flex-shrink: 0;">
+                        <span style="font-size: 13px; color: #495057; line-height: 1.6; text-align: justify;">
+                            <strong style="color: #92400e;">Declaro bajo juramento</strong> que tengo la autorización previa e informada del titular para registrar su información, incluyendo sus preferencias para fines de estudio estadístico y de información. <strong style="color: #92400e;">Asumo la responsabilidad legal de esta recolección.</strong>
+                            <a href="#" onclick="showConsentPolicyModal(event)" style="color: #667eea; font-weight: 600; display: inline-block; margin-top: 4px;">[Leer Políticas]</a>
+                        </span>
+                    </label>
+                    <div id="consentError" style="display: none; color: #dc2626; font-size: 12px; margin-top: 8px; padding: 8px; background: #fee2e2; border-radius: 6px; text-align: center;">
+                        <i class="bi bi-exclamation-triangle"></i> Marca esta casilla de campo obligatorio si quieres continuar
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-submit" id="submitBtn">
                     <i class="bi bi-check-lg"></i> Enviar Registro
                 </button>
@@ -545,6 +559,20 @@
         document.getElementById('publicForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // Verificar consentimiento (Ley 1581 de 2012)
+            const consentCheckbox = document.getElementById('hasConsentToRegister');
+            const consentError = document.getElementById('consentError');
+            
+            if (!consentCheckbox.checked) {
+                consentError.style.display = 'block';
+                consentCheckbox.parentElement.parentElement.style.borderColor = '#dc2626';
+                consentCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            } else {
+                consentError.style.display = 'none';
+                consentCheckbox.parentElement.parentElement.style.borderColor = '#f59e0b';
+            }
+
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -561,30 +589,26 @@
             } else {
                 departamento = document.getElementById('departamento').value;
                 capital = document.getElementById('capital').value;
-                localidad = departamento; // Usar departamento como localidad para compatibilidad
+                localidad = departamento;
             }
             
             const votingPlace = document.getElementById('votingPlace').value.trim();
             const votingTable = document.getElementById('votingTable').value.trim();
             const phone = document.getElementById('phone').value.trim();
 
-            // Clear messages
             document.getElementById('errorAlert').classList.remove('show');
 
-            // Validation
             const localidadValida = ubicacionTipo === 'bogota' ? localidad : departamento;
             if (!firstName || !lastName || !cedula || !localidadValida || !votingPlace || !votingTable) {
                 showError('Por favor completa todos los campos requeridos');
                 return;
             }
 
-            // Disable submit button
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.innerHTML = '<span class="loading-spinner"></span> Procesando...';
 
             try {
-                // Submit registration
                 const payload = {
                     leaderId: currentLeaderId,
                     leaderToken: currentLeaderToken,
@@ -600,7 +624,8 @@
                     votingPlace,
                     votingTable,
                     registeredToVote: true,
-                    date: new Date().toISOString()
+                    date: new Date().toISOString(),
+                    hasConsentToRegister: true
                 };
 
                 const response = await fetch(`${API_URL}/api/registrations`, {
@@ -610,12 +635,10 @@
                 });
 
                 if (response.ok) {
-                    // Hide form and show success
                     document.getElementById('publicForm').style.display = 'none';
                     document.getElementById('successMessage').classList.add('show');
                     document.getElementById('successAlert').classList.add('show');
 
-                    // Reset after 5 seconds
                     setTimeout(() => {
                         window.location.reload();
                     }, 5000);
@@ -637,6 +660,50 @@
             alert.textContent = message;
             alert.classList.add('show');
             alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Show consent policy modal (Ley 1581 de 2012)
+        function showConsentPolicyModal(event) {
+            if (event) event.preventDefault();
+            
+            const modal = document.createElement('div');
+            modal.id = 'consentPolicyModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;';
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="padding: 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; color: #667eea; font-size: 20px;">Política de Tratamiento de Datos</h3>
+                        <button onclick="document.getElementById('consentPolicyModal').remove()" style="background: none; border: none; font-size: 24px; color: #6b7280; cursor: pointer;">&times;</button>
+                    </div>
+                    <div style="padding: 24px; color: #374151; font-size: 14px; line-height: 1.7;">
+                        <h4 style="color: #667eea; margin: 0 0 12px 0;">1. Responsable del Tratamiento</h4>
+                        <p style="margin: 0 0 16px 0;">Los datos personales recolectados son tratados bajo la responsabilidad del administrador del sistema, conforme a la Ley 1581 de 2012.</p>
+                        
+                        <h4 style="color: #667eea; margin: 0 0 12px 0;">2. Finalidad</h4>
+                        <p style="margin: 0 0 16px 0;">Los datos serán utilizados exclusivamente para:</p>
+                        <ul style="margin: 0 0 16px 0; padding-left: 20px;">
+                            <li>Estudio de información y análisis estadístico</li>
+                            <li>Consolidación de métricas</li>
+                            <li>Gestión de participación ciudadana</li>
+                        </ul>
+                        
+                        <h4 style="color: #667eea; margin: 0 0 12px 0;">3. Datos Sensibles</h4>
+                        <p style="margin: 0 0 16px 0;">De conformidad con el artículo 7 de la Ley 1581 de 2012, podrían recolectarse datos que revelen preferencias políticas. Estos requieren autorización previa, expresa e informada del titular.</p>
+                        
+                        <h4 style="color: #667eea; margin: 0 0 12px 0;">4. Derechos del Titular</h4>
+                        <p style="margin: 0;">Tienes derecho a conocer, actualizar y rectificar tus datos; solicitar prueba de autorización; revocar la autorización; y presentar quejas ante la SIC.</p>
+                    </div>
+                    <div style="padding: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+                        <button onclick="document.getElementById('consentPolicyModal').remove()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            Entendido
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
         }
 
         // Initialize
