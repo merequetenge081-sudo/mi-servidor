@@ -559,3 +559,62 @@ function decrypt(encryptedText) {
     return encryptedText; // Fallback: retornar texto original si falla
   }
 }
+
+export async function acceptLegalTerms(req, res) {
+  try {
+    const leaderId = req.user?.userId;
+    
+    if (!leaderId) {
+      return res.status(401).json({ error: "No autenticado" });
+    }
+
+    const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+               req.headers['x-real-ip'] ||
+               req.connection?.remoteAddress ||
+               'unknown';
+
+    const leader = await Leader.findById(leaderId);
+    if (!leader) {
+      return res.status(404).json({ error: "Líder no encontrado" });
+    }
+
+    leader.hasAcceptedLegalTerms = true;
+    leader.legalTermsAcceptedAt = new Date();
+    leader.legalTermsAcceptedIp = ip;
+    await leader.save();
+
+    const { ConsentLogService } = await import("../services/consentLog.service.js");
+    await ConsentLogService.logTermsAccepted(req, leaderId);
+
+    logger.info(`✅ Términos legales aceptados por líder ${leaderId} desde IP ${ip}`);
+
+    res.json({ 
+      success: true, 
+      message: "Términos aceptados correctamente",
+      acceptedAt: leader.legalTermsAcceptedAt
+    });
+  } catch (error) {
+    logger.error("Accept legal terms error:", { error: error.message, stack: error.stack });
+    res.status(500).json({ error: "Error al aceptar términos" });
+  }
+}
+
+export async function checkLegalTermsStatus(req, res) {
+  try {
+    const leaderId = req.user?.userId;
+    
+    if (!leaderId) {
+      return res.status(401).json({ error: "No autenticado" });
+    }
+
+    const leader = await Leader.findById(leaderId).select('hasAcceptedLegalTerms legalTermsAcceptedAt');
+    
+    res.json({
+      hasAccepted: leader?.hasAcceptedLegalTerms || false,
+      acceptedAt: leader?.legalTermsAcceptedAt || null
+    });
+  } catch (error) {
+    logger.error("Check legal terms status error:", { error: error.message });
+    res.status(500).json({ error: "Error al verificar estado de términos" });
+  }
+}

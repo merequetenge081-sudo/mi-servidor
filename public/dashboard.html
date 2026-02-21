@@ -679,8 +679,20 @@
                         <div class="form-group">
                             <label>Asignar a Líder</label>
                             <select id="regLeaderSelect" class="form-select full-width">
-                                <!-- Populated -->
                             </select>
+                        </div>
+
+                        <!-- CONSENT CHECKBOX (Ley 1581 de 2012) -->
+                        <div class="consent-section" style="background: linear-gradient(135deg, #fff9e6 0%, #fff5cc 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 16px; margin: 20px 0;">
+                            <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-weight: normal;">
+                                <input type="checkbox" id="hasConsentToRegisterDash" style="width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: #667eea; flex-shrink: 0;">
+                                <span style="font-size: 13px; color: #495057; line-height: 1.6;">
+                                    <strong style="color: #92400e;">Declaro bajo juramento</strong> que tengo la autorización previa e informada del titular para registrar su información. <strong style="color: #92400e;">Asumo la responsabilidad legal.</strong>
+                                </span>
+                            </label>
+                            <div id="consentErrorDash" style="display: none; color: #dc2626; font-size: 12px; margin-top: 8px; text-align: center;">
+                                <i class="bi bi-exclamation-triangle"></i> Marca esta casilla de campo obligatorio si quieres continuar
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
