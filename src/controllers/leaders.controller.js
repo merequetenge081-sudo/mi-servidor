@@ -270,11 +270,8 @@ export async function updateLeader(req, res) {
     console.log(`[UPDATE DEBUG] Found Leader: ${leader.name}, Org: ${leader.organizationId}`);
 
     // Security check: If leader has orgId and it doesn't match, block access
-    // UNLESS user is superadmin (who has no orgId or has access to all)
-    // FIX: Also treat 'admin' with no orgId as superadmin (legacy admin support)
-    const isSuperAdmin = req.user.role === 'superadmin' ||
-      req.user.role === 'super_admin' ||
-      (req.user.role === 'admin' && !orgId);
+    // UNLESS user is admin
+    const isSuperAdmin = req.user.role === 'admin';
 
     if (!isSuperAdmin && leader.organizationId && leader.organizationId !== orgId) {
       console.log(`[UPDATE DEBUG] Org Mismatch! Leader Org: ${leader.organizationId} !== Req Org: ${orgId}`);
@@ -349,13 +346,11 @@ export async function deleteLeader(req, res) {
   try {
     const user = req.user;
     const orgId = req.user.organizationId; // Multi-tenant filter
-    // Fix: Allow superadmin/legacy admin to delete
+    // Check if admin user can delete
+    const isAdmin = req.user.role === 'admin';
     let leader;
-    const isSuperAdmin = req.user.role === 'superadmin' ||
-      req.user.role === 'super_admin' ||
-      (req.user.role === 'admin' && !orgId);
 
-    if (isSuperAdmin) {
+    if (isAdmin) {
       leader = await Leader.findById(req.params.id);
     } else {
       leader = await Leader.findOne({ _id: req.params.id, organizationId: orgId });

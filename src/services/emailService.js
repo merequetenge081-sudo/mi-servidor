@@ -1,6 +1,8 @@
 import { Resend } from 'resend';
 import QRCode from 'qrcode';
+import crypto from 'crypto';
 import logger from '../config/logger.js';
+import { config } from '../config/env.js';
 
 class EmailService {
   constructor() {
@@ -35,13 +37,107 @@ class EmailService {
     }
   }
 
+    getBaseUrl(baseUrl) {
+        return baseUrl || process.env.BASE_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
+    }
+
+    decryptTempPassword(value) {
+        if (!value || typeof value !== 'string') return value;
+        if (!value.includes(':')) return value;
+
+        try {
+            const algorithm = 'aes-256-cbc';
+            const key = crypto.scryptSync(config.jwtSecret || 'fallback-key', 'salt', 32);
+            const parts = value.split(':');
+            if (parts.length !== 2) return value;
+            const iv = Buffer.from(parts[0], 'hex');
+            const encrypted = parts[1];
+            const decipher = crypto.createDecipheriv(algorithm, key, iv);
+            let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+            return decrypted;
+        } catch (error) {
+            logger.warn('No se pudo desencriptar tempPasswordPlaintext:', error.message);
+            return value;
+        }
+    }
+
+    wrapEmail({
+      title,
+      subtitle,
+      bodyHtml,
+      ctaLabel,
+      ctaUrl,
+      accent = '#1e3a8a',
+      footerNote = 'Este es un mensaje automatico. No respondas a este correo.'
+    }) {
+      const safeTitle = title || 'Actualizacion del sistema';
+      const safeSubtitle = subtitle || 'Red Social y Politica';
+      const buttonHtml = ctaLabel && ctaUrl ? `
+        <table cellpadding="0" cellspacing="0" style="margin-top: 26px;">
+          <tr>
+            <td style="background: ${accent}; border-radius: 8px; padding: 0;">
+              <a href="${ctaUrl}" style="display: inline-block; padding: 14px 34px; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; letter-spacing: 0.2px;">${ctaLabel}</a>
+            </td>
+          </tr>
+        </table>
+      ` : '';
+
+      return `<!DOCTYPE html>
+  <html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${safeTitle}</title>
+  </head>
+  <body style="margin: 0; padding: 0; font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background-color: #f5f7fb;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f7fb;">
+      <tr>
+        <td align="center" style="padding: 36px 18px;">
+          <table width="100%" maxwidth="640" cellpadding="0" cellspacing="0" style="max-width: 640px; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);">
+            <tr>
+              <td style="padding: 18px 36px; border-bottom: 1px solid #e2e8f0;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #64748b; font-weight: 700;">Red Social y Politica</td>
+                    <td align="right" style="font-size: 12px; color: #94a3b8;">Actualizacion segura</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 34px 36px 10px;">
+                <h1 style="margin: 0 0 8px 0; font-size: 26px; font-weight: 700; color: #0f172a; letter-spacing: -0.2px;">${safeTitle}</h1>
+                <p style="margin: 0; font-size: 14px; color: #64748b; line-height: 1.7;">${safeSubtitle}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 18px 36px 36px; color: #334155; font-size: 14px; line-height: 1.8;">
+                ${bodyHtml}
+                ${buttonHtml}
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color: #f8fafc; padding: 22px 36px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
+                <p style="margin: 0 0 6px 0;">${footerNote}</p>
+                <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 Red Social y Politica</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>`;
+    }
+
   /**
    * Envía email con el enlace personalizado y QR al líder
    * @param {Object} leader - Objeto líder con _id, name, email, token
    * @param {string} baseUrl - URL base (ej: https://midominio.com)
    * @returns {Promise<Object>} { success: true, messageId?: string }
    */
-  async sendAccessEmail(leader, baseUrl = process.env.BASE_URL) {
+    async sendAccessEmail(leader, baseUrl = process.env.BASE_URL) {
     try {
       logger.info(`📧 sendAccessEmail() llamada para: ${leader?.email || 'SIN EMAIL'}`);
       logger.info(`📧 Mock mode: ${this.mockMode}`);
@@ -54,11 +150,8 @@ class EmailService {
         throw new Error('Leader token no disponible');
       }
 
-      if (!baseUrl) {
-        throw new Error('BASE_URL no configurado en variables de entorno');
-      }
-
-      const registrationLink = `${baseUrl}/form.html?token=${leader.token}`;
+            const resolvedBaseUrl = this.getBaseUrl(baseUrl);
+            const registrationLink = `${resolvedBaseUrl}/form.html?token=${leader.token}`;
       
       logger.info(`📧 Generando QR para enlace: ${registrationLink}`);
 
@@ -69,7 +162,7 @@ class EmailService {
         width: 300,
       });
 
-      const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
+    const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
 
       // Si está en mock mode, no enviar con Resend
       if (this.mockMode) {
@@ -125,40 +218,144 @@ ${registrationLink}
     try {
       const email = leader?.email;
       if (!email) throw new Error('Leader email no proporcionado');
+      if (!leader.token) throw new Error('Leader token no disponible');
 
-      const subject = '🎉 Bienvenido al Sistema';
-      const loginUrl = `${baseUrl || 'http://localhost:5000'}/login.html`;
-      const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="es">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Bienvenido</title>
-        <style>
-          body { font-family: 'Segoe UI', 'Helvetica Neue', sans-serif; background: #f5f7fb; padding: 20px; }
-          .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
-          .title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
-          .subtitle { color: #6c757d; margin-bottom: 12px; }
-          .body { color: #4a4a68; line-height: 1.6; }
-          .cta { margin-top: 18px; display: inline-block; background: #667eea; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; }
-          .footer { margin-top: 18px; font-size: 12px; color: #6c757d; }
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <div class="title">Hola ${leader?.name || 'lider'},</div>
-          <div class="subtitle">Red Social Política</div>
-          <div class="body">
-            <p>Te damos la bienvenida al sistema de gestión de registros. Aquí podrás administrar tu red, consultar estadísticas y compartir tu enlace de registro.</p>
-            <p>Cuando inicies sesión, podrás actualizar tus datos y revisar el estado de los registros.</p>
-          </div>
-          <a href="${loginUrl}" class="cta">Ir al login</a>
-          <div class="footer">Si no solicitaste esta cuenta, contacta al administrador.</div>
-        </div>
-      </body>
-      </html>
-      `;
+      const subject = 'Bienvenido a Red Social y Politica';
+      const resolvedBaseUrl = this.getBaseUrl(baseUrl);
+      const registrationLink = `${resolvedBaseUrl}/form.html?token=${leader.token}`;
+      const firstName = (leader?.name || 'lider').split(' ')[0];
+      const year = new Date().getFullYear();
+
+      const qrDataUri = await QRCode.toDataURL(registrationLink, {
+        errorCorrectionLevel: 'H',
+        type: 'image/png',
+        width: 260
+      });
+
+      const htmlContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenido a Red Social y Politica</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F3F4F6;font-family:Arial,Helvetica,sans-serif;color:#111827;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F3F4F6;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #E5E7EB;box-shadow:0 12px 30px rgba(15,23,42,0.08);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#4F46E5;background-image:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%);padding:36px 28px;text-align:center;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding-bottom:16px;">
+                    <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,0.18);display:inline-flex;align-items:center;justify-content:center;font-size:22px;color:#ffffff;">R</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-bottom:8px;">
+                    <span style="display:inline-block;background:rgba(255,255,255,0.2);color:#ffffff;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:999px;">Nuevo panel activado</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center">
+                    <h1 style="margin:0;font-size:26px;line-height:1.2;color:#ffffff;font-weight:700;">¡Bienvenido a Red Social y Politica!</h1>
+                    <p style="margin:10px 0 0 0;font-size:14px;color:#EDE9FE;">Tu panel de registro esta listo</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px 28px 24px 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:14px;">
+                <tr>
+                  <td style="font-size:15px;line-height:1.7;color:#374151;">
+                    <p style="margin:0 0 16px 0;font-size:17px;font-weight:600;color:#111827;">Hola ${firstName},</p>
+                    <p style="margin:0 0 16px 0;">Desde tu panel podras administrar tu red, consultar estadisticas y compartir tu enlace de registro.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding:10px 0 8px 0;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                      <tr>
+                        <td style="background:#4F46E5;border-radius:10px;">
+                          <a href="${registrationLink}" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;">Ir al Formulario</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- QR Section -->
+          <tr>
+            <td style="padding:0 28px 24px 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F9FAFB;border-radius:14px;border:1px solid #E5E7EB;">
+                <tr>
+                  <td style="padding:20px 22px;text-align:center;">
+                    <p style="margin:0 0 14px 0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#6B7280;font-weight:600;">Codigo QR de registro</p>
+                    <img src="${qrDataUri}" alt="Codigo QR" width="180" style="display:block;border-radius:10px;margin:0 auto 16px auto;max-width:100%;height:auto;" />
+                    <div style="font-size:12px;color:#6B7280;margin-bottom:6px;">Enlace directo</div>
+                    <div style="font-size:12px;color:#4F46E5;word-break:break-word;font-family:'Courier New',monospace;">${registrationLink}</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Tips -->
+          <tr>
+            <td style="padding:0 28px 28px 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E5E7EB;">
+                <tr>
+                  <td style="padding-top:18px;font-size:14px;color:#374151;">
+                    <p style="margin:0 0 10px 0;font-weight:600;color:#111827;">Consejos rapidos</p>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding:6px 0;">
+                          <span style="display:inline-block;width:18px;height:18px;border-radius:999px;background:#E0E7FF;color:#3730A3;font-size:12px;line-height:18px;text-align:center;margin-right:8px;">✓</span>
+                          Comparte el enlace con tu equipo
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;">
+                          <span style="display:inline-block;width:18px;height:18px;border-radius:999px;background:#E0E7FF;color:#3730A3;font-size:12px;line-height:18px;text-align:center;margin-right:8px;">✓</span>
+                          Imprime el QR para distribucion rapida
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;">
+                          <span style="display:inline-block;width:18px;height:18px;border-radius:999px;background:#E0E7FF;color:#3730A3;font-size:12px;line-height:18px;text-align:center;margin-right:8px;">✓</span>
+                          Monitorea avances desde el panel
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 28px 28px 28px;border-top:1px solid #E5E7EB;background-color:#F9FAFB;font-size:12px;color:#6B7280;text-align:center;">
+              <p style="margin:0 0 6px 0;">Red Social y Politica · Plataforma de gestion</p>
+              <p style="margin:0 0 6px 0;">Soporte: <a href="mailto:soporte@servidor.com" style="color:#4F46E5;text-decoration:none;">soporte@servidor.com</a></p>
+              <p style="margin:0;">© ${year} Red Social y Politica</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 
       return await this.sendEmailWithResend(email, subject, htmlContent, 'WELCOME_EMAIL');
     } catch (error) {
@@ -174,46 +371,38 @@ ${registrationLink}
     try {
       const email = leader?.email;
       if (!email) throw new Error('Leader email no proporcionado');
-      
-      // Si no se proporciona password, usar tempPasswordPlaintext del líder
-      const password = plainPassword || leader.tempPasswordPlaintext;
+
+      const rawPassword = plainPassword || leader.tempPasswordPlaintext;
+      const password = this.decryptTempPassword(rawPassword);
       if (!password) throw new Error('Password temporal no proporcionado');
 
-      const subject = '🔑 Tus credenciales de acceso';
-      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
-      const loginUrl = `${baseUrl}/leader.html`;
-      const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="es">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Credenciales de acceso</title>
-        <style>
-          body { font-family: 'Segoe UI', 'Helvetica Neue', sans-serif; background: #f5f7fb; padding: 20px; }
-          .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
-          .title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
-          .badge { display: inline-block; background: #e3f2fd; color: #1976d2; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
-          .credential { font-family: 'Courier New', monospace; font-size: 16px; background: #f8f9fa; border-radius: 8px; padding: 10px 12px; display: inline-block; margin: 6px 0 14px; }
-          .warning { background: #fff3cd; color: #7a5a00; padding: 10px 12px; border-radius: 8px; font-size: 13px; }
-          .cta { margin-top: 18px; display: inline-block; background: #667eea; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; }
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <div class="badge">Acceso</div>
-          <div class="title">Credenciales de acceso</div>
-          <p>Estas credenciales son temporales para tu primer ingreso.</p>
-          <p><strong>Usuario:</strong></p>
-          <div class="credential">${leader.username || email}</div>
-          <p><strong>Contraseña temporal:</strong></p>
-          <div class="credential">${password}</div>
-          <div class="warning">Recomendamos cambiar la contraseña después de iniciar sesión.</div>
-          <a href="${loginUrl}" class="cta">Iniciar sesión</a>
+      const subject = 'Tus credenciales de acceso';
+      const loginUrl = `${this.getBaseUrl()}/`;
+
+      const bodyHtml = `
+        <p style="margin: 0 0 18px 0; font-size: 15px; color: #64748b; line-height: 1.7;">
+          Tus credenciales son temporales para tu primer ingreso. Guarda esta informacion en un lugar seguro.
+        </p>
+        <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px;">Usuario</p>
+        <div style="background: #f8fafc; border-radius: 10px; padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: #1d4ed8; margin-bottom: 16px;">
+          ${leader.username || email}
         </div>
-      </body>
-      </html>
+        <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px;">Contrasena temporal</p>
+        <div style="background: #f8fafc; border-radius: 10px; padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: #1d4ed8; margin-bottom: 16px;">
+          ${password}
+        </div>
+        <div style="background: #fff7ed; border-left: 4px solid #fb923c; padding: 12px 14px; border-radius: 8px; font-size: 13px; color: #7c2d12;">
+          Por seguridad, inicia sesion y cambia la contrasena inmediatamente.
+        </div>
       `;
+
+      const htmlContent = this.wrapEmail({
+        title: 'Credenciales de acceso',
+        subtitle: 'Usa estos datos para entrar al sistema',
+        bodyHtml,
+        ctaLabel: 'Iniciar sesion',
+        ctaUrl: loginUrl
+      });
 
       return await this.sendEmailWithResend(email, subject, htmlContent, 'CREDENTIALS_EMAIL');
     } catch (error) {
@@ -229,17 +418,17 @@ ${registrationLink}
     try {
       if (!leader || !leader.email) throw new Error('Leader email no proporcionado');
       if (!leader.token) throw new Error('Leader token no disponible');
-      if (!baseUrl) throw new Error('BASE_URL no configurado');
 
-      const registrationLink = `${baseUrl}/form.html?token=${leader.token}`;
+            const resolvedBaseUrl = this.getBaseUrl(baseUrl);
+            const registrationLink = `${resolvedBaseUrl}/form.html?token=${leader.token}`;
       const qrDataUri = await QRCode.toDataURL(registrationLink, {
         errorCorrectionLevel: 'H',
         type: 'image/png',
         width: 300,
       });
 
-      const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
-      const subject = '📲 Tu código QR de registro';
+            const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
+            const subject = 'Tu codigo QR de registro';
 
       return await this.sendEmailWithResend(leader.email, subject, htmlContent, 'QR_EMAIL');
     } catch (error) {
@@ -256,40 +445,28 @@ ${registrationLink}
       const email = leader?.email;
       if (!email) throw new Error('Leader email no proporcionado');
 
-      const subject = '⚠️ Aviso Importante';
-      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
-      const dashboardUrl = `${baseUrl}/leader-dashboard.html`;
-      const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="es">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Aviso Importante</title>
-        <style>
-          body { font-family: 'Segoe UI', 'Helvetica Neue', sans-serif; background: #f5f7fb; padding: 20px; }
-          .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-top: 4px solid #ff9800; }
-          .title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
-          .badge { display: inline-block; background: #fff3cd; color: #7a5a00; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
-          .body { color: #4a4a68; line-height: 1.6; margin-bottom: 20px; }
-          .cta { margin-top: 18px; display: inline-block; background: #ff9800; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; }
-          .footer { margin-top: 18px; font-size: 12px; color: #6c757d; border-top: 1px solid #e9ecef; padding-top: 16px; }
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <div class="badge">⚠️ Recordatorio</div>
-          <div class="title">Hola ${leader?.name || 'líder'},</div>
-          <div class="body">
-            <p>Te recordamos que es importante mantener actualizada tu información y revisar regularmente tu panel de registros.</p>
-            <p>Si tienes alguna duda o necesitas asistencia, no dudes en contactar al administrador del sistema.</p>
-          </div>
-          <a href="${dashboardUrl}" class="cta">Ir al Panel</a>
-          <div class="footer">Este es un mensaje automático del sistema de gestión.</div>
-        </div>
-      </body>
-      </html>
+      const subject = 'Recordatorio importante';
+      const dashboardUrl = `${this.getBaseUrl()}/leader-dashboard.html`;
+      const name = leader?.name || 'lider';
+
+      const bodyHtml = `
+        <p style="margin: 0 0 18px 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hola ${name},</p>
+        <p style="margin: 0 0 16px 0; font-size: 14px; color: #64748b; line-height: 1.7;">
+          Te recomendamos revisar tu panel y mantener tu informacion actualizada para no perder registros.
+        </p>
+        <p style="margin: 0 0 0 0; font-size: 14px; color: #64748b; line-height: 1.7;">
+          Si necesitas ayuda, contacta al administrador.
+        </p>
       `;
+
+      const htmlContent = this.wrapEmail({
+        title: 'Recordatorio',
+        subtitle: 'Accion recomendada',
+        bodyHtml,
+        ctaLabel: 'Ir al panel',
+        ctaUrl: dashboardUrl,
+        accent: '#f59e0b'
+      });
 
       return await this.sendEmailWithResend(email, subject, htmlContent, 'WARNING_EMAIL');
     } catch (error) {
@@ -310,37 +487,29 @@ ${registrationLink}
         throw new Error('Email no proporcionado');
       }
 
-      const subject = '🔐 Restablecimiento de contraseña';
-      const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="es">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Restablecimiento de contraseña</title>
-        <style>
-          body { font-family: 'Segoe UI', 'Helvetica Neue', sans-serif; background: #f5f7fb; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 32px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08); }
-          .title { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
-          .badge { display: inline-block; background: #e3f2fd; color: #1976d2; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
-          .password { font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700; letter-spacing: 1px; background: #f8f9fa; border-radius: 8px; padding: 12px 16px; display: inline-block; margin: 12px 0 20px; }
-          .warning { background: #fff3cd; color: #7a5a00; padding: 12px 16px; border-radius: 8px; font-size: 14px; line-height: 1.6; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="badge">Seguridad</div>
-          <div class="title">Hola ${displayName},</div>
-          <p>Se ha generado una contraseña temporal para tu cuenta.</p>
-          <div class="password">${tempPassword}</div>
-          <div class="warning">
-            Por seguridad, inicia sesión con esta contraseña y cámbiala inmediatamente.
-          </div>
-          <p style="margin-top: 20px; font-size: 12px; color: #6c757d;">Si no solicitaste este cambio, contacta al administrador.</p>
+      const subject = 'Restablecimiento de contrasena';
+      const loginUrl = `${this.getBaseUrl()}/`;
+
+      const bodyHtml = `
+        <p style="margin: 0 0 18px 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hola ${displayName},</p>
+        <p style="margin: 0 0 18px 0; font-size: 14px; color: #64748b; line-height: 1.7;">
+          Se genero una contrasena temporal para tu cuenta.
+        </p>
+        <div style="background: #f8fafc; border-radius: 10px; padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 16px; font-weight: 700; color: #1d4ed8; margin-bottom: 16px; text-align: center;">
+          ${tempPassword}
         </div>
-      </body>
-      </html>
+        <div style="background: #fff7ed; border-left: 4px solid #fb923c; padding: 12px 14px; border-radius: 8px; font-size: 13px; color: #7c2d12;">
+          Inicia sesion y cambia la contrasena inmediatamente.
+        </div>
       `;
+
+      const htmlContent = this.wrapEmail({
+        title: 'Restablecimiento de contrasena',
+        subtitle: 'Nueva clave temporal',
+        bodyHtml,
+        ctaLabel: 'Iniciar sesion',
+        ctaUrl: loginUrl
+      });
 
       return await this.sendEmailWithResend(email, subject, htmlContent, 'TEMP_PASSWORD');
     } catch (error) {
@@ -386,242 +555,32 @@ Subject: ${subject}
    * Genera HTML profesional para el email
    */
   generateEmailHTML(leaderName, registrationLink, qrDataUri) {
-    const firstName = leaderName.split(' ')[0];
-    
-    return `
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tu enlace personalizado de registro</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            body {
-                font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
-            }
-            .email-container {
-                background: white;
-                border-radius: 20px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-                max-width: 600px;
-                width: 100%;
-                overflow: hidden;
-            }
-            .email-header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                padding: 40px 30px;
-                text-align: center;
-                color: white;
-            }
-            .email-header h1 {
-                font-size: 28px;
-                font-weight: 700;
-                margin-bottom: 10px;
-                letter-spacing: -0.5px;
-            }
-            .email-header p {
-                font-size: 14px;
-                opacity: 0.9;
-                font-weight: 500;
-            }
-            .email-body {
-                padding: 40px 30px;
-            }
-            .greeting {
-                font-size: 18px;
-                font-weight: 600;
-                color: #1a1a2e;
-                margin-bottom: 24px;
-                line-height: 1.6;
-            }
-            .greeting span {
-                color: #667eea;
-                font-weight: 700;
-            }
-            .description {
-                font-size: 15px;
-                color: #6c757d;
-                margin-bottom: 32px;
-                line-height: 1.7;
-            }
-            .cta-section {
-                text-align: center;
-                margin-bottom: 40px;
-            }
-            .cta-button {
-                display: inline-block;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                text-decoration: none;
-                padding: 16px 36px;
-                border-radius: 12px;
-                font-weight: 600;
-                font-size: 16px;
-                transition: all 0.3s ease;
-                box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-            }
-            .cta-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-            }
-            .divider {
-                height: 1px;
-                background: #e9ecef;
-                margin: 32px 0;
-            }
-            .qr-section {
-                text-align: center;
-                padding: 30px;
-                background: #f8f9fa;
-                border-radius: 12px;
-                margin-bottom: 24px;
-            }
-            .qr-label {
-                font-size: 14px;
-                font-weight: 600;
-                color: #1a1a2e;
-                margin-bottom: 16px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-            .qr-image {
-                max-width: 200px;
-                height: auto;
-                border-radius: 8px;
-            }
-            .link-section {
-                background: #f5f7fb;
-                padding: 16px;
-                border-radius: 8px;
-                margin-top: 16px;
-            }
-            .link-label {
-                font-size: 12px;
-                color: #6c757d;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 8px;
-            }
-            .link-text {
-                font-size: 13px;
-                color: #667eea;
-                word-break: break-all;
-                font-family: 'Courier New', monospace;
-            }
-            .footer {
-                background: #f8f9fa;
-                padding: 24px 30px;
-                border-top: 1px solid #e9ecef;
-                font-size: 12px;
-                color: #6c757d;
-                text-align: center;
-                line-height: 1.8;
-            }
-            .footer a {
-                color: #667eea;
-                text-decoration: none;
-                font-weight: 600;
-            }
-            .support-badge {
-                display: inline-block;
-                background: #e3f2fd;
-                color: #1976d2;
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-size: 13px;
-                font-weight: 600;
-                margin-top: 12px;
-            }
-            @media (max-width: 600px) {
-                .email-body {
-                    padding: 24px 20px;
-                }
-                .email-header {
-                    padding: 30px 20px;
-                }
-                .email-header h1 {
-                    font-size: 24px;
-                }
-                .footer {
-                    padding: 20px 15px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="email-container">
-            <!-- Header -->
-            <div class="email-header">
-                <h1>🎯 ¡Bienvenido!</h1>
-                <p>Tu panel de registro está listo</p>
-            </div>
+    const firstName = (leaderName || 'lider').split(' ')[0];
 
-            <!-- Body -->
-            <div class="email-body">
-                <div class="greeting">
-                    Hola <span>${firstName}</span>,
-                </div>
-
-                <div class="description">
-                    Ya estás listo para comenzar a registrar personas en tu red. Usa el siguiente enlace o escanea el código QR para acceder al formulario de registro personalizado.
-                </div>
-
-                <!-- CTA Button -->
-                <div class="cta-section">
-                    <a href="${registrationLink}" class="cta-button">
-                        → Ir al Formulario
-                    </a>
-                </div>
-
-                <!-- Divider -->
-                <div class="divider"></div>
-
-                <!-- QR Code Section -->
-                <div class="qr-section">
-                    <div class="qr-label">📱 Código QR</div>
-                    <img src="${qrDataUri}" alt="Código QR de registro" class="qr-image">
-                    <div class="link-section">
-                        <div class="link-label">O copia este enlace:</div>
-                        <div class="link-text">${registrationLink}</div>
-                    </div>
-                </div>
-
-                <div class="description" style="margin-top: 32px; margin-bottom: 0;">
-                    <strong>💡 Consejos:</strong>
-                    <ul style="margin: 12px 0 0 20px; line-height: 1.8;">
-                        <li>Comparte el enlace con tu equipo directamente</li>
-                        <li>Imprime el código QR para distribuirlo</li>
-                        <li>Monitorea los registros en tu panel</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="footer">
-                <p>Si tienes dudas o necesitas soporte, <a href="mailto:soporte@servidor.com">contacta al equipo</a>.</p>
-                <div class="support-badge">
-                    ✓ Email enviado de forma segura
-                </div>
-                <p style="margin-top: 16px; opacity: 0.7;">
-                    © 2026 Sistema de Registros. Todos los derechos reservados.
-                </p>
-            </div>
-        </div>
-    </body>
-    </html>
+    const bodyHtml = `
+      <p style="margin: 0 0 18px 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hola ${firstName},</p>
+      <p style="margin: 0 0 18px 0; font-size: 14px; color: #64748b; line-height: 1.7;">
+        Escanea el codigo QR o usa el enlace para abrir el formulario de registro.
+      </p>
+      <div style="background: #f8fafc; border-radius: 12px; padding: 18px; text-align: center; margin-bottom: 16px;">
+        <img src="${qrDataUri}" alt="Codigo QR de registro" style="display: block; max-width: 180px; height: auto; border-radius: 8px; margin: 0 auto;">
+        <div style="margin-top: 14px; font-size: 12px; color: #64748b;">Enlace:</div>
+        <div style="font-family: 'Courier New', monospace; font-size: 12px; color: #1d4ed8; word-break: break-word;">${registrationLink}</div>
+      </div>
+      <ul style="margin: 0; padding-left: 18px; color: #64748b; font-size: 13px; line-height: 1.6;">
+        <li>Comparte el enlace con tu equipo</li>
+        <li>Imprime el codigo QR para distribuir</li>
+        <li>Monitorea los registros en tu panel</li>
+      </ul>
     `;
+
+    return this.wrapEmail({
+      title: 'Tu enlace de registro',
+      subtitle: 'Acceso rapido al formulario',
+      bodyHtml,
+      ctaLabel: 'Abrir formulario',
+      ctaUrl: registrationLink
+    });
   }
 }
 

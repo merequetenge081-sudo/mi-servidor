@@ -542,12 +542,14 @@ function loadLeadersTable() {
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
                     <div class="action-menu-dropdown" data-leader-id="${leader._id}">
+                        <button class="menu-item menu-scroll menu-scroll-up" data-scroll="up"><i class="bi bi-chevron-up"></i> Subir</button>
                         ${leader.email ? `<button class="menu-item send-email-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" data-leader-email="${leader.email}"><i class=\"bi bi-envelope\"></i> Enviar Correo</button>` : ''}
                         <button class="menu-item qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}"><i class=\"bi bi-qr-code\"></i> Ver QR</button>
                         <a href="/form.html?token=${leader.token || leader.leaderId || leader._id}" target="_blank" class="menu-item" style="text-decoration: none;"><i class=\"bi bi-box-arrow-up-right\"></i> Ver Formulario</a>
                         <button class="menu-item edit-leader-btn" data-leader-id="${leader._id}"><i class=\"bi bi-pencil\"></i> Editar</button>
                         <button class="menu-item gen-pass-btn" data-leader-id="${leader._id}" style="color: #dc2626; font-weight: 600;\"><i class=\"bi bi-key\"></i> Generar Contraseña</button>
                         <button class="menu-item delete-leader-btn" data-leader-id="${leader._id}" style="color: #dc2626; font-weight: 600;\"><i class=\"bi bi-trash\"></i> Eliminar</button>
+                        <button class="menu-item menu-scroll menu-scroll-down" data-scroll="down"><i class="bi bi-chevron-down"></i> Bajar</button>
                     </div>
                 </div>
             </td>
@@ -565,11 +567,46 @@ function loadLeadersTable() {
             e.stopPropagation();
             const leaderId = btn.dataset.leaderId;
             const menu = document.querySelector(`.action-menu-dropdown[data-leader-id="${leaderId}"]`);
+            const container = btn.closest('.action-menu-container');
             const allMenus = document.querySelectorAll('.action-menu-dropdown');
             allMenus.forEach(m => {
-                if (m !== menu) m.style.display = 'none';
+                if (m !== menu) {
+                    m.style.display = 'none';
+                    m.style.maxHeight = '';
+                    m.classList.remove('open-up', 'open-down');
+                    const otherContainer = m.closest('.action-menu-container');
+                    if (otherContainer) {
+                        otherContainer.classList.remove('is-open');
+                    }
+                }
             });
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            const willShow = menu.style.display === 'none' || menu.style.display === '';
+            menu.style.display = willShow ? 'block' : 'none';
+
+            if (container) {
+                container.classList.toggle('is-open', willShow);
+            }
+
+            if (willShow) {
+                const scrollContainer = document.querySelector('.main-scrollable-content');
+                const containerRect = scrollContainer
+                    ? scrollContainer.getBoundingClientRect()
+                    : { top: 0, bottom: window.innerHeight };
+                const btnRect = btn.getBoundingClientRect();
+                const menuHeight = menu.scrollHeight;
+                const spaceBelow = containerRect.bottom - btnRect.bottom;
+                const spaceAbove = btnRect.top - containerRect.top;
+                const openUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
+                const available = Math.max(0, openUp ? spaceAbove : spaceBelow);
+
+                menu.classList.toggle('open-up', openUp);
+                menu.classList.toggle('open-down', !openUp);
+                if (available > 0) {
+                    menu.style.maxHeight = `${Math.max(160, available - 12)}px`;
+                } else {
+                    menu.style.maxHeight = '';
+                }
+            }
         });
     });
 
@@ -578,8 +615,33 @@ function loadLeadersTable() {
         if (!e.target.closest('.action-menu-container')) {
             document.querySelectorAll('.action-menu-dropdown').forEach(menu => {
                 menu.style.display = 'none';
+                menu.style.maxHeight = '';
+                menu.classList.remove('open-up', 'open-down');
+                const container = menu.closest('.action-menu-container');
+                if (container) {
+                    container.classList.remove('is-open');
+                }
             });
         }
+    });
+
+    const scrollContainer = document.querySelector('.main-scrollable-content');
+    document.querySelectorAll('.menu-scroll-up').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (scrollContainer) {
+                scrollContainer.scrollBy({ top: -220, behavior: 'smooth' });
+            }
+        });
+    });
+
+    document.querySelectorAll('.menu-scroll-down').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (scrollContainer) {
+                scrollContainer.scrollBy({ top: 220, behavior: 'smooth' });
+            }
+        });
     });
 
     document.querySelectorAll('.qr-btn').forEach(btn => {

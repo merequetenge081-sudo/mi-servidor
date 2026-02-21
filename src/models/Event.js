@@ -13,6 +13,7 @@ const eventSchema = new mongoose.Schema({
   organizationId: { 
     type: String,
     required: true,
+    default: "default",
     index: true
   },
   

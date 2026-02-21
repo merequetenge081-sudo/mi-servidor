@@ -10,6 +10,7 @@ import * as duplicatesController from "../controllers/duplicates.controller.js";
 import * as auditController from "../controllers/audit.controller.js";
 import * as whatsappController from "../controllers/whatsapp.controller.js";
 import * as organizationController from "../controllers/organization.controller.js";
+import * as puestosController from "../controllers/puestos.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { roleMiddleware } from "../middleware/role.middleware.js";
 import { organizationRoleMiddleware } from "../middleware/organization.middleware.js";
@@ -191,12 +192,24 @@ router.post("/auth/accept-legal-terms", authMiddleware, acceptLegalTerms);
 router.get("/auth/legal-terms-status", authMiddleware, checkLegalTermsStatus);
 
 // ==================== ORGANIZACIONES (MULTI-TENANT) ====================
-router.post("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.createOrganization);
-router.get("/organizations", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.getOrganizations);
-router.get("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin", "org_admin"), organizationController.getOrganizationDetails);
-router.put("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.updateOrganization);
-router.delete("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("super_admin"), organizationController.deleteOrganization);
-router.get("/organizations/:orgId/stats", authMiddleware, organizationRoleMiddleware("super_admin", "org_admin"), organizationController.getOrganizationStats);
+router.post("/organizations", authMiddleware, organizationRoleMiddleware("admin"), organizationController.createOrganization);
+router.get("/organizations", authMiddleware, organizationRoleMiddleware("admin"), organizationController.getOrganizations);
+router.get("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("admin", "org_admin"), organizationController.getOrganizationDetails);
+router.put("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("admin"), organizationController.updateOrganization);
+router.delete("/organizations/:orgId", authMiddleware, organizationRoleMiddleware("admin"), organizationController.deleteOrganization);
+router.get("/organizations/:orgId/stats", authMiddleware, organizationRoleMiddleware("admin", "org_admin"), organizationController.getOrganizationStats);
+
+// ==================== PUESTOS DE VOTACIÓN ====================
+// Público (para formularios públicos de registro)
+router.get("/public/localidades", rateLimitMiddleware, puestosController.getLocalidadesHandler);
+router.get("/public/puestos", rateLimitMiddleware, puestosController.getPuestosHandler);
+router.get("/public/puestos/:id", rateLimitMiddleware, puestosController.getPuestoDetalleHandler);
+
+// Privado (requiere autenticación)
+router.get("/localidades", authMiddleware, puestosController.getLocalidadesHandler);
+router.get("/puestos", authMiddleware, puestosController.getPuestosHandler);
+router.get("/puestos/:id", authMiddleware, puestosController.getPuestoDetalleHandler);
+router.post("/puestos/import", authMiddleware, roleMiddleware("admin"), puestosController.importarPuestosHandler);
 
 // ==================== LÍDERES ====================
 router.post("/leaders", authMiddleware, roleMiddleware("admin"), leaderController.createLeader);

@@ -4,13 +4,11 @@
  */
 
 const requestCounts = {};
-const WINDOW_SIZE = 15 * 60 * 1000;
-const MAX_REQUESTS = 200;
-
-const loginAttempts = {};
-const LOGIN_WINDOW = 15 * 60 * 1000;
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_TIME = 30 * 60 * 1000;
+const loginRequestCounts = {};
+const WINDOW_SIZE = 15 * 60 * 1000; // 15 minutes in milliseconds
+const MAX_REQUESTS = 200; // Maximum 200 requests per window
+const LOGIN_WINDOW_SIZE = 10 * 60 * 1000; // 10 minutes in milliseconds
+const LOGIN_MAX_REQUESTS = 10; // Maximum 10 login attempts per window
 
 function getClientIp(req) {
   return (
@@ -60,50 +58,39 @@ export function rateLimitMiddleware(req, res, next) {
 }
 
 export function loginRateLimitMiddleware(req, res, next) {
-  const loginKey = getLoginKey(req);
+  const clientIp = getClientIp(req);
   const now = Date.now();
 
-  if (!loginAttempts[loginKey]) {
-    loginAttempts[loginKey] = { attempts: [], lockedUntil: null };
+  if (!loginRequestCounts[clientIp]) {
+    loginRequestCounts[clientIp] = [];
   }
 
-  const userLogin = loginAttempts[loginKey];
+  loginRequestCounts[clientIp] = loginRequestCounts[clientIp].filter(
+    timestamp => now - timestamp < LOGIN_WINDOW_SIZE
+  );
 
-  if (userLogin.lockedUntil && now < userLogin.lockedUntil) {
-    const remainingTime = Math.ceil((userLogin.lockedUntil - now) / 1000 / 60);
+  if (loginRequestCounts[clientIp].length >= LOGIN_MAX_REQUESTS) {
     return res.status(429).json({
-      error: `Cuenta bloqueada por demasiados intentos. Intenta en ${remainingTime} minutos.`,
-      retryAfter: Math.ceil((userLogin.lockedUntil - now) / 1000),
-      locked: true
+      error: "Demasiados intentos de login. Intenta mas tarde.",
+      retryAfter: Math.ceil(
+        (loginRequestCounts[clientIp][0] + LOGIN_WINDOW_SIZE - now) / 1000
+      )
     });
   }
 
-  userLogin.attempts = userLogin.attempts.filter(
-    timestamp => now - timestamp < LOGIN_WINDOW
-  );
+  loginRequestCounts[clientIp].push(now);
 
-  const attemptsRemaining = MAX_LOGIN_ATTEMPTS - userLogin.attempts.length;
-
-  req.loginRateLimit = {
-    recordFailedAttempt: () => {
-      userLogin.attempts.push(now);
-      if (userLogin.attempts.length >= MAX_LOGIN_ATTEMPTS) {
-        userLogin.lockedUntil = now + LOCKOUT_TIME;
-      }
-    },
-    resetAttempts: () => {
-      loginAttempts[loginKey] = { attempts: [], lockedUntil: null };
-    },
-    getAttemptsRemaining: () => {
-      return MAX_LOGIN_ATTEMPTS - userLogin.attempts.length;
-    }
-  };
-
-  res.setHeader('X-Login-Attempts-Remaining', attemptsRemaining);
+  res.setHeader("X-RateLimit-Limit", LOGIN_MAX_REQUESTS);
+  res.setHeader("X-RateLimit-Remaining", LOGIN_MAX_REQUESTS - loginRequestCounts[clientIp].length);
+  res.setHeader("X-RateLimit-Reset", new Date(now + LOGIN_WINDOW_SIZE).toISOString());
 
   next();
 }
 
+/**
+ * Cleanup old entries periodically (every hour)
+ * to prevent memory leak from abandoned IPs
+ */
 setInterval(() => {
   const now = Date.now();
   for (const ip in requestCounts) {
@@ -114,11 +101,12 @@ setInterval(() => {
       delete requestCounts[ip];
     }
   }
-  for (const key in loginAttempts) {
-    const data = loginAttempts[key];
-    data.attempts = data.attempts.filter(t => now - t < LOGIN_WINDOW);
-    if (data.attempts.length === 0 && (!data.lockedUntil || now >= data.lockedUntil)) {
-      delete loginAttempts[key];
+  for (const ip in loginRequestCounts) {
+    loginRequestCounts[ip] = loginRequestCounts[ip].filter(
+      timestamp => now - timestamp < LOGIN_WINDOW_SIZE
+    );
+    if (loginRequestCounts[ip].length === 0) {
+      delete loginRequestCounts[ip];
     }
   }
-}, 60 * 60 * 1000);
+}, 60 * 60 * 1000); // 1 hour

@@ -137,13 +137,20 @@ h6 {
 .modern-input {
     width: 100%;
     padding: 14px 16px;
-    padding-left: 48px;
+        padding-left: 56px;
+    /* Space for icon */
     background: white;
     border: 2px solid #e2e8f0;
     border-radius: var(--input-radius);
     font-size: 1rem;
     color: var(--text-dark);
     transition: var(--transition);
+    position: relative;
+    z-index: 1;
+}
+
+.modern-input.has-right-icon {
+    padding-right: 56px;
 }
 
 .modern-input:focus {
@@ -154,13 +161,19 @@ h6 {
 
 .input-icon {
     position: absolute;
-    left: 16px;
+        left: 20px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
     font-size: 1.1rem;
     transition: var(--transition);
     pointer-events: none;
+    z-index: 2;
+}
+
+.modern-input-group .password-toggle {
+    z-index: 3;
+        padding: 6px;
 }
 
 .modern-input:focus+.input-icon {

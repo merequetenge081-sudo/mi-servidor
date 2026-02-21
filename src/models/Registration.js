@@ -13,8 +13,20 @@ const registrationSchema = new mongoose.Schema({
   departamento: String,
   capital: String,
   registeredToVote: { type: Boolean, default: false },
-  votingPlace: String,
-  votingTable: String,
+  
+  // Referencia a puesto de votación (antes era texto libre: votingPlace)
+  puestoId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Puestos',
+    default: null
+  },
+  
+  // Mesa de votación (número, antes era texto libre: votingTable)
+  mesa: {
+    type: Number,
+    default: null
+  },
+  
   date: String,
   notifications: {
     emailSent: { type: Boolean, default: false },
@@ -48,8 +60,6 @@ registrationSchema.pre('save', function(next) {
   if (this.phone) this.phone = this.phone.trim();
   if (this.localidad) this.localidad = this.localidad.trim();
   if (this.leaderName) this.leaderName = this.leaderName.trim();
-  if (this.votingPlace) this.votingPlace = this.votingPlace.trim();
-  if (this.votingTable) this.votingTable = this.votingTable.trim();
   next();
 });
 
