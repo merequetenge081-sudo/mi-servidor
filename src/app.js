@@ -159,6 +159,11 @@ app.get("/dashboard.html", (req, res) => {
   res.sendFile(join(__dirname, "../public/dashboard.html"));
 });
 
+// Dashboard Admin SPA routes (History API support)
+app.get("/dashboard.html/:section", (req, res) => {
+  res.sendFile(join(__dirname, "../public/dashboard.html"));
+});
+
 // Formulario público de registro
 app.get("/form", (req, res) => {
   res.sendFile(join(__dirname, "../public/form.html"));

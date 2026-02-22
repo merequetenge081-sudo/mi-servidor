@@ -1005,12 +1005,7 @@ function populateLeaderFilter() {
     const select = document.getElementById('leaderFilter');
     select.innerHTML = '<option value="">-- Todos los Líderes --</option>' +
         allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
-}
-
-function populateExportLeader() {
-    const select = document.getElementById('exportLeaderSelect');
-    select.innerHTML = allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
-}
+ }
 
 function populateAnalyticsLeaderFilter() {
     const select = document.getElementById('analyticsLeaderFilter');
@@ -1240,38 +1235,6 @@ if (document.getElementById('saveEditLeaderBtn')) {
             console.error(err);
             showAlert('Error de conexión', 'error');
         }
-    });
-}
-
-function showQR(leaderId, leaderName) {
-    const leader = allLeaders.find(l => l._id === leaderId);
-    if (!leader) return;
-
-    const token = leader.token || leader.leaderId || leader._id;
-    const finalLink = `${window.location.origin}/form.html?token=${token}`;
-
-    document.getElementById('qrCode').innerHTML = '';
-    // Check if QRCode lib exists
-    if (typeof QRCode !== 'undefined') {
-        new QRCode(document.getElementById('qrCode'), {
-            text: finalLink,
-            width: 200,
-            height: 200
-        });
-    } else {
-        document.getElementById('qrCode').textContent = 'Librería QRCode no cargada.';
-    }
-
-    const qrLinkInput = document.getElementById('qrLink');
-    if (qrLinkInput) qrLinkInput.value = finalLink;
-
-    document.getElementById('qrModal').classList.add('active');
-}
-
-// Close listeners for new modals if not already bound
-if (document.getElementById('closeEditLeaderModal')) {
-    document.getElementById('closeEditLeaderModal').addEventListener('click', () => {
-        document.getElementById('editLeaderModal').classList.remove('active');
     });
 }
 
@@ -1577,37 +1540,67 @@ function bindAnalyticsFilters() {
     analyticsFiltersBound = true;
 }
 
+// ============== SPA ROUTING (History API) ==============
+function navigateToSection(section, updateHistory = true) {
+    if (!section) section = 'dashboard';
+    
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    
+    const navLink = document.querySelector(`[data-section="${section}"]`);
+    const sectionEl = document.getElementById(section);
+    
+    if (navLink) navLink.classList.add('active');
+    if (sectionEl) sectionEl.classList.add('active');
+    
+    if (updateHistory) {
+        const url = section === 'dashboard' ? '/dashboard.html' : `/dashboard.html/${section}`;
+        window.history.pushState({ section }, '', url);
+    }
+    
+    document.title = section === 'dashboard' ? 'Dashboard' : `${section.charAt(0).toUpperCase() + section.slice(1)} - Dashboard`;
+    
+    requestAnimationFrame(() => {
+        if (section === 'registrations') filterRegistrations();
+        if (section === 'dashboard' && !chartsLoaded) { loadCharts(); chartsLoaded = true; }
+        if (section === 'analytics') {
+            populateAnalyticsLeaderFilter();
+            bindAnalyticsFilters();
+            if (!analyticsLoaded) { loadAnalytics(); analyticsLoaded = true; }
+        }
+        const leaderSearchInput = document.getElementById('leaderSearchInput');
+        if (leaderSearchInput && section === 'leaders' && !leaderSearchInput.hasListener) {
+            leaderSearchInput.addEventListener('input', (e) => filterLeadersByName(e.target.value));
+            leaderSearchInput.hasListener = true;
+        }
+    });
+}
+
+function getSectionFromUrl() {
+    const path = window.location.pathname;
+    const match = path.match(/\/dashboard\.html\/(.+)$/);
+    return match ? match[1] : 'dashboard';
+}
+
+window.addEventListener('popstate', (e) => {
+    const section = e.state?.section || getSectionFromUrl();
+    navigateToSection(section, false);
+});
+
 // NAV LINKS
 document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
         const section = link.dataset.section;
-        // Sidebar styling management
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-
-        // Main content management
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(section).classList.add('active');
-
-        // Lazy-load heavy sections
-        requestAnimationFrame(() => {
-            if (section === 'registrations') filterRegistrations();
-            if (section === 'dashboard' && !chartsLoaded) { loadCharts(); chartsLoaded = true; }
-            if (section === 'analytics') {
-                populateAnalyticsLeaderFilter();
-                bindAnalyticsFilters();
-                if (!analyticsLoaded) { loadAnalytics(); analyticsLoaded = true; }
-            }
-
-            // Attach leader search listener
-            const leaderSearchInput = document.getElementById('leaderSearchInput');
-            if (leaderSearchInput && section === 'leaders' && !leaderSearchInput.hasListener) {
-                leaderSearchInput.addEventListener('input', (e) => filterLeadersByName(e.target.value));
-                leaderSearchInput.hasListener = true;
-            }
-        });
+        navigateToSection(section);
     });
 });
+
+// Initial route on page load
+const initialSection = getSectionFromUrl();
+if (initialSection !== 'dashboard') {
+    navigateToSection(initialSection, false);
+}
 
 // ============== HAMBURGER MENU ==============
 function toggleHamburgerMenu() {
@@ -2468,21 +2461,6 @@ function deleteLeader(leaderId) {
     openDeleteLeaderModal();
 }
 
-function showEditLeader(leaderId) {
-    const leader = allLeaders.find(l => l._id === leaderId);
-    if (!leader) return showAlert('Líder no encontrado', 'error');
-
-    document.getElementById('editLeaderId').value = leaderId;
-    document.getElementById('editLeaderName').value = leader.name;
-    document.getElementById('editLeaderEmail').value = leader.email || '';
-    document.getElementById('editLeaderPhone').value = leader.phone || '';
-
-    // If username exists, maybe show it but usually not editable here or it's complex
-    // For now just basic info
-
-    document.getElementById('editLeaderModal').classList.add('active');
-}
-
 // Bind Edit Leader Save Button
 if (document.getElementById('saveEditLeaderBtn')) {
     document.getElementById('saveEditLeaderBtn').addEventListener('click', async () => {
@@ -2512,33 +2490,6 @@ if (document.getElementById('saveEditLeaderBtn')) {
             showAlert('Error de conexión', 'error');
         }
     });
-}
-
-function showQR(leaderId, leaderName) {
-    const link = `${window.location.origin}/form.html?token=${leaderId}`; // Simple token usage for now
-    // Actually find the exact token from leader object if possible, falling back to ID
-    const leader = allLeaders.find(l => l._id === leaderId);
-    if (!leader) return;
-
-    const token = leader.token || leader.leaderId || leader._id;
-    const finalLink = `${window.location.origin}/form.html?token=${token}`;
-
-    document.getElementById('qrCode').innerHTML = '';
-    // Check if QRCode lib exists
-    if (typeof QRCode !== 'undefined') {
-        new QRCode(document.getElementById('qrCode'), {
-            text: finalLink,
-            width: 200,
-            height: 200
-        });
-    } else {
-        document.getElementById('qrCode').textContent = 'Librería QRCode no cargada.';
-    }
-
-    const qrLinkInput = document.getElementById('qrLink');
-    if (qrLinkInput) qrLinkInput.value = finalLink;
-
-    document.getElementById('qrModal').classList.add('active');
 }
 
 // Close listeners for new modals if not already bound
