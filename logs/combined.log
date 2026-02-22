@@ -4768,3 +4768,16 @@
 {"level":"info","message":"GET /events 200 82ms","service":"mi-servidor","timestamp":"2026-02-22 01:14:25"}
 {"level":"info","message":"GET /leaders 200 100ms","service":"mi-servidor","timestamp":"2026-02-22 01:14:25"}
 {"level":"info","message":"GET /registrations 304 1432ms","service":"mi-servidor","timestamp":"2026-02-22 01:14:26"}
+{"level":"info","message":"GET /leaders 200 81ms","service":"mi-servidor","timestamp":"2026-02-22 01:20:41"}
+{"level":"info","message":"GET /events 200 85ms","service":"mi-servidor","timestamp":"2026-02-22 01:20:41"}
+{"level":"info","message":"GET /registrations 304 1247ms","service":"mi-servidor","timestamp":"2026-02-22 01:20:43"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-22 01:20:54"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-22 01:20:54"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-22 01:20:55"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-22 01:20:55"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 01:20:56"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-22 01:20:56"}
+{"level":"info","message":"GET /puestos/Fontib%C3%B3n 401 3ms","service":"mi-servidor","timestamp":"2026-02-22 01:21:27"}
+{"level":"info","message":"GET /events 200 104ms","service":"mi-servidor","timestamp":"2026-02-22 01:26:19"}
+{"level":"info","message":"GET /leaders 200 91ms","service":"mi-servidor","timestamp":"2026-02-22 01:26:19"}
+{"level":"info","message":"GET /registrations 304 728ms","service":"mi-servidor","timestamp":"2026-02-22 01:26:20"}
