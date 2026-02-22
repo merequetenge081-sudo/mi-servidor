@@ -517,6 +517,7 @@ export async function sendAccessEmail(req, res) {
                    (process.env.FRONTEND_URL) ||
                    `${req.protocol}://${req.get('host')}`;
 
+    logger.info(`📧 Base URL: ${baseUrl}`);
     logger.info(`📧 Enviando correos a ${leader.email} para ${leader.name}...`);
     logger.info(`📧 Flags: Welcome=${shouldSendWelcome}, Credentials=${shouldSendCredentials}, QR=${shouldSendQR}, Warning=${shouldSendWarning}`);
 
