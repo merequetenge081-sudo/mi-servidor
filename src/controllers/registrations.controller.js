@@ -191,6 +191,14 @@ export async function getRegistrations(req, res) {
     const { eventId, leaderId, confirmed, cedula, requiereRevisionPuesto, page = 1, limit = 50 } = req.query;
     const filter = buildOrgFilter(req); // Multi-tenant filtering
 
+    console.log('[RegistrationsController] getRegistrations:', {
+      organizationId: req.organizationId,
+      filter,
+      eventId,
+      page,
+      limit
+    });
+
     if (eventId) filter.eventId = eventId;
     if (leaderId) filter.leaderId = leaderId;
     if (confirmed !== undefined) filter.confirmed = confirmed === "true";
@@ -214,6 +222,12 @@ export async function getRegistrations(req, res) {
 
     const total = await Registration.countDocuments(filter);
     const confirmedCount = await Registration.countDocuments({ ...filter, confirmed: true });
+
+    console.log('[RegistrationsController] Resultados:', {
+      totalEncontrados: total,
+      registracionesRetornadas: registrations.length,
+      confirmedCount
+    });
 
     res.json({
       data: registrations.map(normalizeRegistration),

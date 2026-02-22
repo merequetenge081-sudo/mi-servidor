@@ -14,11 +14,12 @@ class EmailService {
   init() {
     const apiKey = process.env.RESEND_API_KEY;
     const forceMock = process.env.FORCE_EMAIL_MOCK === 'true';
+    const isTestKey = apiKey && apiKey.includes('placeholder');
 
-    logger.info(`📧 EmailService Init - RESEND_API_KEY: ${apiKey ? 'Configurado' : 'NO configurado'}`);
+    logger.info(`📧 EmailService Init - RESEND_API_KEY: ${apiKey ? 'Configurado' : 'NO configurado'}${isTestKey ? ' (clave de prueba)' : ''}`);
 
-    if (!apiKey || forceMock) {
-      logger.warn('⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).');
+    if (!apiKey || forceMock || isTestKey) {
+      logger.warn('⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada, forzado o clave de prueba).');
       this.mockMode = true;
       return;
     }
