@@ -2371,17 +2371,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Puesto de Votación</label>
-                    <div id="editPuestoCatalogo">
-                        <select class="form-input" id="editPuestoId">
-                            <option value="">Selecciona tu puesto de votación</option>
-                        </select>
-                    </div>
-                    <div id="editPuestoManual" style="display: none;">
-                        <input type="text" class="form-input" id="editVotingPlace">
-                    </div>
-                </div>
+                 <div class="form-group">
+                     <label class="form-label">Puesto de Votación</label>
+                     <div id="editPuestoCatalogo" style="position: relative;">
+                         <input type="text" id="editPuestoBusqueda" placeholder="🔍 Escribe para buscar..." autocomplete="off" class="form-input" onkeyup="filtrarEditPuestos()" onfocus="mostrarEditDropdownPuestos()" onclick="mostrarEditDropdownPuestos()">
+                         <div id="editPuestoDropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e0e0e0; border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 4px;">
+                         </div>
+                         <input type="hidden" id="editPuestoId">
+                     </div>
+                     <div id="editPuestoManual" style="display: none;">
+                         <input type="text" class="form-input" id="editVotingPlace">
+                     </div>
+                 </div>
                 <div class="form-group">
                     <label class="form-label">Mesa</label>
                     <input type="text" class="form-input" id="editVotingTable">
@@ -3115,9 +3116,14 @@
         }
 
         // ============== EDIT MODAL ==============
+        let editPuestosCache = [];
+        
         async function cargarEditPuestos(localidad, selectedId = '') {
-            const select = document.getElementById('editPuestoId');
-            select.innerHTML = '<option value="">Selecciona tu puesto de votación</option>';
+            const input = document.getElementById('editPuestoBusqueda');
+            const hiddenInput = document.getElementById('editPuestoId');
+            input.value = '';
+            hiddenInput.value = '';
+            editPuestosCache = [];
 
             if (!localidad) {
                 return;
@@ -3131,18 +3137,79 @@
                 }
 
                 const data = await response.json();
-                const puestos = data.data || [];
-
-                select.innerHTML = '<option value="">Selecciona tu puesto de votación</option>' +
-                    puestos.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('');
+                editPuestosCache = data.data || [];
+                
+                mostrarEditDropdownPuestos();
 
                 if (selectedId) {
-                    select.value = selectedId;
+                    const puesto = editPuestosCache.find(p => p._id === selectedId);
+                    if (puesto) {
+                        input.value = `${puesto.nombre} (${puesto.codigoPuesto || ''})`;
+                        hiddenInput.value = selectedId;
+                    }
                 }
             } catch (error) {
                 console.error('Error al cargar puestos:', error);
             }
         }
+        
+        function normalizeEditPuestoTexto(value) {
+            return (value || '')
+                .normalize('NFD')
+                .replace(/\p{Diacritic}/gu, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function buildEditPuestoSearchText(puesto) {
+            const aliases = Array.isArray(puesto.aliases) ? puesto.aliases.join(' ') : '';
+            const base = `${puesto.nombre || ''} ${puesto.codigoPuesto || ''} ${aliases}`;
+            return normalizeEditPuestoTexto(base);
+        }
+
+        function filtrarEditPuestos() {
+            const terminoRaw = document.getElementById('editPuestoBusqueda').value;
+            const termino = normalizeEditPuestoTexto(terminoRaw);
+            
+            let puestosAMostrar = termino 
+                ? editPuestosCache.filter(p => buildEditPuestoSearchText(p).includes(termino))
+                : editPuestosCache;
+            
+            const dropdown = document.getElementById('editPuestoDropdown');
+            
+            if (puestosAMostrar.length === 0) {
+                dropdown.innerHTML = '<div style="padding: 12px; color: #999; text-align: center;">No hay resultados</div>';
+            } else {
+                dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => `
+                    <div onclick="seleccionarEditPuesto('${p._id}', '${(p.nombre || '').replace(/'/g, "\\'")}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+                        <strong>${p.nombre || 'Sin nombre'}</strong>
+                        <span style="color: #666; font-size: 12px; margin-left: 8px;">${p.codigoPuesto || ''}</span>
+                    </div>
+                `).join('');
+            }
+            
+            dropdown.style.display = 'block';
+        }
+        
+        function mostrarEditDropdownPuestos() {
+            filtrarEditPuestos();
+        }
+        
+        function seleccionarEditPuesto(id, nombre, codigo) {
+            document.getElementById('editPuestoBusqueda').value = `${nombre} (${codigo})`;
+            document.getElementById('editPuestoId').value = id;
+            document.getElementById('editPuestoDropdown').style.display = 'none';
+        }
+        
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('editPuestoCatalogo');
+            if (container && !container.contains(e.target)) {
+                const dropdown = document.getElementById('editPuestoDropdown');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+        });
 
         function handleEditLocalidadChange() {
             const localidad = document.getElementById('editLocalidad').value;
