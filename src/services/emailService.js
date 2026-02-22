@@ -7,7 +7,7 @@ class EmailService {
   constructor() {
     this.resend = null;
     this.mockMode = true;
-    this.fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+    this.fromEmail = process.env.EMAIL_FROM || 'redsp@fulars.com';
     this.init();
   }
 
