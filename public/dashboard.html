@@ -74,22 +74,21 @@
                     <span class="role">Administrador</span>
                 </div>
             </div>
-            <button class="logout-btn-icon" onclick="document.getElementById('logoutModal').classList.add('active')"
-                title="Cerrar Sesión">
+            <button class="logout-btn-icon" data-action="open-logout" title="Cerrar Sesión">
                 <i class="bi bi-box-arrow-right"></i>
             </button>
         </div>
     </aside>
 
     <!-- Overlay for Mobile -->
-    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay"></div>
 
     <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <!-- Top Navigation Bar -->
         <header class="top-bar">
             <div class="top-bar-left">
-                <button class="action-btn sidebar-toggle-main" onclick="toggleSidebar()" title="Alternar Menú">
+                <button class="action-btn sidebar-toggle-main" title="Alternar Menú">
                     <i class="bi bi-list"></i>
                 </button>
                 <div class="page-title-area">
@@ -107,13 +106,12 @@
             </div>
 
             <div class="top-bar-right">
-                <button class="action-btn theme-toggle" onclick="toggleDarkMode()" title="Tema Oscuro/Claro">
+                <button class="action-btn theme-toggle" title="Tema Oscuro/Claro">
                     <i class="bi bi-moon-stars"></i>
                 </button>
 
                 <div class="notification-wrapper">
-                    <button class="action-btn" id="notificationsBtn" onclick="toggleNotificationsDropdown()"
-                        title="Notificaciones">
+                    <button class="action-btn" id="notificationsBtn" title="Notificaciones">
                         <i class="bi bi-bell"></i>
                         <span class="badge-notification" id="notificationsBadge" style="display: none;">0</span>
                     </button>
@@ -121,7 +119,7 @@
                     <div class="notifications-dropdown" id="notificationsDropdown">
                         <div class="dropdown-header">
                             <span>Notificaciones</span>
-                            <button class="mark-read-btn" onclick="markAllRead()" style="display: none;">Leídas</button>
+                            <button class="mark-read-btn" data-action="notifications-mark-read" style="display: none;">Leídas</button>
                         </div>
                         <div class="dropdown-body" id="notificationsContent">
                             <div class="empty-state">
@@ -132,7 +130,7 @@
                     </div>
                 </div>
 
-                <button class="action-btn" onclick="toggleHelpDrawer()" title="Ayuda">
+                <button class="action-btn" data-action="help-toggle" title="Ayuda">
                     <i class="bi bi-question-circle"></i>
                 </button>
             </div>
@@ -211,9 +209,7 @@
                 <div class="table-container fade-in-up">
                     <div class="table-header">
                         <h3><i class="bi bi-clock-history"></i> Registros Recientes</h3>
-                        <button class="btn btn-sm btn-outline"
-                            onclick="document.querySelector('[data-section=\'registrations\']').click()">Ver
-                            Todos</button>
+                        <button class="btn btn-sm btn-outline" data-action="open-registrations">Ver Todos</button>
                     </div>
                     <div class="table-responsive">
                         <table class="table">
@@ -302,10 +298,10 @@
 
                 <!-- Tabs -->
                 <div class="tabs-container">
-                    <button class="tab-btn active" id="bogotaTab" onclick="showRegistrationTab('bogota')">
+                    <button class="tab-btn active" id="bogotaTab">
                         <i class="bi bi-building"></i> Bogotá D.C.
                     </button>
-                    <button class="tab-btn" id="restoTab" onclick="showRegistrationTab('resto')">
+                    <button class="tab-btn" id="restoTab">
                         <i class="bi bi-geo-alt"></i> Resto del País
                     </button>
                 </div>
@@ -395,83 +391,112 @@
             <section id="analytics" class="section">
                 <div class="section-header">
                     <h2>Análisis y Reportes</h2>
-                    <div class="filter-bar">
-                        <select id="analyticsRegionFilter" class="form-select">
-                            <option value="all">Todo el País</option>
-                            <option value="bogota">Solo Bogotá</option>
-                            <option value="resto">Resto del País</option>
-                        </select>
-                        <select id="analyticsLeaderFilter" class="form-select">
-                            <!-- Populated -->
-                        </select>
-                        <button class="btn btn-primary" id="applyAnalyticsFilterBtn">Aplicar</button>
-                        <button class="btn btn-outline" id="clearAnalyticsFilterBtn">Limpiar</button>
-                    </div>
+                    <p style="color: #999; margin: 8px 0 0 0; font-size: 13px;">Análisis de registraciones por región, líder y confirmación</p>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="avgConfirmRate">0%</h3>
-                            <span>Tasa Confirmación Promedio</span>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #667eea;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Región</label>
+                            <select id="analyticsRegionFilter" class="form-select" style="font-size: 14px;">
+                                <option value="all">Todo el País</option>
+                                <option value="bogota">Solo Bogotá</option>
+                                <option value="resto">Resto del País</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="avgRegsPerLeader">0</h3>
-                            <span>Promedio Regs/Líder</span>
+                        <div>
+                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Líder</label>
+                            <select id="analyticsLeaderFilter" class="form-select" style="font-size: 14px;">
+                                <!-- Populated -->
+                            </select>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="bogotaCount">0</h3>
-                            <span>Total Bogotá</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="restoCount">0</h3>
-                            <span>Total Resto País</span>
+                        <div style="display: flex; gap: 8px; align-items: flex-end;">
+                            <button class="btn btn-primary" id="applyAnalyticsFilterBtn" style="flex: 1; font-size: 14px;">
+                                <i class="bi bi-funnel"></i> Aplicar
+                            </button>
+                            <button class="btn btn-outline" id="clearAnalyticsFilterBtn" style="flex: 1; font-size: 14px;">
+                                <i class="bi bi-arrow-clockwise"></i> Limpiar
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="dashboard-row">
+                <!-- KPI Cards -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 24px;">
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%); border-left: 4px solid #667eea;">
+                        <div class="stat-info">
+                            <h3 id="avgConfirmRate" style="margin: 0 0 8px 0; font-size: 32px; color: #667eea;">0%</h3>
+                            <span style="color: #666; font-size: 13px;">Tasa Confirmación</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.05) 100%); border-left: 4px solid #43e97b;">
+                        <div class="stat-info">
+                            <h3 id="avgRegsPerLeader" style="margin: 0 0 8px 0; font-size: 32px; color: #43e97b;">0</h3>
+                            <span style="color: #666; font-size: 13px;">Total Registros</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(63, 81, 181, 0.05) 100%); border-left: 4px solid #4facfe;">
+                        <div class="stat-info">
+                            <h3 id="bogotaCount" style="margin: 0 0 8px 0; font-size: 32px; color: #4facfe;">0</h3>
+                            <span style="color: #666; font-size: 13px;">Bogotá</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 87, 34, 0.05) 100%); border-left: 4px solid #ffa726;">
+                        <div class="stat-info">
+                            <h3 id="restoCount" style="margin: 0 0 8px 0; font-size: 32px; color: #ffa726;">0</h3>
+                            <span style="color: #666; font-size: 13px;">Resto País</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="dashboard-row" style="margin-bottom: 24px;">
                     <div class="chart-container full-width">
-                        <h3><i class="bi bi-bar-chart"></i> Desempeño por Líder (Bogotá vs Nacional)</h3>
-                        <div class="chart-wrapper">
+                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
+                            <i class="bi bi-bar-chart" style="color: #667eea; margin-right: 8px;"></i>Desempeño por Líder
+                        </h3>
+                        <div class="chart-wrapper" style="height: 350px;">
                             <canvas id="leaderRegistrationsChart"></canvas>
                         </div>
                     </div>
                 </div>
 
+                <!-- Analytics Table and Chart Row -->
                 <div class="dashboard-row">
-                    <div class="chart-container half-width">
-                        <h3><i class="bi bi-geo-alt"></i> Top 10 Localidades/Dptos</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="localityChart"></canvas>
-                        </div>
-                    </div>
                     <div class="table-container half-width">
-                        <h3><i class="bi bi-list-ol"></i> Detalle por Líder</h3>
-                        <div class="table-responsive small-table">
-                            <table class="table">
-                                <thead>
+                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
+                            <i class="bi bi-list-ol" style="color: #667eea; margin-right: 8px;"></i>Detalle por Líder
+                        </h3>
+                        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                            <table class="table" style="font-size: 14px; margin-bottom: 0;">
+                                <thead style="position: sticky; top: 0; background: #f8f9fa;">
                                     <tr>
-                                        <th>Líder</th>
-                                        <th>Total</th>
-                                        <th>Conf.</th>
-                                        <th>Pend.</th>
-                                        <th>%</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb;">Líder</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Total</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Conf.</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Pend.</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">%</th>
                                     </tr>
                                 </thead>
-                                <tbody id="leaderDetailTable"></tbody>
+                                <tbody id="leaderDetailTable" style="font-size: 13px;"></tbody>
                             </table>
                         </div>
-                        <div class="pagination-container small">
-                            <button id="prevLeaderPageBtn" class="page-btn"><i class="bi bi-chevron-left"></i></button>
-                            <span id="leaderPageIndicator">Pág 1</span>
-                            <button id="nextLeaderPageBtn" class="page-btn"><i class="bi bi-chevron-right"></i></button>
+                        <div style="display: flex; justify-content: center; gap: 12px; padding: 12px 0; border-top: 1px solid #e5e7eb; margin-top: 12px;">
+                            <button id="prevLeaderPageBtn" class="page-btn" style="padding: 6px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; color: #667eea;">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span id="leaderPageIndicator" style="align-self: center; font-size: 12px; color: #666; min-width: 70px; text-align: center;">Pág 1</span>
+                            <button id="nextLeaderPageBtn" class="page-btn" style="padding: 6px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; color: #667eea;">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container half-width">
+                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
+                            <i class="bi bi-geo-alt" style="color: #667eea; margin-right: 8px;"></i>Top 10 Ubicaciones
+                        </h3>
+                        <div class="chart-wrapper" style="height: 350px;">
+                            <canvas id="localityChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -569,8 +594,7 @@
                     </div>
 
                     <div class="modal-footer" style="border: none; padding-top: 0;">
-                        <button class="btn btn-secondary"
-                            onclick="document.getElementById('leaderModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-secondary" data-close-modal="leaderModal">Cancelar</button>
                         <button class="btn btn-primary" id="saveLiderBtn">Crear Líder</button>
                     </div>
                 </div>
@@ -642,8 +666,7 @@
                         <select id="eventSelect" class="form-select full-width"></select>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary"
-                            onclick="document.getElementById('changeEventModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-secondary" data-close-modal="changeEventModal">Cancelar</button>
                         <button class="btn btn-primary" id="confirmChangeEventBtn">Cambiar</button>
                     </div>
                 </div>
@@ -703,8 +726,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary"
-                            onclick="document.getElementById('newRegModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-secondary" data-close-modal="newRegModal">Cancelar</button>
                         <button class="btn btn-primary" id="saveRegBtn">Guardar Registro</button>
                     </div>
                 </div>
@@ -780,8 +802,7 @@
                     </div>
 
                     <div class="modal-footer" style="border: none; padding-top: 10px;">
-                        <button type="button" class="btn btn-secondary"
-                            onclick="document.getElementById('resetPasswordModal').classList.remove('active')">Cerrar</button>
+                        <button type="button" class="btn btn-secondary" data-close-modal="resetPasswordModal">Cerrar</button>
                         <button type="button" class="btn btn-primary" id="confirmResetPassBtn"
                             style="background: #6366f1; border-color: #6366f1;">
                             <i class="bi bi-check-lg" style="margin-right: 6px;"></i> Guardar y Restablecer
@@ -837,8 +858,7 @@
                     </div>
 
                     <div class="modal-footer" style="border: none; padding-top: 0;">
-                        <button class="btn btn-secondary"
-                            onclick="document.getElementById('editLeaderModal').classList.remove('active')">Cancelar</button>
+                        <button class="btn btn-secondary" data-close-modal="editLeaderModal">Cancelar</button>
                         <button class="btn btn-primary" id="saveEditLeaderBtn"
                             style="background: #f59e0b; border-color: #f59e0b;">
                             <i class="bi bi-check-lg" style="margin-right: 6px;"></i> Guardar Cambios
@@ -859,8 +879,7 @@
                         <div id="notificationsContent"></div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary"
-                            onclick="document.getElementById('notificationsModal').classList.remove('active')">Cerrar</button>
+                        <button class="btn btn-secondary" data-close-modal="notificationsModal">Cerrar</button>
                     </div>
                 </div>
             </div>
@@ -896,9 +915,8 @@
                         <p style="color: var(--text-muted);">¿Seguro que deseas salir del sistema?</p>
                     </div>
                     <div class="modal-footer" style="justify-content: center; display: flex; border-top: none;">
-                        <button class="btn btn-secondary"
-                            onclick="document.getElementById('logoutModal').classList.remove('active')">Cancelar</button>
-                        <button class="btn btn-danger" onclick="confirmLogout()">Cerrar Sesión</button>
+                        <button class="btn btn-secondary" data-close-modal="logoutModal">Cancelar</button>
+                        <button class="btn btn-danger" data-action="confirm-logout">Cerrar Sesión</button>
                     </div>
                 </div>
             </div>
@@ -916,7 +934,7 @@
                             </div>
                             Enviar Correos
                         </h3>
-                        <button class="close-btn" onclick="closeSendEmailModal()"><i class="bi bi-x-lg"></i></button>
+                        <button class="close-btn" data-action="close-send-email"><i class="bi bi-x-lg"></i></button>
                     </div>
 
                     <div class="modal-body" style="padding-top: 10px;">
@@ -1029,8 +1047,8 @@
                     </div>
 
                     <div class="modal-footer" style="border: none; padding-top: 10px;">
-                        <button class="btn btn-secondary" onclick="closeSendEmailModal()">Cancelar</button>
-                        <button class="btn btn-primary" id="dashboard-send-emails-btn" onclick="confirmSendAccessEmail()"
+                        <button class="btn btn-secondary" data-action="close-send-email">Cancelar</button>
+                        <button class="btn btn-primary" id="dashboard-send-emails-btn"
                             style="background: #22c55e; border-color: #22c55e;">
                             <i class="bi bi-send-fill" style="margin-right: 6px;"></i> Enviar
                         </button>
@@ -1044,7 +1062,7 @@
         <div class="help-drawer" id="helpDrawer">
             <div class="help-drawer-header">
                 <h2><i class="bi bi-question-circle"></i> Ayuda</h2>
-                <button class="close-btn" onclick="closeHelpDrawer()">
+                <button class="close-btn" data-action="help-close">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -1067,46 +1085,12 @@
         </div>
 
         <!-- Help Overlay -->
-        <div class="help-overlay" id="helpOverlay" onclick="closeHelpDrawer()"></div>
+        <div class="help-overlay" id="helpOverlay" data-action="help-close"></div>
     </main>
 
-    <!-- FOOTER LEGAL -->
-    <footer class="site-footer">
-        <div class="footer-links">
-            <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer" class="footer-link">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                <span>SIC</span>
-            </a>
-            <span class="footer-divider">|</span>
-            <a href="#" onclick="event.preventDefault();document.getElementById('dashPolicyModal').classList.add('active')" class="footer-link footer-link-primary">
-                <i class="bi bi-shield-check"></i> Política de Datos
-            </a>
-        </div>
-        <span class="footer-copyright">© 2026 Red Social y Política</span>
-    </footer>
-
-    <div id="dashPolicyModal" class="policy-modal" onclick="if(event.target===this)this.classList.remove('active')">
-        <div class="policy-modal-content">
-            <div class="policy-modal-header">
-                <h3>Política de Tratamiento de Datos</h3>
-                <button onclick="document.getElementById('dashPolicyModal').classList.remove('active')" class="policy-modal-close">&times;</button>
-            </div>
-            <div class="policy-modal-body">
-                <h4>1. Responsable</h4>
-                <p>Datos tratados conforme a la Ley 1581 de 2012.</p>
-                <h4>2. Finalidad</h4>
-                <p>Estudio de información, análisis estadístico y métricas.</p>
-                <h4>3. Derechos</h4>
-                <p>Conocer, actualizar, rectificar datos y presentar quejas ante la SIC.</p>
-            </div>
-            <div class="policy-modal-footer">
-                <button onclick="document.getElementById('dashPolicyModal').classList.remove('active')" class="policy-modal-btn">Entendido</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="js/dashboard.js?v=2.7.1"></script>
-    <script src="js/modules/analytics.js?v=2.7.1"></script>
+    <!-- Scripts -->
+    <!-- Arquitectura modular (PRIMERO) -->
+    <script src="js/index.js"></script>
 </body>
 
 </html>

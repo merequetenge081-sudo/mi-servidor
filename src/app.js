@@ -35,7 +35,8 @@ app.use(
           "'unsafe-inline'",
           "https://cdn.jsdelivr.net",
           "https://cdnjs.cloudflare.com",
-          "https://cdn.tailwindcss.com"
+          "https://cdn.tailwindcss.com",
+          "https://fonts.googleapis.com"
         ],
         imgSrc: ["'self'", "data:"],
         connectSrc: [
@@ -48,6 +49,7 @@ app.use(
           "'self'",
           "https://cdnjs.cloudflare.com",
           "https://cdn.jsdelivr.net",
+          "https://fonts.googleapis.com",
           "data:"
         ],
       },
