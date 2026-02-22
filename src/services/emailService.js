@@ -152,6 +152,7 @@ class EmailService {
     
     const firstName = leader.name?.split(' ')[0] || 'Líder';
     const username = leader.username || 'No configurado';
+    const loginUrl = process.env.BASE_URL || 'https://redsociaypolitica.fulars.com';
     
     let tempPassword = 'No disponible';
     if (leader.tempPasswordPlaintext) {
@@ -180,6 +181,9 @@ class EmailService {
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 0 0 20px 0;">
             <p style="margin: 10px 0;"><strong>Usuario:</strong> <code style="background: #e9ecef; padding: 4px 8px; border-radius: 4px;">${username}</code></p>
             <p style="margin: 10px 0;"><strong>Contraseña temporal:</strong> <code style="background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-weight: bold;">${tempPassword}</code></p>
+          </div>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${loginUrl}" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">Iniciar Sesión</a>
           </div>
           <p style="color: #dc3545; font-size: 14px; margin: 0;">⚠️ Cambia tu contraseña después de iniciar sesión.</p>
         </div>
@@ -276,6 +280,7 @@ class EmailService {
     
     const firstName = leader.name?.split(' ')[0] || 'Líder';
     const username = leader.username || leader.email;
+    const loginUrl = process.env.BASE_URL || 'https://redsociaypolitica.fulars.com';
     
     const html = `
     <!DOCTYPE html>
@@ -291,6 +296,9 @@ class EmailService {
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 0 0 20px 0;">
             <p style="margin: 10px 0;"><strong>Usuario:</strong> <code style="background: #e9ecef; padding: 4px 8px; border-radius: 4px;">${username}</code></p>
             <p style="margin: 10px 0;"><strong>Contraseña temporal:</strong> <code style="background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-weight: bold;">${tempPassword}</code></p>
+          </div>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${loginUrl}" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">Iniciar Sesión</a>
           </div>
           <p style="color: #dc3545; font-size: 14px; margin: 0;">⚠️ Esta contraseña es temporal. Te recomendamos cambiarla después de iniciar sesión.</p>
         </div>
