@@ -361,6 +361,20 @@
     window.renderLeaderAnalyticsTable = renderLeaderAnalyticsTable;
     window.bindAnalyticsFilters = bindAnalyticsFilters;
 
+    // Initialize analytics when module loads
+    window.initAnalytics = function() {
+        console.log('[ANALYTICS] Initializing...');
+        bindAnalyticsFilters();
+        loadAnalytics();
+        initAnalyticsPagination();
+    };
+
+    // Refresh analytics data
+    window.refreshAnalytics = function() {
+        console.log('[ANALYTICS] Refreshing...');
+        loadAnalytics();
+    };
+
 })();
 
 // Note: Global state variables (leaderAnalyticsData, currentAnalyticsPage, etc.)
