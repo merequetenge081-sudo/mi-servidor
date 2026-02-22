@@ -161,12 +161,22 @@ export async function getLeaders(req, res) {
     const { eventId, active } = req.query;
     const filter = buildOrgFilter(req);
 
+    console.log('[LeadersController] getLeaders:', {
+      organizationId: req.organizationId,
+      filter,
+      eventId,
+      active
+    });
+
     if (eventId) filter.eventId = eventId;
     if (active !== undefined) filter.active = active === "true";
 
     const leaders = await Leader.find(filter)
       .select('-passwordHash -tempPasswordPlaintext')
       .sort({ name: 1 });
+
+    console.log('[LeadersController] Líderes encontrados:', leaders.length);
+
     res.json(leaders);
   } catch (error) {
     logger.error("Get leaders error:", { error: error.message, stack: error.stack });
