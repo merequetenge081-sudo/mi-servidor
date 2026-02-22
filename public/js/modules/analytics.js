@@ -363,18 +363,5 @@
 
 })();
 
-// ============== GLOBAL STATE ==============
-// These need to remain global for access from other modules
-let leaderAnalyticsData = [];
-let currentAnalyticsPage = 1;
-const analyticsItemsPerPage = 5;
-let chartsLoaded = false;
-let analyticsLoaded = false;
-let analyticsFiltersBound = false;
-
-// Initialize pagination once DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.Analytics) {
-        window.Analytics.initPagination();
-    }
-});
+// Note: Global state variables (leaderAnalyticsData, currentAnalyticsPage, etc.)
+// are declared in dashboard.js, not here. This module is loaded AFTER dashboard.js
