@@ -18,15 +18,20 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
+            padding-bottom: 120px;
         }
 
         .form-container {
             width: 100%;
             max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-card-wrapper {
+            min-height: calc(100vh - 180px);
+            display: flex;
+            align-items: center;
         }
 
         .form-card {
@@ -231,6 +236,78 @@
             margin-right: 8px;
             font-size: 16px;
         }
+
+        /* Site Footer */
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-top: 1px solid #e2e8f0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            font-size: 11px;
+        }
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-link {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 11px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #667eea;
+        }
+
+        .footer-link-primary {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .footer-divider {
+            color: #cbd5e1;
+        }
+
+        .footer-copyright {
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 80px;
+            }
+            
+            .site-footer {
+                flex-direction: column;
+                gap: 4px;
+                padding: 8px 12px;
+            }
+            
+            .footer-link span {
+                display: none;
+            }
+            
+            .footer-copyright {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -380,12 +457,12 @@
 
                 <div class="form-group">
                     <label class="required">Puesto de Votación</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="puestoBusqueda" placeholder="🔍 Busca por nombre..." style="flex: 1;" onkeyup="filtrarPuestos()">
+                    <div style="position: relative;">
+                        <input type="text" id="puestoBusqueda" placeholder="🔍 Escribe para buscar o click para ver opciones..." autocomplete="off" style="width: 100%;" onkeyup="filtrarPuestos()" onfocus="mostrarDropdownPuestos()" onclick="mostrarDropdownPuestos()">
+                        <div id="puestoDropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e0e0e0; border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 4px;">
+                        </div>
+                        <input type="hidden" id="puestoId" required>
                     </div>
-                    <select id="puestoId" required onchange="cargarMesas()" style="margin-top: 8px;">
-                        <option value="">Selecciona tu puesto de votación</option>
-                    </select>
                     <div class="form-text">
                         El lugar donde debes ir a votar
                     </div>
@@ -595,39 +672,56 @@
             const terminoRaw = document.getElementById('puestoBusqueda').value;
             const termino = normalizePuestoTexto(terminoRaw);
             
-            if (!termino) {
-                mostrarPuestosFiltrables();
-                return;
+            let puestosAMostrar = termino 
+                ? puestosCache.filter(p => buildPuestoSearchText(p).includes(termino))
+                : puestosCache;
+            
+            const dropdown = document.getElementById('puestoDropdown');
+            
+            if (puestosAMostrar.length === 0) {
+                dropdown.innerHTML = '<div style="padding: 12px; color: #999; text-align: center;">No hay resultados</div>';
+            } else {
+                dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => `
+                    <div class="puesto-option" data-id="${p._id}" data-nombre="${p.nombre}" onclick="seleccionarPuesto('${p._id}', '${(p.nombre || '').replace(/'/g, "\\'")}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+                        <strong>${p.nombre || 'Sin nombre'}</strong>
+                        <span style="color: #666; font-size: 12px; margin-left: 8px;">${p.codigoPuesto || ''}</span>
+                    </div>
+                `).join('');
             }
             
-            const puestosFiltrables = puestosCache.filter(p =>
-                buildPuestoSearchText(p).includes(termino)
-            );
-            
-            const select = document.getElementById('puestoId');
-            select.innerHTML = puestosFiltrables.length > 0 
-                ? '<option value="">Selecciona tu puesto</option>' +
-                  puestosFiltrables.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('')
-                : '<option value="">No hay resultados</option>';
+            dropdown.style.display = 'block';
         }
         
-        // Mostrar todos los puestos sin filtro
+        // Mostrar dropdown con todos los puestos
+        function mostrarDropdownPuestos() {
+            filtrarPuestos();
+        }
+        
+        // Seleccionar un puesto del dropdown
+        function seleccionarPuesto(id, nombre, codigo) {
+            document.getElementById('puestoBusqueda').value = `${nombre} (${codigo})`;
+            document.getElementById('puestoId').value = id;
+            document.getElementById('puestoDropdown').style.display = 'none';
+            cargarMesas();
+        }
+        
+        // Cerrar dropdown al hacer click fuera
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('puestoBusqueda')?.parentElement;
+            if (container && !container.contains(e.target)) {
+                const dropdown = document.getElementById('puestoDropdown');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+        });
+        
+        // Mostrar todos los puestos (actualizado para dropdown)
         function mostrarPuestosFiltrables() {
-            console.log('📝 mostrarPuestosFiltrables: puestosCache=', puestosCache);
-            const select = document.getElementById('puestoId');
-            const html = '<option value="">Selecciona tu puesto de votación</option>' +
-                puestosCache.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('');
-            console.log('🏗️  HTML generado:', html.substring(0, 100));
-            select.innerHTML = html;
-            console.log('✨ Select actualizado. Opciones:', select.options.length);
+            filtrarPuestos();
         }
         
         // Cargar mesas según puesto seleccionado
         async function cargarMesas() {
-            // La validación de mesas se realiza al enviar el formulario
-            // Solo limpiamos el campo si no hay puesto seleccionado
             const puestoId = document.getElementById('puestoId').value;
-            
             if (!puestoId) {
                 document.getElementById('mesa').value = '';
             }
@@ -712,7 +806,7 @@
                 localidad = departamento;
             }
             
-            const puestoId = document.getElementById('puestoId').value.trim();
+            const puestoId = document.getElementById('puestoId').value;
             const mesa = document.getElementById('mesa').value.trim();
             const phone = document.getElementById('phone').value.trim();
 
@@ -721,6 +815,11 @@
             const localidadValida = ubicacionTipo === 'bogota' ? localidad : departamento;
             if (!firstName || !lastName || !cedula || !localidadValida || !puestoId || !mesa) {
                 showError('Por favor completa todos los campos requeridos');
+                return;
+            }
+
+            if (ubicacionTipo === 'bogota' && !puestoId) {
+                showError('Por favor selecciona un puesto de votación');
                 return;
             }
 
@@ -831,6 +930,21 @@
             validateToken();
         });
     </script>
+
+    <!-- FOOTER LEGAL -->
+    <footer class="site-footer">
+        <div class="footer-links">
+            <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer" class="footer-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>SIC</span>
+            </a>
+            <span class="footer-divider">|</span>
+            <a href="#" onclick="showConsentPolicyModal(event)" class="footer-link footer-link-primary">
+                <i class="bi bi-shield-check"></i> Política de Datos
+            </a>
+        </div>
+        <span class="footer-copyright">© 2026 Red Social y Política</span>
+    </footer>
 </body>
 
 </html>

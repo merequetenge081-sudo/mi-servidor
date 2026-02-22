@@ -1,146 +1,41 @@
 import { Resend } from 'resend';
 import QRCode from 'qrcode';
-import crypto from 'crypto';
 import logger from '../config/logger.js';
-import { config } from '../config/env.js';
+import { decrypt } from '../utils/crypto.js';
 
 class EmailService {
   constructor() {
     this.resend = null;
-    this.initResend();
+    this.mockMode = true;
+    this.fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+    this.init();
   }
 
-  initResend() {
-    // Log de variables de entorno para debugging
-    logger.info(`📧 EmailService Init - NODE_ENV: ${process.env.NODE_ENV}`);
-    logger.info(`📧 RESEND_API_KEY configurado: ${process.env.RESEND_API_KEY ? 'Si' : 'No'}`);
-
-    // Permitir intento de envío real si se define RESEND_API_KEY
-    const hasResendKey = process.env.RESEND_API_KEY;
+  init() {
+    const apiKey = process.env.RESEND_API_KEY;
     const forceMock = process.env.FORCE_EMAIL_MOCK === 'true';
 
-    if (!hasResendKey || forceMock) {
-      logger.warn('⚠️  Usando modo mock para emails (RESEND_API_KEY no configurado o forzado).');
+    logger.info(`📧 EmailService Init - RESEND_API_KEY: ${apiKey ? 'Configurado' : 'NO configurado'}`);
+
+    if (!apiKey || forceMock) {
+      logger.warn('⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).');
       this.mockMode = true;
       return;
     }
 
     try {
-      logger.info(`📧 Inicializando Resend API`);
-      this.resend = new Resend(process.env.RESEND_API_KEY);
+      this.resend = new Resend(apiKey);
       this.mockMode = false;
-      logger.info(`✅ Resend API configurado correctamente`);
+      logger.info(`✅ Resend API configurada correctamente`);
     } catch (error) {
-      logger.error('❌ Error configurando EmailService:', error.message);
-      logger.error('Stack:', error.stack);
+      logger.error('❌ Error configurando Resend:', error.message);
       this.mockMode = true;
     }
   }
 
-    getBaseUrl(baseUrl) {
-        return baseUrl || process.env.BASE_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
-    }
-
-    decryptTempPassword(value) {
-        if (!value || typeof value !== 'string') return value;
-        if (!value.includes(':')) return value;
-
-        try {
-            const algorithm = 'aes-256-cbc';
-            const key = crypto.scryptSync(config.jwtSecret || 'fallback-key', 'salt', 32);
-            const parts = value.split(':');
-            if (parts.length !== 2) return value;
-            const iv = Buffer.from(parts[0], 'hex');
-            const encrypted = parts[1];
-            const decipher = crypto.createDecipheriv(algorithm, key, iv);
-            let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-            decrypted += decipher.final('utf8');
-            return decrypted;
-        } catch (error) {
-            logger.warn('No se pudo desencriptar tempPasswordPlaintext:', error.message);
-            return value;
-        }
-    }
-
-    wrapEmail({
-      title,
-      subtitle,
-      bodyHtml,
-      ctaLabel,
-      ctaUrl,
-      accent = '#1e3a8a',
-      footerNote = 'Este es un mensaje automatico. No respondas a este correo.'
-    }) {
-      const safeTitle = title || 'Actualizacion del sistema';
-      const safeSubtitle = subtitle || 'Red Social y Politica';
-      const buttonHtml = ctaLabel && ctaUrl ? `
-        <table cellpadding="0" cellspacing="0" style="margin-top: 26px;">
-          <tr>
-            <td style="background: ${accent}; border-radius: 8px; padding: 0;">
-              <a href="${ctaUrl}" style="display: inline-block; padding: 14px 34px; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; letter-spacing: 0.2px;">${ctaLabel}</a>
-            </td>
-          </tr>
-        </table>
-      ` : '';
-
-      return `<!DOCTYPE html>
-  <html lang="es">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${safeTitle}</title>
-  </head>
-  <body style="margin: 0; padding: 0; font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background-color: #f5f7fb;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f7fb;">
-      <tr>
-        <td align="center" style="padding: 36px 18px;">
-          <table width="100%" maxwidth="640" cellpadding="0" cellspacing="0" style="max-width: 640px; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);">
-            <tr>
-              <td style="padding: 18px 36px; border-bottom: 1px solid #e2e8f0;">
-                <table width="100%" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #64748b; font-weight: 700;">Red Social y Politica</td>
-                    <td align="right" style="font-size: 12px; color: #94a3b8;">Actualizacion segura</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 34px 36px 10px;">
-                <h1 style="margin: 0 0 8px 0; font-size: 26px; font-weight: 700; color: #0f172a; letter-spacing: -0.2px;">${safeTitle}</h1>
-                <p style="margin: 0; font-size: 14px; color: #64748b; line-height: 1.7;">${safeSubtitle}</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 18px 36px 36px; color: #334155; font-size: 14px; line-height: 1.8;">
-                ${bodyHtml}
-                ${buttonHtml}
-              </td>
-            </tr>
-            <tr>
-              <td style="background-color: #f8fafc; padding: 22px 36px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
-                <p style="margin: 0 0 6px 0;">${footerNote}</p>
-                <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 Red Social y Politica</p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-  </html>`;
-    }
-
-  /**
-   * Envía email con el enlace personalizado y QR al líder
-   * @param {Object} leader - Objeto líder con _id, name, email, token
-   * @param {string} baseUrl - URL base (ej: https://midominio.com)
-   * @returns {Promise<Object>} { success: true, messageId?: string }
-   */
-    async sendAccessEmail(leader, baseUrl = process.env.BASE_URL) {
+  async sendAccessEmail(leader, baseUrl = process.env.BASE_URL) {
     try {
-      logger.info(`📧 sendAccessEmail() llamada para: ${leader?.email || 'SIN EMAIL'}`);
-      logger.info(`📧 Mock mode: ${this.mockMode}`);
+      logger.info(`📧 sendAccessEmail() para: ${leader?.email}`);
       
       if (!leader || !leader.email) {
         throw new Error('Leader email no proporcionado');
@@ -150,439 +45,326 @@ class EmailService {
         throw new Error('Leader token no disponible');
       }
 
-            const resolvedBaseUrl = this.getBaseUrl(baseUrl);
-            const registrationLink = `${resolvedBaseUrl}/form.html?token=${leader.token}`;
-      
-      logger.info(`📧 Generando QR para enlace: ${registrationLink}`);
-
-      // Generar QR como data URI (para incrustar en el email)
+      const registrationLink = `${baseUrl}/form.html?token=${leader.token}`;
       const qrDataUri = await QRCode.toDataURL(registrationLink, {
         errorCorrectionLevel: 'H',
         type: 'image/png',
         width: 300,
       });
 
-    const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
+      const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
 
-      // Si está en mock mode, no enviar con Resend
       if (this.mockMode) {
-        logger.info(`
-╔════════════════════════════════════════════════════╗
-║           📧 MOCK EMAIL - MODO DESARROLLO          ║
-╚════════════════════════════════════════════════════╝
-To: ${leader.email}
-Subject: 🔗 Tu enlace personalizado de registro
-────────────────────────────────────────────────────
-${leader.name}, tu enlace de registro es:
-${registrationLink}
-        `);
+        logger.info(`📧 [MOCK] Email a ${leader.email} - Tu enlace personalizado`);
         return { success: true, mock: true };
       }
 
-      // Enviar correo con Resend
-      logger.info(`📧 Enviando correo a ${leader.email} con Resend...`);
-      
-      try {
-        const data = await this.resend.emails.send({
-          from: 'Red Social Política <redsp@fulars.com>',
-          to: leader.email,
-          subject: '🔗 Tu enlace personalizado de registro',
-          html: htmlContent
-        });
-
-        logger.info(`✅ Email enviado exitosamente a ${leader.email} (Message ID: ${data.id})`);
-        return { success: true, messageId: data.id, mock: false };
-      } catch (resendError) {
-        logger.error('❌ Error al enviar con Resend:', resendError.message);
-        logger.error('Detalle:', resendError);
-        console.error('Error Resend:', resendError);
-        
-        // Fallback a mock mode
-        logger.warn(`📧 Fallback a MOCK: ${resendError?.message}`);
-        return { success: false, mock: true, fallback: true, error: resendError?.message };
-      }
-    } catch (error) {
-      logger.error('❌ Error procesando email:', {
-        message: error.message,
-        stack: error.stack,
-        leaderEmail: leader?.email,
+      const { data, error } = await this.resend.emails.send({
+        from: this.fromEmail,
+        to: leader.email,
+        subject: '🔗 Tu enlace personalizado de registro',
+        html: htmlContent,
       });
+
+      if (error) {
+        logger.error(`❌ Error Resend: ${error.message}`);
+        return { success: false, error: error.message };
+      }
+
+      logger.info(`✅ Email enviado a ${leader.email} (ID: ${data.id})`);
+      return { success: true, messageId: data.id };
+    } catch (error) {
+      logger.error('❌ Error en sendAccessEmail:', error.message);
       throw new Error(`No se pudo enviar el email: ${error.message}`);
     }
   }
 
-  /**
-   * Envía email de bienvenida al líder
-   */
-  async sendWelcomeEmail(leader, baseUrl = process.env.BASE_URL) {
-    try {
-      const email = leader?.email;
-      if (!email) throw new Error('Leader email no proporcionado');
-      if (!leader.token) throw new Error('Leader token no disponible');
-
-      const subject = 'Bienvenido a Red Social y Politica';
-      const resolvedBaseUrl = this.getBaseUrl(baseUrl);
-      const registrationLink = `${resolvedBaseUrl}/form.html?token=${leader.token}`;
-      const firstName = (leader?.name || 'lider').split(' ')[0];
-      const year = new Date().getFullYear();
-
-      const qrDataUri = await QRCode.toDataURL(registrationLink, {
-        errorCorrectionLevel: 'H',
-        type: 'image/png',
-        width: 260
-      });
-
-      const htmlContent = `<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bienvenido a Red Social y Politica</title>
-</head>
-<body style="margin:0;padding:0;background-color:#F3F4F6;font-family:Arial,Helvetica,sans-serif;color:#111827;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F3F4F6;">
-    <tr>
-      <td align="center" style="padding:32px 16px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #E5E7EB;box-shadow:0 12px 30px rgba(15,23,42,0.08);">
-          <!-- Header -->
-          <tr>
-            <td style="background-color:#4F46E5;background-image:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%);padding:36px 28px;text-align:center;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td align="center" style="padding-bottom:16px;">
-                    <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,0.18);display:inline-flex;align-items:center;justify-content:center;font-size:22px;color:#ffffff;">R</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="padding-bottom:8px;">
-                    <span style="display:inline-block;background:rgba(255,255,255,0.2);color:#ffffff;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:999px;">Nuevo panel activado</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center">
-                    <h1 style="margin:0;font-size:26px;line-height:1.2;color:#ffffff;font-weight:700;">¡Bienvenido a Red Social y Politica!</h1>
-                    <p style="margin:10px 0 0 0;font-size:14px;color:#EDE9FE;">Tu panel de registro esta listo</p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Body -->
-          <tr>
-            <td style="padding:32px 28px 24px 28px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:14px;">
-                <tr>
-                  <td style="font-size:15px;line-height:1.7;color:#374151;">
-                    <p style="margin:0 0 16px 0;font-size:17px;font-weight:600;color:#111827;">Hola ${firstName},</p>
-                    <p style="margin:0 0 16px 0;">Desde tu panel podras administrar tu red, consultar estadisticas y compartir tu enlace de registro.</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center" style="padding:10px 0 8px 0;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
-                      <tr>
-                        <td style="background:#4F46E5;border-radius:10px;">
-                          <a href="${registrationLink}" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;">Ir al Formulario</a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- QR Section -->
-          <tr>
-            <td style="padding:0 28px 24px 28px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F9FAFB;border-radius:14px;border:1px solid #E5E7EB;">
-                <tr>
-                  <td style="padding:20px 22px;text-align:center;">
-                    <p style="margin:0 0 14px 0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#6B7280;font-weight:600;">Codigo QR de registro</p>
-                    <img src="${qrDataUri}" alt="Codigo QR" width="180" style="display:block;border-radius:10px;margin:0 auto 16px auto;max-width:100%;height:auto;" />
-                    <div style="font-size:12px;color:#6B7280;margin-bottom:6px;">Enlace directo</div>
-                    <div style="font-size:12px;color:#4F46E5;word-break:break-word;font-family:'Courier New',monospace;">${registrationLink}</div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Tips -->
-          <tr>
-            <td style="padding:0 28px 28px 28px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E5E7EB;">
-                <tr>
-                  <td style="padding-top:18px;font-size:14px;color:#374151;">
-                    <p style="margin:0 0 10px 0;font-weight:600;color:#111827;">Consejos rapidos</p>
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td style="padding:6px 0;">
-                          <span style="display:inline-block;width:18px;height:18px;border-radius:999px;background:#E0E7FF;color:#3730A3;font-size:12px;line-height:18px;text-align:center;margin-right:8px;">✓</span>
-                          Comparte el enlace con tu equipo
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding:6px 0;">
-                          <span style="display:inline-block;width:18px;height:18px;border-radius:999px;background:#E0E7FF;color:#3730A3;font-size:12px;line-height:18px;text-align:center;margin-right:8px;">✓</span>
-                          Imprime el QR para distribucion rapida
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding:6px 0;">
-                          <span style="display:inline-block;width:18px;height:18px;border-radius:999px;background:#E0E7FF;color:#3730A3;font-size:12px;line-height:18px;text-align:center;margin-right:8px;">✓</span>
-                          Monitorea avances desde el panel
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="padding:20px 28px 28px 28px;border-top:1px solid #E5E7EB;background-color:#F9FAFB;font-size:12px;color:#6B7280;text-align:center;">
-              <p style="margin:0 0 6px 0;">Red Social y Politica · Plataforma de gestion</p>
-              <p style="margin:0 0 6px 0;">Soporte: <a href="mailto:soporte@servidor.com" style="color:#4F46E5;text-decoration:none;">soporte@servidor.com</a></p>
-              <p style="margin:0;">© ${year} Red Social y Politica</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-
-      return await this.sendEmailWithResend(email, subject, htmlContent, 'WELCOME_EMAIL');
-    } catch (error) {
-      logger.error('❌ Error enviando welcome email:', error.message);
-      return { success: false, error: error.message };
-    }
-  }
-
-  /**
-   * Envía email con credenciales de acceso temporal
-   */
-  async sendCredentialsEmail(leader, plainPassword = null) {
-    try {
-      const email = leader?.email;
-      if (!email) throw new Error('Leader email no proporcionado');
-
-      const rawPassword = plainPassword || leader.tempPasswordPlaintext;
-      const password = this.decryptTempPassword(rawPassword);
-      if (!password) throw new Error('Password temporal no proporcionado');
-
-      const subject = 'Tus credenciales de acceso';
-      const loginUrl = `${this.getBaseUrl()}/`;
-
-      const bodyHtml = `
-        <p style="margin: 0 0 18px 0; font-size: 15px; color: #64748b; line-height: 1.7;">
-          Tus credenciales son temporales para tu primer ingreso. Guarda esta informacion en un lugar seguro.
-        </p>
-        <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px;">Usuario</p>
-        <div style="background: #f8fafc; border-radius: 10px; padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: #1d4ed8; margin-bottom: 16px;">
-          ${leader.username || email}
+  generateEmailHTML(leaderName, registrationLink, qrDataUri) {
+    const firstName = leaderName.split(' ')[0];
+    
+    return `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tu enlace personalizado de registro</title>
+    </head>
+    <body style="font-family: 'Segoe UI', 'Helvetica Neue', sans-serif; background: #f5f5f5; padding: 20px; margin: 0;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); overflow: hidden;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; color: white;">
+                <h1 style="margin: 0 0 10px 0; font-size: 28px;">🎯 ¡Bienvenido!</h1>
+                <p style="margin: 0; font-size: 14px; opacity: 0.9;">Tu panel de registro está listo</p>
+            </div>
+            <div style="padding: 40px 30px;">
+                <p style="font-size: 18px; color: #1a1a2e; margin-bottom: 24px;">Hola <span style="color: #667eea; font-weight: 600;">${firstName}</span>,</p>
+                <p style="font-size: 15px; color: #6c757d; margin-bottom: 32px; line-height: 1.7;">Ya estás listo para comenzar a registrar personas en tu red. Usa el siguiente enlace o escanea el código QR.</p>
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <a href="${registrationLink}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 16px 36px; border-radius: 12px; font-weight: 600; font-size: 16px;">→ Ir al Formulario</a>
+                </div>
+                <div style="text-align: center; padding: 30px; background: #f8f9fa; border-radius: 12px; margin-bottom: 24px;">
+                    <p style="font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px;">📱 Código QR</p>
+                    <img src="${qrDataUri}" alt="Código QR" style="max-width: 200px; height: auto; border-radius: 8px;">
+                </div>
+            </div>
+            <div style="background: #f8f9fa; padding: 24px 30px; text-align: center; font-size: 12px; color: #6c757d;">
+                <p style="margin: 0;">© 2026 Red Social y Política</p>
+            </div>
         </div>
-        <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.6px;">Contrasena temporal</p>
-        <div style="background: #f8fafc; border-radius: 10px; padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: #1d4ed8; margin-bottom: 16px;">
-          ${password}
+    </body>
+    </html>`;
+  }
+
+  async sendWelcomeEmail(leader, baseUrl) {
+    if (!leader?.email) throw new Error('Email no proporcionado');
+    
+    const firstName = leader.name?.split(' ')[0] || 'Líder';
+    const loginUrl = `${baseUrl}/`;
+    
+    const html = `
+    <!DOCTYPE html>
+    <html><head><meta charset="UTF-8"></head>
+    <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; margin: 0;">
+      <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 30px; text-align: center; color: white;">
+          <h1 style="margin: 0;">👋 ¡Bienvenido!</h1>
         </div>
-        <div style="background: #fff7ed; border-left: 4px solid #fb923c; padding: 12px 14px; border-radius: 8px; font-size: 13px; color: #7c2d12;">
-          Por seguridad, inicia sesion y cambia la contrasena inmediatamente.
+        <div style="padding: 30px;">
+          <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Hola <strong>${firstName}</strong>,</p>
+          <p style="color: #666; margin: 0 0 30px 0;">Bienvenido al sistema de Red Social y Política. Ya puedes acceder a tu panel de gestión.</p>
+          <div style="text-align: center;">
+            <a href="${loginUrl}" style="background: #667eea; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">Ingresar al Panel</a>
+          </div>
         </div>
-      `;
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+          © 2026 Red Social y Política
+        </div>
+      </div>
+    </body></html>`;
 
-      const htmlContent = this.wrapEmail({
-        title: 'Credenciales de acceso',
-        subtitle: 'Usa estos datos para entrar al sistema',
-        bodyHtml,
-        ctaLabel: 'Iniciar sesion',
-        ctaUrl: loginUrl
-      });
-
-      return await this.sendEmailWithResend(email, subject, htmlContent, 'CREDENTIALS_EMAIL');
-    } catch (error) {
-      logger.error('❌ Error enviando credenciales:', error.message);
-      return { success: false, error: error.message };
-    }
+    return this._sendEmail(leader.email, '👋 ¡Bienvenido al Sistema!', html);
   }
 
-  /**
-   * Envía email solo con código QR
-   */
-  async sendQRCodeEmail(leader, baseUrl = process.env.BASE_URL) {
-    try {
-      if (!leader || !leader.email) throw new Error('Leader email no proporcionado');
-      if (!leader.token) throw new Error('Leader token no disponible');
-
-            const resolvedBaseUrl = this.getBaseUrl(baseUrl);
-            const registrationLink = `${resolvedBaseUrl}/form.html?token=${leader.token}`;
-      const qrDataUri = await QRCode.toDataURL(registrationLink, {
-        errorCorrectionLevel: 'H',
-        type: 'image/png',
-        width: 300,
-      });
-
-            const htmlContent = this.generateEmailHTML(leader.name, registrationLink, qrDataUri);
-            const subject = 'Tu codigo QR de registro';
-
-      return await this.sendEmailWithResend(leader.email, subject, htmlContent, 'QR_EMAIL');
-    } catch (error) {
-      logger.error('❌ Error enviando QR email:', error.message);
-      return { success: false, error: error.message };
-    }
-  }
-
-  /**
-   * Envía email de aviso/recordatorio al líder
-   */
-  async sendWarningEmail(leader) {
-    try {
-      const email = leader?.email;
-      if (!email) throw new Error('Leader email no proporcionado');
-
-      const subject = 'Recordatorio importante';
-      const dashboardUrl = `${this.getBaseUrl()}/leader-dashboard.html`;
-      const name = leader?.name || 'lider';
-
-      const bodyHtml = `
-        <p style="margin: 0 0 18px 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hola ${name},</p>
-        <p style="margin: 0 0 16px 0; font-size: 14px; color: #64748b; line-height: 1.7;">
-          Te recomendamos revisar tu panel y mantener tu informacion actualizada para no perder registros.
-        </p>
-        <p style="margin: 0 0 0 0; font-size: 14px; color: #64748b; line-height: 1.7;">
-          Si necesitas ayuda, contacta al administrador.
-        </p>
-      `;
-
-      const htmlContent = this.wrapEmail({
-        title: 'Recordatorio',
-        subtitle: 'Accion recomendada',
-        bodyHtml,
-        ctaLabel: 'Ir al panel',
-        ctaUrl: dashboardUrl,
-        accent: '#f59e0b'
-      });
-
-      return await this.sendEmailWithResend(email, subject, htmlContent, 'WARNING_EMAIL');
-    } catch (error) {
-      logger.error('❌ Error enviando warning email:', error.message);
-      return { success: false, error: error.message };
-    }
-  }
-
-  /**
-   * Envía email con contraseña temporal para restablecimiento
-   */
-  async sendTemporaryPasswordEmail(user, tempPassword) {
-    try {
-      const email = user?.email;
-      const displayName = user?.name || user?.username || 'Usuario';
-
-      if (!email) {
-        throw new Error('Email no proporcionado');
+  async sendCredentialsEmail(leader) {
+    logger.info(`🔑 sendCredentialsEmail para: ${leader?.email}`);
+    
+    if (!leader?.email) throw new Error('Email no proporcionado');
+    
+    const firstName = leader.name?.split(' ')[0] || 'Líder';
+    const username = leader.username || 'No configurado';
+    
+    let tempPassword = 'No disponible';
+    if (leader.tempPasswordPlaintext) {
+      try {
+        tempPassword = decrypt(leader.tempPasswordPlaintext);
+        logger.info(`🔑 Contraseña desencriptada correctamente`);
+      } catch (e) {
+        logger.warn(`🔑 Error desencriptando: ${e.message}`);
+        tempPassword = leader.tempPasswordPlaintext;
       }
-
-      const subject = 'Restablecimiento de contrasena';
-      const loginUrl = `${this.getBaseUrl()}/`;
-
-      const bodyHtml = `
-        <p style="margin: 0 0 18px 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hola ${displayName},</p>
-        <p style="margin: 0 0 18px 0; font-size: 14px; color: #64748b; line-height: 1.7;">
-          Se genero una contrasena temporal para tu cuenta.
-        </p>
-        <div style="background: #f8fafc; border-radius: 10px; padding: 14px 16px; font-family: 'Courier New', monospace; font-size: 16px; font-weight: 700; color: #1d4ed8; margin-bottom: 16px; text-align: center;">
-          ${tempPassword}
-        </div>
-        <div style="background: #fff7ed; border-left: 4px solid #fb923c; padding: 12px 14px; border-radius: 8px; font-size: 13px; color: #7c2d12;">
-          Inicia sesion y cambia la contrasena inmediatamente.
-        </div>
-      `;
-
-      const htmlContent = this.wrapEmail({
-        title: 'Restablecimiento de contrasena',
-        subtitle: 'Nueva clave temporal',
-        bodyHtml,
-        ctaLabel: 'Iniciar sesion',
-        ctaUrl: loginUrl
-      });
-
-      return await this.sendEmailWithResend(email, subject, htmlContent, 'TEMP_PASSWORD');
-    } catch (error) {
-      logger.error('❌ Error enviando temporary password email:', error.message);
-      return { success: false, error: error.message };
+    } else {
+      logger.warn(`🔑 El líder no tiene tempPasswordPlaintext`);
     }
+    
+    const html = `
+    <!DOCTYPE html>
+    <html><head><meta charset="UTF-8"></head>
+    <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; margin: 0;">
+      <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 30px; text-align: center; color: white;">
+          <h1 style="margin: 0;">🔑 Tus Credenciales</h1>
+        </div>
+        <div style="padding: 30px;">
+          <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Hola <strong>${firstName}</strong>,</p>
+          <p style="color: #666; margin: 0 0 20px 0;">Aquí están tus credenciales de acceso:</p>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 0 0 20px 0;">
+            <p style="margin: 10px 0;"><strong>Usuario:</strong> <code style="background: #e9ecef; padding: 4px 8px; border-radius: 4px;">${username}</code></p>
+            <p style="margin: 10px 0;"><strong>Contraseña temporal:</strong> <code style="background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-weight: bold;">${tempPassword}</code></p>
+          </div>
+          <p style="color: #dc3545; font-size: 14px; margin: 0;">⚠️ Cambia tu contraseña después de iniciar sesión.</p>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+          © 2026 Red Social y Política
+        </div>
+      </div>
+    </body></html>`;
+
+    return this._sendEmail(leader.email, '🔑 Tus Credenciales de Acceso', html);
   }
 
-  /**
-   * Método helper para enviar emails con Resend o mock
-   */
-  async sendEmailWithResend(to, subject, html, mockLabel) {
+  async sendQRCodeEmail(leader, baseUrl) {
+    if (!leader?.email) throw new Error('Email no proporcionado');
+    if (!leader?.token) throw new Error('Token no disponible');
+    
+    const firstName = leader.name?.split(' ')[0] || 'Líder';
+    const registrationLink = `${baseUrl}/form.html?token=${leader.token}`;
+    
+    logger.info(`📱 Generando QR para ${leader.email}: ${registrationLink}`);
+    
+    const qrBuffer = await QRCode.toBuffer(registrationLink, {
+      errorCorrectionLevel: 'H',
+      type: 'png',
+      width: 250
+    });
+    
+    logger.info(`📱 QR generado: ${qrBuffer.length} bytes`);
+    
+    const html = `
+    <!DOCTYPE html>
+    <html><head><meta charset="UTF-8"></head>
+    <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; margin: 0;">
+      <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 30px; text-align: center; color: white;">
+          <h1 style="margin: 0;">📱 Tu Enlace de Registro</h1>
+        </div>
+        <div style="padding: 30px; text-align: center;">
+          <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Hola <strong>${firstName}</strong>,</p>
+          <p style="color: #666; margin: 0 0 30px 0;">Tienes 3 formas de acceder al formulario de registro:</p>
+          
+          <p style="font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 0 0 15px 0;">1. Botón directo</p>
+          <div style="text-align: center; margin-bottom: 30px;">
+            <a href="${registrationLink}" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">→ Ir al Formulario</a>
+          </div>
+          
+          <p style="font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 0 0 15px 0;">2. Copia el enlace</p>
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
+            <p style="word-break: break-all; color: #667eea; font-size: 12px; margin: 0; font-family: monospace;">${registrationLink}</p>
+          </div>
+          
+          <p style="font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 0 0 15px 0;">3. Escanea el código QR adjunto</p>
+          <p style="font-size: 13px; color: #999; margin: 0;">El código QR está adjunto a este correo como imagen.</p>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+          © 2026 Red Social y Política
+        </div>
+      </div>
+    </body></html>`;
+
+    return this._sendEmailWithAttachment(leader.email, '📱 Tu Enlace de Registro', html, [
+      { filename: 'qrcode.png', content: qrBuffer, cid: 'qrcode' }
+    ]);
+  }
+
+  async sendWarningEmail(leader) {
+    if (!leader?.email) throw new Error('Email no proporcionado');
+    
+    const firstName = leader.name?.split(' ')[0] || 'Líder';
+    
+    const html = `
+    <!DOCTYPE html>
+    <html><head><meta charset="UTF-8"></head>
+    <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; margin: 0;">
+      <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden;">
+        <div style="background: #f59e0b; padding: 30px; text-align: center; color: white;">
+          <h1 style="margin: 0;">⚠️ Recordatorio</h1>
+        </div>
+        <div style="padding: 30px;">
+          <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Hola <strong>${firstName}</strong>,</p>
+          <p style="color: #666; margin: 0;">Te recordamos que es importante mantener tus registros actualizados.</p>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+          © 2026 Red Social y Política
+        </div>
+      </div>
+    </body></html>`;
+
+    return this._sendEmail(leader.email, '⚠️ Recordatorio Importante', html);
+  }
+
+  async sendTemporaryPasswordEmail(leader, tempPassword) {
+    if (!leader?.email) throw new Error('Email no proporcionado');
+    
+    const firstName = leader.name?.split(' ')[0] || 'Líder';
+    const username = leader.username || leader.email;
+    
+    const html = `
+    <!DOCTYPE html>
+    <html><head><meta charset="UTF-8"></head>
+    <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; margin: 0;">
+      <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 30px; text-align: center; color: white;">
+          <h1 style="margin: 0;">🔐 Nueva Contraseña</h1>
+        </div>
+        <div style="padding: 30px;">
+          <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Hola <strong>${firstName}</strong>,</p>
+          <p style="color: #666; margin: 0 0 20px 0;">Se ha generado una nueva contraseña temporal para tu cuenta.</p>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 0 0 20px 0;">
+            <p style="margin: 10px 0;"><strong>Usuario:</strong> <code style="background: #e9ecef; padding: 4px 8px; border-radius: 4px;">${username}</code></p>
+            <p style="margin: 10px 0;"><strong>Contraseña temporal:</strong> <code style="background: #fff3cd; padding: 4px 8px; border-radius: 4px; font-weight: bold;">${tempPassword}</code></p>
+          </div>
+          <p style="color: #dc3545; font-size: 14px; margin: 0;">⚠️ Esta contraseña es temporal. Te recomendamos cambiarla después de iniciar sesión.</p>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+          © 2026 Red Social y Política
+        </div>
+      </div>
+    </body></html>`;
+
+    return this._sendEmail(leader.email, '🔐 Tu Nueva Contraseña Temporal', html);
+  }
+
+  async _sendEmail(to, subject, html) {
     if (this.mockMode) {
-      logger.info(`
-╔════════════════════════════════════════════════════╗
-║           📧 MOCK EMAIL - ${mockLabel.padEnd(19)}║
-╚════════════════════════════════════════════════════╝
-To: ${to}
-Subject: ${subject}
-────────────────────────────────────────────────────
-      `);
+      logger.info(`📧 [MOCK] Email a ${to} - ${subject}`);
       return { success: true, mock: true };
     }
 
     try {
-      const data = await this.resend.emails.send({
-        from: 'Red Social Política <redsp@fulars.com>',
+      const { data, error } = await this.resend.emails.send({
+        from: this.fromEmail,
         to,
         subject,
-        html
+        html,
       });
 
-      logger.info(`✅ Email enviado exitosamente a ${to} (Message ID: ${data?.id})`);
-      return { success: true, messageId: data?.id };
+      if (error) {
+        logger.error(`❌ Error Resend enviando a ${to}: ${error.message}`);
+        return { success: false, error: error.message };
+      }
+
+      logger.info(`✅ Email enviado a ${to} - ${subject} (ID: ${data.id})`);
+      return { success: true, messageId: data.id };
     } catch (error) {
-      logger.error('❌ Error al enviar con Resend:', error?.message || error);
-      console.error('Resend error:', error);
-      return { success: false, error: error?.message || String(error) };
+      logger.error(`❌ Excepción enviando email a ${to}:`, error.message);
+      return { success: false, error: error.message };
     }
   }
 
-  /**
-   * Genera HTML profesional para el email
-   */
-  generateEmailHTML(leaderName, registrationLink, qrDataUri) {
-    const firstName = (leaderName || 'lider').split(' ')[0];
+  async _sendEmailWithAttachment(to, subject, html, attachments) {
+    if (this.mockMode) {
+      logger.info(`📧 [MOCK] Email con attachment a ${to} - ${subject}`);
+      return { success: true, mock: true };
+    }
 
-    const bodyHtml = `
-      <p style="margin: 0 0 18px 0; font-size: 16px; font-weight: 600; color: #0f172a;">Hola ${firstName},</p>
-      <p style="margin: 0 0 18px 0; font-size: 14px; color: #64748b; line-height: 1.7;">
-        Escanea el codigo QR o usa el enlace para abrir el formulario de registro.
-      </p>
-      <div style="background: #f8fafc; border-radius: 12px; padding: 18px; text-align: center; margin-bottom: 16px;">
-        <img src="${qrDataUri}" alt="Codigo QR de registro" style="display: block; max-width: 180px; height: auto; border-radius: 8px; margin: 0 auto;">
-        <div style="margin-top: 14px; font-size: 12px; color: #64748b;">Enlace:</div>
-        <div style="font-family: 'Courier New', monospace; font-size: 12px; color: #1d4ed8; word-break: break-word;">${registrationLink}</div>
-      </div>
-      <ul style="margin: 0; padding-left: 18px; color: #64748b; font-size: 13px; line-height: 1.6;">
-        <li>Comparte el enlace con tu equipo</li>
-        <li>Imprime el codigo QR para distribuir</li>
-        <li>Monitorea los registros en tu panel</li>
-      </ul>
-    `;
+    try {
+      const resendAttachments = attachments.map(att => ({
+        filename: att.filename,
+        content: att.content,
+        content_type: 'image/png',
+        disposition: 'inline',
+        cid: att.cid
+      }));
 
-    return this.wrapEmail({
-      title: 'Tu enlace de registro',
-      subtitle: 'Acceso rapido al formulario',
-      bodyHtml,
-      ctaLabel: 'Abrir formulario',
-      ctaUrl: registrationLink
-    });
+      const { data, error } = await this.resend.emails.send({
+        from: this.fromEmail,
+        to,
+        subject,
+        html,
+        attachments: resendAttachments,
+      });
+
+      if (error) {
+        logger.error(`❌ Error Resend enviando a ${to}: ${error.message}`);
+        return { success: false, error: error.message };
+      }
+
+      logger.info(`✅ Email con attachment enviado a ${to} - ${subject} (ID: ${data.id})`);
+      return { success: true, messageId: data.id };
+    } catch (error) {
+      logger.error(`❌ Excepción enviando email a ${to}:`, error.message);
+      return { success: false, error: error.message };
+    }
   }
 }
 
-// Exportar instancia singleton
 export const emailService = new EmailService();

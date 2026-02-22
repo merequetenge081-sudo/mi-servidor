@@ -7,7 +7,7 @@ import crypto from "crypto";
 import { Organization } from "../models/Organization.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
 import { emailService } from "../services/emailService.js";
-import { decrypt } from "../utils/crypto.js";
+import { decrypt, encrypt } from "../utils/crypto.js";
 
 // Generar token único de 32 caracteres hexadecimales
 function generateToken() {
@@ -124,6 +124,7 @@ export async function createLeader(req, res) {
       username,
       passwordHash,
       isTemporaryPassword: true,
+      tempPasswordPlaintext: encrypt(tempPassword),
 
       token,
       registrations: 0,
@@ -539,6 +540,7 @@ export async function sendAccessEmail(req, res) {
 
     if (shouldSendCredentials) {
       try {
+        logger.info(`📧 Enviando credenciales - Username: ${leader.username}, hasTempPass: ${!!leader.tempPasswordPlaintext}`);
         emailResults.credentials = await emailService.sendCredentialsEmail(leader);
         logger.info(`✅ Email de credenciales: ${emailResults.credentials.success}`);
       } catch (err) {
@@ -549,6 +551,7 @@ export async function sendAccessEmail(req, res) {
 
     if (shouldSendQR) {
       try {
+        logger.info(`📱 Enviando QR - Token: ${leader.token?.substring(0, 8)}..., Email: ${leader.email}`);
         emailResults.qr = await emailService.sendQRCodeEmail(leader, baseUrl);
         logger.info(`✅ Email de QR: ${emailResults.qr.success}`);
       } catch (err) {

@@ -4029,3 +4029,402 @@
 {"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 71ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:27"}
 {"level":"info","message":"GET /registrations 200 286ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:28"}
 {"level":"info","message":"GET /registrations 304 279ms","service":"mi-servidor","timestamp":"2026-02-21 06:22:31"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 15:08:07"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 15:08:07"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 15:08:07"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 15:08:07"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 15:08:07"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 15:08:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 15:08:07"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 15:08:09"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 15:08:09"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 15:12:28","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 433ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:28"}
+{"level":"info","message":"GET /events 200 114ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:29"}
+{"level":"info","message":"GET /events 200 110ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:29"}
+{"level":"info","message":"GET /events 200 111ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:31"}
+{"level":"info","message":"GET /leaders 304 110ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:31"}
+{"level":"info","message":"GET /registrations 200 325ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:31"}
+{"level":"info","message":"GET /events 200 107ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:32"}
+{"level":"info","message":"GET /events 200 108ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:34"}
+{"level":"info","message":"GET /leaders 200 114ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:34"}
+{"level":"info","message":"GET /registrations 200 1254ms","service":"mi-servidor","timestamp":"2026-02-21 15:12:35"}
+{"level":"info","message":"POST /auth/logout 200 129ms","service":"mi-servidor","timestamp":"2026-02-21 15:19:07"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 15:19:52","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 267ms","service":"mi-servidor","timestamp":"2026-02-21 15:19:52"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 121ms","service":"mi-servidor","timestamp":"2026-02-21 15:19:53"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 111ms","service":"mi-servidor","timestamp":"2026-02-21 15:19:53"}
+{"level":"info","message":"GET /registrations 200 327ms","service":"mi-servidor","timestamp":"2026-02-21 15:19:54"}
+{"level":"info","message":"GET /registrations 304 318ms","service":"mi-servidor","timestamp":"2026-02-21 15:20:40"}
+{"level":"info","message":"GET /registrations 304 323ms","service":"mi-servidor","timestamp":"2026-02-21 15:21:05"}
+{"level":"info","message":"GET /registro/cdf9045047b3bccb9e66b5605d895e39 304 221ms","service":"mi-servidor","timestamp":"2026-02-21 15:21:06"}
+{"level":"info","message":"GET /registrations 304 316ms","service":"mi-servidor","timestamp":"2026-02-21 15:21:14"}
+{"level":"info","message":"GET /registrations 304 326ms","service":"mi-servidor","timestamp":"2026-02-21 15:21:33"}
+{"level":"info","message":"GET /registro/cdf9045047b3bccb9e66b5605d895e39 304 209ms","service":"mi-servidor","timestamp":"2026-02-21 15:21:47"}
+{"level":"info","message":"GET /registrations 304 319ms","service":"mi-servidor","timestamp":"2026-02-21 15:22:27"}
+{"level":"info","message":"GET /registrations 304 319ms","service":"mi-servidor","timestamp":"2026-02-21 15:22:39"}
+{"level":"info","message":"GET /registrations 304 319ms","service":"mi-servidor","timestamp":"2026-02-21 15:23:00"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 15:25:38","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 455ms","service":"mi-servidor","timestamp":"2026-02-21 15:25:38"}
+{"level":"info","message":"GET /events 200 112ms","service":"mi-servidor","timestamp":"2026-02-21 15:25:38"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 15:52:10"}
+{"level":"info","message":"📧 RESEND_API_KEY configurado: Si","service":"mi-servidor","timestamp":"2026-02-21 15:52:10"}
+{"level":"info","message":"📧 Inicializando Resend API","service":"mi-servidor","timestamp":"2026-02-21 15:52:10"}
+{"level":"info","message":"✅ Resend API configurado correctamente","service":"mi-servidor","timestamp":"2026-02-21 15:52:10"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 15:52:10"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 15:52:10"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 15:52:10"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 15:52:12"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 15:52:12"}
+{"level":"info","message":"POST /auth/admin-login 401 196ms","service":"mi-servidor","timestamp":"2026-02-21 15:52:43"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 15:53:10","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 191ms","service":"mi-servidor","timestamp":"2026-02-21 15:53:10"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 115ms","service":"mi-servidor","timestamp":"2026-02-21 15:53:11"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 105ms","service":"mi-servidor","timestamp":"2026-02-21 15:53:11"}
+{"level":"info","message":"GET /registrations 304 325ms","service":"mi-servidor","timestamp":"2026-02-21 15:53:12"}
+{"level":"info","message":"GET /registrations 304 314ms","service":"mi-servidor","timestamp":"2026-02-21 15:53:13"}
+{"level":"info","message":"POST /auth/leader-login 401 106ms","service":"mi-servidor","timestamp":"2026-02-21 15:53:52"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 15:54:00","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 175ms","service":"mi-servidor","timestamp":"2026-02-21 15:54:00"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 107ms","service":"mi-servidor","timestamp":"2026-02-21 15:54:01"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 108ms","service":"mi-servidor","timestamp":"2026-02-21 15:54:01"}
+{"level":"info","message":"GET /registrations 304 305ms","service":"mi-servidor","timestamp":"2026-02-21 15:54:01"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 113ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:02"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 108ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:02"}
+{"level":"info","message":"GET /registrations 304 304ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:02"}
+{"level":"info","message":"POST /auth/leader-login 401 102ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:12"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 16:15:18","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 423ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:18"}
+{"level":"info","message":"GET /events 200 110ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:18"}
+{"level":"info","message":"GET /events 200 105ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:19"}
+{"level":"info","message":"GET /events 200 105ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:21"}
+{"level":"info","message":"GET /leaders 200 121ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:21"}
+{"level":"info","message":"GET /registrations 304 1255ms","service":"mi-servidor","timestamp":"2026-02-21 16:15:22"}
+{"level":"info","message":"POST /auth/logout 200 121ms","service":"mi-servidor","timestamp":"2026-02-21 16:17:29"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 16:17:46","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 174ms","service":"mi-servidor","timestamp":"2026-02-21 16:17:46"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 106ms","service":"mi-servidor","timestamp":"2026-02-21 16:17:47"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 107ms","service":"mi-servidor","timestamp":"2026-02-21 16:17:47"}
+{"level":"info","message":"GET /registrations 304 304ms","service":"mi-servidor","timestamp":"2026-02-21 16:17:47"}
+{"level":"info","message":"GET /registrations 304 300ms","service":"mi-servidor","timestamp":"2026-02-21 16:17:50"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 16:18:06","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 373ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:06"}
+{"level":"info","message":"GET /events 200 104ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:06"}
+{"level":"info","message":"GET /events 200 102ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:07"}
+{"level":"info","message":"GET /events 200 104ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:09"}
+{"level":"info","message":"GET /leaders 200 119ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:09"}
+{"level":"info","message":"GET /registrations 304 1222ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:10"}
+{"level":"info","message":"POST /auth/logout 200 110ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:24"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 16:18:32","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 174ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:32"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 105ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:33"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 106ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:33"}
+{"level":"info","message":"GET /registrations 304 312ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:33"}
+{"level":"info","message":"GET /registrations 304 301ms","service":"mi-servidor","timestamp":"2026-02-21 16:18:35"}
+{"level":"info","message":"GET /registrations 304 302ms","service":"mi-servidor","timestamp":"2026-02-21 16:19:40"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 16:19:46","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 390ms","service":"mi-servidor","timestamp":"2026-02-21 16:19:46"}
+{"level":"info","message":"GET /events 200 102ms","service":"mi-servidor","timestamp":"2026-02-21 16:19:46"}
+{"level":"info","message":"GET /events 200 101ms","service":"mi-servidor","timestamp":"2026-02-21 16:19:47"}
+{"level":"info","message":"GET /events 200 105ms","service":"mi-servidor","timestamp":"2026-02-21 16:19:48"}
+{"level":"info","message":"GET /leaders 200 112ms","service":"mi-servidor","timestamp":"2026-02-21 16:19:48"}
+{"level":"info","message":"GET /registrations 304 1217ms","service":"mi-servidor","timestamp":"2026-02-21 16:19:49"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 16:19:57"}
+{"level":"info","message":"📧 Flags: Welcome=true, Credentials=true, QR=true, Warning=true","service":"mi-servidor","timestamp":"2026-02-21 16:19:57"}
+{"level":"info","message":"✅ Email enviado exitosamente a dubstepculture2013@gmail.com (Message ID: undefined)","service":"mi-servidor","timestamp":"2026-02-21 16:19:57"}
+{"level":"info","message":"✅ Email de bienvenida: true","service":"mi-servidor","timestamp":"2026-02-21 16:19:57"}
+{"0":"P","1":"a","10":"e","11":"m","12":"p","13":"o","14":"r","15":"a","16":"l","17":" ","18":"n","19":"o","2":"s","20":" ","21":"p","22":"r","23":"o","24":"p","25":"o","26":"r","27":"c","28":"i","29":"o","3":"s","30":"n","31":"a","32":"d","33":"o","4":"w","5":"o","6":"r","7":"d","8":" ","9":"t","level":"error","message":"❌ Error enviando credenciales:","service":"mi-servidor","timestamp":"2026-02-21 16:19:57"}
+{"level":"info","message":"✅ Email de credenciales: false","service":"mi-servidor","timestamp":"2026-02-21 16:19:57"}
+{"level":"info","message":"✅ Email enviado exitosamente a dubstepculture2013@gmail.com (Message ID: undefined)","service":"mi-servidor","timestamp":"2026-02-21 16:19:58"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 16:19:58"}
+{"level":"info","message":"✅ Email enviado exitosamente a dubstepculture2013@gmail.com (Message ID: undefined)","service":"mi-servidor","timestamp":"2026-02-21 16:19:58"}
+{"level":"info","message":"✅ Email de alerta: true","service":"mi-servidor","timestamp":"2026-02-21 16:19:58"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 16:19:58"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 1592ms","service":"mi-servidor","timestamp":"2026-02-21 16:19:58"}
+{"level":"info","message":"GET /registro/cdf9045047b3bccb9e66b5605d895e39 304 224ms","service":"mi-servidor","timestamp":"2026-02-21 16:20:23"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 16:21:38"}
+{"level":"info","message":"📧 Flags: Welcome=true, Credentials=true, QR=true, Warning=true","service":"mi-servidor","timestamp":"2026-02-21 16:21:38"}
+{"level":"info","message":"✅ Email enviado exitosamente a dubstepculture2013@gmail.com (Message ID: undefined)","service":"mi-servidor","timestamp":"2026-02-21 16:21:38"}
+{"level":"info","message":"✅ Email de bienvenida: true","service":"mi-servidor","timestamp":"2026-02-21 16:21:38"}
+{"0":"P","1":"a","10":"e","11":"m","12":"p","13":"o","14":"r","15":"a","16":"l","17":" ","18":"n","19":"o","2":"s","20":" ","21":"p","22":"r","23":"o","24":"p","25":"o","26":"r","27":"c","28":"i","29":"o","3":"s","30":"n","31":"a","32":"d","33":"o","4":"w","5":"o","6":"r","7":"d","8":" ","9":"t","level":"error","message":"❌ Error enviando credenciales:","service":"mi-servidor","timestamp":"2026-02-21 16:21:38"}
+{"level":"info","message":"✅ Email de credenciales: false","service":"mi-servidor","timestamp":"2026-02-21 16:21:38"}
+{"level":"info","message":"✅ Email enviado exitosamente a dubstepculture2013@gmail.com (Message ID: undefined)","service":"mi-servidor","timestamp":"2026-02-21 16:21:39"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 16:21:39"}
+{"level":"info","message":"✅ Email enviado exitosamente a dubstepculture2013@gmail.com (Message ID: undefined)","service":"mi-servidor","timestamp":"2026-02-21 16:21:39"}
+{"level":"info","message":"✅ Email de alerta: true","service":"mi-servidor","timestamp":"2026-02-21 16:21:39"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 16:21:39"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 1692ms","service":"mi-servidor","timestamp":"2026-02-21 16:21:39"}
+{"level":"info","message":"GET /registro/cdf9045047b3bccb9e66b5605d895e39 304 215ms","service":"mi-servidor","timestamp":"2026-02-21 16:21:56"}
+{"level":"info","message":"POST /auth/logout 200 1134ms","service":"mi-servidor","timestamp":"2026-02-21 16:37:45"}
+{"level":"info","message":"POST /auth/logout 200 917ms","service":"mi-servidor","timestamp":"2026-02-21 16:37:46"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 16:37:54","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 555ms","service":"mi-servidor","timestamp":"2026-02-21 16:37:55"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 130ms","service":"mi-servidor","timestamp":"2026-02-21 16:37:55"}
+{"level":"info","message":"GET /registrations 304 396ms","service":"mi-servidor","timestamp":"2026-02-21 16:37:56"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 825ms","service":"mi-servidor","timestamp":"2026-02-21 16:37:56"}
+{"level":"info","message":"GET /registrations 304 381ms","service":"mi-servidor","timestamp":"2026-02-21 16:37:57"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 16:38:41"}
+{"level":"info","message":"GET /public/puestos 200 921ms","service":"mi-servidor","timestamp":"2026-02-21 16:38:41"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 17:01:07","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 552ms","service":"mi-servidor","timestamp":"2026-02-21 17:01:07"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 129ms","service":"mi-servidor","timestamp":"2026-02-21 17:01:08"}
+{"level":"info","message":"GET /registrations 304 386ms","service":"mi-servidor","timestamp":"2026-02-21 17:01:09"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 473ms","service":"mi-servidor","timestamp":"2026-02-21 17:01:09"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 17:04:03"}
+{"level":"info","message":"GET /public/puestos 304 542ms","service":"mi-servidor","timestamp":"2026-02-21 17:04:03"}
+{"level":"info","message":"Cargados 103 puestos para Suba","service":"mi-servidor","timestamp":"2026-02-21 17:06:12"}
+{"level":"info","message":"GET /public/puestos 200 638ms","service":"mi-servidor","timestamp":"2026-02-21 17:06:12"}
+{"level":"info","message":"GET /registrations 304 319ms","service":"mi-servidor","timestamp":"2026-02-21 17:06:20"}
+{"level":"info","message":"GET /registrations 304 318ms","service":"mi-servidor","timestamp":"2026-02-21 17:06:49"}
+{"level":"info","message":"GET /registrations 304 318ms","service":"mi-servidor","timestamp":"2026-02-21 17:07:42"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 17:18:40","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 177ms","service":"mi-servidor","timestamp":"2026-02-21 17:18:40"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 107ms","service":"mi-servidor","timestamp":"2026-02-21 17:18:40"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 108ms","service":"mi-servidor","timestamp":"2026-02-21 17:18:41"}
+{"level":"info","message":"GET /registrations 304 322ms","service":"mi-servidor","timestamp":"2026-02-21 17:18:41"}
+{"level":"info","message":"GET /registrations 304 319ms","service":"mi-servidor","timestamp":"2026-02-21 17:18:42"}
+{"level":"info","message":"GET /registrations 304 326ms","service":"mi-servidor","timestamp":"2026-02-21 17:18:44"}
+{"level":"info","message":"GET /registrations 304 320ms","service":"mi-servidor","timestamp":"2026-02-21 17:18:46"}
+{"level":"info","message":"GET /registrations 304 341ms","service":"mi-servidor","timestamp":"2026-02-21 17:18:49"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 17:19:17","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 416ms","service":"mi-servidor","timestamp":"2026-02-21 17:19:17"}
+{"level":"info","message":"GET /events 200 110ms","service":"mi-servidor","timestamp":"2026-02-21 17:19:17"}
+{"level":"info","message":"GET /events 200 108ms","service":"mi-servidor","timestamp":"2026-02-21 17:19:18"}
+{"level":"info","message":"GET /events 200 108ms","service":"mi-servidor","timestamp":"2026-02-21 17:19:19"}
+{"level":"info","message":"GET /leaders 200 235ms","service":"mi-servidor","timestamp":"2026-02-21 17:19:19"}
+{"level":"info","message":"GET /registrations 304 2951ms","service":"mi-servidor","timestamp":"2026-02-21 17:19:22"}
+{"level":"info","message":"📧 EmailService Init - NODE_ENV: undefined","service":"mi-servidor","timestamp":"2026-02-21 17:43:46"}
+{"level":"info","message":"📧 EMAIL_USER configurado: No","service":"mi-servidor","timestamp":"2026-02-21 17:43:46"}
+{"level":"info","message":"📧 EMAIL_PASS configurado: No","service":"mi-servidor","timestamp":"2026-02-21 17:43:46"}
+{"level":"info","message":"📧 SMTP_HOST: smtp.hostinger.com (valor por defecto)","service":"mi-servidor","timestamp":"2026-02-21 17:43:46"}
+{"level":"info","message":"📧 SMTP_PORT: 587 (valor por defecto)","service":"mi-servidor","timestamp":"2026-02-21 17:43:46"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (credenciales no configuradas o forzado).","service":"mi-servidor","timestamp":"2026-02-21 17:43:46"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 17:43:47"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 17:43:48"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 17:43:48"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 17:43:49"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 17:43:49"}
+{"level":"info","message":"GET /events 200 156ms","service":"mi-servidor","timestamp":"2026-02-21 17:43:55"}
+{"level":"info","message":"GET /leaders 200 141ms","service":"mi-servidor","timestamp":"2026-02-21 17:43:55"}
+{"level":"info","message":"GET /registrations 304 1277ms","service":"mi-servidor","timestamp":"2026-02-21 17:43:57"}
+{"level":"info","message":"POST /auth/logout 200 136ms","service":"mi-servidor","timestamp":"2026-02-21 17:44:00"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 17:44:03","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 480ms","service":"mi-servidor","timestamp":"2026-02-21 17:44:03"}
+{"level":"info","message":"GET /events 200 120ms","service":"mi-servidor","timestamp":"2026-02-21 17:44:03"}
+{"level":"info","message":"GET /events 200 106ms","service":"mi-servidor","timestamp":"2026-02-21 17:44:04"}
+{"level":"info","message":"GET /events 200 106ms","service":"mi-servidor","timestamp":"2026-02-21 17:44:06"}
+{"level":"info","message":"GET /leaders 200 128ms","service":"mi-servidor","timestamp":"2026-02-21 17:44:06"}
+{"level":"info","message":"GET /registrations 304 1304ms","service":"mi-servidor","timestamp":"2026-02-21 17:44:07"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"📧 Flags: Welcome=false, Credentials=false, QR=true, Warning=false","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"📱 Enviando QR - Token: cdf90450..., Email: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"📱 Generando QR para dubstepculture2013@gmail.com: http://localhost:3000/form.html?token=cdf9045047b3bccb9e66b5605d895e39","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"📱 QR generado: 3419 bytes","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"📧 [MOCK] Email a dubstepculture2013@gmail.com - 📱 Tu Código QR de Registro","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 234ms","service":"mi-servidor","timestamp":"2026-02-21 17:44:19"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📧 Flags: Welcome=true, Credentials=true, QR=true, Warning=true","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📧 [MOCK] Email a dubstepculture2013@gmail.com - 👋 ¡Bienvenido al Sistema!","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"✅ Email de bienvenida: true","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📧 Enviando credenciales - Username: jmendez, hasTempPass: false","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"🔑 sendCredentialsEmail llamado para: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📧 [MOCK] Email a dubstepculture2013@gmail.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"✅ Email de credenciales: true","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📱 Enviando QR - Token: cdf90450..., Email: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📱 Generando QR para dubstepculture2013@gmail.com: http://localhost:3000/form.html?token=cdf9045047b3bccb9e66b5605d895e39","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📱 QR generado: 3419 bytes","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📧 [MOCK] Email a dubstepculture2013@gmail.com - 📱 Tu Código QR de Registro","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📧 [MOCK] Email a dubstepculture2013@gmail.com - ⚠️ Recordatorio Importante","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"✅ Email de alerta: true","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 143ms","service":"mi-servidor","timestamp":"2026-02-21 17:45:03"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-21 17:55:47"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-21 17:55:47"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 17:55:48"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 17:55:48"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 17:55:48"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 17:55:50"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 17:55:50"}
+{"level":"info","message":"POST /auth/logout 200 147ms","service":"mi-servidor","timestamp":"2026-02-21 17:55:55"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 17:56:00","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 543ms","service":"mi-servidor","timestamp":"2026-02-21 17:56:00"}
+{"level":"info","message":"GET /events 200 209ms","service":"mi-servidor","timestamp":"2026-02-21 17:56:00"}
+{"level":"info","message":"GET /events 200 184ms","service":"mi-servidor","timestamp":"2026-02-21 17:56:02"}
+{"level":"info","message":"GET /events 200 322ms","service":"mi-servidor","timestamp":"2026-02-21 17:56:07"}
+{"level":"info","message":"GET /leaders 200 320ms","service":"mi-servidor","timestamp":"2026-02-21 17:56:07"}
+{"level":"info","message":"GET /registrations 304 1600ms","service":"mi-servidor","timestamp":"2026-02-21 17:56:09"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 17:56:31"}
+{"level":"info","message":"📧 Flags: Welcome=true, Credentials=true, QR=true, Warning=true","service":"mi-servidor","timestamp":"2026-02-21 17:56:31"}
+{"level":"info","message":"✅ Email enviado a dubstepculture2013@gmail.com - 👋 ¡Bienvenido al Sistema! (ID: f18568d6-349c-4198-b4d4-2cceb78da8e0)","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"info","message":"✅ Email de bienvenida: true","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"info","message":"📧 Enviando credenciales - Username: jmendez, hasTempPass: false","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"info","message":"✅ Email enviado a dubstepculture2013@gmail.com - 🔑 Tus Credenciales de Acceso (ID: de2b41b7-87d3-48aa-9716-fb279cff7327)","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"info","message":"✅ Email de credenciales: true","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"info","message":"📱 Enviando QR - Token: cdf90450..., Email: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"info","message":"📱 Generando QR para dubstepculture2013@gmail.com: http://localhost:3000/form.html?token=cdf9045047b3bccb9e66b5605d895e39","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"info","message":"📱 QR generado: 4582 chars","service":"mi-servidor","timestamp":"2026-02-21 17:56:32"}
+{"level":"error","message":"❌ Error Resend enviando a dubstepculture2013@gmail.com: Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.","service":"mi-servidor","timestamp":"2026-02-21 17:56:33"}
+{"level":"info","message":"✅ Email de QR: false","service":"mi-servidor","timestamp":"2026-02-21 17:56:33"}
+{"level":"info","message":"✅ Email enviado a dubstepculture2013@gmail.com - ⚠️ Recordatorio Importante (ID: 173aea16-f0c1-4bba-b71b-a0ca3f050dde)","service":"mi-servidor","timestamp":"2026-02-21 17:56:33"}
+{"level":"info","message":"✅ Email de alerta: true","service":"mi-servidor","timestamp":"2026-02-21 17:56:33"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:56:33"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 1745ms","service":"mi-servidor","timestamp":"2026-02-21 17:56:33"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 17:57:25"}
+{"level":"info","message":"📧 Flags: Welcome=false, Credentials=false, QR=true, Warning=false","service":"mi-servidor","timestamp":"2026-02-21 17:57:25"}
+{"level":"info","message":"📱 Enviando QR - Token: cdf90450..., Email: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:57:25"}
+{"level":"info","message":"📱 Generando QR para dubstepculture2013@gmail.com: http://localhost:3000/form.html?token=cdf9045047b3bccb9e66b5605d895e39","service":"mi-servidor","timestamp":"2026-02-21 17:57:25"}
+{"level":"info","message":"📱 QR generado: 4582 chars","service":"mi-servidor","timestamp":"2026-02-21 17:57:25"}
+{"level":"info","message":"✅ Email enviado a dubstepculture2013@gmail.com - 📱 Tu Código QR de Registro (ID: d1009f90-6009-435f-bc30-e707235471f4)","service":"mi-servidor","timestamp":"2026-02-21 17:57:26"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 17:57:26"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 17:57:26"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 886ms","service":"mi-servidor","timestamp":"2026-02-21 17:57:26"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-21 18:04:51"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-21 18:04:51"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 18:04:52"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 18:04:52"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 18:04:52"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 18:04:54"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 18:04:54"}
+{"level":"info","message":"POST /auth/logout 200 140ms","service":"mi-servidor","timestamp":"2026-02-21 18:04:57"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 18:05:05","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 581ms","service":"mi-servidor","timestamp":"2026-02-21 18:05:05"}
+{"level":"info","message":"GET /events 200 197ms","service":"mi-servidor","timestamp":"2026-02-21 18:05:05"}
+{"level":"info","message":"GET /events 200 109ms","service":"mi-servidor","timestamp":"2026-02-21 18:05:07"}
+{"level":"info","message":"GET /events 200 290ms","service":"mi-servidor","timestamp":"2026-02-21 18:05:09"}
+{"level":"info","message":"GET /leaders 200 224ms","service":"mi-servidor","timestamp":"2026-02-21 18:05:09"}
+{"level":"info","message":"GET /registrations 304 1564ms","service":"mi-servidor","timestamp":"2026-02-21 18:05:11"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 18:05:26"}
+{"level":"info","message":"📧 Flags: Welcome=false, Credentials=false, QR=true, Warning=false","service":"mi-servidor","timestamp":"2026-02-21 18:05:26"}
+{"level":"info","message":"📱 Enviando QR - Token: cdf90450..., Email: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 18:05:26"}
+{"level":"info","message":"📱 Generando QR para dubstepculture2013@gmail.com: http://localhost:3000/form.html?token=cdf9045047b3bccb9e66b5605d895e39","service":"mi-servidor","timestamp":"2026-02-21 18:05:26"}
+{"level":"info","message":"📱 QR generado: 3419 bytes","service":"mi-servidor","timestamp":"2026-02-21 18:05:26"}
+{"level":"info","message":"✅ Email con attachment enviado a dubstepculture2013@gmail.com - 📱 Tu Código QR de Registro (ID: 08ee2715-3362-4d65-8570-452660300515)","service":"mi-servidor","timestamp":"2026-02-21 18:05:27"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 18:05:27"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 18:05:27"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 1303ms","service":"mi-servidor","timestamp":"2026-02-21 18:05:27"}
+{"level":"info","message":"POST /auth/logout 200 235ms","service":"mi-servidor","timestamp":"2026-02-21 18:08:06"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 18:08:12","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 788ms","service":"mi-servidor","timestamp":"2026-02-21 18:08:12"}
+{"level":"info","message":"GET /events 200 111ms","service":"mi-servidor","timestamp":"2026-02-21 18:08:12"}
+{"level":"info","message":"GET /events 200 228ms","service":"mi-servidor","timestamp":"2026-02-21 18:08:14"}
+{"level":"info","message":"GET /events 200 116ms","service":"mi-servidor","timestamp":"2026-02-21 18:08:17"}
+{"level":"info","message":"GET /leaders 200 133ms","service":"mi-servidor","timestamp":"2026-02-21 18:08:17"}
+{"level":"info","message":"GET /registrations 304 1723ms","service":"mi-servidor","timestamp":"2026-02-21 18:08:18"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 18:08:37"}
+{"level":"info","message":"📧 Flags: Welcome=false, Credentials=false, QR=true, Warning=false","service":"mi-servidor","timestamp":"2026-02-21 18:08:37"}
+{"level":"info","message":"📱 Enviando QR - Token: cdf90450..., Email: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 18:08:37"}
+{"level":"info","message":"📱 Generando QR para dubstepculture2013@gmail.com: http://localhost:3000/form.html?token=cdf9045047b3bccb9e66b5605d895e39","service":"mi-servidor","timestamp":"2026-02-21 18:08:37"}
+{"level":"info","message":"📱 QR generado: 3419 bytes","service":"mi-servidor","timestamp":"2026-02-21 18:08:37"}
+{"level":"info","message":"✅ Email con attachment enviado a dubstepculture2013@gmail.com - 📱 Tu Código QR de Registro (ID: 454bbab3-3ee8-4ff7-a5b5-35b7bc8e8b8b)","service":"mi-servidor","timestamp":"2026-02-21 18:08:38"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 18:08:38"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 18:08:38"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 735ms","service":"mi-servidor","timestamp":"2026-02-21 18:08:38"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-21 18:09:25"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-21 18:09:25"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 18:09:26"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 18:09:26"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 18:09:26"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 18:09:28"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 18:09:28"}
+{"level":"info","message":"POST /auth/logout 200 234ms","service":"mi-servidor","timestamp":"2026-02-21 18:09:33"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 18:09:37","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 771ms","service":"mi-servidor","timestamp":"2026-02-21 18:09:37"}
+{"level":"info","message":"GET /events 200 186ms","service":"mi-servidor","timestamp":"2026-02-21 18:09:38"}
+{"level":"info","message":"GET /events 200 304ms","service":"mi-servidor","timestamp":"2026-02-21 18:09:44"}
+{"level":"info","message":"GET /events 200 172ms","service":"mi-servidor","timestamp":"2026-02-21 18:09:46"}
+{"level":"info","message":"GET /leaders 200 167ms","service":"mi-servidor","timestamp":"2026-02-21 18:09:46"}
+{"level":"info","message":"GET /registrations 304 1569ms","service":"mi-servidor","timestamp":"2026-02-21 18:09:48"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 18:09:56"}
+{"level":"info","message":"📧 Flags: Welcome=false, Credentials=false, QR=true, Warning=false","service":"mi-servidor","timestamp":"2026-02-21 18:09:56"}
+{"level":"info","message":"📱 Enviando QR - Token: cdf90450..., Email: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 18:09:56"}
+{"level":"info","message":"📱 Generando email QR para dubstepculture2013@gmail.com: http://localhost:3000/form.html?token=cdf9045047b3bccb9e66b5605d895e39","service":"mi-servidor","timestamp":"2026-02-21 18:09:56"}
+{"level":"info","message":"✅ Email enviado a dubstepculture2013@gmail.com - 📱 Tu Enlace de Registro (ID: 30dec526-3383-405c-8388-2fe1fb055964)","service":"mi-servidor","timestamp":"2026-02-21 18:09:57"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 18:09:57"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 18:09:57"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 676ms","service":"mi-servidor","timestamp":"2026-02-21 18:09:57"}
+{"level":"info","message":"GET /registro/cdf9045047b3bccb9e66b5605d895e39 304 235ms","service":"mi-servidor","timestamp":"2026-02-21 18:10:10"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-21 18:12:47"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-21 18:12:47"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 18:12:48"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 18:12:49"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 18:12:49"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 18:12:50"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 18:12:50"}
+{"level":"info","message":"POST /auth/logout 200 140ms","service":"mi-servidor","timestamp":"2026-02-21 18:12:53"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 18:12:58","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 853ms","service":"mi-servidor","timestamp":"2026-02-21 18:12:58"}
+{"level":"info","message":"GET /events 200 201ms","service":"mi-servidor","timestamp":"2026-02-21 18:12:59"}
+{"level":"info","message":"GET /events 200 252ms","service":"mi-servidor","timestamp":"2026-02-21 18:13:00"}
+{"level":"info","message":"GET /events 200 119ms","service":"mi-servidor","timestamp":"2026-02-21 18:13:02"}
+{"level":"info","message":"GET /leaders 200 133ms","service":"mi-servidor","timestamp":"2026-02-21 18:13:02"}
+{"level":"info","message":"GET /registrations 304 1308ms","service":"mi-servidor","timestamp":"2026-02-21 18:13:03"}
+{"level":"info","message":"📧 Enviando correos a dubstepculture2013@gmail.com para Jeisson Mendez...","service":"mi-servidor","timestamp":"2026-02-21 18:13:18"}
+{"level":"info","message":"📧 Flags: Welcome=false, Credentials=false, QR=true, Warning=false","service":"mi-servidor","timestamp":"2026-02-21 18:13:18"}
+{"level":"info","message":"📱 Enviando QR - Token: cdf90450..., Email: dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 18:13:18"}
+{"level":"info","message":"📱 Generando QR para dubstepculture2013@gmail.com: http://localhost:3000/form.html?token=cdf9045047b3bccb9e66b5605d895e39","service":"mi-servidor","timestamp":"2026-02-21 18:13:18"}
+{"level":"info","message":"📱 QR generado: 3419 bytes","service":"mi-servidor","timestamp":"2026-02-21 18:13:18"}
+{"level":"info","message":"✅ Email con attachment enviado a dubstepculture2013@gmail.com - 📱 Tu Enlace de Registro (ID: 0c8f6068-62b1-47ea-b736-40674823c17a)","service":"mi-servidor","timestamp":"2026-02-21 18:13:19"}
+{"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-21 18:13:19"}
+{"level":"info","message":"✅ Al menos un email fue enviado a dubstepculture2013@gmail.com","service":"mi-servidor","timestamp":"2026-02-21 18:13:19"}
+{"level":"info","message":"POST /leaders/6998f3d0a935eb2c1685fc77/send-access 200 907ms","service":"mi-servidor","timestamp":"2026-02-21 18:13:19"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-21 18:37:02"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-21 18:37:02"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 18:37:03"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 18:37:04"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 18:37:04"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 18:37:05"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 18:37:05"}
+{"level":"info","message":"GET /events 200 147ms","service":"mi-servidor","timestamp":"2026-02-21 18:37:09"}
+{"level":"info","message":"GET /events 200 255ms","service":"mi-servidor","timestamp":"2026-02-21 18:37:12"}
+{"level":"info","message":"GET /leaders 200 250ms","service":"mi-servidor","timestamp":"2026-02-21 18:37:12"}
+{"level":"info","message":"GET /registrations 304 1752ms","service":"mi-servidor","timestamp":"2026-02-21 18:37:13"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-21 18:45:30"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-21 18:45:30"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 18:45:32"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 18:45:32"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 18:45:32"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 18:45:34"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 18:45:34"}
+{"level":"info","message":"POST /auth/logout 200 749ms","service":"mi-servidor","timestamp":"2026-02-21 18:45:36"}
+{"level":"info","message":"POST /auth/logout 200 1699ms","service":"mi-servidor","timestamp":"2026-02-21 18:45:36"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 18:45:39","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 616ms","service":"mi-servidor","timestamp":"2026-02-21 18:45:39"}
+{"level":"info","message":"GET /events 200 196ms","service":"mi-servidor","timestamp":"2026-02-21 18:45:39"}
+{"level":"info","message":"GET /events 200 125ms","service":"mi-servidor","timestamp":"2026-02-21 18:45:41"}
+{"level":"info","message":"GET /events 200 174ms","service":"mi-servidor","timestamp":"2026-02-21 18:45:42"}
+{"level":"info","message":"GET /leaders 200 196ms","service":"mi-servidor","timestamp":"2026-02-21 18:45:42"}
+{"level":"info","message":"GET /registrations 304 1694ms","service":"mi-servidor","timestamp":"2026-02-21 18:45:44"}
+{"level":"info","message":"POST /auth/logout 200 118ms","service":"mi-servidor","timestamp":"2026-02-21 18:46:06"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 18:46:22","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 289ms","service":"mi-servidor","timestamp":"2026-02-21 18:46:22"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 154ms","service":"mi-servidor","timestamp":"2026-02-21 18:46:23"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 119ms","service":"mi-servidor","timestamp":"2026-02-21 18:46:23"}
+{"level":"info","message":"GET /registrations 304 402ms","service":"mi-servidor","timestamp":"2026-02-21 18:46:23"}
+{"level":"info","message":"GET /registrations 304 398ms","service":"mi-servidor","timestamp":"2026-02-21 18:46:25"}
+{"level":"info","message":"GET /registrations 304 428ms","service":"mi-servidor","timestamp":"2026-02-21 18:46:37"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-21 18:53:18"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-21 18:53:18"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 18:53:19"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 18:53:19"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 18:53:19"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 18:53:21"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-21 18:53:21"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 18:53:37","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 563ms","service":"mi-servidor","timestamp":"2026-02-21 18:53:37"}
+{"level":"info","message":"GET /events 200 115ms","service":"mi-servidor","timestamp":"2026-02-21 18:53:37"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-21 18:53:59","user":"jmendez"}
+{"level":"info","message":"POST /auth/leader-login 200 274ms","service":"mi-servidor","timestamp":"2026-02-21 18:53:59"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 135ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:00"}
+{"level":"info","message":"GET /leaders/LID-MLVJOYIY-VEUV 304 131ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:00"}
+{"level":"info","message":"GET /registrations 304 348ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:00"}
+{"level":"info","message":"GET /registrations 304 330ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:12"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-21 18:54:18"}
+{"level":"info","message":"GET /public/puestos 304 232ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:18"}
+{"level":"info","message":"GET /registrations 304 334ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:25"}
+{"level":"info","message":"GET /registro/cdf9045047b3bccb9e66b5605d895e39 304 223ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:48"}

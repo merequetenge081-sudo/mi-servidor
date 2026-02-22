@@ -35,6 +35,7 @@
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--light-bg);
             overflow-x: hidden;
+            padding-bottom: 55px;
         }
 
         /* ============== NAVBAR ============== */
@@ -1576,6 +1577,105 @@
             -webkit-backdrop-filter: none !important;
             background: rgba(0, 0, 0, 0.85) !important;
         }
+
+        /* Site Footer */
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-top: 1px solid #e2e8f0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-link {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 11px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #667eea;
+        }
+
+        .footer-link-primary {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .footer-divider {
+            color: #cbd5e1;
+        }
+
+        .footer-copyright {
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        /* Footer Dark Mode */
+        body.dark-mode .site-footer {
+            background: rgba(22, 33, 62, 0.95);
+            border-top-color: rgba(255, 255, 255, 0.08);
+        }
+
+        body.dark-mode .footer-link {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .footer-link:hover {
+            color: #a5b4fc;
+        }
+
+        body.dark-mode .footer-link-primary {
+            color: #a5b4fc;
+        }
+
+        body.dark-mode .footer-divider {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .footer-copyright {
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 60px;
+            }
+            
+            .site-footer {
+                flex-direction: column;
+                gap: 4px;
+                padding: 8px 12px;
+            }
+            
+            .footer-link span {
+                display: none;
+            }
+            
+            .footer-copyright {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -1774,12 +1874,6 @@
                             <span class="tooltip-text">Genera un código QR para que las personas se registren
                                 escaneándolo.</span>
                         </div>
-                        <div class="tooltip-container">
-                            <button class="btn-primary" onclick="openForm()">
-                                <i class="bi bi-box-arrow-up-right"></i> Llenar Formulario
-                            </button>
-                            <span class="tooltip-text">Registra manualmente a una persona desde tu panel.</span>
-                        </div>
                     </div>
                 </div>
 
@@ -1880,8 +1974,8 @@
         <!-- NEW REGISTRATION VIEW -->
         <div id="newRegistrationView" class="view">
             <div class="form-container">
-                <button class="back-btn" onclick="goToView('welcome')">
-                    <i class="bi bi-arrow-left"></i> Volver al inicio
+                <button class="back-btn" onclick="goToView('registrations')">
+                    <i class="bi bi-arrow-left"></i> Volver a gestión
                 </button>
 
                 <div class="form-card">
@@ -2022,10 +2116,12 @@
                         <div class="form-group">
                             <label class="form-label required">Puesto de Votación</label>
                             <div id="puestoCatalogo">
-                                <input type="text" class="form-input" id="puestoBusquedaLeader" placeholder="🔍 Busca por nombre..." onkeyup="filtrarPuestosLeader()" style="margin-bottom: 8px;">
-                                <select class="form-input" id="puestoId" required>
-                                    <option value="">Selecciona tu puesto de votación</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <input type="text" class="form-input" id="puestoBusquedaLeader" placeholder="🔍 Escribe para buscar o click para ver opciones..." autocomplete="off" onkeyup="filtrarPuestosLeader()" onfocus="mostrarDropdownPuestosLeader()" onclick="mostrarDropdownPuestosLeader()">
+                                    <div id="puestoDropdownLeader" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 4px;">
+                                    </div>
+                                    <input type="hidden" id="puestoId" required>
+                                </div>
                             </div>
                             <div id="puestoManual" style="display: none;">
                                 <input type="text" class="form-input" id="votingPlace"
@@ -2060,7 +2156,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary" onclick="goToView('welcome')">
+                            <button type="button" class="btn-secondary" onclick="goToView('registrations')">
                                 <i class="bi bi-x-lg"></i> Cancelar
                             </button>
                             <button type="submit" class="btn-primary">
@@ -3274,30 +3370,51 @@
         }
 
         function mostrarPuestosLeader() {
-            const select = document.getElementById('puestoId');
-            select.innerHTML = '<option value="">Selecciona tu puesto de votación</option>' +
-                puestosLeaderCache.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('');
+            filtrarPuestosLeader();
+        }
+
+        function mostrarDropdownPuestosLeader() {
+            filtrarPuestosLeader();
         }
 
         function filtrarPuestosLeader() {
             const terminoRaw = document.getElementById('puestoBusquedaLeader').value;
             const termino = normalizePuestoTexto(terminoRaw);
 
-            if (!termino) {
-                mostrarPuestosLeader();
-                return;
+            let puestosAMostrar = termino 
+                ? puestosLeaderCache.filter(p => buildPuestoSearchText(p).includes(termino))
+                : puestosLeaderCache;
+
+            const dropdown = document.getElementById('puestoDropdownLeader');
+
+            if (puestosAMostrar.length === 0) {
+                dropdown.innerHTML = '<div style="padding: 12px; color: #999; text-align: center;">No hay resultados</div>';
+            } else {
+                dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => `
+                    <div class="puesto-option" data-id="${p._id}" onclick="seleccionarPuestoLeader('${p._id}', '${(p.nombre || '').replace(/'/g, "\\'")}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+                        <strong>${p.nombre || 'Sin nombre'}</strong>
+                        <span style="color: #666; font-size: 12px; margin-left: 8px;">${p.codigoPuesto || ''}</span>
+                    </div>
+                `).join('');
             }
 
-            const puestosFiltrados = puestosLeaderCache.filter(p =>
-                buildPuestoSearchText(p).includes(termino)
-            );
-
-            const select = document.getElementById('puestoId');
-            select.innerHTML = puestosFiltrados.length > 0
-                ? '<option value="">Selecciona tu puesto</option>' +
-                  puestosFiltrados.map(p => `<option value="${p._id}">${p.nombre} (${p.codigoPuesto})</option>`).join('')
-                : '<option value="">No hay resultados</option>';
+            dropdown.style.display = 'block';
         }
+
+        function seleccionarPuestoLeader(id, nombre, codigo) {
+            document.getElementById('puestoBusquedaLeader').value = `${nombre} (${codigo})`;
+            document.getElementById('puestoId').value = id;
+            document.getElementById('puestoDropdownLeader').style.display = 'none';
+        }
+
+        // Cerrar dropdown al hacer click fuera
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('puestoBusquedaLeader')?.parentElement;
+            if (container && !container.contains(e.target)) {
+                const dropdown = document.getElementById('puestoDropdownLeader');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+        });
 
         function handleLocalidadChange() {
             const localidad = document.getElementById('localidad').value;
@@ -3753,6 +3870,21 @@
             loadRegistrations();
         });
     </script>
+
+    <!-- FOOTER LEGAL -->
+    <footer class="site-footer">
+        <div class="footer-links">
+            <a href="https://www.sic.gov.co" target="_blank" rel="noopener noreferrer" class="footer-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>SIC</span>
+            </a>
+            <span class="footer-divider">|</span>
+            <a href="#" onclick="showPolicyModal(event)" class="footer-link footer-link-primary">
+                <i class="bi bi-shield-check"></i> Política de Datos
+            </a>
+        </div>
+        <span class="footer-copyright">© 2026 Red Social y Política</span>
+    </footer>
 </body>
 
 </html>
