@@ -13,5 +13,15 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: redsp@fulars.com
+      - key: BASE_URL
+        value: https://midominio.com
+      - key: FRONTEND_URL
+        value: https://midominio.com
       - key: LOG_LEVEL
         value: info
+      - key: ENCRYPTION_KEY
+        sync: false
