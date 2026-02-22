@@ -4428,3 +4428,343 @@
 {"level":"info","message":"GET /public/puestos 304 232ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:18"}
 {"level":"info","message":"GET /registrations 304 334ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:25"}
 {"level":"info","message":"GET /registro/cdf9045047b3bccb9e66b5605d895e39 304 223ms","service":"mi-servidor","timestamp":"2026-02-21 18:54:48"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-21 22:51:01"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-21 22:51:01"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 22:51:02"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-21 22:51:02"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 22:51:02"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-21 22:51:02"}
+{"error":"connect ECONNREFUSED 127.0.0.1:27017","level":"error","message":"✗ Error conectando a MongoDB:","service":"mi-servidor","stack":"MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017\n    at _handleConnectionErrors (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\connection.js:1169:11)\n    at NativeConnection.openUri (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\connection.js:1100:11)\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at listOnTimeout (node:internal/timers:569:9)\n    at process.processTimers (node:internal/timers:543:7)\n    at async connectDB (file:///C:/Users/Janus/Projects/mi-servidor/src/config/db.js:12:5)\n    at async start (file:///C:/Users/Janus/Projects/mi-servidor/server.js:42:3)","timestamp":"2026-02-21 22:51:12"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-21 23:05:10"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-21 23:05:10"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 23:05:10"}
+{"error":"Connection timeout","level":"error","message":"✗ Error conectando a MongoDB:","service":"mi-servidor","stack":"Error: Connection timeout\n    at Timeout._onTimeout (file:///C:/Users/Janus/Projects/mi-servidor/src/config/db.js:19:58)\n    at listOnTimeout (node:internal/timers:608:17)\n    at process.processTimers (node:internal/timers:543:7)","timestamp":"2026-02-21 23:05:20"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-21 23:06:49"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-21 23:06:49"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 23:06:49"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 23:06:53"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (production)","service":"mi-servidor","timestamp":"2026-02-21 23:06:53"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-21 23:13:14"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-21 23:13:14"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-21 23:13:14"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-21 23:13:19"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (production)","service":"mi-servidor","timestamp":"2026-02-21 23:13:19"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-22 00:10:29"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-22 00:10:29"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-22 00:10:29"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-22 00:10:29"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 00:10:32"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-22 00:10:32"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-22 00:13:18"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-22 00:13:18"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-22 00:13:18"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-22 00:13:18"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 00:13:20"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-22 00:13:20"}
+{"level":"warn","message":"Route not found: GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-22 00:13:50"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:13:50"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-22 00:14:14","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 657ms","service":"mi-servidor","timestamp":"2026-02-22 00:14:14"}
+{"level":"info","message":"GET /events 200 102ms","service":"mi-servidor","timestamp":"2026-02-22 00:14:14"}
+{"level":"info","message":"GET /events 200 206ms","service":"mi-servidor","timestamp":"2026-02-22 00:14:18"}
+{"level":"info","message":"GET /events 200 88ms","service":"mi-servidor","timestamp":"2026-02-22 00:14:23"}
+{"level":"info","message":"GET /leaders 200 840ms","service":"mi-servidor","timestamp":"2026-02-22 00:14:23"}
+{"level":"info","message":"GET /registrations 200 10122ms","service":"mi-servidor","timestamp":"2026-02-22 00:14:33"}
+{"level":"info","message":"POST /auth/logout 200 97ms","service":"mi-servidor","timestamp":"2026-02-22 00:18:01"}
+{"level":"info","message":"✅ Leader login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-22 00:18:17","user":"cleader"}
+{"level":"info","message":"POST /auth/leader-login 200 142ms","service":"mi-servidor","timestamp":"2026-02-22 00:18:17"}
+{"level":"info","message":"GET /auth/legal-terms-status 200 393ms","service":"mi-servidor","timestamp":"2026-02-22 00:18:19"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 200 84ms","service":"mi-servidor","timestamp":"2026-02-22 00:18:19"}
+{"level":"info","message":"GET /registrations 200 338ms","service":"mi-servidor","timestamp":"2026-02-22 00:18:19"}
+{"level":"info","message":"Cargados 0 puestos para Fontibón","service":"mi-servidor","timestamp":"2026-02-22 00:19:22"}
+{"level":"info","message":"GET /public/puestos 200 90ms","service":"mi-servidor","timestamp":"2026-02-22 00:19:22"}
+{"error":"connect ECONNREFUSED 127.0.0.1:27017","level":"error","message":"✗ Error conectando a MongoDB:","service":"mi-servidor","stack":"MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017\n    at _handleConnectionErrors (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\connection.js:1169:11)\n    at NativeConnection.openUri (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\connection.js:1100:11)\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at listOnTimeout (node:internal/timers:569:9)\n    at process.processTimers (node:internal/timers:543:7)\n    at async connectDB (file:///C:/Users/Janus/Projects/mi-servidor/src/config/db.js:12:5)\n    at async [eval]:1:60","timestamp":"2026-02-22 00:19:22"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 00:19:54"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-22 00:21:49","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 320ms","service":"mi-servidor","timestamp":"2026-02-22 00:21:49"}
+{"level":"info","message":"📍 Iniciando importación de puestos vía API...","service":"mi-servidor","timestamp":"2026-02-22 00:21:49"}
+{"level":"info","message":"📦 Recibidos 959 puestos del request","service":"mi-servidor","timestamp":"2026-02-22 00:21:49"}
+{"level":"info","message":"📦 Validados 959 puestos","service":"mi-servidor","timestamp":"2026-02-22 00:21:49"}
+{"level":"info","message":"🗑️  Colección anterior limpiada","service":"mi-servidor","timestamp":"2026-02-22 00:21:49"}
+{"level":"info","message":"✅ Se importaron 959 puestos de votación","service":"mi-servidor","timestamp":"2026-02-22 00:21:49"}
+{"level":"info","message":"POST /admin/import-puestos 200 590ms","service":"mi-servidor","timestamp":"2026-02-22 00:21:49"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 00:22:43"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 00:23:27"}
+{"level":"info","message":"Cargados 42 puestos para Fontibón","service":"mi-servidor","timestamp":"2026-02-22 00:23:49"}
+{"level":"info","message":"GET /public/puestos 200 294ms","service":"mi-servidor","timestamp":"2026-02-22 00:23:49"}
+{"level":"info","message":"Cargados 19 puestos para Los Mártires","service":"mi-servidor","timestamp":"2026-02-22 00:24:10"}
+{"level":"info","message":"GET /public/puestos 200 165ms","service":"mi-servidor","timestamp":"2026-02-22 00:24:10"}
+{"level":"info","message":"Cargados 9 puestos para La Candelaria","service":"mi-servidor","timestamp":"2026-02-22 00:24:21"}
+{"level":"info","message":"GET /public/puestos 200 81ms","service":"mi-servidor","timestamp":"2026-02-22 00:24:21"}
+{"level":"info","message":"Cargados 42 puestos para Fontibón","service":"mi-servidor","timestamp":"2026-02-22 00:24:38"}
+{"level":"info","message":"GET /public/puestos 200 328ms","service":"mi-servidor","timestamp":"2026-02-22 00:24:38"}
+{"level":"info","message":"Cargados 19 puestos para Los Mártires","service":"mi-servidor","timestamp":"2026-02-22 00:24:46"}
+{"level":"info","message":"GET /public/puestos 200 378ms","service":"mi-servidor","timestamp":"2026-02-22 00:24:46"}
+{"level":"info","message":"Cargados 9 puestos para La Candelaria","service":"mi-servidor","timestamp":"2026-02-22 00:24:54"}
+{"level":"info","message":"GET /public/puestos 200 86ms","service":"mi-servidor","timestamp":"2026-02-22 00:24:54"}
+{"level":"info","message":"GET /registrations 200 352ms","service":"mi-servidor","timestamp":"2026-02-22 00:25:27"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-22 00:25:29"}
+{"level":"info","message":"GET /public/puestos 200 273ms","service":"mi-servidor","timestamp":"2026-02-22 00:25:29"}
+{"level":"info","message":"Cargados 42 puestos para Fontibón","service":"mi-servidor","timestamp":"2026-02-22 00:25:36"}
+{"level":"info","message":"GET /public/puestos 304 176ms","service":"mi-servidor","timestamp":"2026-02-22 00:25:36"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 88ms","service":"mi-servidor","timestamp":"2026-02-22 00:27:33"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 93ms","service":"mi-servidor","timestamp":"2026-02-22 00:27:33"}
+{"level":"info","message":"GET /registrations 304 336ms","service":"mi-servidor","timestamp":"2026-02-22 00:27:33"}
+{"level":"info","message":"GET /registrations 304 332ms","service":"mi-servidor","timestamp":"2026-02-22 00:28:08"}
+{"level":"info","message":"Cargados 57 puestos para Usaquén","service":"mi-servidor","timestamp":"2026-02-22 00:28:09"}
+{"level":"info","message":"GET /public/puestos 304 194ms","service":"mi-servidor","timestamp":"2026-02-22 00:28:09"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-22 00:28:29","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 358ms","service":"mi-servidor","timestamp":"2026-02-22 00:28:29"}
+{"level":"info","message":"GET /events 200 90ms","service":"mi-servidor","timestamp":"2026-02-22 00:28:29"}
+{"level":"info","message":"GET /events 200 86ms","service":"mi-servidor","timestamp":"2026-02-22 00:28:30"}
+{"level":"info","message":"GET /events 200 83ms","service":"mi-servidor","timestamp":"2026-02-22 00:28:31"}
+{"level":"info","message":"GET /leaders 200 274ms","service":"mi-servidor","timestamp":"2026-02-22 00:28:31"}
+{"level":"info","message":"GET /registrations 200 5641ms","service":"mi-servidor","timestamp":"2026-02-22 00:28:37"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-22 00:42:55"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-22 00:42:55"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-22 00:42:56"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-22 00:42:56"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 00:42:58"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-22 00:42:58"}
+{"level":"info","message":"GET /app 302 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:28"}
+{"level":"info","message":"GET /events 200 111ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:28"}
+{"level":"info","message":"GET /leaders 200 301ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:28"}
+{"level":"info","message":"GET /registrations 304 4971ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:33"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:43"}
+{"level":"info","message":"GET /leaders 200 136ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:43"}
+{"level":"info","message":"GET /events 200 138ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:43"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:44"}
+{"level":"info","message":"GET /events 200 100ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:44"}
+{"level":"info","message":"GET /leaders 200 209ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:44"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:45"}
+{"level":"info","message":"GET /events 200 88ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:45"}
+{"level":"info","message":"GET /leaders 200 88ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:45"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:46"}
+{"level":"info","message":"GET /leaders 200 86ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:46"}
+{"level":"info","message":"GET /events 200 88ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:46"}
+{"level":"info","message":"GET /registrations 304 4018ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:47"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:43:49"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:49"}
+{"level":"info","message":"GET /registrations 304 3494ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:50"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"info","message":"GET /registrations 304 4578ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"info","message":"GET /events 200 83ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"info","message":"GET /leaders 200 87ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:55"}
+{"level":"info","message":"GET /registrations 304 2246ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:57"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:43:58"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:58"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:43:58"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:58"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:58"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:43:58"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:58"}
+{"level":"info","message":"GET /events 200 96ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:59"}
+{"level":"info","message":"GET /leaders 200 97ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:59"}
+{"level":"info","message":"GET /registrations 304 1713ms","service":"mi-servidor","timestamp":"2026-02-22 00:43:59"}
+{"level":"info","message":"GET /registrations 304 1837ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:01"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"info","message":"GET /events 200 102ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"info","message":"GET /leaders 200 210ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:03"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:04"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 13ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:04"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:04"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:04"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:04"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:04"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:04"}
+{"level":"info","message":"GET /events 200 83ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:05"}
+{"level":"info","message":"GET /leaders 200 494ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:05"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"info","message":"GET /leaders 200 81ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"info","message":"GET /events 200 85ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:06"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"info","message":"GET /leaders 200 90ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"info","message":"GET /events 200 92ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:07"}
+{"level":"info","message":"GET /registrations 304 4426ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:08"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:08"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:08"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:08"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:08"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:08"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:09"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:09"}
+{"level":"info","message":"GET /events 200 85ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:09"}
+{"level":"info","message":"GET /leaders 200 185ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:09"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"info","message":"GET /events 200 95ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"info","message":"GET /leaders 200 182ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:10"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:11"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:11"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:11"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:11"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:11"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:12"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:12"}
+{"level":"info","message":"GET /events 200 83ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:12"}
+{"level":"info","message":"GET /leaders 200 183ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:12"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:12"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:12"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"info","message":"GET /events 200 83ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"info","message":"GET /leaders 200 162ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:13"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:14"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:14"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:14"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:14"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:14"}
+{"level":"info","message":"GET /events 200 84ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:14"}
+{"level":"info","message":"GET /leaders 200 162ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:14"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:15"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:15"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:15"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:15"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:15"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:16"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:16"}
+{"level":"info","message":"GET /events 200 81ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:16"}
+{"level":"info","message":"GET /leaders 200 89ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:16"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"info","message":"GET /events 200 80ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"info","message":"GET /leaders 200 177ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:17"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"info","message":"GET /events 200 84ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"info","message":"GET /leaders 200 85ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:20"}
+{"level":"info","message":"GET /registrations 200 2484ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:22"}
+{"level":"info","message":"GET /registrations 304 3132ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:25"}
+{"level":"info","message":"GET /registrations 304 4314ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:30"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:31"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:31"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:31"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:31"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:31"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:31"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:31"}
+{"level":"info","message":"GET /events 200 82ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:32"}
+{"level":"info","message":"GET /leaders 200 86ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:32"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"info","message":"GET /registrations 304 3252ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"info","message":"GET /events 200 89ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"info","message":"GET /leaders 200 106ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:33"}
+{"level":"info","message":"GET /registrations 304 3786ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:37"}
+{"level":"info","message":"GET /registrations 304 2769ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:39"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:41"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:41"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:42"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 2ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:42"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:42"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 00:44:42"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:42"}
+{"level":"info","message":"GET /registrations 304 2616ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:42"}
+{"level":"info","message":"GET /leaders 200 84ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:42"}
+{"level":"info","message":"GET /events 200 86ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:42"}
+{"level":"info","message":"GET /registrations 304 4585ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:47"}
+{"level":"info","message":"GET /registrations 304 4465ms","service":"mi-servidor","timestamp":"2026-02-22 00:44:51"}
+{"level":"info","message":"GET /auth/legal-terms-status 304 88ms","service":"mi-servidor","timestamp":"2026-02-22 00:57:43"}
+{"level":"info","message":"GET /leaders/LID-MLULVTSN-3G4H 304 75ms","service":"mi-servidor","timestamp":"2026-02-22 00:57:43"}
+{"level":"info","message":"GET /registrations 304 323ms","service":"mi-servidor","timestamp":"2026-02-22 00:57:43"}
+{"level":"info","message":"✅ Admin login exitoso [mongodb]","service":"mi-servidor","source":"mongodb","timestamp":"2026-02-22 00:57:51","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 343ms","service":"mi-servidor","timestamp":"2026-02-22 00:57:51"}
+{"level":"info","message":"GET /events 200 88ms","service":"mi-servidor","timestamp":"2026-02-22 00:57:51"}
+{"level":"info","message":"GET /events 200 83ms","service":"mi-servidor","timestamp":"2026-02-22 00:57:52"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:13"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:14"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:15"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:16"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:17"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:18"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:18"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:19"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:20"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:21"}
+{"level":"info","message":"GET /app 302 0ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:22"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:23"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 00:58:23"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-22 01:01:37"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-22 01:01:37"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-22 01:01:38"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-22 01:01:38"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 01:01:40"}
+{"level":"info","message":"GET /app 302 1ms","service":"mi-servidor","timestamp":"2026-02-22 01:01:52"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-22 01:06:12"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o forzado).","service":"mi-servidor","timestamp":"2026-02-22 01:06:12"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-22 01:06:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-22 01:06:13"}
+{"level":"info","message":"✓ Conectado a MongoDB","service":"mi-servidor","timestamp":"2026-02-22 01:06:14"}
+{"level":"info","message":"✓ Servidor corriendo en puerto 3000 (development)","service":"mi-servidor","timestamp":"2026-02-22 01:06:14"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 01:07:01"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 4ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:01"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 01:07:02"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:02"}
+{"level":"warn","message":"Route not found: GET /.well-known/appspecific/com.chrome.devtools.json","service":"mi-servidor","timestamp":"2026-02-22 01:07:17"}
+{"level":"info","message":"GET /.well-known/appspecific/com.chrome.devtools.json 404 4ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:17"}
+{"level":"info","message":"GET /analytics/leaders-list 200 123ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:17"}
+{"level":"info","message":"GET /analytics/top-puestos 200 105ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:17"}
+{"$clusterTime":{"clusterTime":{"$timestamp":"7609582919136313376"},"signature":{"hash":"o005nag9wBcJzvN5Pjfay73eLqc=","keyId":{"high":1760461432,"low":17,"unsigned":false}}},"code":241,"codeName":"ConversionFailure","errorLabelSet":{},"errorResponse":{"$clusterTime":{"clusterTime":{"$timestamp":"7609582919136313376"},"signature":{"hash":"o005nag9wBcJzvN5Pjfay73eLqc=","keyId":{"high":1760461432,"low":17,"unsigned":false}}},"code":241,"codeName":"ConversionFailure","errmsg":"PlanExecutor error during aggregation :: caused by :: Failed to parse objectId 'LID-MLSGYMFG-J5QC' in $convert with no onError value: Invalid string length for parsing to OID, expected 24 but found 17","ok":0,"operationTime":{"$timestamp":"7609582919136313376"}},"level":"error","message":"Error en getLeadersByLocality: PlanExecutor error during aggregation :: caused by :: Failed to parse objectId 'LID-MLSGYMFG-J5QC' in $convert with no onError value: Invalid string length for parsing to OID, expected 24 but found 17","ok":0,"operationTime":{"$timestamp":"7609582919136313376"},"service":"mi-servidor","stack":"MongoServerError: PlanExecutor error during aggregation :: caused by :: Failed to parse objectId 'LID-MLSGYMFG-J5QC' in $convert with no onError value: Invalid string length for parsing to OID, expected 24 but found 17\n    at Connection.sendCommand (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cmap\\connection.js:306:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Connection.command (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cmap\\connection.js:334:26)\n    at async Server.command (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\sdam\\server.js:194:29)\n    at async tryOperation (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:213:32)\n    at async executeOperation (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:78:16)\n    at async AggregationCursor._initialize (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\aggregation_cursor.js:57:26)\n    at async AggregationCursor.cursorInit (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:632:27)\n    at async AggregationCursor.fetchBatch (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:666:13)\n    at async AggregationCursor.next (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:342:17)\n    at async [Symbol.asyncIterator] (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:250:34)\n    at async AggregationCursor.toArray (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:422:26)\n    at async Aggregate.exec (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\aggregate.js:1104:14)\n    at async getLeadersByLocality (file:///C:/Users/Janus/Projects/mi-servidor/src/controllers/analytics.controller.js:122:21)","timestamp":"2026-02-22 01:07:17"}
+{"level":"info","message":"GET /analytics/leaders-by-locality 500 144ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:17"}
+{"$clusterTime":{"clusterTime":{"$timestamp":"7609582919136313376"},"signature":{"hash":"o005nag9wBcJzvN5Pjfay73eLqc=","keyId":{"high":1760461432,"low":17,"unsigned":false}}},"code":241,"codeName":"ConversionFailure","errorLabelSet":{},"errorResponse":{"$clusterTime":{"clusterTime":{"$timestamp":"7609582919136313376"},"signature":{"hash":"o005nag9wBcJzvN5Pjfay73eLqc=","keyId":{"high":1760461432,"low":17,"unsigned":false}}},"code":241,"codeName":"ConversionFailure","errmsg":"PlanExecutor error during aggregation :: caused by :: Failed to parse objectId 'LID-MLULVTSN-3G4H' in $convert with no onError value: Invalid string length for parsing to OID, expected 24 but found 17","ok":0,"operationTime":{"$timestamp":"7609582919136313376"}},"level":"error","message":"Error en getTopMesas: PlanExecutor error during aggregation :: caused by :: Failed to parse objectId 'LID-MLULVTSN-3G4H' in $convert with no onError value: Invalid string length for parsing to OID, expected 24 but found 17","ok":0,"operationTime":{"$timestamp":"7609582919136313376"},"service":"mi-servidor","stack":"MongoServerError: PlanExecutor error during aggregation :: caused by :: Failed to parse objectId 'LID-MLULVTSN-3G4H' in $convert with no onError value: Invalid string length for parsing to OID, expected 24 but found 17\n    at Connection.sendCommand (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cmap\\connection.js:306:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Connection.command (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cmap\\connection.js:334:26)\n    at async Server.command (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\sdam\\server.js:194:29)\n    at async tryOperation (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:213:32)\n    at async executeOperation (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:78:16)\n    at async AggregationCursor._initialize (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\aggregation_cursor.js:57:26)\n    at async AggregationCursor.cursorInit (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:632:27)\n    at async AggregationCursor.fetchBatch (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:666:13)\n    at async AggregationCursor.next (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:342:17)\n    at async [Symbol.asyncIterator] (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:250:34)\n    at async AggregationCursor.toArray (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongodb\\lib\\cursor\\abstract_cursor.js:422:26)\n    at async Aggregate.exec (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\aggregate.js:1104:14)\n    at async getTopMesas (file:///C:/Users/Janus/Projects/mi-servidor/src/controllers/analytics.controller.js:278:21)","timestamp":"2026-02-22 01:07:17"}
+{"level":"info","message":"GET /analytics/top-mesas 500 164ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:17"}
+{"level":"info","message":"GET /analytics/overview 200 365ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:18"}
+{"level":"info","message":"GET /analytics/simulation 200 517ms","service":"mi-servidor","timestamp":"2026-02-22 01:07:18"}
+{"level":"warn","message":"Route not found: GET /analytics.html","service":"mi-servidor","timestamp":"2026-02-22 01:09:24"}
+{"level":"info","message":"GET /analytics.html 404 1ms","service":"mi-servidor","timestamp":"2026-02-22 01:09:24"}
+{"level":"info","message":"GET /events 200 89ms","service":"mi-servidor","timestamp":"2026-02-22 01:09:31"}
+{"level":"info","message":"GET /events 200 108ms","service":"mi-servidor","timestamp":"2026-02-22 01:09:32"}
+{"level":"info","message":"GET /leaders 200 141ms","service":"mi-servidor","timestamp":"2026-02-22 01:09:32"}
+{"level":"info","message":"GET /registrations 304 909ms","service":"mi-servidor","timestamp":"2026-02-22 01:09:33"}
+{"level":"info","message":"GET /events 200 82ms","service":"mi-servidor","timestamp":"2026-02-22 01:14:25"}
+{"level":"info","message":"GET /leaders 200 100ms","service":"mi-servidor","timestamp":"2026-02-22 01:14:25"}
+{"level":"info","message":"GET /registrations 304 1432ms","service":"mi-servidor","timestamp":"2026-02-22 01:14:26"}
