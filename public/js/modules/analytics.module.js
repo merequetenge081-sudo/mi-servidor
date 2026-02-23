@@ -636,10 +636,91 @@ const AnalyticsModule = (() => {
     }
 
     // ===================================
+    // CARGAR VISTA CLÁSICA
+    // ===================================
+    function loadClassicAnalytics() {
+        console.log('[AnalyticsModule] Cargando vista clásica...');
+        updateStats();
+        populateLeaderDetailTable();
+        loadCharts();
+    }
+
+    // ===================================
     // VINCULACIÓN DE EVENTOS
     // ===================================
     function bindEvents() {
-        // Botones principales
+        // Toggle entre vistas
+        const classicBtn = DOMUtils.byId('analyzeViewClassicBtn');
+        const advancedBtn = DOMUtils.byId('analyzeViewAdvancedBtn');
+
+        if (classicBtn) {
+            classicBtn.addEventListener('click', () => {
+                console.log('[AnalyticsModule] Cargando vista clásica');
+                loadClassicAnalytics();
+            });
+        }
+
+        if (advancedBtn) {
+            advancedBtn.addEventListener('click', () => {
+                console.log('[AnalyticsModule] Cargando vista avanzada');
+                loadAnalytics();
+            });
+        }
+
+        // Filtros clásicos
+        const applyClassicBtn = DOMUtils.byId('applyAnalyticsClassicFilterBtn');
+        if (applyClassicBtn) {
+            applyClassicBtn.addEventListener('click', () => {
+                const regionFilter = DOMUtils.byId('analyticsRegionFilter');
+                const leaderFilter = DOMUtils.byId('analyticsLeaderFilterClassic');
+                
+                currentFilter.region = regionFilter?.value || 'all';
+                currentFilter.leaderId = leaderFilter?.value || null;
+                currentAnalyticsPage = 1;
+                
+                console.log('[AnalyticsModule] Filtros clásicos aplicados:', currentFilter);
+                loadClassicAnalytics();
+            });
+        }
+
+        const clearClassicBtn = DOMUtils.byId('clearAnalyticsClassicFilterBtn');
+        if (clearClassicBtn) {
+            clearClassicBtn.addEventListener('click', () => {
+                const regionFilter = DOMUtils.byId('analyticsRegionFilter');
+                const leaderFilter = DOMUtils.byId('analyticsLeaderFilterClassic');
+                
+                if (regionFilter) regionFilter.value = 'all';
+                if (leaderFilter) leaderFilter.value = '';
+                
+                currentFilter = { region: 'all', leaderId: null };
+                currentAnalyticsPage = 1;
+                
+                console.log('[AnalyticsModule] Filtros clásicos limpiados');
+                loadClassicAnalytics();
+            });
+        }
+
+        // Paginación clásica
+        const firstPageBtn = DOMUtils.byId('firstPageAnalyticsBtn');
+        const prevPageBtn = DOMUtils.byId('prevPageAnalyticsBtn');
+        const nextPageBtn = DOMUtils.byId('nextPageAnalyticsBtn');
+
+        if (firstPageBtn) firstPageBtn.addEventListener('click', () => {
+            currentAnalyticsPage = 1;
+            populateLeaderDetailTable();
+        });
+
+        if (prevPageBtn) prevPageBtn.addEventListener('click', () => {
+            currentAnalyticsPage = Math.max(1, currentAnalyticsPage - 1);
+            populateLeaderDetailTable();
+        });
+
+        if (nextPageBtn) nextPageBtn.addEventListener('click', () => {
+            currentAnalyticsPage += 1;
+            populateLeaderDetailTable();
+        });
+
+        // Botones avanzados
         const applyBtn = DOMUtils.byId('applyAnalyticsFilterBtn');
         const exportBtn = DOMUtils.byId('exportAnalyticsBtn');
 
@@ -656,7 +737,7 @@ const AnalyticsModule = (() => {
                 if (localidad) params.append('localidad', localidad);
                 if (startDate) params.append('startDate', startDate);
 
-                console.log('[AnalyticsModule] Aplicando filtros:', { leaderId, localidad, startDate });
+                console.log('[AnalyticsModule] Aplicando filtros avanzados:', { leaderId, localidad, startDate });
                 
                 // Mostrar loaders
                 showSkeletonLoaders();
@@ -677,7 +758,7 @@ const AnalyticsModule = (() => {
                         renderChartsAdvanced(data);
                         
                         hideSkeletonLoaders();
-                        console.log('[AnalyticsModule] ✅ Filtros aplicados exitosamente');
+                        console.log('[AnalyticsModule] ✅ Filtros avanzados aplicados exitosamente');
                     })
                     .catch(error => {
                         console.error('[AnalyticsModule] Error:', error);
@@ -694,9 +775,9 @@ const AnalyticsModule = (() => {
             });
         }
 
-        // Auto-cargar analytics al iniciar
+        // Auto-cargar analytics clásicos al iniciar
         console.log('[AnalyticsModule] bindEvents - Cargando initial data...');
-        loadAnalytics();
+        loadClassicAnalytics();
     }
 
     // ===================================
@@ -1019,6 +1100,7 @@ const AnalyticsModule = (() => {
     return {
         init,
         loadAnalytics,
+        loadClassicAnalytics,
         applyFilters,
         clearFilters,
         updateStats,
