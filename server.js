@@ -6,7 +6,21 @@ import { initMemoryAuth } from "./src/utils/authFallback.js";
 import logger from "./src/config/logger.js";
 import { currentEnv } from "./src/backend/config/environment.js";
 
+// Validación de PORT antes de inicializar
+if (process.env.NODE_ENV === "production" && !process.env.PORT) {
+  console.error("CRITICO: PORT no definido en produccion. Render debe inyectar la variable PORT.");
+  process.exit(1);
+}
+
 const PORT = config.port;
+
+// Logs de diagnóstico
+console.log("=== Diagnostico de inicio ===");
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`process.env.PORT: ${process.env.PORT || "(no definido, usando fallback)"}`);
+console.log(`PUERTO FINAL: ${PORT}`);
+console.log(`CWD: ${process.cwd()}`);
+console.log("Variables validadas correctamente\n");
 
 async function start() {
   // Validar secrets en producción
@@ -44,16 +58,21 @@ async function start() {
 
   app.listen(PORT, "0.0.0.0", () => {
     const banner = [
-      "==============================",
-      "🚀 SERVER STARTED",
+      "============================================",
+      "SERVER STARTED SUCCESSFULLY",
       `Environment: ${currentEnv}`,
       `Mongo DB: ${mongoDbName}`,
       `Port: ${PORT}`,
-      "=============================="
+      `Listening on: 0.0.0.0:${PORT}`,
+      "============================================"
     ].join("\n");
     
     logger.info(banner);
-    logger.info(`✓ Servidor corriendo en puerto ${PORT} (${currentEnv})`);
+    logger.info(`Server escuchando en 0.0.0.0:${PORT} (${currentEnv})`);
+    
+    if (process.env.NODE_ENV === "production") {
+      logger.info("Sistema detectado como PRODUCCION - listo para Render");
+    }
   });
 }
 
