@@ -105,7 +105,6 @@ const Events = (() => {
             // Send email button
             const sendEmailBtn = target.closest('.send-email-btn');
             if (sendEmailBtn) {
-                e.__handledByEvents = true;
                 LeadersModule.sendAccessEmail(
                     sendEmailBtn.dataset.leaderId,
                     sendEmailBtn.dataset.leaderName,
@@ -117,7 +116,6 @@ const Events = (() => {
             // Leader QR button
             const qrBtn = target.closest('.qr-btn');
             if (qrBtn) {
-                e.__handledByEvents = true;
                 closeAllActionMenus();
                 ModalsModule.showQR(qrBtn.dataset.leaderId, qrBtn.dataset.leaderName);
                 return;
