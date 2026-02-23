@@ -237,7 +237,10 @@ export async function adminResetPassword(req, res) {
     let emailSent = false;
     if (leader.email) {
       try {
-        const emailResult = await emailService.sendTemporaryPasswordEmail(leader, tempPassword);
+        const baseUrl = process.env.BASE_URL || 
+                       (process.env.FRONTEND_URL) ||
+                       `${req.protocol}://${req.get('host')}`;
+        const emailResult = await emailService.sendTemporaryPasswordEmail(leader, tempPassword, baseUrl);
         emailSent = emailResult.success;
         
         if (emailSent) {
@@ -381,7 +384,10 @@ export async function requestPasswordReset(req, res) {
 
     // Enviar email con la contraseña temporal
     try {
-      const emailResult = await emailService.sendTemporaryPasswordEmail(leader, tempPassword);
+      const baseUrl = process.env.BASE_URL || 
+                     (process.env.FRONTEND_URL) ||
+                     `${req.protocol}://${req.get('host')}`;
+      const emailResult = await emailService.sendTemporaryPasswordEmail(leader, tempPassword, baseUrl);
       
       if (emailResult.success) {
         logger.info(`📧 Email de restablecimiento enviado a ${leader.email}`);

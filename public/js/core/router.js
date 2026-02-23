@@ -101,17 +101,16 @@ const Router = {
                     LeadersModule.populateAnalyticsLeaderFilter();
                 }
                 
-                // Cargar analytics
+                // Cargar analytics (siempre recargar para actualizar datos)
                 if (typeof AnalyticsModule !== 'undefined' && AnalyticsModule.loadAnalytics) {
-                    const alreadyLoaded = AppState.getUI('analyticsLoaded');
-                    if (!alreadyLoaded) {
-                        AnalyticsModule.loadAnalytics();
-                        AppState.setUI('analyticsLoaded', true);
-                    }
+                    AnalyticsModule.loadAnalytics();
                 }
                 break;
             case 'registrations':
-                if (typeof filterRegistrations === 'function') {
+                // Cargar registros
+                if (typeof RegistrationsModule !== 'undefined' && RegistrationsModule.load) {
+                    RegistrationsModule.load();
+                } else if (typeof filterRegistrations === 'function') {
                     filterRegistrations();
                 }
                 break;
@@ -119,8 +118,10 @@ const Router = {
                 const leaderSearchInput = document.getElementById('leaderSearchInput');
                 if (leaderSearchInput && !leaderSearchInput.dataset.bound) {
                     leaderSearchInput.addEventListener('input', (e) => {
-                        if (typeof filterLeadersByName === 'function') {
-                            filterLeadersByName(e.target.value);
+                        if (typeof LeadersModule !== 'undefined' && LeadersModule.filterByName) {
+                            LeadersModule.filterByName(e.target.value);
+                        } else {
+                            console.warn('[Router] LeadersModule.filterByName no disponible');
                         }
                     });
                     leaderSearchInput.dataset.bound = 'true';
