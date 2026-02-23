@@ -51,7 +51,27 @@ const LeadersModule = (() => {
         // - Password generation
         // Ver: core/events.js > bindGlobalClicks()
 
-        console.log('✅ LeadersModule events bound (delegated to Events.js)');
+        document.addEventListener('click', (e) => {
+            if (e.__handledByEvents) return;
+
+            const target = e.target;
+            const sendEmailBtn = target.closest('.send-email-btn');
+            if (sendEmailBtn) {
+                LeadersModule.sendAccessEmail(
+                    sendEmailBtn.dataset.leaderId,
+                    sendEmailBtn.dataset.leaderName,
+                    sendEmailBtn.dataset.leaderEmail
+                );
+                return;
+            }
+
+            const qrBtn = target.closest('.qr-btn');
+            if (qrBtn) {
+                ModalsModule.showQR(qrBtn.dataset.leaderId, qrBtn.dataset.leaderName);
+            }
+        });
+
+        console.log('✅ LeadersModule events bound (delegated to Events.js + fallback)');
     }
 
     // ====== LOAD LEADERS TABLE ======

@@ -285,38 +285,50 @@ export async function getAdvancedDashboard(filters = {}) {
     const localidadesWithPercentage = rawData.topLocalidades.map(loc => ({
       ...loc,
       percentage: ((loc.votes / totalVotes) * 100).toFixed(2),
-      rank: rawData.topLocalidades.indexOf(loc) + 1
+      rank: rawData.topLocalidades.indexOf(loc) + 1,
+      dominantLeader: calculateDominantLeaderByLocalidad(loc._id, rawData),
+      registrationCount: loc.votes  // Aproximación basada en votos
     }));
 
     // Calcular porcentajes para puestos
     const puestosWithPercentage = rawData.topPuestos.map(puesto => ({
       ...puesto,
       percentage: ((puesto.votes / totalVotes) * 100).toFixed(2),
-      rank: rawData.topPuestos.indexOf(puesto) + 1
+      rank: rawData.topPuestos.indexOf(puesto) + 1,
+      isMostCrowded: rawData.topPuestos[0]._id === puesto._id
     }));
 
     // Calcular porcentajes para distribución
     const distributionWithPercentage = rawData.distribution.map(dist => ({
       ...dist,
-      percentage: ((dist.votes / totalVotes) * 100).toFixed(2)
+      percentage: ((dist.votes / totalVotes) * 100).toFixed(2),
+      hasHighestRegistrations: rawData.distribution[0].votes === dist.votes
     }));
+
+    // Generar insights
+    const insights = generateInsights(leadersWithPercentage, localidadesWithPercentage, puestosWithPercentage, rawData.totalVotes);
 
     const enrichedData = {
       totalVotes: rawData.totalVotes,
       leaders: {
         top: leadersWithPercentage,
-        total: leadersWithPercentage.length
+        total: leadersWithPercentage.length,
+        dominantLeader: leadersWithPercentage[0]?.leaderName || 'N/A'
       },
       localidades: {
         top: localidadesWithPercentage,
-        total: localidadesWithPercentage.length
+        total: localidadesWithPercentage.length,
+        mostActive: localidadesWithPercentage[0],
+        dominantLeadersByLocalidad: calculateAllDominantLeaders(rawData)
       },
       puestos: {
         top: puestosWithPercentage,
-        total: puestosWithPercentage.length
+        total: puestosWithPercentage.length,
+        mostCrowded: puestosWithPercentage[0]
       },
       distribution: distributionWithPercentage,
       timeline: rawData.timeline,
+      insights: insights,
       metadata: {
         generatedAt: new Date(),
         filters: filters,
@@ -328,7 +340,8 @@ export async function getAdvancedDashboard(filters = {}) {
     logger.debug('Advanced dashboard enriched', { 
       totalVotes,
       leaders: leadersWithPercentage.length,
-      localidades: localidadesWithPercentage.length
+      localidades: localidadesWithPercentage.length,
+      insights: insights.length
     });
 
     return enrichedData;
@@ -337,6 +350,113 @@ export async function getAdvancedDashboard(filters = {}) {
     logger.error('Error en advanced dashboard', error);
     throw AppError.serverError('Error al obtener dashboard avanzado');
   }
+}
+
+/**
+ * Calcula el líder dominante por localidad
+ */
+function calculateDominantLeaderByLocalidad(localidadName, rawData) {
+  // Simplified: return top leader data for this localidad
+  const leaderInLocalidad = rawData.topLeaders.find(l => 
+    l.localidad === localidadName || 
+    l.leaderName
+  );
+  return leaderInLocalidad?.leaderName || 'N/A';
+}
+
+/**
+ * Calcula líderes dominantes por cada localidad
+ */
+function calculateAllDominantLeaders(rawData) {
+  const result = {};
+  
+  rawData.topLocalidades.forEach(loc => {
+    const dominantLeader = rawData.topLeaders.find(l => 
+      l.localidad === loc._id || 
+      l.localidad === loc.region
+    );
+    result[loc._id] = {
+      localidad: loc._id,
+      leader: dominantLeader?.leaderName || 'N/A',
+      votes: dominantLeader?.votes || 0
+    };
+  });
+
+  return result;
+}
+
+/**
+ * Genera insights basados en los datos agregados
+ */
+function generateInsights(leaders, localidades, puestos, totalVotes) {
+  const insights = [];
+
+  // Insight 1: Líder con mejor desempeño
+  if (leaders.length > 0) {
+    const topLeader = leaders[0];
+    insights.push({
+      type: 'leader_dominance',
+      title: '🏆 Líder Dominante',
+      description: `${topLeader.leaderName} lidera con ${topLeader.votes} registros (${topLeader.percentage}% del total)`,
+      icon: '👑',
+      severity: 'info'
+    });
+  }
+
+  // Insight 2: Localidad más activa
+  if (localidades.length > 0) {
+    const topLocalidad = localidades[0];
+    insights.push({
+      type: 'localidad_activity',
+      title: '🗺️ Localidad Más Activa',
+      description: `${topLocalidad._id} concentra ${topLocalidad.votes} registros (${topLocalidad.percentage}% del total)`,
+      icon: '📍',
+      severity: 'info'
+    });
+  }
+
+  // Insight 3: Puesto más concurrido
+  if (puestos.length > 0) {
+    const topPuesto = puestos[0];
+    insights.push({
+      type: 'puesto_crowding',
+      title: '🏢 Puesto Más Concurrido',
+      description: `${topPuesto.puestoName || topPuesto._id} tiene ${topPuesto.votes} registros (${topPuesto.percentage}% del total)`,
+      icon: '👥',
+      severity: 'info'
+    });
+  }
+
+  // Insight 4: Tasa de confirmación
+  if (totalVotes.confirmationRate) {
+    const confirmRate = totalVotes.confirmationRate;
+    let severity = 'info';
+    if (confirmRate > 80) severity = 'success';
+    if (confirmRate < 50) severity = 'warning';
+    
+    insights.push({
+      type: 'confirmation_rate',
+      title: '✅ Tasa de Confirmación',
+      description: `${confirmRate}% de los registros han sido confirmados (${totalVotes.confirmed}/${totalVotes.total})`,
+      icon: '✓',
+      severity: severity
+    });
+  }
+
+  // Insight 5: Distribución de líderes
+  if (leaders.length > 1) {
+    const secondLeader = leaders[1];
+    const gap = leaders[0].votes - secondLeader.votes;
+    insights.push({
+      type: 'leader_gap',
+      title: '📊 Brecha de Liderazgo',
+      description: `${leaders[0].leaderName} aventaja a ${secondLeader.leaderName} con ${gap} registros más`,
+      icon: '↑',
+      severity: 'info'
+    });
+  }
+
+  return insights;
 }
 
 export default {

@@ -640,9 +640,47 @@ const AnalyticsModule = (() => {
     // ===================================
     function loadClassicAnalytics() {
         console.log('[AnalyticsModule] Cargando vista clásica...');
+        populateLeaderSelects(); // Llenar selects de líderes
         updateStats();
         populateLeaderDetailTable();
         loadCharts();
+    }
+
+    // ===================================
+    // POBLAR SELECTS DE LÍDERES
+    // ===================================
+    function populateLeaderSelects() {
+        const leaders = AppState.data.leaders || [];
+        const selectors = [
+            'analyticsLeaderFilter', // Avanzado
+            'analyticsLeaderFilterClassic' // Clásico
+        ];
+
+        selectors.forEach(selectorId => {
+            const select = DOMUtils.byId(selectorId);
+            if (!select) return;
+
+            // Guardar valor actual
+            const currentValue = select.value;
+
+            // Limpiar opciones excepto la primera
+            select.innerHTML = '<option value="">📊 Todos los Líderes</option>';
+
+            // Agregar opciones de líderes
+            leaders.forEach(leader => {
+                const option = document.createElement('option');
+                option.value = leader._id;
+                option.textContent = `${leader.name} (${leader.registrations || 0} registros)`;
+                select.appendChild(option);
+            });
+
+            // Restaurar valor si existe
+            if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
+                select.value = currentValue;
+            }
+        });
+
+        console.log(`[AnalyticsModule] ✅ Selects de líderes poblados (${leaders.length} líderes)`);
     }
 
     // ===================================
@@ -889,7 +927,7 @@ const AnalyticsModule = (() => {
     // RENDER CHARTS - Advanced Aggregation
     // ===================================
     function renderChartsAdvanced(data) {
-        const { totalVotes, leaders, localidades, puestos, timeline, distribution } = data;
+        const { totalVotes, leaders, localidades, puestos, timeline, distribution, insights } = data;
 
         // Destruir gráficos anteriores antes de crear nuevos
         destroyAllCharts();
@@ -905,6 +943,16 @@ const AnalyticsModule = (() => {
         
         // Gráfico 4: Top Puestos (Horizontal Bar Chart)
         renderPuestosChart(puestos.top);
+
+        // Renderizar Insights
+        if (insights && Array.isArray(insights)) {
+            renderInsights(insights);
+        }
+
+        // Renderizar estadísticas clave
+        if (localidades.top && localidades.top.length > 0) {
+            renderTopStatistics(localidades.top, puestos.top, leaders.top);
+        }
     }
 
     function renderLeadersChart(leadersData) {
@@ -1064,6 +1112,108 @@ const AnalyticsModule = (() => {
                 }
             }
         });
+    }
+
+    // ===================================
+    // RENDERIZAR INSIGHTS
+    // ===================================
+    function renderInsights(insights) {
+        const container = DOMUtils.byId('advancedInsightsContainer');
+        if (!container) {
+            console.warn('[Analytics] Container #advancedInsightsContainer not found');
+            return;
+        }
+
+        if (!insights || insights.length === 0) {
+            container.innerHTML = '<div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: #9ca3af;">No hay insights disponibles</div>';
+            return;
+        }
+
+        container.innerHTML = insights.map(insight => {
+            const severityColors = {
+                'success': { bg: '#dcfce7', border: '#22c55e', icon: '✅', text: '#166534' },
+                'warning': { bg: '#fef3c7', border: '#f59e0b', icon: '⚠️', text: '#92400e' },
+                'error': { bg: '#fee2e2', border: '#ef4444', icon: '❌', text: '#991b1b' },
+                'info': { bg: '#dbeafe', border: '#3b82f6', icon: 'ℹ️', text: '#1e40af' }
+            };
+
+            const severity = insight.severity || 'info';
+            const colors = severityColors[severity] || severityColors.info;
+
+            return `
+                <div style="
+                    background: ${colors.bg};
+                    border-left: 4px solid ${colors.border};
+                    padding: 16px;
+                    border-radius: 8px;
+                    color: ${colors.text};
+                ">
+                    <div style="
+                        font-size: 14px;
+                        font-weight: 700;
+                        margin-bottom: 6px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    ">
+                        <span style="font-size: 18px;">${insight.icon || colors.icon}</span>
+                        ${insight.title}
+                    </div>
+                    <div style="
+                        font-size: 13px;
+                        line-height: 1.5;
+                        opacity: 0.9;
+                    ">
+                        ${insight.description}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ===================================
+    // RENDERIZAR ESTADÍSTICAS TOP
+    // ===================================
+    function renderTopStatistics(localidades, puestos, leaders) {
+        const topLocalidad = localidades[0];
+        const topPuesto = puestos[0];
+        const topLeader = leaders[0];
+        const secondLeader = leaders[1];
+
+        // Localidad Top
+        const localidadEl = DOMUtils.byId('topLocalidadName');
+        const localidadVotesEl = DOMUtils.byId('topLocalidadVotes');
+        if (localidadEl && topLocalidad) {
+            localidadEl.textContent = topLocalidad.localidad || '-';
+            localidadVotesEl.textContent = `${topLocalidad.votes || 0} registros`;
+        }
+
+        // Puesto Top
+        const puestoEl = DOMUtils.byId('topPuestoName');
+        const puestoVotesEl = DOMUtils.byId('topPuestoVotes');
+        if (puestoEl && topPuesto) {
+            puestoEl.textContent = topPuesto.puesto || '-';
+            puestoVotesEl.textContent = `${topPuesto.votes || 0} registros`;
+        }
+
+        // Brecha de Líderes
+        const gapEl = DOMUtils.byId('leaderGap');
+        const gapDescEl = DOMUtils.byId('leaderGapDesc');
+        if (gapEl && topLeader && secondLeader) {
+            const gap = topLeader.votes - secondLeader.votes;
+            gapEl.textContent = `+${gap} votos`;
+            gapDescEl.textContent = `${topLeader.leaderName} vs ${secondLeader.leaderName}`;
+        } else if (gapEl && topLeader) {
+            gapEl.textContent = `${topLeader.votes} votos`;
+            gapDescEl.textContent = `${topLeader.leaderName} lidera`;
+        }
+
+        // Última actualización
+        const updateEl = DOMUtils.byId('lastUpdate');
+        if (updateEl) {
+            const now = new Date().toLocaleTimeString('es-CO');
+            updateEl.textContent = now;
+        }
     }
 
     // ===================================
