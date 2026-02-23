@@ -1,4 +1,5 @@
 import "dotenv/config";
+import http from "http";
 import app from "./app.js";
 import { config } from "./config/env.js";
 import { connectDB, mongoDbName } from "./config/db.js";
@@ -56,7 +57,10 @@ async function start() {
   // Conectar a MongoDB (pero continuar si falla)
   await connectDB();
 
-  app.listen(PORT, "0.0.0.0", () => {
+  // Crear servidor HTTP explícito
+  const server = http.createServer(app);
+
+  server.listen(PORT, "0.0.0.0", () => {
     const banner = [
       "============================================",
       "SERVER STARTED SUCCESSFULLY",
