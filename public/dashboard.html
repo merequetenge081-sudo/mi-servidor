@@ -388,121 +388,106 @@
                 </div>
             </section>
 
-            <!-- ANALYTICS SECTION -->
+            <!-- ANALYTICS SECTION - ENTERPRISE BI -->
             <section id="analytics" class="section">
                 <div class="section-header">
-                    <h2>Análisis y Reportes</h2>
-                    <p style="color: #999; margin: 8px 0 0 0; font-size: 13px;">Análisis de registraciones por región, líder y confirmación</p>
+                    <h2>📊 Dashboard BI Avanzado</h2>
+                    <p style="color: #999; margin: 8px 0 0 0; font-size: 13px;">Análisis en tiempo real con agregaciones MongoDB | Últimos 30 días</p>
                 </div>
 
+                <!-- FILTROS AVANZADOS -->
                 <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #667eea;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
                         <div>
-                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Región</label>
-                            <select id="analyticsRegionFilter" class="form-select" style="font-size: 14px;">
-                                <option value="all">Todo el País</option>
-                                <option value="bogota">Solo Bogotá</option>
-                                <option value="resto">Resto del País</option>
+                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Filtrar por Líder</label>
+                            <select id="analyticsLeaderFilter" class="form-select" style="font-size: 14px;">
+                                <option value="">Todos los Líderes</option>
                             </select>
                         </div>
                         <div>
-                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Líder</label>
-                            <select id="analyticsLeaderFilter" class="form-select" style="font-size: 14px;">
-                                <!-- Populated -->
-                            </select>
+                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Localidad</label>
+                            <input type="text" id="analyticsLocalidadFilter" class="form-select" placeholder="Ej: Bogotá" style="font-size: 14px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Desde</label>
+                            <input type="date" id="analyticsStartDateFilter" class="form-select" style="font-size: 14px;">
                         </div>
                         <div style="display: flex; gap: 8px; align-items: flex-end;">
                             <button class="btn btn-primary" id="applyAnalyticsFilterBtn" style="flex: 1; font-size: 14px;">
-                                <i class="bi bi-funnel"></i> Aplicar
+                                <i class="bi bi-arrow-repeat"></i> Actualizar
                             </button>
-                            <button class="btn btn-outline" id="clearAnalyticsFilterBtn" style="flex: 1; font-size: 14px;">
-                                <i class="bi bi-arrow-clockwise"></i> Limpiar
+                            <button class="btn btn-outline" id="exportAnalyticsBtn" style="flex: 1; font-size: 14px;">
+                                <i class="bi bi-download"></i> Exportar
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- KPI Cards - ESTILO SÓLIDO -->
-                <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-                    <div class="stat-card" style="background: #e0e7ff; border: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); padding: 18px; border-radius: 10px;">
-                        <div class="stat-info">
-                            <h3 id="avgConfirmRate" style="margin: 0 0 6px 0; font-size: 32px; font-weight: 700; color: #4f46e5;">0%</h3>
-                            <span style="color: #4338ca; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Tasa Confirmación</span>
-                        </div>
-                    </div>
-                    <div class="stat-card" style="background: #d1fae5; border: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); padding: 18px; border-radius: 10px;">
-                        <div class="stat-info">
-                            <h3 id="avgRegsPerLeader" style="margin: 0 0 6px 0; font-size: 32px; font-weight: 700; color: #059669;">0</h3>
-                            <span style="color: #047857; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Promedio Regs/Líder</span>
-                        </div>
-                    </div>
-                    <div class="stat-card" style="background: #dbeafe; border: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); padding: 18px; border-radius: 10px;">
-                        <div class="stat-info">
-                            <h3 id="bogotaCount" style="margin: 0 0 6px 0; font-size: 32px; font-weight: 700; color: #2563eb;">0</h3>
-                            <span style="color: #1d4ed8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Total Bogotá</span>
-                        </div>
-                    </div>
-                    <div class="stat-card" style="background: #fed7aa; border: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); padding: 18px; border-radius: 10px;">
-                        <div class="stat-info">
-                            <h3 id="restoCount" style="margin: 0 0 6px 0; font-size: 32px; font-weight: 700; color: #ea580c;">0</h3>
-                            <span style="color: #c2410c; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Total Resto País</span>
-                        </div>
-                    </div>
+                <!-- KPI CARDS - ENTERPRISE STYLE-->
+                <div id="kpiCardsContainer" class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 28px;">
+                    <!-- Se llena dinámicamente con renderKPICards() -->
+                    <div class="animated-pulse bg-gray-200 h-32 rounded"></div>
+                    <div class="animated-pulse bg-gray-200 h-32 rounded"></div>
+                    <div class="animated-pulse bg-gray-200 h-32 rounded"></div>
+                    <div class="animated-pulse bg-gray-200 h-32 rounded"></div>
                 </div>
 
-                <!-- Charts Row - GRÁFICO COMPACTO -->
+                <!-- ROW 1: LEADERS CHART -->
                 <div class="dashboard-row" style="margin-bottom: 24px;">
                     <div class="chart-container full-width" style="background: #ffffff; padding: 24px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;">
                         <h3 style="margin: 0 0 20px 0; font-size: 16px; font-weight: 600; color: #1f2937; display: flex; align-items: center;">
-                            <i class="bi bi-bar-chart-fill" style="color: #667eea; margin-right: 10px; font-size: 20px;"></i>
-                            <span>Desempeño por Líder (Bogotá vs Nacional)</span>
+                            <i class="bi bi-bar-chart-fill" style="color: #3b82f6; margin-right: 10px; font-size: 20px;"></i>
+                            <span>🏆 Top 10 Líderes</span>
                         </h3>
-                        <div class="chart-wrapper" style="height: 340px; position: relative;">
-                            <canvas id="leaderRegistrationsChart"></canvas>
+                        <div class="chart-wrapper" style="height: 380px; position: relative;">
+                            <canvas id="leadersChart" data-chart="leaders"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- Analytics Table and Chart Row - ESTILO COMPACTO -->
-                <div class="dashboard-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div class="table-container" style="background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
-                        <h3 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center;">
-                            <i class="bi bi-list" style="color: #667eea; margin-right: 8px; font-size: 18px;"></i>
-                            <span>Detalle por Líder</span>
-                        </h3>
-                        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                            <table class="table" style="font-size: 14px; margin-bottom: 0;">
-                                <thead style="position: sticky; top: 0; background: #f8f9fa;">
-                                    <tr>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb;">Líder</th>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Total</th>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Conf.</th>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Pend.</th>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">%</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="leaderDetailTable" style="font-size: 13px;"></tbody>
-                            </table>
-                        </div>
-                        <div style="display: flex; justify-content: center; gap: 12px; padding: 12px 0; border-top: 1px solid #e5e7eb; margin-top: 12px;">
-                            <button id="prevLeaderPageBtn" class="page-btn" style="padding: 6px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; color: #667eea;">
-                                <i class="bi bi-chevron-left"></i>
-                            </button>
-                            <span id="leaderPageIndicator" style="align-self: center; font-size: 12px; color: #666; min-width: 70px; text-align: center;">Pág 1</span>
-                            <button id="nextLeaderPageBtn" class="page-btn" style="padding: 6px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; color: #667eea;">
-                                <i class="bi bi-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
+                <!-- ROW 2: LOCALIDADES + TIMELINE -->
+                <div class="dashboard-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                    <!-- Localidades Doughnut -->
                     <div class="chart-container" style="background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
                         <h3 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center;">
-                            <i class="bi bi-geo-alt" style="color: #667eea; margin-right: 8px; font-size: 18px;"></i>
-                            <span>Top 10 Localidades/Dptos</span>
+                            <i class="bi bi-geo-alt-fill" style="color: #f97316; margin-right: 8px; font-size: 18px;"></i>
+                            <span>🗺️ Top 10 Localidades</span>
                         </h3>
-                        <div class="chart-wrapper" style="height: 280px; position: relative;">
-                            <canvas id="localityChart"></canvas>
+                        <div class="chart-wrapper" style="height: 300px; position: relative;">
+                            <canvas id="localidadesChart" data-chart="localidades"></canvas>
                         </div>
                     </div>
+
+                    <!-- Timeline Line Chart -->
+                    <div class="chart-container" style="background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
+                        <h3 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center;">
+                            <i class="bi bi-graph-up" style="color: #06b6d4; margin-right: 8px; font-size: 18px;"></i>
+                            <span>📈 Timeline (Últimos 30 días)</span>
+                        </h3>
+                        <div class="chart-wrapper" style="height: 300px; position: relative;">
+                            <canvas id="timelineChart" data-chart="timeline"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 3: PUESTOS HORIZONTAL BAR -->
+                <div class="dashboard-row" style="margin-bottom: 24px;">
+                    <div class="chart-container full-width" style="background: #ffffff; padding: 24px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;">
+                        <h3 style="margin: 0 0 20px 0; font-size: 16px; font-weight: 600; color: #1f2937; display: flex; align-items: center;">
+                            <i class="bi bi-building" style="color: #ec4899; margin-right: 10px; font-size: 20px;"></i>
+                            <span>🏢 Top 10 Puestos de Votación</span>
+                        </h3>
+                        <div class="chart-wrapper" style="height: 340px; position: relative;">
+                            <canvas id="puestosChart" data-chart="puestos"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- METADATA -->
+                <div style="background: #f0f9ff; padding: 16px; border-radius: 8px; border-left: 4px solid #0ea5e9; font-size: 12px; color: #0369a1;">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Datos en vivo:</strong> Los gráficos se actualizan cada vez que recargas la página. 
+                    <strong>Agregación:</strong> MongoDB pipeline optimizado | <strong>Fuente:</strong> /api/v2/analytics/advanced
                 </div>
             </section>
 

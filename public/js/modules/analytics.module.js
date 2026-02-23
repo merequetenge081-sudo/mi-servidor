@@ -639,39 +639,64 @@ const AnalyticsModule = (() => {
     // VINCULACIÓN DE EVENTOS
     // ===================================
     function bindEvents() {
+        // Botones principales
         const applyBtn = DOMUtils.byId('applyAnalyticsFilterBtn');
-        const clearBtn = DOMUtils.byId('clearAnalyticsFilterBtn');
-        const prevBtn = DOMUtils.byId('prevLeaderPageBtn');
-        const nextBtn = DOMUtils.byId('nextLeaderPageBtn');
+        const exportBtn = DOMUtils.byId('exportAnalyticsBtn');
 
-        if (applyBtn) applyBtn.addEventListener('click', applyFilters);
-        if (clearBtn) clearBtn.addEventListener('click', clearFilters);
+        // Cuando se hace click en "Actualizar", fetch con filtros
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                const leaderId = DOMUtils.byId('analyticsLeaderFilter')?.value;
+                const localidad = DOMUtils.byId('analyticsLocalidadFilter')?.value;
+                const startDate = DOMUtils.byId('analyticsStartDateFilter')?.value;
 
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                if (currentAnalyticsPage > 1) {
-                    currentAnalyticsPage--;
-                    populateLeaderDetailTable();
-                }
+                // Construir parámetros
+                const params = new URLSearchParams();
+                if (leaderId) params.append('leaderId', leaderId);
+                if (localidad) params.append('localidad', localidad);
+                if (startDate) params.append('startDate', startDate);
+
+                console.log('[AnalyticsModule] Aplicando filtros:', { leaderId, localidad, startDate });
+                
+                // Mostrar loaders
+                showSkeletonLoaders();
+
+                // Fetch con parámetros
+                fetch(`/api/v2/analytics/advanced?${params.toString()}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        return res.json();
+                    })
+                    .then(response => {
+                        if (!response.success) throw new Error(response.message);
+                        
+                        const data = response.data;
+                        AppState.data.advancedAnalytics = data;
+                        
+                        renderKPICards(data);
+                        renderChartsAdvanced(data);
+                        
+                        hideSkeletonLoaders();
+                        console.log('[AnalyticsModule] ✅ Filtros aplicados exitosamente');
+                    })
+                    .catch(error => {
+                        console.error('[AnalyticsModule] Error:', error);
+                        hideSkeletonLoaders();
+                        showErrorMessage('Error aplicando filtros: ' + error.message);
+                    });
             });
         }
 
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                const registrations = AppState.data.registrations || [];
-                const filtered = filterRegistrations(registrations, currentFilter.region, currentFilter.leaderId);
-                const leaders = AppState.data.leaders || [];
-                const leaderStats = leaders.map(leader => ({
-                    total: filtered.filter(r => r.leaderId === leader._id).length
-                })).filter(s => s.total > 0);
-
-                const totalPages = Math.ceil(leaderStats.length / ITEMS_PER_PAGE);
-                if (currentAnalyticsPage < totalPages) {
-                    currentAnalyticsPage++;
-                    populateLeaderDetailTable();
-                }
+        // Botón exportar
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                exportAnalyticsToExcel();
             });
         }
+
+        // Auto-cargar analytics al iniciar
+        console.log('[AnalyticsModule] bindEvents - Cargando initial data...');
+        loadAnalytics();
     }
 
     // ===================================
