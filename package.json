@@ -3,10 +3,10 @@
   "version": "2.0.0",
   "description": "Sistema de gestión electoral enterprise - Fase 1 Refactorización",
   "type": "module",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
     "test": "jest --testEnvironment=node --no-coverage",
     "test:watch": "jest --testEnvironment=node --watch",
     "test:unit": "jest --testEnvironment=node --testPathPattern=unit",

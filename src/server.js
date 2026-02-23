@@ -1,10 +1,10 @@
 import "dotenv/config";
-import app from "./src/app.js";
-import { config } from "./src/config/env.js";
-import { connectDB, mongoDbName } from "./src/config/db.js";
-import { initMemoryAuth } from "./src/utils/authFallback.js";
-import logger from "./src/config/logger.js";
-import { currentEnv } from "./src/backend/config/environment.js";
+import app from "./app.js";
+import { config } from "./config/env.js";
+import { connectDB, mongoDbName } from "./config/db.js";
+import { initMemoryAuth } from "./utils/authFallback.js";
+import logger from "./config/logger.js";
+import { currentEnv } from "./backend/config/environment.js";
 
 // Validación de PORT antes de inicializar
 if (process.env.NODE_ENV === "production" && !process.env.PORT) {
@@ -87,4 +87,3 @@ process.on("uncaughtException", (error) => {
   logger.error("✗ Uncaught Exception:", { message: error.message, stack: error.stack });
   process.exit(1);
 });
-
