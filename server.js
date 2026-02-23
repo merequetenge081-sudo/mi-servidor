@@ -1,9 +1,10 @@
 import "dotenv/config";
 import app from "./src/app.js";
 import { config } from "./src/config/env.js";
-import { connectDB } from "./src/config/db.js";
+import { connectDB, mongoDbName } from "./src/config/db.js";
 import { initMemoryAuth } from "./src/utils/authFallback.js";
 import logger from "./src/config/logger.js";
+import { currentEnv } from "./src/backend/config/environment.js";
 
 const PORT = config.port;
 
@@ -42,7 +43,17 @@ async function start() {
   await connectDB();
 
   app.listen(PORT, "0.0.0.0", () => {
-    logger.info(`✓ Servidor corriendo en puerto ${PORT} (${process.env.NODE_ENV || "development"})`);
+    const banner = [
+      "==============================",
+      "🚀 SERVER STARTED",
+      `Environment: ${currentEnv}`,
+      `Mongo DB: ${mongoDbName}`,
+      `Port: ${PORT}`,
+      "=============================="
+    ].join("\n");
+    
+    logger.info(banner);
+    logger.info(`✓ Servidor corriendo en puerto ${PORT} (${currentEnv})`);
   });
 }
 
