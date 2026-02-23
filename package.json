@@ -21,6 +21,7 @@
     "docs:generate": "node --experimental-vm-modules scripts/generateTestDocs.js",
     "report:json": "node --experimental-vm-modules scripts/generateTestReport.js",
     "report:dashboard": "node --experimental-vm-modules scripts/generateDashboard.js",
+    "report:view": "node --experimental-vm-modules scripts/generateDashboard.js && start reports/dashboard.html",
     "docs:auto": "npm run test && npm run docs:generate",
     "report:full": "npm run test && npm run report:json && npm run report:dashboard && npm run docs:generate",
     "lint": "eslint src --fix"
