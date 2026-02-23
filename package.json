@@ -19,7 +19,10 @@
     "test:ci": "jest --testEnvironment=node --coverage --ci --maxWorkers=2",
     "test:report": "jest --testEnvironment=node --coverage",
     "docs:generate": "node --experimental-vm-modules scripts/generateTestDocs.js",
+    "report:json": "node --experimental-vm-modules scripts/generateTestReport.js",
+    "report:dashboard": "node --experimental-vm-modules scripts/generateDashboard.js",
     "docs:auto": "npm run test && npm run docs:generate",
+    "report:full": "npm run test && npm run report:json && npm run report:dashboard && npm run docs:generate",
     "lint": "eslint src --fix"
   },
   "keywords": [
