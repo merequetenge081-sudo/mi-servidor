@@ -17,8 +17,10 @@
     "test:controllers": "jest --testEnvironment=node --testPathPattern=controllers --coverage",
     "test:all": "jest --testEnvironment=node --coverage --verbose",
     "test:ci": "jest --testEnvironment=node --coverage --ci --maxWorkers=2",
-    "lint": "eslint src --fix",
-    "test:report": "jest --testEnvironment=node --coverage"
+    "test:report": "jest --testEnvironment=node --coverage",
+    "docs:generate": "node --experimental-vm-modules scripts/generateTestDocs.js",
+    "docs:auto": "npm run test && npm run docs:generate",
+    "lint": "eslint src --fix"
   },
   "keywords": [
     "electoral",
