@@ -6,14 +6,37 @@ import xss from "xss-clean";
 import hpp from "hpp";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import mongoose from "mongoose";
 import logger from "./config/logger.js";
 import apiRoutes from "./routes/index.js";
 import { organizationMiddleware } from "./middleware/organization.middleware.js";
+import { initMemoryAuth } from "./utils/authFallback.js";
+import { currentEnv } from "./backend/config/environment.js";
+
+// ==================== ENTERPRISE MODULES ====================
+import leaderRoutes from "./backend/modules/leaders/leader.routes.js";
+import registrationRoutes from "./backend/modules/registrations/registration.routes.js";
+import eventRoutes from "./backend/modules/events/event.routes.js";
+import puestoRoutes from "./backend/modules/puestos/puesto.routes.js";
+import authRoutes from "./backend/modules/auth/auth.routes.js";
+import analyticsRoutes from "./backend/modules/analytics/analytics.routes.js";
+import exportsRoutes from "./backend/modules/exports/exports.routes.js";
+import duplicatesRoutes from "./backend/modules/duplicates/duplicates.routes.js";
+import auditRoutes from "./backend/modules/audit/audit.routes.js";
+import organizationRoutes from "./backend/modules/organization/organization.routes.js";
+import whatsappRoutes from "./backend/modules/whatsapp/whatsapp.routes.js";
+import adminRoutes from "./backend/modules/admin/admin.routes.js";
+import { errorMiddleware, notFoundMiddleware } from "./backend/middlewares/error.middleware.js";
+import { authMiddleware } from "./backend/middlewares/auth.middleware.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+
+// ==================== INICIALIZAR AUTENTICACIÓN EN MEMORIA ====================
+// Debe ejecutarse antes de que se procese cualquier request de login
+await initMemoryAuth();
 
 // ==================== SEGURIDAD ====================
 // Helmet - Asegurar headers HTTP
@@ -103,6 +126,11 @@ app.use(express.static(join(__dirname, "../public")));
 
 // Request logging
 app.use((req, res, next) => {
+  logger.info(
+    `[${currentEnv.toUpperCase()}] ${req.method} ${req.originalUrl}`,
+    { ip: req.ip }
+  );
+
   const start = Date.now();
   res.on("finish", () => {
     const duration = Date.now() - start;
@@ -191,32 +219,77 @@ app.get("/leader", (req, res) => {
 // Apply AFTER HTML routes so they don't try to access req.user
 app.use(organizationMiddleware);
 
+// ==================== ENTERPRISE ROUTES (NEW ARCHITECTURE) ====================
+// New modular routes with Controller → Service → Repository pattern
+// Using /api/v2 namespace during gradual migration
+// TODO: Migrate existing /api routes to /api/v2 gradually
+
+// Auth enterprise module (new architecture)
+// Public endpoints: admin-login, leader-login, request-password-reset, reset-password
+// Protected endpoints: change-password, verify-token, logout
+app.use("/api/v2/auth", authRoutes);
+
+// Leaders enterprise module (new architecture)
+app.use("/api/v2/leaders", leaderRoutes);
+
+// Registrations enterprise module (new architecture)
+// Note: Also accepts public calls via leaderToken
+app.use("/api/v2/registrations", registrationRoutes);
+
+// Events enterprise module (new architecture)
+app.use("/api/v2/events", eventRoutes);
+
+// Puestos (Polling Places) enterprise module (new architecture)
+app.use("/api/v2/puestos", puestoRoutes);
+
+// Analytics enterprise module (new architecture)
+// Stats, dashboard, trends, and reporting endpoints
+app.use("/api/v2/analytics", analyticsRoutes);
+
+// Exports enterprise module (new architecture)
+// CSV/Excel exports, QR generation, PDF reports
+app.use("/api/v2/exports", exportsRoutes);
+
+// Duplicates enterprise module (new architecture)
+// Duplicate detection and analysis endpoints
+app.use("/api/v2/duplicates", duplicatesRoutes);
+
+// Audit enterprise module (new architecture)
+// Audit logs, statistics, and reporting endpoints
+app.use("/api/v2/audit", auditRoutes);
+
+// Organization enterprise module (new architecture)
+// Organization CRUD and resource limits management
+app.use("/api/v2/organizations", organizationRoutes);
+
+// WhatsApp enterprise module (new architecture)
+// WhatsApp messaging and QR code distribution (stub implementation, requires real API integration)
+app.use("/api/v2/whatsapp", whatsappRoutes);
+
+// Admin enterprise module (new architecture)
+// Admin functions: puestos import, statistics, monitoring
+app.use("/api/v2/admin", adminRoutes);
+
 // ==================== RUTAS API ====================
 app.use("/api", apiRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  res.json({
+    status: "ok",
+    environment: currentEnv,
+    dbName: mongoose.connection.name,
+    dbStatus: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    uptime: process.uptime(),
+  });
 });
 
 // ==================== ERROR HANDLING ====================
-// 404 handler
-app.use((req, res) => {
-  logger.warn(`Route not found: ${req.method} ${req.path}`);
-  res.status(404).json({ error: "Route not found" });
-});
+// 404 handler (platform default)
+app.use(notFoundMiddleware);
 
-// Global error handler
-app.use((err, req, res, next) => {
-  logger.error(`Unhandled error: ${err.message}`, { stack: err.stack });
-
-  const status = err.status || 500;
-  const message = process.env.NODE_ENV === "production"
-    ? "Internal server error"
-    : err.message;
-
-  res.status(status).json({ error: message });
-});
+// Global error handler (handles both enterprise and legacy errors)
+app.use(errorMiddleware);
 
 // ==================== UNHANDLED EXCEPTIONS ====================
 process.on("unhandledRejection", (reason, promise) => {
