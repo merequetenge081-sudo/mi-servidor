@@ -77,6 +77,13 @@ export async function findLeaderLocal(email) {
 }
 
 /**
+ * Verifica password localmente (sin MongoDB)
+ */
+export async function verifyPasswordLocal(plainPassword, passwordHash) {
+  return bcryptjs.compare(plainPassword, passwordHash);
+}
+
+/**
  * Busca admin con fallback a memoria
  */
 export async function findAdminWithFallback(Admin, username) {
