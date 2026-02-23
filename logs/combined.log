@@ -6142,3 +6142,54 @@
 {"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 04:11:02"}
 {"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 04:11:02"}
 {"level":"info","message":"GET /advanced 200 35ms","service":"mi-servidor","timestamp":"2026-02-23 04:11:02"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado ✅","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 05:11:22"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /health","service":"mi-servidor","timestamp":"2026-02-23 05:12:01"}
+{"level":"info","message":"GET /health 200 3ms","service":"mi-servidor","timestamp":"2026-02-23 05:12:01"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado ✅","service":"mi-servidor","timestamp":"2026-02-23 16:56:19"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 16:56:19"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-23 16:56:19"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 16:56:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 16:56:20"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 16:56:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 16:56:20"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 16:56:20"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 16:56:20"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 16:56:20"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 16:56:20"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/auth/legal-terms-status","service":"mi-servidor","timestamp":"2026-02-23 16:56:27"}
+{"level":"info","message":"GET /auth/legal-terms-status 401 6ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:27"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders/null","service":"mi-servidor","timestamp":"2026-02-23 16:56:28"}
+{"level":"info","message":"GET /leaders/null 401 4ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:28"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?leaderId=null&limit=1000","service":"mi-servidor","timestamp":"2026-02-23 16:56:28"}
+{"level":"info","message":"GET /registrations 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:28"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /favicon.ico","service":"mi-servidor","timestamp":"2026-02-23 16:56:28"}
+{"level":"info","message":"GET /favicon.ico 404 2ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:28"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] POST /api/auth/admin-login","service":"mi-servidor","timestamp":"2026-02-23 16:56:35"}
+{"level":"info","message":"POST /auth/admin-login 401 86ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:36"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] POST /api/auth/admin-login","service":"mi-servidor","timestamp":"2026-02-23 16:56:41"}
+{"level":"info","message":"✅ Admin login exitoso [memory]","service":"mi-servidor","source":"memory","timestamp":"2026-02-23 16:56:41","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 193ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:41"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/events","service":"mi-servidor","timestamp":"2026-02-23 16:56:41"}
+{"level":"info","message":"GET /events 200 54ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:41"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/events","service":"mi-servidor","timestamp":"2026-02-23 16:56:42"}
+{"level":"info","message":"GET /events 304 4ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:42"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders?eventId=699c163260e27b2881d8b4ce","service":"mi-servidor","timestamp":"2026-02-23 16:56:43"}
+{"level":"info","message":"GET /leaders 200 48ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:43"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?eventId=699c163260e27b2881d8b4ce&limit=2000","service":"mi-servidor","timestamp":"2026-02-23 16:56:43"}
+{"level":"info","message":"GET /registrations 200 109ms","service":"mi-servidor","timestamp":"2026-02-23 16:56:44"}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-02-23 17:09:31"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-02-23 17:09:31"}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-02-23 17:10:25"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-02-23 17:10:25"}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-02-23 17:10:42"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-02-23 17:10:42"}

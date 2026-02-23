@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="/js/xlsx.full.min.js"></script>
+    <script type="module" src="/js/modules/leaderImport.js"></script>
     <style>
         * {
             margin: 0;
@@ -3064,16 +3065,18 @@
                         return;
                     }
 
-                    const registrations = jsonData.map(row => ({
-                        firstName: row['Nombre'],
-                        lastName: row['Apellido'],
-                        cedula: row['Cédula'] || row['Cedula'],
-                        email: row['Email'],
-                        phone: row['Celular'] || row['Telefono'],
-                        votingTable: row['Mesa'],
-                        localidad: row['Localidad'],
-                        votingPlace: row['Puesto Votación'] || row['Puesto Votacion']
-                    }));
+                    const registrations = window.leaderImport
+                        ? window.leaderImport.mapImportRows(jsonData)
+                        : jsonData.map(row => ({
+                            firstName: row['Nombre'],
+                            lastName: row['Apellido'],
+                            cedula: row['Cédula'] || row['Cedula'],
+                            email: row['Email'],
+                            phone: row['Celular'] || row['Telefono'],
+                            votingTable: row['Mesa'],
+                            localidad: row['Localidad'],
+                            votingPlace: row['Puesto Votación'] || row['Puesto Votacion']
+                        }));
 
                     fetch(`${API_URL}/api/registrations/bulk`, {
                         method: 'POST',

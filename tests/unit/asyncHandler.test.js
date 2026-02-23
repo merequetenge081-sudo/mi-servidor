@@ -1,62 +1,85 @@
 /**
  * Unit Tests: AsyncHandler Utility
  * 
- * Simple mock-based tests that don't require full module loading
+ * Tests para verificar patrones de manejo de errores asincronos
  */
 
 describe('asyncHandler', () => {
-  // Test basic wrapper behavior without loading full modules
-  it('should exist as a function', () => {
-    expect(typeof Function).toBe('function');
-  });
-
-  it('should simulate error catching in async handlers', () => {
-    // Mock implementation of asyncHandler
+  // Test básico - verificar que existe como concepto
+  it('debería existir como un patrón de manejo de errores', () => {
+    // Mock local de asyncHandler
     const asyncHandler = (fn) => (req, res, next) => {
       Promise.resolve(fn(req, res, next)).catch(next);
     };
 
-    const next = jest.fn();
+    expect(typeof asyncHandler).toBe('function');
+  });
+
+  it('debería capturar errores de funciones asincronas', (done) => {
+    // Mock local de asyncHandler
+    const asyncHandler = (fn) => (req, res, next) => {
+      Promise.resolve(fn(req, res, next)).catch(next);
+    };
+
+    const mockNext = (error) => {
+      expect(error).toBeDefined();
+      expect(error.message).toBe('Error en async');
+      done();
+    };
+
     const req = {};
     const res = {};
-    const error = new Error('Test error');
+    const error = new Error('Error en async');
 
     const handler = asyncHandler(async () => {
       throw error;
     });
 
-    handler(req, res, next);
-
-    // Give the promise time to reject
-    return new Promise(resolve => {
-      setTimeout(() => {
-        expect(next).toHaveBeenCalledWith(error);
-        resolve();
-      }, 10);
-    });
+    handler(req, res, mockNext);
   });
 
-  it('should not call next on success', () => {
+  it('debería retornar resultado exitoso sin llamar next', (done) => {
+    // Mock local de asyncHandler
     const asyncHandler = (fn) => (req, res, next) => {
       Promise.resolve(fn(req, res, next)).catch(next);
     };
 
-    const next = jest.fn();
-    const req = {};
-    const res = { json: jest.fn() };
+    const mockNext = () => {
+      throw new Error('next no debería ser llamado');
+    };
+
+    const mockRes = {
+      json: (data) => {
+        expect(data).toEqual({ success: true });
+        done();
+      }
+    };
 
     const handler = asyncHandler(async (req, res) => {
       res.json({ success: true });
     });
 
-    handler(req, res, next);
+    handler({}, mockRes, mockNext);
+  });
 
-    return new Promise(resolve => {
-      setTimeout(() => {
-        expect(next).not.toHaveBeenCalled();
-        expect(res.json).toHaveBeenCalledWith({ success: true });
-        resolve();
-      }, 10);
+  it('debería manejar promesas que se rechazan', (done) => {
+    const asyncHandler = (fn) => (req, res, next) => {
+      Promise.resolve(fn(req, res, next)).catch(next);
+    };
+
+    const rejectionError = new Error('Promise rechazada');
+    let errorCapturado = null;
+
+    const mockNext = (error) => {
+      errorCapturado = error;
+      expect(errorCapturado.message).toBe('Promise rechazada');
+      done();
+    };
+
+    const handler = asyncHandler(async () => {
+      return Promise.reject(rejectionError);
     });
+
+    handler({}, {}, mockNext);
   });
 });

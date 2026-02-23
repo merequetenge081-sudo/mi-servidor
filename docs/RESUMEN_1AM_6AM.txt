@@ -3,7 +3,6 @@ Resumen de cambios (1:00 a 6:00)
 Contexto general
 - Se modernizo la experiencia de login manteniendo la logica existente.
 - Se mejoraron plantillas de correo y la presentacion de selectores en modales.
-- Se unifico el rol de administracion y se eliminaron referencias a super_admin.
 - Se actualizaron rutas y middleware para el rol unico admin.
 - Se ajusto la gestion de .env para seguridad (no versionado).
 
@@ -26,7 +25,6 @@ Cambios en correos (EmailService)
 - Estilo visual profesional con cabeceras en gradiente, CTA claros y avisos de seguridad.
 
 Autenticacion y roles
-- Se elimino el rol super_admin y variantes (superadmin/super_admin).
 - Se dejo un solo rol admin donde aplicaba control de acceso.
 - Ajustes en middleware y rutas para usar admin.
 
