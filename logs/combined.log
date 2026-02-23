@@ -5887,3 +5887,219 @@
 {"level":"info","message":"✅ Email de QR: true","service":"mi-servidor","timestamp":"2026-02-22 18:09:29"}
 {"level":"info","message":"✅ Al menos un email fue enviado a jonnathanpena1@gmail.com","service":"mi-servidor","timestamp":"2026-02-22 18:09:29"}
 {"level":"info","message":"POST /leaders/699815fdcad687256e453105/send-access 200 638ms","service":"mi-servidor","timestamp":"2026-02-22 18:09:29"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-23 02:50:07"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-23 02:50:07"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 02:50:08"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 02:50:08"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 02:50:08"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 02:50:08"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 02:50:08"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 02:50:08"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 02:50:08"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 02:50:08"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-23 02:50:41"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-23 02:50:41"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 02:50:42"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 02:50:42"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 02:50:42"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 02:50:42"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 02:50:42"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 02:50:42"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 02:50:42"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 02:50:42"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-23 02:50:58"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-23 02:50:58"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 02:50:59"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 02:50:59"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 02:50:59"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 02:50:59"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 02:50:59"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 02:50:59"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 02:50:59"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 02:50:59"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced","service":"mi-servidor","timestamp":"2026-02-23 02:51:29"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 02:51:29"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 02:51:29"}
+{"level":"info","message":"GET /advanced 200 67ms","service":"mi-servidor","timestamp":"2026-02-23 02:51:29"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/dashboard","service":"mi-servidor","timestamp":"2026-02-23 02:51:34"}
+{"level":"info","message":"[AnalyticsController] Dashboard request","service":"mi-servidor","timestamp":"2026-02-23 02:51:34"}
+{"eventId":null,"level":"info","message":"[AnalyticsService] Obteniendo dashboard summary","service":"mi-servidor","timestamp":"2026-02-23 02:51:34"}
+{"level":"error","message":"[AnalyticsRepository] ❌ Error obteniendo stats líderes: (eventId && [{(intermediate value)}]) is not iterable","service":"mi-servidor","stack":"TypeError: (eventId && [{(intermediate value)}]) is not iterable\n    at getLeaderStats (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.repository.js:63:19)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Promise.all (index 1)\n    at async Object.getExecutiveSummary (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.repository.js:201:55)\n    at async Object.getDashboardSummary (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.service.js:19:21)\n    at async getDashboard (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.controller.js:22:23)","timestamp":"2026-02-23 02:51:34"}
+{"level":"error","message":"[AnalyticsRepository] ❌ Error obteniendo resumen ejecutivo: Error al obtener estadísticas de líderes","service":"mi-servidor","stack":"AppError: Error al obtener estadísticas de líderes\n    at AppError.serverError (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/core/AppError.js:46:12)\n    at getLeaderStats (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.repository.js:85:20)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Promise.all (index 1)\n    at async Object.getExecutiveSummary (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.repository.js:201:55)\n    at async Object.getDashboardSummary (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.service.js:19:21)\n    at async getDashboard (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.controller.js:22:23)","timestamp":"2026-02-23 02:51:34"}
+{"level":"error","message":"[ErrorHandler] ❌ GET /api/v2/analytics/dashboard - 500: Error al obtener resumen","service":"mi-servidor","stack":"AppError: Error al obtener resumen\n    at AppError.serverError (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/core/AppError.js:46:12)\n    at Object.getExecutiveSummary (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.repository.js:223:20)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Object.getDashboardSummary (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.service.js:19:21)\n    at async getDashboard (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/analytics.controller.js:22:23)","timestamp":"2026-02-23 02:51:34"}
+{"level":"info","message":"GET /api/v2/analytics/dashboard 500 17ms","service":"mi-servidor","timestamp":"2026-02-23 02:51:34"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /health","service":"mi-servidor","timestamp":"2026-02-23 02:51:39"}
+{"level":"info","message":"GET /health 200 0ms","service":"mi-servidor","timestamp":"2026-02-23 02:51:39"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] POST /api/v2/auth/login","service":"mi-servidor","timestamp":"2026-02-23 02:51:45"}
+{"level":"info","message":"POST /api/v2/auth/login 404 2ms","service":"mi-servidor","timestamp":"2026-02-23 02:51:45"}
+{"level":"info","message":"[SeedAnalytics] 📊 Conectado a MongoDB local","service":"mi-servidor","timestamp":"2026-02-23 02:52:24"}
+{"level":"info","message":"[SeedAnalytics] 🧹 Limpieza completada","service":"mi-servidor","timestamp":"2026-02-23 02:52:24"}
+{"level":"info","message":"[SeedAnalytics] 📊 Conectado a MongoDB local","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] 🧹 Limpieza completada","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 1","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 2","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 3","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 4","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 5","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 6","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 7","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 8","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 9","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 10","service":"mi-servidor","timestamp":"2026-02-23 02:52:39"}
+{"level":"info","message":"[SeedAnalytics] 📊 Conectado a MongoDB local","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] 🧹 Limpieza completada","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Evento creado: Evento Test Analytics (ID: 699c159333e91c182ad8beea)","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 1","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 2","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 3","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 4","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 5","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 6","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 7","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 8","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 9","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ Líder creado: Líder 10","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] ✅ 150 registraciones creadas","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] 📈 Estadísticas de datos de prueba:","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics]    Total registraciones: 150","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics]    Confirmadas: 116 (77.3%)","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics]    Bogotá: 83","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics]    Resto: 67","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics]    Líderes activos: 10","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] \n✅ Datos de prueba listos","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics] 🧪 Testear con:","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics]    curl http://localhost:3000/api/v2/analytics/advanced","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics]    curl \"http://localhost:3000/api/v2/analytics/advanced?eventId=699c159333e91c182ad8beea\"","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"level":"info","message":"[SeedAnalytics]    curl \"http://localhost:3000/api/v2/analytics/advanced?leaderId=leader-1\"","service":"mi-servidor","timestamp":"2026-02-23 02:53:39"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced","service":"mi-servidor","timestamp":"2026-02-23 02:53:51"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 02:53:51"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 02:53:51"}
+{"level":"info","message":"GET /advanced 200 44ms","service":"mi-servidor","timestamp":"2026-02-23 02:53:51"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced","service":"mi-servidor","timestamp":"2026-02-23 02:53:58"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 02:53:58"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 02:53:58"}
+{"level":"info","message":"GET /advanced 200 32ms","service":"mi-servidor","timestamp":"2026-02-23 02:53:58"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/auth/legal-terms-status","service":"mi-servidor","timestamp":"2026-02-23 02:54:55"}
+{"level":"info","message":"GET /auth/legal-terms-status 401 33ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:55"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/auth/legal-terms-status","service":"mi-servidor","timestamp":"2026-02-23 02:54:55"}
+{"level":"info","message":"GET /auth/legal-terms-status 401 5ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:55"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/auth/legal-terms-status","service":"mi-servidor","timestamp":"2026-02-23 02:54:55"}
+{"level":"info","message":"GET /auth/legal-terms-status 401 3ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:55"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/auth/legal-terms-status","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /auth/legal-terms-status 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders/null","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /leaders/null 401 4ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?leaderId=null&limit=1000","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /registrations 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders/null","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /leaders/null 401 2ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders/null","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /leaders/null 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?leaderId=null&limit=1000","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /registrations 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?leaderId=null&limit=1000","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /registrations 401 0ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders/null","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /leaders/null 401 2ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?leaderId=null&limit=1000","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"level":"info","message":"GET /registrations 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 02:54:56"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] POST /api/auth/admin-login","service":"mi-servidor","timestamp":"2026-02-23 02:55:04"}
+{"level":"info","message":"✅ Admin login exitoso [memory]","service":"mi-servidor","source":"memory","timestamp":"2026-02-23 02:55:04","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 157ms","service":"mi-servidor","timestamp":"2026-02-23 02:55:04"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/events","service":"mi-servidor","timestamp":"2026-02-23 02:55:04"}
+{"level":"info","message":"GET /events 200 9ms","service":"mi-servidor","timestamp":"2026-02-23 02:55:04"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/events","service":"mi-servidor","timestamp":"2026-02-23 02:55:05"}
+{"level":"info","message":"GET /events 304 4ms","service":"mi-servidor","timestamp":"2026-02-23 02:55:05"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] POST /api/auth/admin-login","service":"mi-servidor","timestamp":"2026-02-23 02:55:11"}
+{"level":"info","message":"✅ Admin login exitoso [memory]","service":"mi-servidor","source":"memory","timestamp":"2026-02-23 02:55:11","username":"admin"}
+{"level":"info","message":"POST /auth/admin-login 200 73ms","service":"mi-servidor","timestamp":"2026-02-23 02:55:11"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/events","service":"mi-servidor","timestamp":"2026-02-23 02:55:11"}
+{"level":"info","message":"GET /events 304 5ms","service":"mi-servidor","timestamp":"2026-02-23 02:55:11"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/events","service":"mi-servidor","timestamp":"2026-02-23 02:55:12"}
+{"level":"info","message":"GET /events 304 5ms","service":"mi-servidor","timestamp":"2026-02-23 02:55:12"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced","service":"mi-servidor","timestamp":"2026-02-23 02:55:24"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 02:55:24"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 02:55:24"}
+{"level":"info","message":"GET /advanced 200 54ms","service":"mi-servidor","timestamp":"2026-02-23 02:55:24"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced","service":"mi-servidor","timestamp":"2026-02-23 02:56:05"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 02:56:05"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 02:56:05"}
+{"level":"info","message":"GET /advanced 200 45ms","service":"mi-servidor","timestamp":"2026-02-23 02:56:05"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/events","service":"mi-servidor","timestamp":"2026-02-23 02:56:09"}
+{"level":"info","message":"GET /events 304 3ms","service":"mi-servidor","timestamp":"2026-02-23 02:56:09"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] POST /api/events","service":"mi-servidor","timestamp":"2026-02-23 02:56:18"}
+{"level":"info","message":"POST /events 201 10ms","service":"mi-servidor","timestamp":"2026-02-23 02:56:18"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders?eventId=699c163260e27b2881d8b4ce","service":"mi-servidor","timestamp":"2026-02-23 02:56:19"}
+{"level":"info","message":"GET /leaders 200 15ms","service":"mi-servidor","timestamp":"2026-02-23 02:56:19"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?eventId=699c163260e27b2881d8b4ce&limit=2000","service":"mi-servidor","timestamp":"2026-02-23 02:56:19"}
+{"level":"info","message":"GET /registrations 200 17ms","service":"mi-servidor","timestamp":"2026-02-23 02:56:19"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?","service":"mi-servidor","timestamp":"2026-02-23 02:56:25"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 02:56:25"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 02:56:25"}
+{"level":"info","message":"GET /advanced 200 31ms","service":"mi-servidor","timestamp":"2026-02-23 02:56:25"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?","service":"mi-servidor","timestamp":"2026-02-23 02:56:45"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 02:56:45"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 02:56:45"}
+{"level":"info","message":"GET /advanced 200 32ms","service":"mi-servidor","timestamp":"2026-02-23 02:56:45"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: Configurado","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"✅ Resend API configurada correctamente","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 03:01:28"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced","service":"mi-servidor","timestamp":"2026-02-23 03:01:55"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:01:55"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:01:55"}
+{"level":"info","message":"GET /advanced 200 38ms","service":"mi-servidor","timestamp":"2026-02-23 03:01:55"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?","service":"mi-servidor","timestamp":"2026-02-23 03:02:02"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:02:02"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:02:02"}
+{"level":"info","message":"GET /advanced 200 42ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:02"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders","service":"mi-servidor","timestamp":"2026-02-23 03:02:02"}
+{"level":"info","message":"GET /leaders 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:02"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?limit=2000","service":"mi-servidor","timestamp":"2026-02-23 03:02:02"}
+{"level":"info","message":"GET /registrations 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:02"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?leaderId=leader-1","service":"mi-servidor","timestamp":"2026-02-23 03:02:10"}
+{"leaderId":"leader-1","level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:02:10"}
+{"filters":{"leaderId":"leader-1"},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:02:10"}
+{"level":"info","message":"GET /advanced 200 22ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:10"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?","service":"mi-servidor","timestamp":"2026-02-23 03:02:34"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:02:34"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:02:34"}
+{"level":"info","message":"GET /advanced 200 35ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:34"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders","service":"mi-servidor","timestamp":"2026-02-23 03:02:34"}
+{"level":"info","message":"GET /leaders 401 1ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:34"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?limit=2000","service":"mi-servidor","timestamp":"2026-02-23 03:02:34"}
+{"level":"info","message":"GET /registrations 401 2ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:34"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?","service":"mi-servidor","timestamp":"2026-02-23 03:02:42"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:02:42"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:02:42"}
+{"level":"info","message":"GET /advanced 200 37ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:42"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders?eventId=699c163260e27b2881d8b4ce","service":"mi-servidor","timestamp":"2026-02-23 03:02:42"}
+{"level":"info","message":"GET /leaders 304 21ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:42"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?eventId=699c163260e27b2881d8b4ce&limit=2000","service":"mi-servidor","timestamp":"2026-02-23 03:02:42"}
+{"level":"info","message":"GET /registrations 304 11ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:42"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?","service":"mi-servidor","timestamp":"2026-02-23 03:02:51"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:02:51"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:02:51"}
+{"level":"info","message":"GET /advanced 200 31ms","service":"mi-servidor","timestamp":"2026-02-23 03:02:51"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?","service":"mi-servidor","timestamp":"2026-02-23 03:04:24"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:04:24"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:04:24"}
+{"level":"info","message":"GET /advanced 200 64ms","service":"mi-servidor","timestamp":"2026-02-23 03:04:24"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/leaders?eventId=699c163260e27b2881d8b4ce","service":"mi-servidor","timestamp":"2026-02-23 03:04:24"}
+{"level":"info","message":"GET /leaders 304 8ms","service":"mi-servidor","timestamp":"2026-02-23 03:04:24"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/registrations?eventId=699c163260e27b2881d8b4ce&limit=2000","service":"mi-servidor","timestamp":"2026-02-23 03:04:24"}
+{"level":"info","message":"GET /registrations 304 19ms","service":"mi-servidor","timestamp":"2026-02-23 03:04:24"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?","service":"mi-servidor","timestamp":"2026-02-23 03:04:25"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:04:25"}
+{"filters":{},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:04:25"}
+{"level":"info","message":"GET /advanced 200 51ms","service":"mi-servidor","timestamp":"2026-02-23 03:04:25"}
+{"ip":"127.0.0.1","level":"info","message":"[DEVELOPMENT] GET /api/v2/analytics/advanced?leaderId=leader-1","service":"mi-servidor","timestamp":"2026-02-23 03:05:43"}
+{"leaderId":"leader-1","level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-23 03:05:43"}
+{"filters":{"leaderId":"leader-1"},"level":"info","message":"[AnalyticsService] Obteniendo advanced dashboard","service":"mi-servidor","timestamp":"2026-02-23 03:05:43"}
+{"level":"info","message":"GET /advanced 200 22ms","service":"mi-servidor","timestamp":"2026-02-23 03:05:43"}

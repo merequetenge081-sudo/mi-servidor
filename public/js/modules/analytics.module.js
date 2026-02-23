@@ -725,64 +725,83 @@ const AnalyticsModule = (() => {
     // RENDER KPI CARDS - Enterprise UI
     // ===================================
     function renderKPICards(data) {
-        const container = DOMUtils.byId('kpiCardsContainer') || document.querySelector('[data-analytics-kpi]');
+        const container = DOMUtils.byId('kpiCardsContainer');
         if (!container) return;
 
         const { totalVotes, leaders, puestos, distribution } = data;
         
-        const kpiCards = `
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Total Votes KPI -->
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-semibold opacity-90">Total de Votos</p>
-                            <h3 class="text-3xl font-bold mt-2">${totalVotes.total.toLocaleString()}</h3>
-                            <p class="text-xs opacity-75 mt-2">Confirmados: ${totalVotes.confirmed}</p>
-                        </div>
-                        <span class="text-4xl">📊</span>
+        // Calcular pendientes
+        const pendientes = totalVotes.total - totalVotes.confirmed;
+        const ratioBogota = distribution.find(d => d.region === 'Bogotá')?.votes || 0;
+        
+        const html = `
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); color: #fff; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(102,126,234,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.3)'">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <p style="margin: 0 0 8px 0; font-size: 12px; opacity: 0.9; font-weight: 500;">📊 Total de Votos</p>
+                        <h2 style="margin: 0; font-size: 36px; font-weight: 700;">${totalVotes.total.toLocaleString()}</h2>
+                        <p style="margin: 8px 0 0 0; font-size: 12px; opacity: 0.8;">✓ ${totalVotes.confirmed} confirmados</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Confirmation Rate KPI -->
-                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-semibold opacity-90">Tasa de Confirmación</p>
-                            <h3 class="text-3xl font-bold mt-2">${parseFloat(totalVotes.confirmationRate).toFixed(1)}%</h3>
-                            <p class="text-xs opacity-75 mt-2">De los registros</p>
-                        </div>
-                        <span class="text-4xl">✅</span>
+            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(245,87,108,0.3); color: #fff; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(245,87,108,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(245,87,108,0.3)'">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <p style="margin: 0 0 8px 0; font-size: 12px; opacity: 0.9; font-weight: 500;">✅ Confirmación</p>
+                        <h2 style="margin: 0; font-size: 36px; font-weight: 700;">${parseFloat(totalVotes.confirmationRate).toFixed(1)}%</h2>
+                        <p style="margin: 8px 0 0 0; font-size: 12px; opacity: 0.8;">⏳ ${pendientes} pendientes</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Top Leaders Count KPI -->
-                <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-semibold opacity-90">Líderes Activos</p>
-                            <h3 class="text-3xl font-bold mt-2">${leaders.total}</h3>
-                            <p class="text-xs opacity-75 mt-2">Top 10 mostrados</p>
-                        </div>
-                        <span class="text-4xl">👥</span>
+            <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,242,254,0.3); color: #fff; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(0,242,254,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,242,254,0.3)'">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <p style="margin: 0 0 8px 0; font-size: 12px; opacity: 0.9; font-weight: 500;">👥 Líderes Activos</p>
+                        <h2 style="margin: 0; font-size: 36px; font-weight: 700;">${leaders.total}</h2>
+                        <p style="margin: 8px 0 0 0; font-size: 12px; opacity: 0.8;">🏆 Top 10 mostrados</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Localities Count KPI -->
-                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-semibold opacity-90">Localidades</p>
-                            <h3 class="text-3xl font-bold mt-2">${distribution.length}</h3>
-                            <p class="text-xs opacity-75 mt-2">Regiones registradas</p>
-                        </div>
-                        <span class="text-4xl">🗺️</span>
+            <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(67,233,123,0.3); color: #fff; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(67,233,123,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(67,233,123,0.3)'">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <p style="margin: 0 0 8px 0; font-size: 12px; opacity: 0.9; font-weight: 500;">🗺️ Regiones</p>
+                        <h2 style="margin: 0; font-size: 36px; font-weight: 700;">${distribution.length}</h2>
+                        <p style="margin: 8px 0 0 0; font-size: 12px; opacity: 0.8;">📍 Bogotá: ${ratioBogota}</p>
                     </div>
                 </div>
             </div>
         `;
 
-        container.innerHTML = kpiCards;
+        container.innerHTML = html;
+        
+        // Actualizar timestamp
+        const lastUpdate = document.getElementById('lastUpdate');
+        if (lastUpdate) {
+            const now = new Date();
+            lastUpdate.textContent = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+        }
+    }
+
+    // ===================================
+    // HELPER: Destruir todos los charts existentes
+    // ===================================
+    function destroyAllCharts() {
+        const chartIds = ['leadersChart', 'localidadesChart', 'timelineChart', 'puestosChart'];
+        chartIds.forEach(id => {
+            const canvas = document.getElementById(id);
+            if (canvas && canvas.chart) {
+                try {
+                    canvas.chart.destroy();
+                    canvas.chart = null;
+                } catch (e) {
+                    console.warn(`[Analytics] Warning destroying chart ${id}:`, e.message);
+                }
+            }
+        });
     }
 
     // ===================================
@@ -790,6 +809,9 @@ const AnalyticsModule = (() => {
     // ===================================
     function renderChartsAdvanced(data) {
         const { totalVotes, leaders, localidades, puestos, timeline, distribution } = data;
+
+        // Destruir gráficos anteriores antes de crear nuevos
+        destroyAllCharts();
 
         // Gráfico 1: Top Leaders (Bar Chart)
         renderLeadersChart(leaders.top);
@@ -805,14 +827,14 @@ const AnalyticsModule = (() => {
     }
 
     function renderLeadersChart(leadersData) {
-        const chartContainer = document.querySelector('#leadersChart, [data-chart="leaders"]');
-        if (!chartContainer) return;
+        const chartContainer = document.getElementById('leadersChart');
+        if (!chartContainer) {
+            console.warn('[Analytics] Canvas #leadersChart not found');
+            return;
+        }
 
-        const ctx = chartContainer.getContext ? chartContainer.getContext('2d') : null;
+        const ctx = chartContainer.getContext('2d');
         if (!ctx) return;
-
-        // Destruir gráfico anterior si existe
-        if (chartContainer.chart) chartContainer.chart.destroy();
 
         const medals = ['🥇', '🥈', '🥉'];
         
@@ -846,13 +868,14 @@ const AnalyticsModule = (() => {
     }
 
     function renderLocalidadesChart(localidadesData) {
-        const chartContainer = document.querySelector('#localidadesChart, [data-chart="localidades"]');
-        if (!chartContainer) return;
+        const chartContainer = document.getElementById('localidadesChart');
+        if (!chartContainer) {
+            console.warn('[Analytics] Canvas #localidadesChart not found');
+            return;
+        }
 
-        const ctx = chartContainer.getContext ? chartContainer.getContext('2d') : null;
+        const ctx = chartContainer.getContext('2d');
         if (!ctx) return;
-
-        if (chartContainer.chart) chartContainer.chart.destroy();
 
         const colors = [
             'rgba(59, 130, 246, 0.8)',
@@ -887,13 +910,14 @@ const AnalyticsModule = (() => {
     }
 
     function renderTimelineChart(timelineData) {
-        const chartContainer = document.querySelector('#timelineChart, [data-chart="timeline"]');
-        if (!chartContainer) return;
+        const chartContainer = document.getElementById('timelineChart');
+        if (!chartContainer) {
+            console.warn('[Analytics] Canvas #timelineChart not found');
+            return;
+        }
 
-        const ctx = chartContainer.getContext ? chartContainer.getContext('2d') : null;
+        const ctx = chartContainer.getContext('2d');
         if (!ctx) return;
-
-        if (chartContainer.chart) chartContainer.chart.destroy();
 
         chartContainer.chart = new Chart(ctx, {
             type: 'line',
@@ -924,31 +948,35 @@ const AnalyticsModule = (() => {
     }
 
     function renderPuestosChart(puestosData) {
-        const chartContainer = document.querySelector('#puestosChart, [data-chart="puestos"]');
-        if (!chartContainer) return;
+        const chartContainer = document.getElementById('puestosChart');
+        if (!chartContainer) {
+            console.warn('[Analytics] Canvas #puestosChart not found');
+            return;
+        }
 
-        const ctx = chartContainer.getContext ? chartContainer.getContext('2d') : null;
+        const ctx = chartContainer.getContext('2d');
         if (!ctx) return;
 
-        if (chartContainer.chart) chartContainer.chart.destroy();
-
+        // FIX: Usar 'bar' con indexAxis: 'y' en lugar de 'barH'
         chartContainer.chart = new Chart(ctx, {
-            type: 'barH',
+            type: 'bar',
             data: {
-                labels: puestosData.map(p => p.puestoName),
+                labels: puestosData.map(p => p.puestoName || 'N/A'),
                 datasets: [{
                     label: 'Votos',
                     data: puestosData.map(p => p.votes),
                     backgroundColor: 'rgba(248, 113, 113, 0.8)',
-                    borderRadius: 4
+                    borderRadius: 4,
+                    borderSkipped: false
                 }]
             },
             options: {
                 indexAxis: 'y',
                 responsive: true,
+                maintainAspectRatio: true,
                 plugins: {
                     legend: { display: false },
-                    title: { text: 'Top 10 Puestos', display: true }
+                    title: { text: 'Top 10 Puestos de Votación', display: true }
                 },
                 scales: {
                     x: { beginAtZero: true }
