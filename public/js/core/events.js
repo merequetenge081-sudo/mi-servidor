@@ -132,6 +132,15 @@ const Events = (() => {
                 return;
             }
 
+            // Open new leader modal button
+            if (target.id === 'newLeaderBtn') {
+                const modal = document.getElementById('leaderModal');
+                if (modal) {
+                    modal.classList.add('active');
+                }
+                return;
+            }
+
             // Generate random password button
             if (target.id === 'generatePassBtn') {
                 const passInput = document.getElementById('resetPassPassword');
@@ -160,6 +169,12 @@ const Events = (() => {
             // Confirm reset password button
             if (target.id === 'confirmResetPassBtn') {
                 LeadersModule.handleConfirmResetPassword();
+                return;
+            }
+
+            // Save new leader button
+            if (target.id === 'saveLiderBtn') {
+                LeadersModule.handleCreateLeader();
                 return;
             }
 
@@ -366,11 +381,29 @@ const Events = (() => {
     }
 
     function bindFilters() {
-        // Search input for leaders
-        const leaderSearch = document.getElementById('leaderSearch');
+        // Search input for leaders - filtrado en tiempo real
+        const leaderSearch = document.getElementById('leaderSearchInput');
         if (leaderSearch) {
             leaderSearch.addEventListener('input', (e) => {
-                LeadersModule.filterByName(e.target.value);
+                const searchTerm = e.target.value;
+                console.log('[Events] Búsqueda de líder:', searchTerm);
+                if (typeof LeadersModule !== 'undefined' && LeadersModule.filterByName) {
+                    LeadersModule.filterByName(searchTerm);
+                } else {
+                    console.warn('[Events] LeadersModule.filterByName no disponible');
+                }
+            });
+
+            // Permitir búsqueda también con Enter
+            leaderSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const searchTerm = e.target.value;
+                    console.log('[Events] Búsqueda (Enter):', searchTerm);
+                    if (typeof LeadersModule !== 'undefined' && LeadersModule.filterByName) {
+                        LeadersModule.filterByName(searchTerm);
+                    }
+                }
             });
         }
 

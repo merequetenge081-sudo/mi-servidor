@@ -20,6 +20,8 @@ export async function createLeader(req, res) {
     let { leaderId } = req.body; // Allow modification
     const user = req.user;
 
+    console.log('[LeadersController] createLeader request:', { name, email, phone, customUsername, user: user?.username, role: user?.role });
+
     // Auto-generate leaderId if not provided
     if (!leaderId) {
       leaderId = `LID-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
@@ -371,10 +373,16 @@ export async function deleteLeader(req, res) {
       return res.status(404).json({ error: "Líder no encontrado" });
     }
 
+    // Contar registros antes de eliminar
     const registrationCount = await Registration.countDocuments({ leaderId: leader.leaderId });
 
+    // Eliminar todos los registros del líder
+    await Registration.deleteMany({ leaderId: leader.leaderId });
+
+    // Eliminar el líder
     await Leader.deleteOne({ _id: req.params.id });
-    await AuditService.log("DELETE", "Leader", leader._id.toString(), user, { registrations: registrationCount }, `Líder ${leader.name} eliminado`);
+    
+    await AuditService.log("DELETE", "Leader", leader._id.toString(), user, { registrations: registrationCount }, `Líder ${leader.name} eliminado (${registrationCount} registros eliminados)`);
 
     res.json({ message: "Líder eliminado", registrationsDeleted: registrationCount });
   } catch (error) {
@@ -552,7 +560,7 @@ export async function sendAccessEmail(req, res) {
     if (shouldSendCredentials) {
       try {
         logger.info(`📧 Enviando credenciales - Username: ${leader.username}, hasTempPass: ${!!leader.tempPasswordPlaintext}`);
-        emailResults.credentials = await emailService.sendCredentialsEmail(leader);
+        emailResults.credentials = await emailService.sendCredentialsEmail(leader, baseUrl);
         logger.info(`✅ Email de credenciales: ${emailResults.credentials.success}`);
       } catch (err) {
         logger.error(`❌ Error enviando email de credenciales: ${err.message}`);

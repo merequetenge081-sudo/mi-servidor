@@ -18,9 +18,9 @@ services:
       - key: EMAIL_FROM
         value: redsp@fulars.com
       - key: BASE_URL
-        value: https://midominio.com
+        value: https://redsocialypolitica.fulars.com
       - key: FRONTEND_URL
-        value: https://midominio.com
+        value: https://redsocialypolitica.fulars.com
       - key: LOG_LEVEL
         value: info
       - key: ENCRYPTION_KEY

@@ -146,14 +146,14 @@ class EmailService {
     return this._sendEmail(leader.email, '👋 ¡Bienvenido al Sistema!', html);
   }
 
-  async sendCredentialsEmail(leader) {
+  async sendCredentialsEmail(leader, baseUrl = process.env.BASE_URL) {
     logger.info(`🔑 sendCredentialsEmail para: ${leader?.email}`);
     
     if (!leader?.email) throw new Error('Email no proporcionado');
     
     const firstName = leader.name?.split(' ')[0] || 'Líder';
     const username = leader.username || 'No configurado';
-    const loginUrl = process.env.BASE_URL || 'https://redsociaypolitica.fulars.com';
+    const loginUrl = baseUrl || 'https://redsociaypolitica.fulars.com';
     
     let tempPassword = 'No disponible';
     if (leader.tempPasswordPlaintext) {
@@ -276,12 +276,12 @@ class EmailService {
     return this._sendEmail(leader.email, '⚠️ Recordatorio Importante', html);
   }
 
-  async sendTemporaryPasswordEmail(leader, tempPassword) {
+  async sendTemporaryPasswordEmail(leader, tempPassword, baseUrl = process.env.BASE_URL) {
     if (!leader?.email) throw new Error('Email no proporcionado');
     
     const firstName = leader.name?.split(' ')[0] || 'Líder';
     const username = leader.username || leader.email;
-    const loginUrl = process.env.BASE_URL || 'https://redsociaypolitica.fulars.com';
+    const loginUrl = baseUrl || 'https://redsociaypolitica.fulars.com';
     
     const html = `
     <!DOCTYPE html>

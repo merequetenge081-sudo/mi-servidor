@@ -55,22 +55,28 @@ const DataService = {
         const endpoint = `/api/leaders${eventId ? '?eventId=' + eventId : ''}`;
         console.log('[DataService] Llamando getLeaders:', endpoint);
         
-        const response = await this.apiCall(endpoint);
-        console.log('[DataService] Response status:', response.status, response.ok);
-        
-        if (!response.ok) {
-            const error = await response.text();
-            console.error('[DataService] Error en API:', response.status, error);
+        try {
+            const response = await this.apiCall(endpoint);
+            console.log('[DataService] Response status:', response.status, response.ok);
+            
+            if (!response.ok) {
+                const error = await response.text();
+                console.error('[DataService] Error en API:', response.status, error);
+                console.warn('[DataService] Retornando array vacío');
+                return [];
+            }
+            
+            const data = await response.json();
+            console.log('[DataService] Raw leaders data:', data);
+            
+            const leaders = Array.isArray(data) ? data : (data.data || []);
+            console.log('[DataService] Leaders cargados:', leaders.length);
+            AppState.setData('leaders', leaders);
+            return leaders;
+        } catch (err) {
+            console.error('[DataService] Exception en getLeaders:', err);
             return [];
         }
-        
-        const data = await response.json();
-        console.log('[DataService] Raw leaders data:', data);
-        
-        const leaders = Array.isArray(data) ? data : (data.data || []);
-        console.log('[DataService] Leaders cargados:', leaders.length);
-        AppState.setData('leaders', leaders);
-        return leaders;
     },
 
     /**
@@ -121,22 +127,28 @@ const DataService = {
         const endpoint = `/api/registrations${eventId ? '?eventId=' + eventId + '&' : '?'}limit=2000`;
         console.log('[DataService] Llamando getRegistrations:', endpoint);
         
-        const response = await this.apiCall(endpoint);
-        console.log('[DataService] Response status:', response.status, response.ok);
-        
-        if (!response.ok) {
-            const error = await response.text();
-            console.error('[DataService] Error en API:', response.status, error);
+        try {
+            const response = await this.apiCall(endpoint);
+            console.log('[DataService] Response status:', response.status, response.ok);
+            
+            if (!response.ok) {
+                const error = await response.text();
+                console.error('[DataService] Error en API:', response.status, error);
+                console.warn('[DataService] Retornando array vacío');
+                return [];
+            }
+            
+            const data = await response.json();
+            console.log('[DataService] Raw data:', data);
+            
+            const regs = Array.isArray(data) ? data : (data.data || []);
+            console.log('[DataService] Registrations cargadas:', regs.length);
+            AppState.setData('registrations', regs);
+            return regs;
+        } catch (err) {
+            console.error('[DataService] Exception en getRegistrations:', err);
             return [];
         }
-        
-        const data = await response.json();
-        console.log('[DataService] Raw data:', data);
-        
-        const regs = Array.isArray(data) ? data : (data.data || []);
-        console.log('[DataService] Registrations cargadas:', regs.length);
-        AppState.setData('registrations', regs);
-        return regs;
     },
 
     /**

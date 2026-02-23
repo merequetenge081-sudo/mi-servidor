@@ -154,8 +154,8 @@ const BootstrapService = (() => {
      * Cargar registraciones en tabs
      */
     function loadRegistrationsTabbed() {
-        if (typeof RegistrationsModule !== 'undefined' && RegistrationsModule.loadTable) {
-            RegistrationsModule.loadTable();
+        if (typeof RegistrationsModule !== 'undefined' && RegistrationsModule.load) {
+            RegistrationsModule.load();
             console.log('[Bootstrap] ✅ Tabla de registraciones cargada');
         }
     }
