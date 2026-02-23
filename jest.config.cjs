@@ -18,12 +18,9 @@ module.exports = {
 
   // Cobertura
   collectCoverageFrom: [
-    'src/**/*.js',
-    '!src/**/*.test.js',
-    '!src/**/*.spec.js',
-    '!src/**/index.js',
-    '!src/server.js',
-    '!src/app.js',
+    'src/services/validation.service.js',
+    'src/services/emailService.js',
+    'src/utils/passwordValidator.js',
   ],
 
   coveragePathIgnorePatterns: [

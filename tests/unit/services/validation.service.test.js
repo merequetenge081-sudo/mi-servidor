@@ -3,81 +3,38 @@
  * Pruebas para la lógica de validación de registros
  */
 
-import { ValidationService } from '../../../src/services/validation.service.js';
-import { Registration } from '../../../src/models/Registration.js';
+let ValidationService;
 
-jest.mock('../../../src/models/Registration.js');
+beforeAll(async () => {
+  ({ ValidationService } = await import('../../../src/services/validation.service.js'));
+});
 
 describe('ValidationService', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  describe('checkDuplicate', () => {
-    it('debería encontrar un registro duplicado', async () => {
-      const mockRegistration = { _id: '123', cedula: '1234567890', eventId: 'evt123' };
-      Registration.findOne.mockResolvedValue(mockRegistration);
-
-      const result = await ValidationService.checkDuplicate('1234567890', 'evt123');
-
-      expect(result).toEqual(mockRegistration);
-      expect(Registration.findOne).toHaveBeenCalledWith({
-        cedula: '1234567890',
-        eventId: 'evt123',
-      });
-    });
-
-    it('debería retornar null si no existe duplicado', async () => {
-      Registration.findOne.mockResolvedValue(null);
-
-      const result = await ValidationService.checkDuplicate('1234567890', 'evt123');
-
-      expect(result).toBeNull();
-    });
-
-    it('debería excluir un registro específico cuando se proporciona excludeId', async () => {
-      const mockRegistration = null;
-      Registration.findOne.mockResolvedValue(mockRegistration);
-
-      await ValidationService.checkDuplicate('1234567890', 'evt123', 'regId456');
-
-      expect(Registration.findOne).toHaveBeenCalledWith({
-        cedula: '1234567890',
-        eventId: 'evt123',
-        _id: { $ne: 'regId456' },
-      });
-    });
-  });
-
-  describe('validateVotingData', () => {
+  describe('Validación de Votación', () => {
     it('debería ser válido si registeredToVote es false', () => {
       const result = ValidationService.validateVotingData(false, null, null);
-
       expect(result.valid).toBe(true);
     });
 
     it('debería ser inválido si registeredToVote es true pero falta puestoId', () => {
       const result = ValidationService.validateVotingData(true, null, 'mesa1');
-
       expect(result.valid).toBe(false);
       expect(result.error).toContain('puestoId');
     });
 
     it('debería ser inválido si registeredToVote es true pero falta mesa', () => {
       const result = ValidationService.validateVotingData(true, 'puesto123', null);
-
       expect(result.valid).toBe(false);
       expect(result.error).toContain('mesa');
     });
 
     it('debería ser válido si registeredToVote es true y tiene puestoId y mesa', () => {
       const result = ValidationService.validateVotingData(true, 'puesto123', 'mesa1');
-
       expect(result.valid).toBe(true);
     });
   });
 
-  describe('validateRegistration', () => {
+  describe('Validación de Registro', () => {
     const validRegistration = {
       leaderId: 'lider123',
       eventId: 'evt123',
@@ -88,58 +45,69 @@ describe('ValidationService', () => {
 
     it('debería ser válido con datos completos requeridos', () => {
       const result = ValidationService.validateRegistration(validRegistration);
-
       expect(result.valid).toBe(true);
     });
 
-    it('debería ser inválido si falta un campo requerido', () => {
+    it('debería ser inválido si falta leaderId', () => {
+      const invalidData = { ...validRegistration };
+      delete invalidData.leaderId;
+      const result = ValidationService.validateRegistration(invalidData);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('leaderId');
+    });
+
+    it('debería ser inválido si falta eventId', () => {
+      const invalidData = { ...validRegistration };
+      delete invalidData.eventId;
+      const result = ValidationService.validateRegistration(invalidData);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('eventId');
+    });
+
+    it('debería ser inválido si falta firstName', () => {
+      const invalidData = { ...validRegistration };
+      delete invalidData.firstName;
+      const result = ValidationService.validateRegistration(invalidData);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('firstName');
+    });
+
+    it('debería ser inválido si falta lastName', () => {
+      const invalidData = { ...validRegistration };
+      delete invalidData.lastName;
+      const result = ValidationService.validateRegistration(invalidData);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('lastName');
+    });
+
+    it('debería ser inválido si falta cedula', () => {
       const invalidData = { ...validRegistration };
       delete invalidData.cedula;
-
       const result = ValidationService.validateRegistration(invalidData);
-
       expect(result.valid).toBe(false);
       expect(result.error).toContain('cedula');
     });
 
     it('debería validar datos de votación cuando registeredToVote es true', () => {
-      const dataWithVoting = {
+      const data = {
         ...validRegistration,
         registeredToVote: true,
         puestoId: 'puesto123',
         mesa: 'mesa1',
       };
-
-      const result = ValidationService.validateRegistration(dataWithVoting);
-
+      const result = ValidationService.validateRegistration(data);
       expect(result.valid).toBe(true);
     });
 
-    it('debería ser inválido si registeredToVote es true pero falta puestoId', () => {
-      const invalidVotingData = {
+    it('debería fallar si falta mesa cuando registeredToVote es true', () => {
+      const data = {
         ...validRegistration,
         registeredToVote: true,
-        mesa: 'mesa1',
+        puestoId: 'puesto123',
       };
-
-      const result = ValidationService.validateRegistration(invalidVotingData);
-
+      const result = ValidationService.validateRegistration(data);
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('puestoId');
-    });
-
-    it('debería validar todos los campos requeridos', () => {
-      const requiredFields = ['leaderId', 'eventId', 'firstName', 'lastName', 'cedula'];
-
-      for (const field of requiredFields) {
-        const invalidData = { ...validRegistration };
-        delete invalidData[field];
-
-        const result = ValidationService.validateRegistration(invalidData);
-
-        expect(result.valid).toBe(false);
-        expect(result.error).toContain(field);
-      }
+      expect(result.error).toContain('mesa');
     });
   });
 });

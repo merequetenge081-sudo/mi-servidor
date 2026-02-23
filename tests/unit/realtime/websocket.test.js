@@ -3,6 +3,8 @@
  * Tests para comunicación en tiempo real, eventos de socket y notificaciones
  */
 
+import { jest } from '@jest/globals';
+
 describe('WebSocket Connection Management - IMPORTANTE', () => {
   // Simular conexión WebSocket
   class MockWebSocket {

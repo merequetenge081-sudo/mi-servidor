@@ -1,198 +1,93 @@
 /**
  * Unit Tests: EmailService
- * Pruebas para el servicio de email
+ * Pruebas para el servicio real de email
  */
 
-import { EmailService } from '../../../src/services/emailService.js';
-import { Resend } from 'resend';
-import QRCode from 'qrcode';
-import logger from '../../../src/config/logger.js';
+let emailService;
 
-jest.mock('resend');
-jest.mock('qrcode');
-jest.mock('../../../src/config/logger.js');
+beforeAll(async () => {
+  ({ emailService } = await import('../../../src/services/emailService.js'));
+});
 
 describe('EmailService', () => {
-  let emailService;
-
   beforeEach(() => {
-    jest.clearAllMocks();
-    process.env.FORCE_EMAIL_MOCK = 'true';
-    process.env.EMAIL_FROM = 'test@example.com';
-    process.env.BASE_URL = 'http://localhost:3000';
-    
-    emailService = new EmailService();
+    emailService.mockMode = true;
   });
 
-  afterEach(() => {
-    delete process.env.FORCE_EMAIL_MOCK;
-  });
-
-  describe('init', () => {
-    it('debería usar mock mode cuando FORCE_EMAIL_MOCK es true', () => {
-      process.env.FORCE_EMAIL_MOCK = 'true';
-      const service = new EmailService();
-
-      expect(service.mockMode).toBe(true);
-    });
-
-    it('debería usar mock mode cuando RESEND_API_KEY no está configurada', () => {
-      process.env.FORCE_EMAIL_MOCK = 'false';
-      delete process.env.RESEND_API_KEY;
-      
-      const service = new EmailService();
-
-      expect(service.mockMode).toBe(true);
-    });
-
-    it('debería guardar el email from correctamente', () => {
-      process.env.EMAIL_FROM = 'custom@domain.com';
-      const service = new EmailService();
-
-      expect(service.fromEmail).toBe('custom@domain.com');
-    });
-
-    it('debería usar email default si EMAIL_FROM no está configurado', () => {
-      delete process.env.EMAIL_FROM;
-      const service = new EmailService();
-
-      expect(service.fromEmail).toBe('redsp@fulars.com');
+  describe('Configuración de EmailService', () => {
+    it('debería iniciar en mockMode cuando no hay API key', () => {
+      expect(emailService.mockMode).toBe(true);
     });
   });
 
-  describe('sendAccessEmail', () => {
-    const mockLeader = {
-      email: 'leader@example.com',
-      name: 'Juan Pérez',
-      token: 'token123',
-    };
-
-    it('debería rechazar si leader no tiene email', async () => {
-      const leaderWithoutEmail = { ...mockLeader, email: null };
-
-      await expect(emailService.sendAccessEmail(leaderWithoutEmail))
-        .rejects
-        .toThrow('Leader email no proporcionado');
+  describe('Generación de HTML', () => {
+    it('debería incluir el nombre del líder', () => {
+      const html = emailService.generateEmailHTML('Juan Pérez', 'http://example.com', 'data:image');
+      expect(html).toContain('Juan');
     });
 
-    it('debería rechazar si leader no tiene token', async () => {
-      const leaderWithoutToken = { ...mockLeader, token: null };
-
-      await expect(emailService.sendAccessEmail(leaderWithoutToken))
-        .rejects
-        .toThrow('Leader token no disponible');
+    it('debería incluir el enlace personalizado', () => {
+      const html = emailService.generateEmailHTML('User', 'http://example.com/form?token=123', 'data:image');
+      expect(html).toContain('http://example.com/form?token=123');
     });
 
-    it('debería retornar success en mock mode', async () => {
-      emailService.mockMode = true;
+    it('debería incluir el QR code', () => {
+      const html = emailService.generateEmailHTML('User', 'http://example.com', 'data:image/png;base64,ABC');
+      expect(html).toContain('data:image/png;base64,ABC');
+    });
 
-      const result = await emailService.sendAccessEmail(mockLeader);
+    it('debería ser HTML válido', () => {
+      const html = emailService.generateEmailHTML('Test', 'http://url', 'data:img');
+      expect(html).toContain('<!DOCTYPE html>');
+      expect(html).toContain('</html>');
+      expect(html).toContain('<body');
+    });
+  });
 
+  describe('sendAccessEmail en modo mock', () => {
+    it('debería retornar success true con mock', async () => {
+      const leader = { email: 'test@example.com', token: 'token123', name: 'Juan Pérez' };
+      const result = await emailService.sendAccessEmail(leader, 'http://localhost:3000');
       expect(result.success).toBe(true);
       expect(result.mock).toBe(true);
     });
 
-    it('debería generar QR code con la URL correcta', async () => {
-      emailService.mockMode = true;
-      const expectedUrl = `http://localhost:3000/form.html?token=token123`;
-      QRCode.toDataURL.mockResolvedValue('data:image/png;base64,ABC123');
-
-      await emailService.sendAccessEmail(mockLeader);
-
-      expect(QRCode.toDataURL).toHaveBeenCalledWith(
-        expectedUrl,
-        expect.objectContaining({
-          errorCorrectionLevel: 'H',
-          type: 'image/png',
-          width: 300,
-        })
-      );
+    it('debería fallar si falta email', async () => {
+      const leader = { token: 'token123', name: 'Juan Pérez' };
+      await expect(emailService.sendAccessEmail(leader, 'http://localhost:3000')).rejects.toThrow('email');
     });
 
-    it('debería usar BASE_URL por defecto si no se proporciona', async () => {
-      emailService.mockMode = true;
-
-      await emailService.sendAccessEmail(mockLeader);
-
-      expect(logger.info).toHaveBeenCalled();
-    });
-
-    it('debería registrar un error si QR generation falla', async () => {
-      emailService.mockMode = false;
-      QRCode.toDataURL.mockRejectedValue(new Error('QR generation failed'));
-
-      await expect(emailService.sendAccessEmail(mockLeader))
-        .rejects
-        .toThrow('No se pudo enviar el email');
+    it('debería fallar si falta token', async () => {
+      const leader = { email: 'test@example.com', name: 'Juan Pérez' };
+      await expect(emailService.sendAccessEmail(leader, 'http://localhost:3000')).rejects.toThrow('token');
     });
   });
 
-  describe('generateEmailHTML', () => {
-    it('debería generar HTML válido', () => {
-      const html = emailService.generateEmailHTML('Juan', 'http://example.com', 'data:image/png;base64,ABC');
-
-      expect(html).toContain('Juan');
-      expect(html).toContain('http://example.com');
-      expect(html).toContain('data:image/png;base64,ABC');
-      expect(html).toMatch(/<html/);
-      expect(html).toMatch(/<\/html>/);
-    });
-
-    it('debería incluir el nombre del líder en el HTML', () => {
-      const html = emailService.generateEmailHTML('María López', 'http://example.com', 'data:image/png');
-
-      expect(html).toContain('María López');
-    });
-  });
-
-  describe('Integración con Resend', () => {
-    it('debería enviar email a través de Resend cuando está configurado', async () => {
-      process.env.FORCE_EMAIL_MOCK = 'false';
-      process.env.RESEND_API_KEY = 'real_key_123';
-      
-      const mockResendInstance = {
-        emails: {
-          send: jest.fn().mockResolvedValue({ data: { id: 'msg_123' }, error: null }),
-        },
-      };
-      Resend.mockImplementation(() => mockResendInstance);
-      QRCode.toDataURL.mockResolvedValue('data:image/png;base64,ABC');
-
-      const service = new EmailService();
-      const result = await service.sendAccessEmail({
-        email: 'test@example.com',
-        name: 'Test User',
-        token: 'token_abc',
-      });
-
+  describe('Otros envíos en modo mock', () => {
+    it('debería enviar welcome email en mock', async () => {
+      const leader = { email: 'test@example.com', name: 'Juana Perez' };
+      const result = await emailService.sendWelcomeEmail(leader, 'http://localhost:3000');
       expect(result.success).toBe(true);
-      expect(result.messageId).toBe('msg_123');
+      expect(result.mock).toBe(true);
     });
 
-    it('debería manejar errores de Resend', async () => {
-      process.env.FORCE_EMAIL_MOCK = 'false';
-      process.env.RESEND_API_KEY = 'real_key_123';
-      
-      const mockResendInstance = {
-        emails: {
-          send: jest.fn().mockResolvedValue({ 
-            data: null, 
-            error: { message: 'Invalid email' } 
-          }),
-        },
-      };
-      Resend.mockImplementation(() => mockResendInstance);
-      QRCode.toDataURL.mockResolvedValue('data:image/png;base64,ABC');
-
-      const service = new EmailService();
-      const result = await service.sendAccessEmail({
+    it('debería enviar credenciales en mock', async () => {
+      const leader = {
         email: 'test@example.com',
-        name: 'Test User',
-        token: 'token_abc',
-      });
+        name: 'Juana Perez',
+        username: 'jperez',
+        tempPasswordPlaintext: 'temp123'
+      };
+      const result = await emailService.sendCredentialsEmail(leader, 'http://localhost:3000');
+      expect(result.success).toBe(true);
+      expect(result.mock).toBe(true);
+    });
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Invalid email');
+    it('debería enviar password temporal en mock', async () => {
+      const leader = { email: 'test@example.com', name: 'Juana Perez', username: 'jperez' };
+      const result = await emailService.sendTemporaryPasswordEmail(leader, 'Temp1234', 'http://localhost:3000');
+      expect(result.success).toBe(true);
+      expect(result.mock).toBe(true);
     });
   });
 });

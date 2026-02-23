@@ -3,6 +3,8 @@
  * Pruebas para endpoints principales
  */
 
+import { jest } from '@jest/globals';
+
 describe('Health Check Endpoint', () => {
   const mockReq = {};
   const mockRes = {

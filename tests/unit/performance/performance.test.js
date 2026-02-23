@@ -3,6 +3,8 @@
  * Tests para optimización, caching y rendimiento del sistema
  */
 
+import { jest } from '@jest/globals';
+
 describe('In-Memory Cache - IMPORTANTE', () => {
   // Sistema de cache en memoria
   class CacheManager {
