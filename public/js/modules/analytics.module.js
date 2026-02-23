@@ -593,648 +593,78 @@ const AnalyticsModule = (() => {
     // CARGAR ANALYTICS (ENTRY POINT)
     // ===================================
     function loadAnalytics() {
-        console.log('[AnalyticsModule] � Cargando Advanced Analytics desde servidor...');
+        console.log('[AnalyticsModule] 🔍 Cargando analytics desde base de datos...');
         
-        // Mostrar skeleton loaders mientras se cargan los datos
-        showSkeletonLoaders();
+        const allRegs = AppState.data.registrations || [];
+        const allLeaders = AppState.data.leaders || [];
         
-        // Construir parámetros de filtro
-        const params = new URLSearchParams();
-        if (currentFilter.leaderId) params.append('leaderId', currentFilter.leaderId);
+        console.log('[AnalyticsModule] Datos disponibles:', {
+            registrations: allRegs.length,
+            leaders: allLeaders.length
+        });
         
-        // Fetch del nuevo endpoint avanzado
-        fetch(`/api/v2/analytics/advanced?${params.toString()}`)
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.json();
-            })
-            .then(response => {
-                if (!response.success) throw new Error(response.message || 'Error en respuesta');
-                
-                const data = response.data;
-                console.log('[AnalyticsModule] 📊 Datos Advanced recibidos:', data);
-                
-                // Guardar en estado global para compatibilidad
-                AppState.data.advancedAnalytics = data;
-                
-                // Actualizar todas las secciones
-                renderKPICards(data);
-                renderChartsAdvanced(data);
-                
-                // Resetear filtros
-                currentFilter = { region: 'all', leaderId: null };
-                currentAnalyticsPage = 1;
-                
-                console.log('[AnalyticsModule] ✅ Advanced Analytics cargado exitosamente');
-                hideSkeletonLoaders();
-            })
-            .catch(error => {
-                console.error('[AnalyticsModule] ❌ Error cargando advanced analytics:', error);
-                hideSkeletonLoaders();
-                showErrorMessage('Error cargando análisis avanzado');
-            });
-    }
+        // Resetear filtros al cargar
+        currentFilter = { region: 'all', leaderId: null };
+        currentAnalyticsPage = 1;
+        
+        // Poblar selector de región y resetear
+        const regionSelect = DOMUtils.byId('analyticsRegionFilter');
+        if (regionSelect) {
+            regionSelect.value = 'all';
+        }
+        
+        // Poblar selector de líderes
+        const leaderSelect = DOMUtils.byId('analyticsLeaderFilter');
+        if (leaderSelect) {
+            const leaders = AppState.data.leaders || [];
+            leaderSelect.innerHTML = '<option value="">Todos los Líderes</option>' +
+                leaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+        }
 
-    // ===================================
-    // CARGAR VISTA CLÁSICA
-    // ===================================
-    function loadClassicAnalytics() {
-        console.log('[AnalyticsModule] Cargando vista clásica...');
-        populateLeaderSelects(); // Llenar selects de líderes
+        // Cargar análisis completamente desde AppState (MongoDB)
         updateStats();
         populateLeaderDetailTable();
         loadCharts();
-    }
 
-    // ===================================
-    // POBLAR SELECTS DE LÍDERES
-    // ===================================
-    function populateLeaderSelects() {
-        const leaders = AppState.data.leaders || [];
-        const selectors = [
-            'analyticsLeaderFilter', // Avanzado
-            'analyticsLeaderFilterClassic' // Clásico
-        ];
-
-        selectors.forEach(selectorId => {
-            const select = DOMUtils.byId(selectorId);
-            if (!select) return;
-
-            // Guardar valor actual
-            const currentValue = select.value;
-
-            // Limpiar opciones excepto la primera
-            select.innerHTML = '<option value="">📊 Todos los Líderes</option>';
-
-            // Agregar opciones de líderes
-            leaders.forEach(leader => {
-                const option = document.createElement('option');
-                option.value = leader._id;
-                option.textContent = `${leader.name} (${leader.registrations || 0} registros)`;
-                select.appendChild(option);
-            });
-
-            // Restaurar valor si existe
-            if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
-                select.value = currentValue;
-            }
-        });
-
-        console.log(`[AnalyticsModule] ✅ Selects de líderes poblados (${leaders.length} líderes)`);
+        console.log('[AnalyticsModule] ✅ Analytics cargado desde base de datos');
     }
 
     // ===================================
     // VINCULACIÓN DE EVENTOS
     // ===================================
     function bindEvents() {
-        // Toggle entre vistas
-        const classicBtn = DOMUtils.byId('analyzeViewClassicBtn');
-        const advancedBtn = DOMUtils.byId('analyzeViewAdvancedBtn');
-
-        if (classicBtn) {
-            classicBtn.addEventListener('click', () => {
-                console.log('[AnalyticsModule] Cargando vista clásica');
-                loadClassicAnalytics();
-            });
-        }
-
-        if (advancedBtn) {
-            advancedBtn.addEventListener('click', () => {
-                console.log('[AnalyticsModule] Cargando vista avanzada');
-                loadAnalytics();
-            });
-        }
-
-        // Filtros clásicos
-        const applyClassicBtn = DOMUtils.byId('applyAnalyticsClassicFilterBtn');
-        if (applyClassicBtn) {
-            applyClassicBtn.addEventListener('click', () => {
-                const regionFilter = DOMUtils.byId('analyticsRegionFilter');
-                const leaderFilter = DOMUtils.byId('analyticsLeaderFilterClassic');
-                
-                currentFilter.region = regionFilter?.value || 'all';
-                currentFilter.leaderId = leaderFilter?.value || null;
-                currentAnalyticsPage = 1;
-                
-                console.log('[AnalyticsModule] Filtros clásicos aplicados:', currentFilter);
-                loadClassicAnalytics();
-            });
-        }
-
-        const clearClassicBtn = DOMUtils.byId('clearAnalyticsClassicFilterBtn');
-        if (clearClassicBtn) {
-            clearClassicBtn.addEventListener('click', () => {
-                const regionFilter = DOMUtils.byId('analyticsRegionFilter');
-                const leaderFilter = DOMUtils.byId('analyticsLeaderFilterClassic');
-                
-                if (regionFilter) regionFilter.value = 'all';
-                if (leaderFilter) leaderFilter.value = '';
-                
-                currentFilter = { region: 'all', leaderId: null };
-                currentAnalyticsPage = 1;
-                
-                console.log('[AnalyticsModule] Filtros clásicos limpiados');
-                loadClassicAnalytics();
-            });
-        }
-
-        // Paginación clásica
-        const firstPageBtn = DOMUtils.byId('firstPageAnalyticsBtn');
-        const prevPageBtn = DOMUtils.byId('prevPageAnalyticsBtn');
-        const nextPageBtn = DOMUtils.byId('nextPageAnalyticsBtn');
-
-        if (firstPageBtn) firstPageBtn.addEventListener('click', () => {
-            currentAnalyticsPage = 1;
-            populateLeaderDetailTable();
-        });
-
-        if (prevPageBtn) prevPageBtn.addEventListener('click', () => {
-            currentAnalyticsPage = Math.max(1, currentAnalyticsPage - 1);
-            populateLeaderDetailTable();
-        });
-
-        if (nextPageBtn) nextPageBtn.addEventListener('click', () => {
-            currentAnalyticsPage += 1;
-            populateLeaderDetailTable();
-        });
-
-        // Botones avanzados
         const applyBtn = DOMUtils.byId('applyAnalyticsFilterBtn');
-        const exportBtn = DOMUtils.byId('exportAnalyticsBtn');
+        const clearBtn = DOMUtils.byId('clearAnalyticsFilterBtn');
+        const prevBtn = DOMUtils.byId('prevLeaderPageBtn');
+        const nextBtn = DOMUtils.byId('nextLeaderPageBtn');
 
-        // Cuando se hace click en "Actualizar", fetch con filtros
-        if (applyBtn) {
-            applyBtn.addEventListener('click', () => {
-                const leaderId = DOMUtils.byId('analyticsLeaderFilter')?.value;
-                const localidad = DOMUtils.byId('analyticsLocalidadFilter')?.value;
-                const startDate = DOMUtils.byId('analyticsStartDateFilter')?.value;
+        if (applyBtn) applyBtn.addEventListener('click', applyFilters);
+        if (clearBtn) clearBtn.addEventListener('click', clearFilters);
 
-                // Construir parámetros
-                const params = new URLSearchParams();
-                if (leaderId) params.append('leaderId', leaderId);
-                if (localidad) params.append('localidad', localidad);
-                if (startDate) params.append('startDate', startDate);
-
-                console.log('[AnalyticsModule] Aplicando filtros avanzados:', { leaderId, localidad, startDate });
-                
-                // Mostrar loaders
-                showSkeletonLoaders();
-
-                // Fetch con parámetros
-                fetch(`/api/v2/analytics/advanced?${params.toString()}`)
-                    .then(res => {
-                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                        return res.json();
-                    })
-                    .then(response => {
-                        if (!response.success) throw new Error(response.message);
-                        
-                        const data = response.data;
-                        AppState.data.advancedAnalytics = data;
-                        
-                        renderKPICards(data);
-                        renderChartsAdvanced(data);
-                        
-                        hideSkeletonLoaders();
-                        console.log('[AnalyticsModule] ✅ Filtros avanzados aplicados exitosamente');
-                    })
-                    .catch(error => {
-                        console.error('[AnalyticsModule] Error:', error);
-                        hideSkeletonLoaders();
-                        showErrorMessage('Error aplicando filtros: ' + error.message);
-                    });
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (currentAnalyticsPage > 1) {
+                    currentAnalyticsPage--;
+                    populateLeaderDetailTable();
+                }
             });
         }
 
-        // Botón exportar
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => {
-                exportAnalyticsToExcel();
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const registrations = AppState.data.registrations || [];
+                const filtered = filterRegistrations(registrations, currentFilter.region, currentFilter.leaderId);
+                const leaders = AppState.data.leaders || [];
+                const leaderStats = leaders.map(leader => ({
+                    total: filtered.filter(r => r.leaderId === leader._id).length
+                })).filter(s => s.total > 0);
+
+                const totalPages = Math.ceil(leaderStats.length / ITEMS_PER_PAGE);
+                if (currentAnalyticsPage < totalPages) {
+                    currentAnalyticsPage++;
+                    populateLeaderDetailTable();
+                }
             });
-        }
-
-        // Auto-cargar analytics clásicos al iniciar
-        console.log('[AnalyticsModule] bindEvents - Cargando initial data...');
-        loadClassicAnalytics();
-    }
-
-    // ===================================
-    // SKELETON LOADERS
-    // ===================================
-    function showSkeletonLoaders() {
-        const containers = document.querySelectorAll('[data-analytics-section]');
-        containers.forEach(container => {
-            container.innerHTML = '<div class="animated-pulse bg-gray-200 h-40 rounded mb-4"></div>';
-        });
-    }
-
-    function hideSkeletonLoaders() {
-        // Los loaders se reemplazan con contenido real en renderKPICards y renderChartsAdvanced
-    }
-
-    function showErrorMessage(message) {
-        const toast = document.createElement('div');
-        toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 5000);
-    }
-
-    // ===================================
-    // RENDER KPI CARDS - Enterprise UI
-    // ===================================
-    function renderKPICards(data) {
-        const container = DOMUtils.byId('kpiCardsContainer');
-        if (!container) return;
-
-        const { totalVotes, leaders, puestos, distribution } = data;
-        
-        // Calcular pendientes
-        const pendientes = totalVotes.total - totalVotes.confirmed;
-        const ratioBogota = distribution.find(d => d.region === 'Bogotá')?.votes || 0;
-        
-        const html = `
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(102,126,234,0.3); color: #fff; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(102,126,234,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.3)'">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <p style="margin: 0 0 8px 0; font-size: 12px; opacity: 0.9; font-weight: 500;">📊 Total de Votos</p>
-                        <h2 style="margin: 0; font-size: 36px; font-weight: 700;">${totalVotes.total.toLocaleString()}</h2>
-                        <p style="margin: 8px 0 0 0; font-size: 12px; opacity: 0.8;">✓ ${totalVotes.confirmed} confirmados</p>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(245,87,108,0.3); color: #fff; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(245,87,108,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(245,87,108,0.3)'">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <p style="margin: 0 0 8px 0; font-size: 12px; opacity: 0.9; font-weight: 500;">✅ Confirmación</p>
-                        <h2 style="margin: 0; font-size: 36px; font-weight: 700;">${parseFloat(totalVotes.confirmationRate).toFixed(1)}%</h2>
-                        <p style="margin: 8px 0 0 0; font-size: 12px; opacity: 0.8;">⏳ ${pendientes} pendientes</p>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,242,254,0.3); color: #fff; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(0,242,254,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,242,254,0.3)'">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <p style="margin: 0 0 8px 0; font-size: 12px; opacity: 0.9; font-weight: 500;">👥 Líderes Activos</p>
-                        <h2 style="margin: 0; font-size: 36px; font-weight: 700;">${leaders.total}</h2>
-                        <p style="margin: 8px 0 0 0; font-size: 12px; opacity: 0.8;">🏆 Top 10 mostrados</p>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(67,233,123,0.3); color: #fff; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 16px rgba(67,233,123,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(67,233,123,0.3)'">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <p style="margin: 0 0 8px 0; font-size: 12px; opacity: 0.9; font-weight: 500;">🗺️ Regiones</p>
-                        <h2 style="margin: 0; font-size: 36px; font-weight: 700;">${distribution.length}</h2>
-                        <p style="margin: 8px 0 0 0; font-size: 12px; opacity: 0.8;">📍 Bogotá: ${ratioBogota}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        container.innerHTML = html;
-        
-        // Actualizar timestamp
-        const lastUpdate = document.getElementById('lastUpdate');
-        if (lastUpdate) {
-            const now = new Date();
-            lastUpdate.textContent = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-        }
-    }
-
-    // ===================================
-    // HELPER: Destruir todos los charts existentes
-    // ===================================
-    function destroyAllCharts() {
-        const chartIds = ['leadersChart', 'localidadesChart', 'timelineChart', 'puestosChart'];
-        chartIds.forEach(id => {
-            const canvas = document.getElementById(id);
-            if (canvas && canvas.chart) {
-                try {
-                    canvas.chart.destroy();
-                    canvas.chart = null;
-                } catch (e) {
-                    console.warn(`[Analytics] Warning destroying chart ${id}:`, e.message);
-                }
-            }
-        });
-    }
-
-    // ===================================
-    // RENDER CHARTS - Advanced Aggregation
-    // ===================================
-    function renderChartsAdvanced(data) {
-        const { totalVotes, leaders, localidades, puestos, timeline, distribution, insights } = data;
-
-        // Destruir gráficos anteriores antes de crear nuevos
-        destroyAllCharts();
-
-        // Gráfico 1: Top Leaders (Bar Chart)
-        renderLeadersChart(leaders.top);
-        
-        // Gráfico 2: Top Localidades (Doughnut Chart)
-        renderLocalidadesChart(localidades.top);
-        
-        // Gráfico 3: Timeline (Line Chart)
-        renderTimelineChart(timeline);
-        
-        // Gráfico 4: Top Puestos (Horizontal Bar Chart)
-        renderPuestosChart(puestos.top);
-
-        // Renderizar Insights
-        if (insights && Array.isArray(insights)) {
-            renderInsights(insights);
-        }
-
-        // Renderizar estadísticas clave
-        if (localidades.top && localidades.top.length > 0) {
-            renderTopStatistics(localidades.top, puestos.top, leaders.top);
-        }
-    }
-
-    function renderLeadersChart(leadersData) {
-        const chartContainer = document.getElementById('leadersChart');
-        if (!chartContainer) {
-            console.warn('[Analytics] Canvas #leadersChart not found');
-            return;
-        }
-
-        const ctx = chartContainer.getContext('2d');
-        if (!ctx) return;
-
-        const medals = ['🥇', '🥈', '🥉'];
-        
-        chartContainer.chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: leadersData.map((l, i) => `${medals[i] || '•'} ${l.leaderName}`),
-                datasets: [{
-                    label: 'Votos',
-                    data: leadersData.map(l => l.votes),
-                    backgroundColor: leadersData.map((_, i) => {
-                        const colors = ['rgba(59, 130, 246, 0.8)', 'rgba(34, 197, 94, 0.8)', 'rgba(168, 85, 247, 0.8)'];
-                        return colors[i] || 'rgba(100, 116, 139, 0.8)';
-                    }),
-                    borderRadius: 8,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { display: false },
-                    title: { text: 'Top 10 Líderes', display: true }
-                },
-                scales: {
-                    y: { beginAtZero: true, title: { display: true, text: 'Votos' } }
-                }
-            }
-        });
-    }
-
-    function renderLocalidadesChart(localidadesData) {
-        const chartContainer = document.getElementById('localidadesChart');
-        if (!chartContainer) {
-            console.warn('[Analytics] Canvas #localidadesChart not found');
-            return;
-        }
-
-        const ctx = chartContainer.getContext('2d');
-        if (!ctx) return;
-
-        const colors = [
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(34, 197, 94, 0.8)',
-            'rgba(168, 85, 247, 0.8)',
-            'rgba(248, 113, 113, 0.8)',
-            'rgba(251, 146, 60, 0.8)',
-            'rgba(236, 72, 153, 0.8)',
-            'rgba(139, 92, 246, 0.8)',
-            'rgba(14, 165, 233, 0.8)',
-            'rgba(20, 184, 166, 0.8)',
-            'rgba(245, 158, 11, 0.8)'
-        ];
-
-        chartContainer.chart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: localidadesData.map(l => l.localidad),
-                datasets: [{
-                    data: localidadesData.map(l => l.votes),
-                    backgroundColor: colors
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    title: { text: 'Top 10 Localidades', display: true }
-                }
-            }
-        });
-    }
-
-    function renderTimelineChart(timelineData) {
-        const chartContainer = document.getElementById('timelineChart');
-        if (!chartContainer) {
-            console.warn('[Analytics] Canvas #timelineChart not found');
-            return;
-        }
-
-        const ctx = chartContainer.getContext('2d');
-        if (!ctx) return;
-
-        chartContainer.chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: timelineData.map(t => t.date),
-                datasets: [{
-                    label: 'Votos Diarios',
-                    data: timelineData.map(t => t.votes),
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 2,
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true },
-                    title: { text: 'Timeline de Votos (Últimos 30 días)', display: true }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-    }
-
-    function renderPuestosChart(puestosData) {
-        const chartContainer = document.getElementById('puestosChart');
-        if (!chartContainer) {
-            console.warn('[Analytics] Canvas #puestosChart not found');
-            return;
-        }
-
-        const ctx = chartContainer.getContext('2d');
-        if (!ctx) return;
-
-        // FIX: Usar 'bar' con indexAxis: 'y' en lugar de 'barH'
-        chartContainer.chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: puestosData.map(p => p.puestoName || 'N/A'),
-                datasets: [{
-                    label: 'Votos',
-                    data: puestosData.map(p => p.votes),
-                    backgroundColor: 'rgba(248, 113, 113, 0.8)',
-                    borderRadius: 4,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { display: false },
-                    title: { text: 'Top 10 Puestos de Votación', display: true }
-                },
-                scales: {
-                    x: { beginAtZero: true }
-                }
-            }
-        });
-    }
-
-    // ===================================
-    // RENDERIZAR INSIGHTS
-    // ===================================
-    function renderInsights(insights) {
-        const container = DOMUtils.byId('advancedInsightsContainer');
-        if (!container) {
-            console.warn('[Analytics] Container #advancedInsightsContainer not found');
-            return;
-        }
-
-        if (!insights || insights.length === 0) {
-            container.innerHTML = '<div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: #9ca3af;">No hay insights disponibles</div>';
-            return;
-        }
-
-        container.innerHTML = insights.map(insight => {
-            const severityColors = {
-                'success': { bg: '#dcfce7', border: '#22c55e', icon: '✅', text: '#166534' },
-                'warning': { bg: '#fef3c7', border: '#f59e0b', icon: '⚠️', text: '#92400e' },
-                'error': { bg: '#fee2e2', border: '#ef4444', icon: '❌', text: '#991b1b' },
-                'info': { bg: '#dbeafe', border: '#3b82f6', icon: 'ℹ️', text: '#1e40af' }
-            };
-
-            const severity = insight.severity || 'info';
-            const colors = severityColors[severity] || severityColors.info;
-
-            return `
-                <div style="
-                    background: ${colors.bg};
-                    border-left: 4px solid ${colors.border};
-                    padding: 16px;
-                    border-radius: 8px;
-                    color: ${colors.text};
-                ">
-                    <div style="
-                        font-size: 14px;
-                        font-weight: 700;
-                        margin-bottom: 6px;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                    ">
-                        <span style="font-size: 18px;">${insight.icon || colors.icon}</span>
-                        ${insight.title}
-                    </div>
-                    <div style="
-                        font-size: 13px;
-                        line-height: 1.5;
-                        opacity: 0.9;
-                    ">
-                        ${insight.description}
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    // ===================================
-    // RENDERIZAR ESTADÍSTICAS TOP
-    // ===================================
-    function renderTopStatistics(localidades, puestos, leaders) {
-        const topLocalidad = localidades[0];
-        const topPuesto = puestos[0];
-        const topLeader = leaders[0];
-        const secondLeader = leaders[1];
-
-        // Localidad Top
-        const localidadEl = DOMUtils.byId('topLocalidadName');
-        const localidadVotesEl = DOMUtils.byId('topLocalidadVotes');
-        if (localidadEl && topLocalidad) {
-            localidadEl.textContent = topLocalidad.localidad || '-';
-            localidadVotesEl.textContent = `${topLocalidad.votes || 0} registros`;
-        }
-
-        // Puesto Top
-        const puestoEl = DOMUtils.byId('topPuestoName');
-        const puestoVotesEl = DOMUtils.byId('topPuestoVotes');
-        if (puestoEl && topPuesto) {
-            puestoEl.textContent = topPuesto.puesto || '-';
-            puestoVotesEl.textContent = `${topPuesto.votes || 0} registros`;
-        }
-
-        // Brecha de Líderes
-        const gapEl = DOMUtils.byId('leaderGap');
-        const gapDescEl = DOMUtils.byId('leaderGapDesc');
-        if (gapEl && topLeader && secondLeader) {
-            const gap = topLeader.votes - secondLeader.votes;
-            gapEl.textContent = `+${gap} votos`;
-            gapDescEl.textContent = `${topLeader.leaderName} vs ${secondLeader.leaderName}`;
-        } else if (gapEl && topLeader) {
-            gapEl.textContent = `${topLeader.votes} votos`;
-            gapDescEl.textContent = `${topLeader.leaderName} lidera`;
-        }
-
-        // Última actualización
-        const updateEl = DOMUtils.byId('lastUpdate');
-        if (updateEl) {
-            const now = new Date().toLocaleTimeString('es-CO');
-            updateEl.textContent = now;
-        }
-    }
-
-    // ===================================
-    // EXPORTAR A EXCEL (Stub)
-    // ===================================
-    function exportAnalyticsToExcel() {
-        console.log('[AnalyticsModule] 📥 Export analytics start...');
-        
-        try {
-            const data = AppState.data.advancedAnalytics;
-            if (!data) {
-                alert('No hay datos para exportar');
-                return;
-            }
-            
-            // Aquí va la lógica de exportación con exceljs
-            console.log('Exporting advanced analytics data');
-            alert('Exportación en desarrollo. Los datos están listos en /api/v2/analytics/advanced');
-        } catch (error) {
-            console.error('Error en export:', error);
-            alert('Error al exportar datos');
         }
     }
 
@@ -1250,13 +680,9 @@ const AnalyticsModule = (() => {
     return {
         init,
         loadAnalytics,
-        loadClassicAnalytics,
         applyFilters,
         clearFilters,
-        updateStats,
-        exportAnalyticsToExcel,
-        renderKPICards,
-        renderChartsAdvanced
+        updateStats
     };
 })();
 

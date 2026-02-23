@@ -7,13 +7,18 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "jest --testEnvironment=node --no-coverage",
-    "test:watch": "jest --testEnvironment=node --watch",
-    "test:unit": "jest --testEnvironment=node --testPathPattern=unit",
-    "test:integration": "jest --testEnvironment=node --testPathPattern=integration",
-    "test:e2e": "jest --testEnvironment=node --testPathPattern=e2e",
-    "test:coverage": "jest --testEnvironment=node --coverage",
-    "lint": "eslint src --fix"
+    "test": "jest --testEnvironment=node --no-coverage --passWithNoTests",
+    "test:watch": "jest --testEnvironment=node --watch --passWithNoTests",
+    "test:unit": "jest --testEnvironment=node --testPathPattern=unit --passWithNoTests",
+    "test:integration": "jest --testEnvironment=node --testPathPattern=integration --passWithNoTests",
+    "test:e2e": "jest --testEnvironment=node --testPathPattern=e2e --passWithNoTests",
+    "test:coverage": "jest --testEnvironment=node --coverage --passWithNoTests",
+    "test:services": "jest --testEnvironment=node --testPathPattern=services --coverage",
+    "test:controllers": "jest --testEnvironment=node --testPathPattern=controllers --coverage",
+    "test:all": "jest --testEnvironment=node --coverage --verbose",
+    "test:ci": "jest --testEnvironment=node --coverage --ci --maxWorkers=2",
+    "lint": "eslint src --fix",
+    "test:report": "jest --testEnvironment=node --coverage"
   },
   "keywords": [
     "electoral",

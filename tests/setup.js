@@ -1,28 +1,51 @@
 /**
  * Jest Setup File
- * 
- * Runs before all tests
+ * Configuración global para todos los tests
  */
 
-// Suppress console logs during tests (optional)
-// global.console.log = jest.fn();
-
-// Set test environment
+// Configuración de entorno para tests
 process.env.NODE_ENV = 'test';
-process.env.FORCE_EMAIL_MOCK = 'true'; // Use email mock in tests
+process.env.FORCE_EMAIL_MOCK = 'true';
+process.env.JWT_SECRET = 'test_secret_key_min_32_characters_long';
+process.env.ENCRYPTION_KEY = 'test_encryption_key_min_16_chars';
+process.env.LOG_LEVEL = 'error'; // Reducir ruido en tests
 
-// MongoDB connection timeout
-jest.setTimeout(10000);
+// Custom matchers
+if (typeof expect !== 'undefined' && typeof expect.extend === 'function') {
+  expect.extend({
+    toBeValidObjectId(received) {
+      const valid = /^[0-9a-fA-F]{24}$/.test(received);
+      return {
+        pass: valid,
+        message: () => valid
+          ? `expect ${received} not to be a valid MongoDB ObjectId`
+          : `expect ${received} to be a valid MongoDB ObjectId`
+      };
+    },
 
-// Add custom matchers if needed
-expect.extend({
-  toBeValidObjectId(received) {
-    const valid = /^[0-9a-fA-F]{24}$/.test(received);
-    return {
-      pass: valid,
-      message: () => valid
-        ? `expected ${received} not to be a valid MongoDB ObjectId`
-        : `expected ${received} to be a valid MongoDB ObjectId`
-    };
-  }
-});
+    toBeValidEmail(received) {
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(received);
+      return {
+        pass: valid,
+        message: () => valid
+          ? `expect ${received} not to be a valid email`
+          : `expect ${received} to be a valid email`
+      };
+    },
+
+    toBeWithinRange(received, floor, ceiling) {
+      const pass = received >= floor && received <= ceiling;
+      if (pass) {
+        return {
+          message: () => `expect ${received} not to be within range ${floor} - ${ceiling}`,
+          pass: true,
+        };
+      } else {
+        return {
+          message: () => `expect ${received} to be within range ${floor} - ${ceiling}`,
+          pass: false,
+        };
+      }
+    },
+  });
+}

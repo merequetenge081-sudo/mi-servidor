@@ -12,7 +12,6 @@
     <!-- Styles -->
     <link rel="stylesheet" href="css/modern.css?v=2.7.0">
     <link rel="stylesheet" href="css/dashboard.css?v=2.7.0">
-    <link rel="stylesheet" href="css/analytics-enhanced.css?v=1.0.2">
     <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -388,290 +387,120 @@
                 </div>
             </section>
 
-            <!-- ANALYTICS SECTION - ENTERPRISE BI -->
+            <!-- ANALYTICS SECTION -->
             <section id="analytics" class="section">
-                <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div>
-                        <h2>📊 Análisis</h2>
-                        <p style="color: #999; margin: 8px 0 0 0; font-size: 13px;">Datos en tiempo real con opciones clásica y avanzada</p>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button id="analyzeViewClassicBtn" class="btn btn-primary" style="padding: 8px 16px; height: auto; font-size: 13px;">📊 Análisis Clásico</button>
-                        <button id="analyzeViewAdvancedBtn" class="btn btn-outline" style="padding: 8px 16px; height: auto; font-size: 13px; opacity: 0.6;">🚀 Análisis Avanzados</button>
+                <div class="section-header">
+                    <h2>Análisis y Reportes</h2>
+                    <p style="color: #999; margin: 8px 0 0 0; font-size: 13px;">Análisis de registraciones por región, líder y confirmación</p>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #667eea;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Región</label>
+                            <select id="analyticsRegionFilter" class="form-select" style="font-size: 14px;">
+                                <option value="all">Todo el País</option>
+                                <option value="bogota">Solo Bogotá</option>
+                                <option value="resto">Resto del País</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Líder</label>
+                            <select id="analyticsLeaderFilter" class="form-select" style="font-size: 14px;">
+                                <!-- Populated -->
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: flex-end;">
+                            <button class="btn btn-primary" id="applyAnalyticsFilterBtn" style="flex: 1; font-size: 14px;">
+                                <i class="bi bi-funnel"></i> Aplicar
+                            </button>
+                            <button class="btn btn-outline" id="clearAnalyticsFilterBtn" style="flex: 1; font-size: 14px;">
+                                <i class="bi bi-arrow-clockwise"></i> Limpiar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ===== VISTA CLÁSICA ===== -->
-                <div id="analyticsClassicView" style="display: block;">
-                    <!-- Filtros clásicos -->
-                    <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #667eea;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: flex-end;">
-                            <div>
-                                <label style="font-size: 11px; color: #667eea; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase;">🗺️ Región</label>
-                                <select id="analyticsRegionFilter" class="form-select" style="font-size: 14px; height: 36px;">
-                                    <option value="all">Todo el País</option>
-                                    <option value="bogota">🏙️ Bogotá</option>
-                                    <option value="resto">🌍 Resto del País</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-size: 11px; color: #667eea; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase;">👨 Líder</label>
-                                <select id="analyticsLeaderFilterClassic" class="form-select" style="font-size: 14px; height: 36px;">
-                                    <option value="">Todos</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-size: 11px; color: #667eea; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase; opacity: 0;">.</label>
-                                <button class="btn btn-primary" id="applyAnalyticsClassicFilterBtn" style="width: 100%; font-size: 13px; height: 36px; padding: 0;">
-                                    <i class="bi bi-funnel" style="margin-right: 4px;"></i> Filtrar
-                                </button>
-                            </div>
-                            <div>
-                                <button class="btn btn-outline" id="clearAnalyticsClassicFilterBtn" style="width: 100%; font-size: 13px; height: 36px; padding: 0;">
-                                    <i class="bi bi-x" style="margin-right: 4px;"></i> Limpiar
-                                </button>
-                            </div>
+                <!-- KPI Cards -->
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 24px;">
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%); border-left: 4px solid #667eea;">
+                        <div class="stat-info">
+                            <h3 id="avgConfirmRate" style="margin: 0 0 8px 0; font-size: 32px; color: #667eea;">0%</h3>
+                            <span style="color: #666; font-size: 13px;">Tasa Confirmación</span>
                         </div>
                     </div>
-
-                    <!-- KPI Cards Clásicos -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px;">
-                        <div style="background: #f0f9ff; padding: 16px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
-                            <div style="font-size: 11px; color: #0369a1; font-weight: 600; text-transform: uppercase;">Confirmación Promedio</div>
-                            <div id="avgConfirmRate" style="font-size: 28px; font-weight: 700; color: #0ea5e9; margin-top: 8px;">--%</div>
-                        </div>
-                        <div style="background: #f0fdf4; padding: 16px; border-radius: 8px; border-left: 4px solid #22c55e;">
-                            <div style="font-size: 11px; color: #166534; font-weight: 600; text-transform: uppercase;">Total Registros</div>
-                            <div id="avgRegsPerLeader" style="font-size: 28px; font-weight: 700; color: #22c55e; margin-top: 8px;">0</div>
-                        </div>
-                        <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                            <div style="font-size: 11px; color: #92400e; font-weight: 600; text-transform: uppercase;">Bogotá</div>
-                            <div id="bogotaCount" style="font-size: 28px; font-weight: 700; color: #f59e0b; margin-top: 8px;">0</div>
-                        </div>
-                        <div style="background: #fce7f3; padding: 16px; border-radius: 8px; border-left: 4px solid #ec4899;">
-                            <div style="font-size: 11px; color: #831843; font-weight: 600; text-transform: uppercase;">Resto del País</div>
-                            <div id="restoCount" style="font-size: 28px; font-weight: 700; color: #ec4899; margin-top: 8px;">0</div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.05) 100%); border-left: 4px solid #43e97b;">
+                        <div class="stat-info">
+                            <h3 id="avgRegsPerLeader" style="margin: 0 0 8px 0; font-size: 32px; color: #43e97b;">0</h3>
+                            <span style="color: #666; font-size: 13px;">Total Registros</span>
                         </div>
                     </div>
-
-                    <!-- Tabla de Líderes -->
-                    <div style="background: #ffffff; padding: 22px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); border: 1px solid #e5e7eb; margin-bottom: 20px;">
-                        <h3 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #1f2937;">📋 Desempeño por Líder</h3>
-                        <div style="overflow-x: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                <thead>
-                                    <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
-                                        <th style="padding: 12px; text-align: left; font-weight: 600; color: #1f2937;">Líder</th>
-                                        <th style="padding: 12px; text-align: center; font-weight: 600; color: #1f2937;">Total</th>
-                                        <th style="padding: 12px; text-align: center; font-weight: 600; color: #1f2937;">Confirmados</th>
-                                        <th style="padding: 12px; text-align: center; font-weight: 600; color: #1f2937;">Pendientes</th>
-                                        <th style="padding: 12px; text-align: right; font-weight: 600; color: #1f2937;">Tasa</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="leaderDetailTable" style="color: #4b5563;">
-                                    <tr><td colspan="5" style="padding: 16px; text-align: center; color: #9ca3af;">Cargando...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div style="margin-top: 12px; display: flex; justify-content: center; gap: 8px; align-items: center;">
-                            <button class="btn btn-outline" id="firstPageAnalyticsBtn" style="padding: 6px 12px; font-size: 12px;"><i class="bi bi-chevron-double-left"></i></button>
-                            <button class="btn btn-outline" id="prevPageAnalyticsBtn" style="padding: 6px 12px; font-size: 12px;"><i class="bi bi-chevron-left"></i></button>
-                            <span id="leaderPageIndicator" style="font-size: 13px; color: #666; min-width: 100px; text-align: center;">Pág 1 de 1</span>
-                            <button class="btn btn-outline" id="nextPageAnalyticsBtn" style="padding: 6px 12px; font-size: 12px;"><i class="bi bi-chevron-right"></i></button>
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(63, 81, 181, 0.05) 100%); border-left: 4px solid #4facfe;">
+                        <div class="stat-info">
+                            <h3 id="bogotaCount" style="margin: 0 0 8px 0; font-size: 32px; color: #4facfe;">0</h3>
+                            <span style="color: #666; font-size: 13px;">Bogotá</span>
                         </div>
                     </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 87, 34, 0.05) 100%); border-left: 4px solid #ffa726;">
+                        <div class="stat-info">
+                            <h3 id="restoCount" style="margin: 0 0 8px 0; font-size: 32px; color: #ffa726;">0</h3>
+                            <span style="color: #666; font-size: 13px;">Resto País</span>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Gráficos Clásicos -->
-                    <div style="background: #ffffff; padding: 22px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); border: 1px solid #e5e7eb;">
-                        <h3 style="margin: 0 0 18px 0; font-size: 15px; font-weight: 600; color: #1f2937;">📈 Desempeño de Líderes</h3>
-                        <div style="height: 300px; position: relative;">
+                <!-- Charts Row -->
+                <div class="dashboard-row" style="margin-bottom: 24px;">
+                    <div class="chart-container full-width">
+                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
+                            <i class="bi bi-bar-chart" style="color: #667eea; margin-right: 8px;"></i>Desempeño por Líder
+                        </h3>
+                        <div class="chart-wrapper" style="height: 350px;">
                             <canvas id="leaderRegistrationsChart"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== VISTA AVANZADA ===== -->
-                <div id="analyticsAdvancedView" style="display: none;">
-                    <!-- FILTROS MEJORADOS - ACORDEÓN COLAPSABLE -->
-                    <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #667eea;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" id="filterToggle">
-                            <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1f2937;">🔍 Filtros Avanzados (Todos opcional)</h4>
-                            <i class="bi bi-chevron-down" id="filterChevron" style="transition: transform 0.3s;"></i>
+                <!-- Analytics Table and Chart Row -->
+                <div class="dashboard-row">
+                    <div class="table-container half-width">
+                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
+                            <i class="bi bi-list-ol" style="color: #667eea; margin-right: 8px;"></i>Detalle por Líder
+                        </h3>
+                        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                            <table class="table" style="font-size: 14px; margin-bottom: 0;">
+                                <thead style="position: sticky; top: 0; background: #f8f9fa;">
+                                    <tr>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb;">Líder</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Total</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Conf.</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Pend.</th>
+                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderDetailTable" style="font-size: 13px;"></tbody>
+                            </table>
                         </div>
-                        
-                        <div id="filterPanel" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; padding-top: 12px; border-top: 1px solid rgba(102, 126, 234, 0.2);">
-                            <div>
-                                <label style="font-size: 11px; color: #667eea; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">👨 Líder</label>
-                                <select id="analyticsLeaderFilter" class="form-select" style="font-size: 14px; height: 36px;">
-                                    <option value="">📊 Todos los Líderes</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-size: 11px; color: #667eea; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">🗺️ Localidad</label>
-                                <input type="text" id="analyticsLocalidadFilter" class="form-select" placeholder="Ej: Bogotá, Usaquén..." style="font-size: 14px; height: 36px;">
-                            </div>
-                            <div>
-                                <label style="font-size: 11px; color: #667eea; font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">📅 Desde</label>
-                                <input type="date" id="analyticsStartDateFilter" class="form-select" style="font-size: 14px; height: 36px;">
-                            </div>
-                            <div style="display: flex; gap: 8px; align-items: flex-end;">
-                                <button class="btn btn-primary" id="applyAnalyticsFilterBtn" style="flex: 1; font-size: 13px; height: 36px; padding: 0;">
-                                    <i class="bi bi-arrow-repeat" style="margin-right: 4px;"></i> Actualizar
-                                </button>
-                                <button class="btn btn-outline" id="exportAnalyticsBtn" style="flex: 1; font-size: 13px; height: 36px; padding: 0;" title="Exportar datos a Excel">
-                                    <i class="bi bi-download" style="margin-right: 4px;"></i> Exportar
-                                </button>
-                            </div>
+                        <div style="display: flex; justify-content: center; gap: 12px; padding: 12px 0; border-top: 1px solid #e5e7eb; margin-top: 12px;">
+                            <button id="prevLeaderPageBtn" class="page-btn" style="padding: 6px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; color: #667eea;">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span id="leaderPageIndicator" style="align-self: center; font-size: 12px; color: #666; min-width: 70px; text-align: center;">Pág 1</span>
+                            <button id="nextLeaderPageBtn" class="page-btn" style="padding: 6px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; color: #667eea;">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
-
-                    <!-- KPI CARDS - IMPROVED DESIGN -->
-                    <div id="kpiCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 28px;">
-                        <!-- Se llena dinámicamente con renderKPICards() -->
-                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; height: 130px; color: #fff; display: flex; flex-direction: column; justify-content: space-between;">
-                            <div style="font-size: 12px; opacity: 0.9;">Total de Votos</div>
-                            <div style="font-size: 32px; font-weight: 700;">...</div>
-                        </div>
-                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 10px; height: 130px; color: #fff; display: flex; flex-direction: column; justify-content: space-between;">
-                            <div style="font-size: 12px; opacity: 0.9;">Tasa Confirmación</div>
-                            <div style="font-size: 32px; font-weight: 700;">...</div>
-                        </div>
-                        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px; border-radius: 10px; height: 130px; color: #fff; display: flex; flex-direction: column; justify-content: space-between;">
-                            <div style="font-size: 12px; opacity: 0.9;">Líderes Activos</div>
-                            <div style="font-size: 32px; font-weight: 700;">...</div>
-                        </div>
-                        <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 20px; border-radius: 10px; height: 130px; color: #fff; display: flex; flex-direction: column; justify-content: space-between;">
-                            <div style="font-size: 12px; opacity: 0.9;">Localidades</div>
-                            <div style="font-size: 32px; font-weight: 700;">...</div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 1: LEADERS CHART -->
-                    <div style="margin-bottom: 20px;">
-                        <div style="background: #ffffff; padding: 22px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); border: 1px solid #e5e7eb;">
-                            <h3 style="margin: 0 0 18px 0; font-size: 15px; font-weight: 600; color: #1f2937;">🏆 Top 10 Líderes por Votos</h3>
-                            <div style="height: 350px; position: relative;">
-                                <canvas id="leadersChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 2: LOCALIDADES + TIMELINE -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-                        <!-- Localidades Doughnut -->
-                        <div style="background: #ffffff; padding: 22px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); border: 1px solid #e5e7eb;">
-                            <h3 style="margin: 0 0 18px 0; font-size: 15px; font-weight: 600; color: #1f2937;">🗺️ Distribución por Localidades</h3>
-                            <div style="height: 280px; position: relative;">
-                                <canvas id="localidadesChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Timeline Line Chart -->
-                        <div style="background: #ffffff; padding: 22px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); border: 1px solid #e5e7eb;">
-                            <h3 style="margin: 0 0 18px 0; font-size: 15px; font-weight: 600; color: #1f2937;">📈 Votos en el Tiempo</h3>
-                            <div style="height: 280px; position: relative;">
-                                <canvas id="timelineChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 3: PUESTOS CHART -->
-                    <div style="margin-bottom: 20px;">
-                        <div style="background: #ffffff; padding: 22px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); border: 1px solid #e5e7eb;">
-                            <h3 style="margin: 0 0 18px 0; font-size: 15px; font-weight: 600; color: #1f2937;">🏢 Top 10 Puestos de Votación</h3>
-                            <div style="height: 350px; position: relative;">
-                                <canvas id="puestosChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 4: INSIGHTS & KEY METRICS -->
-                    <div style="background: #ffffff; padding: 22px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); border: 1px solid #e5e7eb; margin-bottom: 20px;">
-                        <h3 style="margin: 0 0 18px 0; font-size: 15px; font-weight: 600; color: #1f2937;">💡 Insights & Análisis</h3>
-                        <div id="advancedInsightsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
-                            <!-- Se llena dinámicamente con renderInsights() -->
-                            <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; color: #9ca3af; text-align: center; grid-column: 1 / -1;">
-                                Cargando insights...
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ROW 5: KEY STATISTICS -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
-                        <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                            <div style="font-size: 12px; color: #92400e; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">🏆 Localidad Top</div>
-                            <div id="topLocalidadName" style="font-size: 18px; font-weight: 700; color: #d97706;">-</div>
-                            <div id="topLocalidadVotes" style="font-size: 13px; color: #92400e; margin-top: 4px;">0 registros</div>
-                        </div>
-                        <div style="background: #d1fae5; padding: 16px; border-radius: 8px; border-left: 4px solid #10b981;">
-                            <div style="font-size: 12px; color: #065f46; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">🏢 Puesto Top</div>
-                            <div id="topPuestoName" style="font-size: 18px; font-weight: 700; color: #059669;">-</div>
-                            <div id="topPuestoVotes" style="font-size: 13px; color: #065f46; margin-top: 4px;">0 registros</div>
-                        </div>
-                        <div style="background: #dbeafe; padding: 16px; border-radius: 8px; border-left: 4px solid #3b82f6;">
-                            <div style="font-size: 12px; color: #1e40af; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">👥 Brecha Líder</div>
-                            <div id="leaderGap" style="font-size: 18px; font-weight: 700; color: #1e40af;">-</div>
-                            <div id="leaderGapDesc" style="font-size: 13px; color: #1e40af; margin-top: 4px;">Diferencia</div>
-                        </div>
-                    </div>
-
-                    <!-- INFO FOOTER -->
-                    <div style="background: #f0f9ff; padding: 14px; border-radius: 8px; border-left: 4px solid #0ea5e9; font-size: 12px; color: #0369a1; display: flex; gap: 8px; align-items: flex-start;">
-                        <i class="bi bi-info-circle" style="margin-top: 2px; flex-shrink: 0;"></i>
-                        <div>
-                            <strong>💡 Tip:</strong> Los datos se actualizan automáticamente. Los filtros son opcionales. 
-                            <strong>Fuente:</strong> MongoDB aggregation pipeline | <strong>Última actualización:</strong> <span id="lastUpdate">Cargando...</span>
+                    <div class="chart-container half-width">
+                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
+                            <i class="bi bi-geo-alt" style="color: #667eea; margin-right: 8px;"></i>Top 10 Ubicaciones
+                        </h3>
+                        <div class="chart-wrapper" style="height: 350px;">
+                            <canvas id="localityChart"></canvas>
                         </div>
                     </div>
                 </div>
-                </div>
-
-                <!-- JavaScript para el toggle de filtros y vistas -->
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Toggle entre vistas clásica y avanzada
-                        const classicBtn = document.getElementById('analyzeViewClassicBtn');
-                        const advancedBtn = document.getElementById('analyzeViewAdvancedBtn');
-                        const classicView = document.getElementById('analyticsClassicView');
-                        const advancedView = document.getElementById('analyticsAdvancedView');
-
-                        classicBtn.addEventListener('click', () => {
-                            classicView.style.display = 'block';
-                            advancedView.style.display = 'none';
-                            classicBtn.classList.remove('btn-outline');
-                            classicBtn.classList.add('btn-primary');
-                            advancedBtn.classList.add('btn-outline');
-                            advancedBtn.classList.remove('btn-primary');
-                            advancedBtn.style.opacity = '0.6';
-                            classicBtn.style.opacity = '1';
-                        });
-
-                        advancedBtn.addEventListener('click', () => {
-                            advancedView.style.display = 'block';
-                            classicView.style.display = 'none';
-                            advancedBtn.classList.remove('btn-outline');
-                            advancedBtn.classList.add('btn-primary');
-                            classicBtn.classList.add('btn-outline');
-                            classicBtn.classList.remove('btn-primary');
-                            classicBtn.style.opacity = '0.6';
-                            advancedBtn.style.opacity = '1';
-                        });
-
-                        // Toggle para filtros avanzados
-                        const filterToggle = document.getElementById('filterToggle');
-                        const filterPanel = document.getElementById('filterPanel');
-                        const filterChevron = document.getElementById('filterChevron');
-                        
-                        if (filterToggle && filterPanel) {
-                            filterToggle.addEventListener('click', function() {
-                                const isVisible = filterPanel.style.display !== 'none';
-                                filterPanel.style.display = isVisible ? 'none' : 'grid';
-                                filterChevron.style.transform = isVisible ? 'rotate(0)' : 'rotate(180deg)';
-                            });
-                        }
-                    });
-                </script>
-
+            </section>
 
             <!-- EXPORT SECTION -->
             <section id="export" class="section">
@@ -1064,10 +893,10 @@
                         </h3>
                     </div>
                     <div class="modal-body">
-                        <p style="color: var(--text-muted); margin-bottom: 0;">¿Estás seguro de que deseas eliminar este líder?<br>
-                            <strong style="color: #dc2626;">Esta acción no se puede deshacer.</strong></p>
+                        <p style="color: var(--text-muted);">¿Estás seguro de que deseas eliminar este líder?<br>Esta
+                            acción no se puede deshacer.</p>
                     </div>
-                    <div class="modal-footer" style="justify-content: center; display: flex; border-top: none; gap: 12px;">
+                    <div class="modal-footer" style="justify-content: center; display: flex; border-top: none;">
                         <button class="btn btn-secondary" id="cancelDeleteBtn">Cancelar</button>
                         <button class="btn btn-danger" id="confirmDeleteBtn">Eliminar Definitivamente</button>
                     </div>

@@ -116,11 +116,9 @@ const LeadersModule = (() => {
 
     // ====== FILTER LEADERS BY NAME ======
     function filterByName(searchTerm) {
-        const allLeaders = window.AppState.data.leaders || [];
+        const allLeaders = window.AppState.data.leaders;
         const filtered = searchTerm.trim() === '' ? allLeaders :
             allLeaders.filter(leader => leader.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
-        console.log('[LeadersModule] Filtrando por:', searchTerm, '| Total:', allLeaders.length, '| Coincidencias:', filtered.length);
 
         // Create filtered table using existing renderLeadersTable logic
         const html = filtered.map(leader => {
@@ -175,13 +173,9 @@ const LeadersModule = (() => {
         `;
         }).join('');
 
-        const tableElement = document.getElementById('leadersTable');
-        if (tableElement) {
-            tableElement.innerHTML = html || '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin resultados para la búsqueda</td></tr>';
-            console.log('[LeadersModule] Tabla filtrada actualizada');
-        } else {
-            console.warn('[LeadersModule] Elemento leadersTable no encontrado');
-        }
+        document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
+
+        console.log('📌 Eventos delegados desde core/events.js');
     }
 
     // ====== SEND ACCESS EMAIL ======
@@ -490,22 +484,20 @@ const LeadersModule = (() => {
 
     // ====== POPULATE FILTERS ======
     function populateLeaderFilter() {
-        const allLeaders = window.AppState.data.leaders || [];
+        const allLeaders = window.AppState.data.leaders;
         const select = document.getElementById('leaderFilter');
-        if (!select) return;
         select.innerHTML = '<option value="">-- Todos los Líderes --</option>' +
             allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
     }
 
     function populateExportLeader() {
-        const allLeaders = window.AppState.data.leaders || [];
+        const allLeaders = window.AppState.data.leaders;
         const select = document.getElementById('exportLeaderSelect');
-        if (!select) return;
         select.innerHTML = allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
     }
 
     function populateAnalyticsLeaderFilter() {
-        const allLeaders = window.AppState.data.leaders || [];
+        const allLeaders = window.AppState.data.leaders;
         const select = document.getElementById('analyticsLeaderFilter');
         if (!select) return;
         select.innerHTML = '<option value="all">Todos los líderes</option>' +
@@ -551,6 +543,14 @@ const LeadersModule = (() => {
             return;
         }
 
+        const leader2 = document.getElementById('deleteLeaderInput')?.value || '';
+        const leader3 = document.getElementById('deleteLeaderNameConfirm')?.value || '';
+
+        if (leader2 !== leader.name && leader3 !== leader.name) {
+            showAlert('El nombre del líder no coincide', 'warning');
+            return;
+        }
+
         (async () => {
             try {
                 const res = await DataService.apiCall(`/api/leaders/${leaderToDeleteId}`, {
@@ -568,14 +568,12 @@ const LeadersModule = (() => {
                 const leadersData = await leadersRes.json();
                 
                 if (leadersData.data) {
-                    AppState.setData('leaders', leadersData.data);
-                } else if (Array.isArray(leadersData)) {
-                    AppState.setData('leaders', leadersData);
+                    AppState.updateData({ leaders: leadersData.data });
                 }
                 
                 // Cerrar modal y recargar tabla
                 closeDeleteLeaderModals();
-                LeadersModule.loadTable();
+                populateLeadersTable();
                 showAlert('¡Líder eliminado correctamente!', 'success');
                 
             } catch (err) {
@@ -633,74 +631,6 @@ const LeadersModule = (() => {
         }
     }
 
-    // ====== CREATE LEADER ======
-    async function handleCreateLeader() {
-        const name = document.getElementById('leaderName')?.value.trim() || '';
-        const email = document.getElementById('leaderEmail')?.value.trim() || '';
-        const phone = document.getElementById('leaderPhone')?.value.trim() || '';
-        const username = document.getElementById('leaderUsername')?.value.trim() || '';
-
-        if (!name) {
-            showAlert('El nombre es obligatorio', 'warning');
-            return;
-        }
-
-        console.log('[LeadersModule] Creando líder:', { name, email, phone, customUsername: username });
-
-        try {
-            const res = await DataService.apiCall('/api/leaders', {
-                method: 'POST',
-                body: JSON.stringify({ 
-                    name, 
-                    email, 
-                    phone, 
-                    customUsername: username  // Backend espera customUsername
-                })
-            });
-
-            console.log('[LeadersModule] Response status:', res.status, res.ok);
-
-            if (res.ok) {
-                const data = await res.json();
-                console.log('[LeadersModule] Líder creado exitosamente:', data);
-                
-                // Actualizar AppState
-                const leadersRes = await DataService.apiCall('/api/leaders');
-                const leadersData = await leadersRes.json();
-                
-                if (leadersData.data) {
-                    AppState.setData('leaders', leadersData.data);
-                } else if (Array.isArray(leadersData)) {
-                    AppState.setData('leaders', leadersData);
-                }
-
-                // Limpiar formulario
-                document.getElementById('leaderName').value = '';
-                document.getElementById('leaderEmail').value = '';
-                document.getElementById('leaderPhone').value = '';
-                document.getElementById('leaderUsername').value = '';
-
-                // Cerrar modal
-                const modal = document.getElementById('leaderModal');
-                if (modal) {
-                    modal.classList.remove('active');
-                }
-
-                // Recargar tabla y mostrar alerta
-                LeadersModule.loadTable();
-                showAlert('¡Líder creado correctamente!', 'success');
-                
-            } else {
-                const errorData = await res.json();
-                console.error('[LeadersModule] Error en respuesta:', res.status, errorData);
-                showAlert('Error: ' + (errorData.error || 'No se pudo crear el líder'), 'error');
-            }
-        } catch (err) {
-            console.error('[LeadersModule] Error creando líder:', err);
-            showAlert(`Error de conexión: ${err.message || 'Intenta nuevamente'}`, 'error');
-        }
-    }
-
     // ====== PUBLIC API ======
     return {
         init,
@@ -712,7 +642,6 @@ const LeadersModule = (() => {
         openResetPassModal,
         handleConfirmResetPassword,
         handleSaveEditLeader,
-        handleCreateLeader,
         showCredentials,
         populateLeaderFilter,
         populateExportLeader,
