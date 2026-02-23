@@ -770,7 +770,10 @@ async function confirmSendAccessEmail() {
 
         const result = await res.json();
 
-        if (result.success || result.emailResults) {
+        // Verificar success===true o que al menos un email fue enviado
+        const anyEmailSent = result.emailResults && Object.values(result.emailResults).some(r => r && r.success === true);
+        
+        if (result.success === true || anyEmailSent) {
             if (resultDiv) {
                 resultDiv.style.background = '#d1fae5';
                 resultDiv.style.color = '#065f46';
