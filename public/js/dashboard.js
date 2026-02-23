@@ -941,11 +941,13 @@ async function showCredentials(leaderId) {
 
     try {
         const res = await apiCall(`/api/leaders/${leaderId}/credentials`);
-        const data = await res.json();
-
+        
         if (!res.ok) {
-            return showAlert(data.error || 'Error al obtener credenciales', 'error');
+            const errorData = await res.json();
+            return showAlert(errorData.error || 'Error al obtener credenciales', 'error');
         }
+        
+        const data = await res.json();
 
         if (!data.hasCredentials) {
             return showAlert('Este líder no tiene credenciales configuradas', 'warning');
