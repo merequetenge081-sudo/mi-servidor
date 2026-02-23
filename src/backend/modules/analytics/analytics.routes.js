@@ -22,6 +22,13 @@ router.get('/dashboard', analyticsController.getDashboard);
 router.get('/summary', analyticsController.getSummary);
 
 /**
+ * GET /api/v2/analytics/advanced
+ * ⭐ NUEVO: Dashboard avanzado con agregaciones enterprise BI
+ * Query: eventId?, leaderId?, puestoId?, localidad?, startDate?, endDate?
+ */
+router.get('/advanced', analyticsController.getAdvanced);
+
+/**
  * GET /api/v2/analytics/registrations
  * Estadísticas de registraciones (público)
  * Query: eventId?, period?

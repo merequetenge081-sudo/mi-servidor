@@ -226,6 +226,57 @@ export async function getSummary(req, res, next) {
   }
 }
 
+/**
+ * GET /api/v2/analytics/advanced
+ * Obtiene análisis avanzado con agregaciones enterprise
+ * Query params: eventId, leaderId, puestoId, localidad, startDate, endDate
+ */
+export async function getAdvanced(req, res, next) {
+  try {
+    const { eventId, leaderId, puestoId, localidad, startDate, endDate } = req.query;
+    
+    logger.info('Advanced analytics request', { eventId, leaderId, puestoId });
+
+    // Validar y construir filtros
+    const filters = {};
+    if (eventId) {
+      if (!eventId.match(/^[0-9a-f]{24}$/i)) {
+        return next(AppError.badRequest('eventId inválido'));
+      }
+      filters.eventId = eventId;
+    }
+    if (leaderId) filters.leaderId = leaderId;
+    if (puestoId) filters.puestoId = puestoId;
+    if (localidad) filters.localidad = localidad;
+    if (startDate) {
+      try {
+        filters.startDate = new Date(startDate);
+        if (isNaN(filters.startDate.getTime())) throw new Error();
+      } catch {
+        return next(AppError.badRequest('startDate debe ser fecha válida ISO'));
+      }
+    }
+    if (endDate) {
+      try {
+        filters.endDate = new Date(endDate);
+        if (isNaN(filters.endDate.getTime())) throw new Error();
+      } catch {
+        return next(AppError.badRequest('endDate debe ser fecha válida ISO'));
+      }
+    }
+
+    const dashboard = await analyticsService.getAdvancedDashboard(filters);
+
+    res.json({
+      success: true,
+      message: 'Advanced Analytics Dashboard',
+      data: dashboard
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   getDashboard,
   getRegistrationStats,
@@ -235,5 +286,6 @@ export default {
   getPuestoStats,
   getTrends,
   comparePeriods,
-  getSummary
+  getSummary,
+  getAdvanced
 };

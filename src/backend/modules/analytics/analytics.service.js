@@ -263,6 +263,82 @@ export async function getEventDetail(eventId) {
   }
 }
 
+/**
+ * Obtiene análisis avanzado con cálculos de porcentaje
+ * Enterprise BI Level - Optimizado para frontend moderno
+ */
+export async function getAdvancedDashboard(filters = {}) {
+  try {
+    logger.info('Obteniendo advanced dashboard', { filters });
+
+    const rawData = await analyticsRepository.getAdvancedAnalytics(filters);
+    
+    // Calcular porcentajes para leaders
+    const totalVotes = rawData.totalVotes.total || 1;
+    const leadersWithPercentage = rawData.topLeaders.map(leader => ({
+      ...leader,
+      percentage: ((leader.votes / totalVotes) * 100).toFixed(2),
+      rank: rawData.topLeaders.indexOf(leader) + 1
+    }));
+
+    // Calcular porcentajes para localidades
+    const localidadesWithPercentage = rawData.topLocalidades.map(loc => ({
+      ...loc,
+      percentage: ((loc.votes / totalVotes) * 100).toFixed(2),
+      rank: rawData.topLocalidades.indexOf(loc) + 1
+    }));
+
+    // Calcular porcentajes para puestos
+    const puestosWithPercentage = rawData.topPuestos.map(puesto => ({
+      ...puesto,
+      percentage: ((puesto.votes / totalVotes) * 100).toFixed(2),
+      rank: rawData.topPuestos.indexOf(puesto) + 1
+    }));
+
+    // Calcular porcentajes para distribución
+    const distributionWithPercentage = rawData.distribution.map(dist => ({
+      ...dist,
+      percentage: ((dist.votes / totalVotes) * 100).toFixed(2)
+    }));
+
+    const enrichedData = {
+      totalVotes: rawData.totalVotes,
+      leaders: {
+        top: leadersWithPercentage,
+        total: leadersWithPercentage.length
+      },
+      localidades: {
+        top: localidadesWithPercentage,
+        total: localidadesWithPercentage.length
+      },
+      puestos: {
+        top: puestosWithPercentage,
+        total: puestosWithPercentage.length
+      },
+      distribution: distributionWithPercentage,
+      timeline: rawData.timeline,
+      metadata: {
+        generatedAt: new Date(),
+        filters: filters,
+        dataPoints: totalVotes,
+        confirmationRate: rawData.totalVotes.confirmationRate
+      }
+    };
+
+    logger.debug('Advanced dashboard enriched', { 
+      totalVotes,
+      leaders: leadersWithPercentage.length,
+      localidades: localidadesWithPercentage.length
+    });
+
+    return enrichedData;
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error en advanced dashboard', error);
+    throw AppError.serverError('Error al obtener dashboard avanzado');
+  }
+}
+
 export default {
   getDashboardSummary,
   getRegistrationAnalytics,
@@ -271,5 +347,6 @@ export default {
   getPuestoAnalytics,
   getTrendAnalysis,
   getPeriodComparison,
-  getEventDetail
+  getEventDetail,
+  getAdvancedDashboard
 };
