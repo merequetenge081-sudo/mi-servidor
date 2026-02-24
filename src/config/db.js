@@ -50,9 +50,9 @@ export async function connectDB() {
     
     let mongoUrl;
 
-    if (isProduction) {
+    if (isProduction || isStaging) {
       if (!process.env.MONGO_URL) {
-        console.error("❌ MONGO_URL no definido en producción");
+        console.error("❌ MONGO_URL no definido en producción/staging");
         process.exit(1);
       }
 
@@ -61,14 +61,14 @@ export async function connectDB() {
       mongoUrl = "mongodb://localhost:27017/seguimiento-datos-dev";
     }
 
-    if (isProduction && mongoUrl.includes("localhost")) {
-      console.error("❌ Producción no puede usar Mongo localhost");
+    if ((isProduction || isStaging) && mongoUrl.includes("localhost")) {
+      console.error("❌ Producción/Staging no puede usar Mongo localhost");
       process.exit(1);
     }
 
     console.log(
       "[BOOT] Mongo URL target:",
-      isProduction ? "Atlas (production)" : "Localhost (development)"
+      (isProduction || isStaging) ? "Atlas (cloud)" : "Localhost (development)"
     );
 
     await mongoose.connect(mongoUrl, {
