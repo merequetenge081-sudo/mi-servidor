@@ -174,3 +174,7 @@ const ChartService = (() => {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ChartService;
 }
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.ChartService = ChartService;
+}
