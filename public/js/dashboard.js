@@ -770,7 +770,10 @@ async function confirmSendAccessEmail() {
 
         const result = await res.json();
 
-        if (result.success || result.emailResults) {
+        // Verificar success===true o que al menos un email fue enviado
+        const anyEmailSent = result.emailResults && Object.values(result.emailResults).some(r => r && r.success === true);
+        
+        if (result.success === true || anyEmailSent) {
             if (resultDiv) {
                 resultDiv.style.background = '#d1fae5';
                 resultDiv.style.color = '#065f46';
@@ -941,11 +944,13 @@ async function showCredentials(leaderId) {
 
     try {
         const res = await apiCall(`/api/leaders/${leaderId}/credentials`);
-        const data = await res.json();
-
+        
         if (!res.ok) {
-            return showAlert(data.error || 'Error al obtener credenciales', 'error');
+            const errorData = await res.json();
+            return showAlert(errorData.error || 'Error al obtener credenciales', 'error');
         }
+        
+        const data = await res.json();
 
         if (!data.hasCredentials) {
             return showAlert('Este líder no tiene credenciales configuradas', 'warning');

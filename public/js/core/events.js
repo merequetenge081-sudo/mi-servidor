@@ -122,6 +122,16 @@ const Events = (() => {
             }
 
             // =====================================
+            // NEW LEADER BUTTON
+            // =====================================
+
+            if (target.id === 'newLeaderBtn') {
+                const modal = document.getElementById('leaderModal');
+                if (modal) modal.classList.add('active');
+                return;
+            }
+
+            // =====================================
             // MODAL BUTTONS
             // =====================================
 
@@ -129,15 +139,6 @@ const Events = (() => {
             const closeModalBtn = target.closest('[data-close-modal]');
             if (closeModalBtn) {
                 ModalsModule.closeModal(closeModalBtn.dataset.closeModal);
-                return;
-            }
-
-            // Open new leader modal button
-            if (target.id === 'newLeaderBtn') {
-                const modal = document.getElementById('leaderModal');
-                if (modal) {
-                    modal.classList.add('active');
-                }
                 return;
             }
 
@@ -157,6 +158,21 @@ const Events = (() => {
                 if (user && pass) {
                     const text = `Usuario: ${user}\nContraseña: ${pass}`;
                     navigator.clipboard.writeText(text).then(() => {
+                        Helpers.showAlert('Credenciales copiadas al portapapeles', 'success');
+                    });
+                }
+                return;
+            }
+
+            // Save new leader button
+            if (target.id === 'saveLiderBtn') {
+                if (typeof LeadersModule !== 'undefined' && LeadersModule.handleSaveLeader) {
+                    LeadersModule.handleSaveLeader();
+                } else {
+                    console.error('[Events] LeadersModule.handleSaveLeader not available');
+                }
+                return;
+            }
                         target.innerHTML = '<i class="bi bi-check"></i> ¡Copiado!';
                         setTimeout(() => {
                             target.innerHTML = '<i class="bi bi-clipboard"></i> Copiar credenciales';
@@ -169,12 +185,6 @@ const Events = (() => {
             // Confirm reset password button
             if (target.id === 'confirmResetPassBtn') {
                 LeadersModule.handleConfirmResetPassword();
-                return;
-            }
-
-            // Save new leader button
-            if (target.id === 'saveLiderBtn') {
-                LeadersModule.handleCreateLeader();
                 return;
             }
 
@@ -381,29 +391,11 @@ const Events = (() => {
     }
 
     function bindFilters() {
-        // Search input for leaders - filtrado en tiempo real
-        const leaderSearch = document.getElementById('leaderSearchInput');
+        // Search input for leaders
+        const leaderSearch = document.getElementById('leaderSearch');
         if (leaderSearch) {
             leaderSearch.addEventListener('input', (e) => {
-                const searchTerm = e.target.value;
-                console.log('[Events] Búsqueda de líder:', searchTerm);
-                if (typeof LeadersModule !== 'undefined' && LeadersModule.filterByName) {
-                    LeadersModule.filterByName(searchTerm);
-                } else {
-                    console.warn('[Events] LeadersModule.filterByName no disponible');
-                }
-            });
-
-            // Permitir búsqueda también con Enter
-            leaderSearch.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const searchTerm = e.target.value;
-                    console.log('[Events] Búsqueda (Enter):', searchTerm);
-                    if (typeof LeadersModule !== 'undefined' && LeadersModule.filterByName) {
-                        LeadersModule.filterByName(searchTerm);
-                    }
-                }
+                LeadersModule.filterByName(e.target.value);
             });
         }
 

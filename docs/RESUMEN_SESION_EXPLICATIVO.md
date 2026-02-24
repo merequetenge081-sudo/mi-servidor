@@ -1,6 +1,4 @@
-# Resumen de Sesión - 20/21 Febrero 2026 (8:00 PM - 6:23 AM)
 
-## ¿Qué logramos en esta sesión de 10 horas?
 
 ### 🎯 Objetivo Principal
 Mejorar la calidad de los datos de puestos de votación en el sistema, identificar registros con problemas y crear un flujo para que líderes y administradores puedan revisarlos fácilmente.
@@ -12,7 +10,7 @@ Mejorar la calidad de los datos de puestos de votación en el sistema, identific
 **Situación inicial:** 
 Teníamos 462 registros donde las personas escribieron manualmente cosas como "Colegio Toberín", "Universidad Distrital", etc. Muchos de estos nombres no coincidían exactamente con los nombres oficiales de los puestos de votación, lo que causaba:
 - Dificultad para encontrar puestos en las búsquedas
-- Riesgo de que las personas vayan al lugar equivocado
+- 
 - Datos inconsistentes para análisis
 
 **¿Cómo lo solucionamos?**
@@ -178,167 +176,52 @@ node tools/mark_revision_from_report.js
 
 ## 🎯 PRIORIDAD ALTA: Análisis de Datos Avanzados
 
-### 1. Dashboard de Análisis Electoral
+Necesito refactorizar la sección "analytics" del panel admin SIN crear un nuevo login ni duplicar lógica.
 
-**Objetivo:** Crear una vista que permita ver quién está ganando territorio y hacer proyecciones.
+Contexto:
+Actualmente en dashboard.html existe una sección interna:
+<section id="analytics" class="section">...</section>
 
-#### 1.1 Líder Dominante por Localidad
-**¿Qué es?**
-- Mostrar qué líder tiene más registros en cada localidad de Bogotá
-- Vista tipo mapa de calor o tabla comparativa
+También existe un archivo separado llamado analytics.html.
 
-**Visualización propuesta:**
-```
-📊 Líderes por Localidad
+Problema:
+No quiero que analytics sea una sección interna dentro de dashboard.html.
+Quiero que:
+1. Todo el código HTML, JS y lógica que hace funcionar la sección <section id="analytics"> sea extraído completamente.
+2. Esa lógica sea movida e integrada correctamente dentro de analytics.html.
+3. analytics.html funcione de forma independiente pero reutilizando exactamente la misma lógica, funciones, gráficos (Chart.js), filtros y datos.
+4. NO se debe crear un nuevo sistema de login.
+5. NO se debe duplicar autenticación.
+6. NO se debe romper el sistema de navegación actual.
+7. NO debe haber conflictos de variables globales ni listeners duplicados.
 
-Usaquén:      María González    245 registros  ⭐ Dominante
-Chapinero:    Juan Pérez        189 registros  
-Suba:         Ana Rodríguez     312 registros  ⭐ Dominante
-Kennedy:      Carlos López      278 registros  ⭐ Dominante
-...
+Requisitos técnicos:
+- Extraer únicamente la lógica relacionada con analytics.
+- Si hay funciones JS compartidas, moverlas a un archivo común como:
+    /js/shared.js o /js/analytics.js
+- Asegurar que los event listeners se inicialicen con:
+    document.addEventListener("DOMContentLoaded", ...)
+- Validar que los IDs del DOM existan en analytics.html.
+- Evitar conflictos con otras secciones como dashboard, leaders o registrations.
+- Mantener Chart.js funcionando correctamente.
+- Mantener los filtros y paginación funcionando igual que antes.
+- Eliminar completamente <section id="analytics"> de dashboard.html.
+- El botón del sidebar que tiene data-section="analytics" debe redirigir ahora a:
+    window.location.href = "/analytics.html";
 
-Gráfica de barras horizontales mostrando top 3 líderes por localidad
-```
+Resultado esperado:
+- analytics.html funciona perfectamente.
+- dashboard.html queda limpio sin la sección analytics.
+- No existe doble login.
+- No hay errores de consola.
+- No hay conflictos entre scripts.
+- El código queda modular y mantenible.
 
-**Utilidad:**
-- Identificar fortalezas territoriales
-- Ver dónde necesitamos más presencia
-- Reconocer líderes destacados por zona
-
-#### 1.2 Puesto de Votación Más Fuerte
-**¿Qué es?**
-- Ranking de puestos con más registros
-- Identificar los "súper puestos" donde tenemos más apoyo
-
-**Visualización propuesta:**
-```
-🏫 Top 10 Puestos de Votación
-
-1. Colegio Distrital General Santander      523 registros
-2. Universidad Nacional                      487 registros
-3. Colegio San José de Castilla             456 registros
-4. Colegio Nicolás Esguerra                 421 registros
-...
-
-Mapa interactivo mostrando concentración geográfica
-```
-
-**Utilidad:**
-- Enfocar recursos en puestos clave
-- Planear logística de transporte
-- Identificar zonas de alta concentración
-
-#### 1.3 Mesa con Más Votos
-**¿Qué es?**
-- Dentro de cada puesto, ver qué mesas específicas tienen más registros
-- Identificar patrones de concentración
-
-**Visualización propuesta:**
-```
-📋 Análisis de Mesas - Colegio General Santander
-
-Mesa 1:   45 registros  ▬▬▬▬▬▬▬▬▬
-Mesa 2:   38 registros  ▬▬▬▬▬▬▬
-Mesa 3:   52 registros  ▬▬▬▬▬▬▬▬▬▬ ⭐ Mayor
-Mesa 4:   29 registros  ▬▬▬▬▬
-...
-
-Líder responsable: María González
-Estado: 85% confirmados
-```
-
-**Utilidad:**
-- Asignar testigos de mesa estratégicamente
-- Verificar distribución equitativa
-- Detectar mesas "olvidadas"
-
-#### 1.4 Simulación Final Electoral
-**¿Qué es?**
-- Proyección matemática del resultado final basada en datos actuales
-- Escenarios optimista, realista y pesimista
-
-**Visualización propuesta:**
-```
-🎲 SIMULACIÓN ELECTORAL 2026
-
-Datos actuales:
-- Total registrados:    12,450
-- Tasa de confirmación: 73%
-- Puestos cubiertos:    456 / 965 (47%)
-
-Escenarios:
-
-📊 OPTIMISTA (90% asistencia)
-   Votos proyectados:  11,205
-   Localidades con >80%: 8/20
-
-📊 REALISTA (75% asistencia)
-   Votos proyectados:  9,338
-   Localidades con >80%: 5/20
-
-📊 CONSERVADOR (60% asistencia)
-   Votos proyectados:  7,470
-   Localidades con >80%: 3/20
-
-Zonas de riesgo:
-⚠️ Sumapaz: solo 12 registros (meta: 50)
-⚠️ La Candelaria: 23 registros (meta: 80)
-```
-
-**Utilidad:**
-- Planificación estratégica
-- Asignación de recursos
-- Metas realistas por zona
-
-#### 1.5 Filtros Avanzados para Todo el Sistema
-
-**Agregar a la vista de análisis:**
-
-##### Filtro por Localidad
-```
-Seleccionar localidad: [Dropdown con las 20 localidades]
-↓
-Ver todas las métricas SOLO para esa localidad:
-- Líderes activos
-- Registros totales
-- Puestos cubiertos
-- Tasa de confirmación
-```
-
-##### Filtro por Puesto
-```
-Buscar puesto: [Búsqueda con autocompletar]
-↓
-Ver detalle completo del puesto:
-- Total de registros
-- Lista de mesas
-- Líder con más registros ahí
-- Tasa de confirmación
-- Personas asignadas
-```
-
-##### Filtro por Estado
-```
-Estado: [Todos | Confirmados | Pendientes | Requiere Revisión]
-↓
-Actualiza todas las estadísticas en tiempo real
-```
-
-##### Proyección Estimada Total
-```
-Widget persistente en esquina superior:
-
-┌─────────────────────────────────┐
-│ PROYECCIÓN TOTAL               │
-│                                 │
-│ Registros:     12,450          │
-│ Proyección:    9,338 votos     │
-│ Cobertura:     47% de puestos  │
-│ Meta:          20,000          │
-│                                 │
-│ Progreso: ▬▬▬▬▬▬░░░░ 46.7%    │
-└─────────────────────────────────┘
-```
+Por favor:
+1. Muéstrame exactamente qué código debo eliminar de dashboard.html.
+2. Muéstrame el nuevo código que debe ir en analytics.html.
+3. Si necesitas crear un archivo JS nuevo, créalo como analytics.js y muestra su contenido completo.
+4. Asegúrate de que todo quede profesional y bien estructurado.
 
 ---
 

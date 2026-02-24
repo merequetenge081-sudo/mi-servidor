@@ -10,7 +10,9 @@ import authRepository from './auth.repository.js';
 import { emailService } from '../../../services/emailService.js';
 import config from '../../config/config.js';
 import crypto from 'crypto';
-import { findAdminLocal, findLeaderLocal, verifyPasswordLocal } from '../../../utils/authFallback.js';
+import * as authFallback from '../../../utils/authFallback.js';
+
+const { findAdminLocal, findLeaderLocal, verifyPasswordLocal } = authFallback;
 
 const logger = createLogger('AuthService');
 

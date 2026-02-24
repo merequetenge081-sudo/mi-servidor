@@ -3,7 +3,6 @@ import dns from "dns";
 import logger from "./logger.js";
 import {
   currentEnv,
-  isProduction,
   isStaging,
   isDevelopment,
 } from "../backend/config/environment.js";
@@ -12,6 +11,7 @@ import {
 dns.setDefaultResultOrder("ipv4first");
 
 const MONGO_TIMEOUT = parseInt(process.env.MONGO_TIMEOUT || "30000", 10);
+const isProduction = process.env.NODE_ENV === "production";
 
 function resolveDbName() {
   if (isProduction) return "seguimiento-datos-prod";
@@ -35,7 +35,6 @@ function validateMongoTarget(dbName) {
 }
 
 export const mongoDbName = resolveDbName();
-const MONGO_URL = `mongodb://localhost:27017/${mongoDbName}`;
 
 /**
  * Connect to MongoDB with fail-fast strategy
@@ -49,24 +48,39 @@ export async function connectDB() {
 
     logger.info("Iniciando conexión a MongoDB...");
     
-    await Promise.race([
-      mongoose.connect(MONGO_URL, {
-        connectTimeoutMS: 10000,
-        serverSelectionTimeoutMS: 10000,
-        socketTimeoutMS: 45000,
-        family: 4
-      }),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("MongoDB connection timeout")), MONGO_TIMEOUT)
-      )
-    ]);
+    let mongoUrl;
+
+    if (isProduction) {
+      if (!process.env.MONGO_URL) {
+        console.error("❌ MONGO_URL no definido en producción");
+        process.exit(1);
+      }
+
+      mongoUrl = process.env.MONGO_URL;
+    } else {
+      mongoUrl = "mongodb://localhost:27017/seguimiento-datos-dev";
+    }
+
+    if (isProduction && mongoUrl.includes("localhost")) {
+      console.error("❌ Producción no puede usar Mongo localhost");
+      process.exit(1);
+    }
+
+    console.log(
+      "[BOOT] Mongo URL target:",
+      isProduction ? "Atlas (production)" : "Localhost (development)"
+    );
+
+    await mongoose.connect(mongoUrl, {
+      serverSelectionTimeoutMS: MONGO_TIMEOUT
+    });
     
     logger.info("✓ Conectado exitosamente a MongoDB");
     return true;
   } catch (error) {
     logger.error("✗ Error CRÍTICO conectando a MongoDB", {
       error: error.message,
-      url: MONGO_URL ? "[REDACTED]" : "undefined",
+      url: "[REDACTED]",
       timeout: MONGO_TIMEOUT,
       stack: error.stack
     });
