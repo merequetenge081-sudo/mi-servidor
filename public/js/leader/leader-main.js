@@ -2,7 +2,7 @@
 import { AuthManager } from './auth.js';
 import { UIManager } from './ui.js';
 import { RegistrationsManager } from './registrations.js';
-import { FormManager } from './forms.js';
+import { FormManager } from './forms.js?v=2.7.1';
 import { DeleteManager } from './delete.js';
 import { StatisticsManager } from './statistics.js';
 import { ImportExportManager } from './import-export.js';
