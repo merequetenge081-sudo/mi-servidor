@@ -42,6 +42,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 4. Cargar registraciones
         await RegistrationsManager.loadRegistrations(leaderId);
+        RegistrationsManager.renderRegistrations();
+        RegistrationsManager.checkRevisionPendiente();
+        StatisticsManager.loadStatistics(RegistrationsManager.myRegistrations);
 
         // 5. Verificar términos legales
         await ModalsManager.checkLegalTermsStatus();
@@ -276,6 +279,9 @@ function connectEventListeners(leaderId, leaderData) {
             if (response.ok) {
                 DeleteManager.closeDeleteConfirmModal();
                 await RegistrationsManager.loadRegistrations(leaderId);
+                RegistrationsManager.renderRegistrations();
+                RegistrationsManager.checkRevisionPendiente();
+                StatisticsManager.loadStatistics(RegistrationsManager.myRegistrations);
                 ModalsManager.showSuccessModal('Éxito', 'Registración eliminada correctamente');
             }
         });
@@ -407,7 +413,12 @@ window.closeLogoutModal = () => AuthManager.closeLogoutModal();
 window.filtrarRegistrosRevision = () => RegistrationsManager.applyFilters('revision', 'revision');
 window.refreshRegistrations = async () => {
     const leaderId = StorageManager.getCurrentLeaderId();
-    if (leaderId) await RegistrationsManager.loadRegistrations(leaderId);
+    if (leaderId) {
+        await RegistrationsManager.loadRegistrations(leaderId);
+        RegistrationsManager.renderRegistrations();
+        RegistrationsManager.checkRevisionPendiente();
+        StatisticsManager.loadStatistics(RegistrationsManager.myRegistrations);
+    }
 };
 window.previousPage = () => RegistrationsManager.changePage(-1);
 window.nextPage = () => RegistrationsManager.changePage(1);
