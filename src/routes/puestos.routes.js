@@ -12,8 +12,8 @@ const router = Router();
 
 // Rutas públicas (protegidas por token)
 router.get("/localidades", verifyToken, getLocalidadesHandler);
-router.get("/:id", verifyToken, getPuestoDetalleHandler);
 router.get("/", verifyToken, getPuestosHandler);
+router.get("/:id", verifyToken, getPuestoDetalleHandler);
 
 // Rutas admin
 router.post("/import", verifyToken, adminOnly, importarPuestosHandler);
