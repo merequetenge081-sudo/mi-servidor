@@ -495,8 +495,13 @@ export async function bulkCreateRegistrations(req, res) {
     const user = req.user;
     const { leaderId, registrations } = req.body;
 
+    // Validate input
+    if (!Array.isArray(registrations) || registrations.length === 0) {
+      return res.status(400).json({ error: "No se proporcionaron registros para importar." });
+    }
+
     // Validate leader
-    const leader = await Leader.findOne({ leaderId });
+    const leader = await Leader.findOne({ leaderId }).lean();
     if (!leader) return res.status(404).json({ error: "Líder no encontrado" });
     if (!leader.active) return res.status(403).json({ error: "El líder está inactivo" });
 
@@ -506,105 +511,178 @@ export async function bulkCreateRegistrations(req, res) {
       return res.status(400).json({ error: "El líder no está asociado a ningún evento. Contacte al administrador." });
     }
 
+    // ========== STEP 1: Batch lookup puestos ==========
+    // Collect unique votingPlace values (case-insensitive normalization)
+    const votingPlacesSet = new Set();
+    registrations.forEach(reg => {
+      if (reg.votingPlace && typeof reg.votingPlace === 'string') {
+        votingPlacesSet.add(reg.votingPlace.trim().toLowerCase());
+      }
+    });
+
+    const uniqueVotingPlaces = Array.from(votingPlacesSet);
+
+    // Batch query: match by nombre (case insensitive), organizationId, and active status
+    let puestosMap = new Map(); // lowercase nombre -> puesto object
+    
+    if (uniqueVotingPlaces.length > 0) {
+      const puestos = await Puestos.find({
+        nombre: { 
+          $in: uniqueVotingPlaces.map(name => new RegExp(`^${name}$`, 'i'))
+        },
+        organizationId: leader.organizationId,
+        activo: true
+      }).lean();
+
+      // Build in-memory map
+      puestos.forEach(puesto => {
+        const normalizedName = puesto.nombre.trim().toLowerCase();
+        puestosMap.set(normalizedName, puesto);
+      });
+    }
+
+    // ========== STEP 2: Batch check duplicates ==========
+    // Extract all cedulas to check for duplicates in one query
+    const cedulas = registrations.map(r => r.cedula).filter(Boolean);
+    const existingRegistrations = await Registration.find({
+      cedula: { $in: cedulas },
+      eventId: eventId
+    }).select('cedula').lean();
+
+    const existingCedulasSet = new Set(existingRegistrations.map(r => r.cedula));
+
+    // ========== STEP 3: Process each row ==========
     const errors = [];
     const validRegistrations = [];
+    let requiresReviewCount = 0;
 
     for (let i = 0; i < registrations.length; i++) {
       const reg = registrations[i];
-      const rowNum = i + 1;
+      const rowNum = i + 2; // Excel row (assuming row 1 is headers)
       const missing = [];
 
-      // Strict validation as requested
-      if (!reg.firstName) missing.push("Nombre");
-      if (!reg.lastName) missing.push("Apellido");
-      if (!reg.cedula) missing.push("Cédula");
-      if (!reg.email) missing.push("Email");
-      if (!reg.phone) missing.push("Celular");
-      if (!reg.puestoId) missing.push("Puesto");
-      const mesaValue = reg.mesa !== undefined && reg.mesa !== null ? Number(reg.mesa) : null;
-      if (mesaValue === null || Number.isNaN(mesaValue)) missing.push("Mesa");
+      // Validate required fields
+      if (!reg.firstName || !reg.firstName.trim()) missing.push("Nombre");
+      if (!reg.lastName || !reg.lastName.trim()) missing.push("Apellido");
+      if (!reg.cedula || !reg.cedula.toString().trim()) missing.push("Cédula");
+      if (!reg.email || !reg.email.trim()) missing.push("Email");
+      if (!reg.phone || !reg.phone.toString().trim()) missing.push("Celular");
 
       if (missing.length > 0) {
         errors.push({
           row: rowNum,
           name: `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || 'Desconocido',
-          error: `Faltan campos: ${missing.join(', ')}`
+          error: `Faltan campos requeridos: ${missing.join(', ')}`
         });
         continue;
       }
 
-      // Check duplicates (basic check against existing DB)
-      const existing = await Registration.findOne({ cedula: reg.cedula });
-      if (existing) {
-        errors.push({
-          row: rowNum,
-          name: `${reg.firstName} ${reg.lastName}`,
-          error: `Ya existe un registro con cédula ${reg.cedula}`
-        });
-        continue;
+      // Convert votingTable to mesa (number)
+      let mesa = null;
+      if (reg.votingTable !== undefined && reg.votingTable !== null) {
+        mesa = Number(reg.votingTable);
+        if (Number.isNaN(mesa)) {
+          errors.push({
+            row: rowNum,
+            name: `${reg.firstName} ${reg.lastName}`,
+            error: `Mesa inválida: "${reg.votingTable}" no es un número válido`
+          });
+          continue;
+        }
       }
-      if (!mongoose.Types.ObjectId.isValid(reg.puestoId)) {
+
+      // Check for duplicates
+      const cedulaStr = reg.cedula.toString().trim();
+      if (existingCedulasSet.has(cedulaStr)) {
         errors.push({
           row: rowNum,
           name: `${reg.firstName} ${reg.lastName}`,
-          error: "puestoId inválido"
+          error: `Ya existe un registro con cédula ${cedulaStr} en este evento`
         });
         continue;
       }
 
-      const puesto = await Puestos.findById(reg.puestoId).lean();
-      if (!puesto || puesto.activo === false) {
-        errors.push({
-          row: rowNum,
-          name: `${reg.firstName} ${reg.lastName}`,
-          error: "puestoId no existe o no está activo"
-        });
-        continue;
+      // ========== STEP 4: Match votingPlace to puesto ==========
+      let puestoId = null;
+      let localidad = reg.localidad || null;
+      let requiereRevisionPuesto = false;
+      let revisionPuestoResuelta = false;
+
+      if (reg.votingPlace && typeof reg.votingPlace === 'string') {
+        const normalizedVotingPlace = reg.votingPlace.trim().toLowerCase();
+        const matchedPuesto = puestosMap.get(normalizedVotingPlace);
+
+        if (matchedPuesto) {
+          // Puesto found
+          puestoId = matchedPuesto._id;
+          localidad = matchedPuesto.localidad || localidad;
+          requiereRevisionPuesto = false;
+          revisionPuestoResuelta = true;
+        } else {
+          // Puesto not found - requires review but still import
+          requiereRevisionPuesto = true;
+          revisionPuestoResuelta = false;
+          requiresReviewCount++;
+        }
       }
 
+      // Add to valid registrations
       validRegistrations.push({
         leaderId: leader.leaderId,
         leaderName: leader.name,
-        eventId: eventId, // Assign leader's event
-        firstName: reg.firstName,
-        lastName: reg.lastName,
-        cedula: reg.cedula,
-        email: reg.email,
-        phone: reg.phone,
-        puestoId: reg.puestoId,
-        mesa: mesaValue,
-        localidad: puesto.localidad || reg.localidad || '',
+        eventId: eventId,
+        organizationId: leader.organizationId,
+        firstName: reg.firstName.trim(),
+        lastName: reg.lastName.trim(),
+        cedula: cedulaStr,
+        email: reg.email.trim(),
+        phone: reg.phone.toString().trim(),
+        votingPlace: reg.votingPlace ? reg.votingPlace.trim() : null,
+        puestoId: puestoId,
+        mesa: mesa,
+        localidad: localidad,
+        requiereRevisionPuesto: requiereRevisionPuesto,
+        revisionPuestoResuelta: revisionPuestoResuelta,
         registeredToVote: true,
-        date: new Date().toISOString(),
         confirmed: false,
-        organizationId: leader.organizationId
+        date: new Date()
       });
     }
 
-    if (errors.length > 0) {
-      return res.status(400).json({
-        error: "Se encontraron errores en el archivo. Por favor corríjalos antes de importar.",
-        details: errors
-      });
+    // ========== STEP 5: Insert valid registrations ==========
+    let insertedCount = 0;
+    if (validRegistrations.length > 0) {
+      const insertResult = await Registration.insertMany(validRegistrations, { ordered: false });
+      insertedCount = insertResult.length;
+
+      // Increment leader count
+      await Leader.updateOne(
+        { leaderId: leader.leaderId }, 
+        { $inc: { registrations: insertedCount } }
+      );
     }
 
-    if (validRegistrations.length === 0) {
-      return res.status(400).json({ error: "No hay registros válidos para importar." });
-    }
-
-    await Registration.insertMany(validRegistrations);
-
-    // Increment leader count
-    await Leader.updateOne({ leaderId: leader.leaderId }, { $inc: { registrations: validRegistrations.length } });
-
-    res.json({
+    // ========== STEP 6: Return structured response ==========
+    const response = {
       success: true,
-      count: validRegistrations.length,
-      message: `Se importaron ${validRegistrations.length} registros exitosamente.`
-    });
+      imported: insertedCount,
+      requiresReview: requiresReviewCount,
+      failed: errors.length,
+      errors: errors,
+      message: `Importación completada: ${insertedCount} registros importados${requiresReviewCount > 0 ? `, ${requiresReviewCount} requieren revisión de puesto` : ''}${errors.length > 0 ? `, ${errors.length} errores` : ''}.`
+    };
+
+    // Log import summary
+    logger.info(`Bulk import completed - Leader: ${leaderId}, Imported: ${insertedCount}, Review: ${requiresReviewCount}, Errors: ${errors.length}`);
+
+    res.json(response);
 
   } catch (error) {
     logger.error("Bulk import error:", error);
-    res.status(500).json({ error: "Error interno al procesar importación: " + error.message });
+    res.status(500).json({ 
+      success: false,
+      error: "Error interno al procesar importación",
+      details: error.message 
+    });
   }
 }
