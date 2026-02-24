@@ -54,6 +54,11 @@ export class ImportExportManager {
                         const leaderId = sessionStorage.getItem('leaderId') || localStorage.getItem('leaderId');
                         if (leaderId) {
                             await window.registrationsManager.loadRegistrations(leaderId);
+                            window.registrationsManager.renderRegistrations();
+                            window.registrationsManager.checkRevisionPendiente();
+                            if (window.statisticsManager) {
+                                window.statisticsManager.loadStatistics(window.registrationsManager.myRegistrations);
+                            }
                         }
                     }
                 }
