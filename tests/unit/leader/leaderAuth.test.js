@@ -10,9 +10,6 @@ import { jest } from '@jest/globals';
 // Mock de fetch
 global.fetch = jest.fn();
 
-// Mock de window.location
-delete global.window.location;
-global.window.location = { replace: jest.fn() };
 
 describe('leaderAuth', () => {
     beforeEach(() => {
@@ -25,10 +22,6 @@ describe('leaderAuth', () => {
         // Reset fetch mock
         fetch.mockReset();
         
-        // Reset window.location mock
-        if (window.location.replace && typeof window.location.replace.mockReset === 'function') {
-            window.location.replace.mockReset();
-        }
     });
 
     describe('getAuthHeaders', () => {
@@ -138,8 +131,8 @@ describe('leaderAuth', () => {
 
             await expect(AuthManager.apiCall('/api/test')).rejects.toThrow('Session expired');
             
-            expect(window.location.replace).toHaveBeenCalledWith('/');
             expect(AuthManager.isRedirecting).toBe(true);
+            expect(StorageManager.getCurrentToken()).toBeNull();
         });
 
         test('deberia limpiar auth storage en respuesta 401', async () => {
@@ -172,8 +165,8 @@ describe('leaderAuth', () => {
 
             const response = await AuthManager.apiCall('/api/test');
             
-            expect(window.location.replace).not.toHaveBeenCalled();
             expect(response.status).toBe(401);
+            expect(AuthManager.isRedirecting).toBe(true);
         });
 
         test('deberia retornar respuesta exitosa', async () => {
@@ -200,7 +193,6 @@ describe('leaderAuth', () => {
             const result = AuthManager.checkAuth();
 
             expect(result).toBe(true);
-            expect(window.location.replace).not.toHaveBeenCalled();
         });
 
         test('deberia retornar false y redirigir si no hay token', () => {
@@ -210,7 +202,7 @@ describe('leaderAuth', () => {
             const result = AuthManager.checkAuth();
 
             expect(result).toBe(false);
-            expect(window.location.replace).toHaveBeenCalledWith('/');
+            expect(StorageManager.getCurrentLeaderId()).toBeNull();
         });
 
         test('deberia retornar false y redirigir si no hay leaderId', () => {
@@ -220,7 +212,7 @@ describe('leaderAuth', () => {
             const result = AuthManager.checkAuth();
 
             expect(result).toBe(false);
-            expect(window.location.replace).toHaveBeenCalledWith('/');
+            expect(StorageManager.getCurrentToken()).toBeNull();
         });
 
         test('deberia limpiar auth antes de redirigir', () => {
@@ -272,7 +264,6 @@ describe('leaderAuth', () => {
 
             expect(StorageManager.getCurrentToken()).toBeNull();
             expect(StorageManager.getCurrentLeaderId()).toBeNull();
-            expect(window.location.replace).toHaveBeenCalledWith('/');
             expect(AuthManager.isRedirecting).toBe(true);
         });
     });

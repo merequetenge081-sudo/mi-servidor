@@ -2833,6 +2833,7 @@ window.reviewDeletionRequest = reviewDeletionRequest;
 // Ejecutar cuando el DOM esté completamente listo
 function initializeEventListeners() {
     console.log('[LISTENERS] Inicializando event listeners...');
+    const hasModalsModule = typeof ModalsModule !== 'undefined';
     
     // Close listeners for modals
     const closeEditLeaderModal = document.getElementById('closeEditLeaderModal');
@@ -2844,16 +2845,18 @@ function initializeEventListeners() {
     }
 
     // Event listener para botón de notificaciones
-    const notificationsBtn = document.getElementById('notificationsBtn');
-    if (notificationsBtn) {
-        notificationsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            console.log('[LISTENERS] Notificaciones btn clicked');
-            toggleNotificationsDropdown();
-        });
-        console.log('[LISTENERS] ✅ notificationsBtn');
-    } else {
-        console.warn('[LISTENERS] ❌ notificationsBtn NOT FOUND');
+    if (!hasModalsModule) {
+        const notificationsBtn = document.getElementById('notificationsBtn');
+        if (notificationsBtn) {
+            notificationsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('[LISTENERS] Notificaciones btn clicked');
+                toggleNotificationsDropdown();
+            });
+            console.log('[LISTENERS] ✅ notificationsBtn');
+        } else {
+            console.warn('[LISTENERS] ❌ notificationsBtn NOT FOUND');
+        }
     }
 
     // Event delegation para data-action (ayuda, tema, etc.)
@@ -2863,6 +2866,10 @@ function initializeEventListeners() {
             const action = actionBtn.dataset.action;
             console.log('[LISTENERS] data-action clicked:', action);
             e.stopPropagation();
+
+            if (hasModalsModule && (action === 'help-toggle' || action === 'help-close' || action === 'close-modal' || action === 'notifications-mark-read')) {
+                return;
+            }
             
             switch (action) {
                 case 'help-toggle':
@@ -2883,21 +2890,25 @@ function initializeEventListeners() {
     console.log('[LISTENERS] ✅ data-action delegation');
     
     // Event listener para botón de tema
-    const themeToggleBtn = document.querySelector('.theme-toggle');
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', toggleDarkMode);
-        console.log('[LISTENERS] ✅ themeToggleBtn');
-    } else {
-        console.warn('[LISTENERS] ❌ themeToggleBtn NOT FOUND');
+    if (!hasModalsModule) {
+        const themeToggleBtn = document.querySelector('.theme-toggle');
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', toggleDarkMode);
+            console.log('[LISTENERS] ✅ themeToggleBtn');
+        } else {
+            console.warn('[LISTENERS] ❌ themeToggleBtn NOT FOUND');
+        }
     }
 
     // Event listener para botón de toggle sidebar
-    const sidebarToggleBtn = document.querySelector('.sidebar-toggle-main');
-    if (sidebarToggleBtn) {
-        sidebarToggleBtn.addEventListener('click', toggleSidebar);
-        console.log('[LISTENERS] ✅ sidebarToggleBtn');
-    } else {
-        console.warn('[LISTENERS] ❌ sidebarToggleBtn NOT FOUND');
+    if (!hasModalsModule) {
+        const sidebarToggleBtn = document.querySelector('.sidebar-toggle-main');
+        if (sidebarToggleBtn) {
+            sidebarToggleBtn.addEventListener('click', toggleSidebar);
+            console.log('[LISTENERS] ✅ sidebarToggleBtn');
+        } else {
+            console.warn('[LISTENERS] ❌ sidebarToggleBtn NOT FOUND');
+        }
     }
     
     // Event listener para botón de solicitudes de eliminación

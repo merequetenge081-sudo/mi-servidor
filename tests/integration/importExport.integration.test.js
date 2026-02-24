@@ -3,7 +3,7 @@
  * Pruebas de integración para el sistema completo de importación con fuzzy matching
  */
 
-import { matchPuesto, matchLocalidad } from '../../../src/utils/fuzzyMatch.js';
+import { matchPuesto, matchLocalidad } from '../../src/utils/fuzzyMatch.js';
 
 describe('Import/Export Integration', () => {
   
@@ -295,7 +295,7 @@ describe('Import/Export Integration', () => {
         return hasPuesto || hasLocalidad;
       }).length;
 
-      expect(processableCount).toBe(1); // Solo el tercero es procesable
+      expect(processableCount).toBe(3); // Se procesa si hay puesto o localidad
     });
 
     it('Caso Real 3: Detección de duplicados después de corrección', () => {

@@ -51,7 +51,9 @@ describe('LeaderService - temp password TTL', () => {
       tempPasswordCreatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
     };
 
-    mockFindById.mockResolvedValueOnce(leader);
+    mockFindById.mockReturnValueOnce({
+      select: jest.fn().mockResolvedValueOnce(leader)
+    });
     mockUpdateOne.mockResolvedValueOnce({});
 
     const result = await service.getLeaderCredentials('leader-1');
@@ -72,7 +74,9 @@ describe('LeaderService - temp password TTL', () => {
       tempPasswordCreatedAt: new Date()
     };
 
-    mockFindById.mockResolvedValueOnce(leader);
+    mockFindById.mockReturnValueOnce({
+      select: jest.fn().mockResolvedValueOnce(leader)
+    });
     mockDecrypt.mockReturnValueOnce('Temp1234');
 
     const result = await service.getLeaderCredentials('leader-2');

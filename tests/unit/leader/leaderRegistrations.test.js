@@ -61,7 +61,8 @@ describe('leaderRegistrations', () => {
             data.registrations = [{ id: 999 }];
             
             const result = RegistrationsManager.parseRegistrationsResponse(data);
-            expect(result).toEqual([{ id: 1 }]);
+            expect(result).toBe(data);
+            expect(result[0]).toEqual({ id: 1 });
         });
     });
 
@@ -280,13 +281,15 @@ describe('leaderRegistrations', () => {
             RegistrationsManager.filteredRegistrations = [];
             
             // Mock de updatePagination
-            RegistrationsManager.updatePagination = jest.fn();
+            const updatePaginationSpy = jest.spyOn(RegistrationsManager, 'updatePagination').mockImplementation(() => {});
 
             RegistrationsManager.renderRegistrations();
 
             const tbody = document.getElementById('registrationsTableBody');
             expect(tbody.innerHTML).toContain('No hay registros para mostrar');
             expect(tbody.innerHTML).toContain('bi-inbox');
+
+            updatePaginationSpy.mockRestore();
         });
 
         test('deberia paginar correctamente los registros', () => {
@@ -305,13 +308,16 @@ describe('leaderRegistrations', () => {
             RegistrationsManager.itemsPerPage = 10;
 
             // Mock de renderRow y updatePagination
-            RegistrationsManager.renderRow = jest.fn((reg) => `<tr><td>${reg.firstName}</td></tr>`);
-            RegistrationsManager.updatePagination = jest.fn();
+            const renderRowSpy = jest.spyOn(RegistrationsManager, 'renderRow').mockImplementation((reg) => `<tr><td>${reg.firstName}</td></tr>`);
+            const updatePaginationSpy = jest.spyOn(RegistrationsManager, 'updatePagination').mockImplementation(() => {});
 
             RegistrationsManager.renderRegistrations();
 
             // Debería renderizar 10 items (página 1)
-            expect(RegistrationsManager.renderRow).toHaveBeenCalledTimes(10);
+            expect(renderRowSpy).toHaveBeenCalledTimes(10);
+
+            renderRowSpy.mockRestore();
+            updatePaginationSpy.mockRestore();
         });
 
         test('deberia mostrar segunda pagina correctamente', () => {
@@ -328,16 +334,19 @@ describe('leaderRegistrations', () => {
             RegistrationsManager.currentPage = 2;
             RegistrationsManager.itemsPerPage = 10;
 
-            RegistrationsManager.renderRow = jest.fn((reg) => `<tr><td>${reg.firstName}</td></tr>`);
-            RegistrationsManager.updatePagination = jest.fn();
+            const renderRowSpy = jest.spyOn(RegistrationsManager, 'renderRow').mockImplementation((reg) => `<tr><td>${reg.firstName}</td></tr>`);
+            const updatePaginationSpy = jest.spyOn(RegistrationsManager, 'updatePagination').mockImplementation(() => {});
 
             RegistrationsManager.renderRegistrations();
 
             // Segunda página,Items 10-19
-            expect(RegistrationsManager.renderRow).toHaveBeenCalledTimes(10);
-            expect(RegistrationsManager.renderRow).toHaveBeenCalledWith(
+            expect(renderRowSpy).toHaveBeenCalledTimes(10);
+            expect(renderRowSpy).toHaveBeenCalledWith(
                 expect.objectContaining({ firstName: 'Nombre10' })
             );
+
+            renderRowSpy.mockRestore();
+            updatePaginationSpy.mockRestore();
         });
     });
 
