@@ -245,6 +245,12 @@ router.delete("/registrations/:id", authMiddleware, registrationController.delet
 router.post("/registrations/:id/confirm", authMiddleware, registrationController.confirmRegistration);
 router.post("/registrations/:id/unconfirm", authMiddleware, roleMiddleware("admin"), registrationController.unconfirmRegistration);
 
+// ==================== DELETION REQUESTS ====================
+router.post("/registrations/deletion-request", authMiddleware, registrationController.requestBulkDeletion);
+router.get("/registrations/deletion-request/status", authMiddleware, registrationController.getDeletionRequestStatus);
+router.get("/deletion-requests", authMiddleware, roleMiddleware("admin"), registrationController.getAllDeletionRequests);
+router.post("/deletion-requests/:requestId/review", authMiddleware, roleMiddleware("admin"), registrationController.reviewDeletionRequest);
+
 // ==================== EVENTOS ====================
 router.post("/events", authMiddleware, roleMiddleware("admin"), eventController.createEvent);
 router.get("/events", authMiddleware, eventController.getEvents);

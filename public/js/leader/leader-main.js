@@ -476,3 +476,122 @@ window.exportToExcel = async () => {
 
 // Crear instancia global de FormManager para onclick handlers en HTML
 window.formManager = FormManager;
+
+// ========== BULK DELETE FUNCTIONS ==========
+
+/**
+ * Abrir modal de eliminación masiva
+ */
+window.openBulkDeleteModal = async () => {
+    const modal = document.getElementById('bulkDeleteModal');
+    const countElement = document.getElementById('bulkDeleteCount');
+    const pendingAlert = document.getElementById('bulkDeletePendingAlert');
+    const form = document.getElementById('bulkDeleteForm');
+    
+    // Mostrar cantidad de registros
+    if (countElement) {
+        const count = RegistrationsManager.myRegistrations.length;
+        countElement.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+    }
+    
+    // Verificar si hay solicitud pendiente
+    try {
+        const response = await AuthManager.apiCall('/api/registrations/deletion-request/status');
+        const data = await response.json();
+        
+        if (data.hasPendingRequest && data.request) {
+            pendingAlert.style.display = 'block';
+            form.style.display = 'none';
+        } else {
+            pendingAlert.style.display = 'none';
+            form.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error checking deletion request status:', error);
+    }
+    
+    // Limpiar form
+    document.getElementById('bulkDeletePassword').value = '';
+    document.getElementById('bulkDeleteReason').value = '';
+    
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+};
+
+/**
+ * Cerrar modal de eliminación masiva
+ */
+window.closeBulkDeleteModal = () => {
+    const modal = document.getElementById('bulkDeleteModal');
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+};
+
+/**
+ * Toggle password visibility
+ */
+window.toggleBulkDeletePassword = () => {
+    const passwordInput = document.getElementById('bulkDeletePassword');
+    const icon = document.getElementById('bulkDeletePasswordIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+};
+
+/**
+ * Enviar solicitud de eliminación masiva
+ */
+window.submitBulkDelete = async (event) => {
+    event.preventDefault();
+    
+    const password = document.getElementById('bulkDeletePassword').value;
+    const reason = document.getElementById('bulkDeleteReason').value;
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    
+    if (!password) {
+        ModalsManager.showError('Debes ingresar tu contraseña');
+        return;
+    }
+    
+    // Deshabilitar botón durante la petición
+    const originalBtnContent = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
+    
+    try {
+        const response = await AuthManager.apiCall('/api/registrations/deletion-request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password, reason })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al enviar solicitud');
+        }
+        
+        // Éxito
+        window.closeBulkDeleteModal();
+        ModalsManager.showSuccess(
+            '¡Solicitud Enviada!',
+            data.message || 'Tu solicitud ha sido enviada y está pendiente de aprobación por un administrador.'
+        );
+        
+    } catch (error) {
+        console.error('Error al solicitar eliminación masiva:', error);
+        ModalsManager.showError(error.message || 'Error al enviar solicitud de eliminación');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnContent;
+    }
+};

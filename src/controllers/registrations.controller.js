@@ -3,13 +3,14 @@ import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
 import { Organization } from "../models/Organization.js";
-import { Puestos } from "../models/index.js";
+import { Puestos, DeletionRequest } from "../models/index.js";
 import { AuditService } from "../services/audit.service.js";
 import { ValidationService } from "../services/validation.service.js";
 import { ConsentLogService } from "../services/consentLog.service.js";
 import logger from "../config/logger.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
 import { matchPuesto, matchLocalidad, autocorrectRegistration } from "../utils/fuzzyMatch.js";
+import bcrypt from "bcryptjs";
 
 const normalizeRegistration = (registration) => {
   if (!registration) return registration;
@@ -730,5 +731,256 @@ export async function bulkCreateRegistrations(req, res) {
       error: "Error interno al procesar importación",
       details: error.message 
     });
+  }
+}
+
+// ========== DELETION REQUESTS ==========
+
+/**
+ * Request bulk deletion of all registrations for a leader
+ * Requires leader password verification
+ */
+export async function requestBulkDeletion(req, res) {
+  try {
+    const user = req.user;
+    const orgId = user.organizationId;
+    const { password, reason } = req.body;
+
+    // Solo líderes pueden solicitar eliminación de sus propios registros
+    if (user.role !== 'leader') {
+      return res.status(403).json({ error: "Solo líderes pueden solicitar eliminación" });
+    }
+
+    // Verificar que se proporcionó contraseña
+    if (!password) {
+      return res.status(400).json({ error: "Contraseña requerida" });
+    }
+
+    // Obtener líder y verificar contraseña
+    const leader = await Leader.findOne({ 
+      leaderId: user.leaderId,
+      organizationId: orgId
+    });
+
+    if (!leader || !leader.passwordHash) {
+      return res.status(401).json({ error: "Credenciales inválidas" });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, leader.passwordHash);
+    if (!passwordMatch) {
+      logger.warn(`Failed deletion request - Invalid password for leader: ${user.leaderId}`);
+      return res.status(401).json({ error: "Contraseña incorrecta" });
+    }
+
+    // Contar registros del líder
+    const registrationCount = await Registration.countDocuments({
+      leaderId: user.leaderId,
+      organizationId: orgId
+    });
+
+    if (registrationCount === 0) {
+      return res.status(400).json({ error: "No tienes registros para eliminar" });
+    }
+
+    // Verificar si ya existe una solicitud pendiente
+    const existingRequest = await DeletionRequest.findOne({
+      leaderId: user.leaderId,
+      organizationId: orgId,
+      status: 'pending'
+    });
+
+    if (existingRequest) {
+      return res.status(400).json({ 
+        error: "Ya tienes una solicitud de eliminación pendiente",
+        requestId: existingRequest._id
+      });
+    }
+
+    // Crear solicitud de eliminación
+    const deletionRequest = new DeletionRequest({
+      leaderId: user.leaderId,
+      leaderName: leader.name,
+      organizationId: orgId,
+      eventId: leader.eventId,
+      status: 'pending',
+      registrationCount,
+      reason: reason || 'Sin razón especificada'
+    });
+
+    await deletionRequest.save();
+
+    logger.info(`Deletion request created - Leader: ${user.leaderId}, Count: ${registrationCount}`);
+
+    await AuditService.log(
+      "CREATE",
+      "DeletionRequest",
+      deletionRequest._id.toString(),
+      user,
+      { registrationCount, reason },
+      `Solicitud de eliminación masiva creada para ${registrationCount} registros`
+    );
+
+    res.json({
+      success: true,
+      message: `Solicitud enviada. Se eliminará ${registrationCount} registro(s) una vez aprobada por el administrador.`,
+      requestId: deletionRequest._id,
+      registrationCount,
+      status: 'pending'
+    });
+
+  } catch (error) {
+    logger.error("Request bulk deletion error:", error);
+    res.status(500).json({ error: "Error al crear solicitud de eliminación" });
+  }
+}
+
+/**
+ * Get deletion request status for current leader
+ */
+export async function getDeletionRequestStatus(req, res) {
+  try {
+    const user = req.user;
+    const orgId = user.organizationId;
+
+    const request = await DeletionRequest.findOne({
+      leaderId: user.leaderId,
+      organizationId: orgId,
+      status: 'pending'
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      hasPendingRequest: !!request,
+      request: request || null
+    });
+
+  } catch (error) {
+    logger.error("Get deletion request status error:", error);
+    res.status(500).json({ error: "Error al obtener estado de solicitud" });
+  }
+}
+
+/**
+ * Get all deletion requests (Admin only)
+ */
+export async function getAllDeletionRequests(req, res) {
+  try {
+    const user = req.user;
+    const orgId = user.organizationId;
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: "Acceso denegado" });
+    }
+
+    const { status } = req.query;
+    const filter = { organizationId: orgId };
+
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+      filter.status = status;
+    }
+
+    const requests = await DeletionRequest.find(filter)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.json({
+      success: true,
+      requests
+    });
+
+  } catch (error) {
+    logger.error("Get all deletion requests error:", error);
+    res.status(500).json({ error: "Error al obtener solicitudes" });
+  }
+}
+
+/**
+ * Approve or reject deletion request (Admin only)
+ */
+export async function reviewDeletionRequest(req, res) {
+  try {
+    const user = req.user;
+    const orgId = user.organizationId;
+    const { requestId } = req.params;
+    const { action, notes } = req.body;
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: "Acceso denegado" });
+    }
+
+    if (!['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ error: "Acción inválida. Use 'approve' o 'reject'" });
+    }
+
+    const deletionRequest = await DeletionRequest.findOne({
+      _id: requestId,
+      organizationId: orgId
+    });
+
+    if (!deletionRequest) {
+      return res.status(404).json({ error: "Solicitud no encontrada" });
+    }
+
+    if (deletionRequest.status !== 'pending') {
+      return res.status(400).json({ error: "Esta solicitud ya fue procesada" });
+    }
+
+    // Actualizar estado de la solicitud
+    deletionRequest.status = action === 'approve' ? 'approved' : 'rejected';
+    deletionRequest.reviewedBy = user.username || user.email;
+    deletionRequest.reviewedAt = new Date();
+    deletionRequest.reviewNotes = notes || '';
+    await deletionRequest.save();
+
+    // Si se aprueba, eliminar todos los registros del líder
+    if (action === 'approve') {
+      const deleteResult = await Registration.deleteMany({
+        leaderId: deletionRequest.leaderId,
+        organizationId: orgId
+      });
+
+      // Actualizar contador del líder
+      await Leader.updateOne(
+        { leaderId: deletionRequest.leaderId },
+        { $set: { registrations: 0 } }
+      );
+
+      logger.info(`Bulk deletion approved and executed - Leader: ${deletionRequest.leaderId}, Deleted: ${deleteResult.deletedCount}`);
+
+      await AuditService.log(
+        "DELETE_BULK",
+        "Registration",
+        deletionRequest.leaderId,
+        user,
+        { deletedCount: deleteResult.deletedCount, requestId },
+        `Eliminación masiva aprobada: ${deleteResult.deletedCount} registros eliminados`
+      );
+
+      res.json({
+        success: true,
+        message: `Solicitud aprobada. Se eliminaron ${deleteResult.deletedCount} registros.`,
+        deletedCount: deleteResult.deletedCount
+      });
+    } else {
+      logger.info(`Bulk deletion rejected - Leader: ${deletionRequest.leaderId}, RequestId: ${requestId}`);
+
+      await AuditService.log(
+        "REJECT",
+        "DeletionRequest",
+        requestId,
+        user,
+        { notes },
+        `Solicitud de eliminación masiva rechazada`
+      );
+
+      res.json({
+        success: true,
+        message: "Solicitud rechazada",
+        reason: notes
+      });
+    }
+
+  } catch (error) {
+    logger.error("Review deletion request error:", error);
+    res.status(500).json({ error: "Error al procesar solicitud" });
   }
 }

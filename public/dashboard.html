@@ -61,6 +61,12 @@
                         <span>Exportar</span>
                     </a>
                 </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="deletion-requests">
+                        <i class="bi bi-trash-fill"></i>
+                        <span>Solicitudes Eliminación</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -534,6 +540,41 @@
                         <p>Descarga registros de un solo líder.</p>
                         <select id="exportLeaderSelect" class="form-select mb-2"></select>
                         <button class="btn btn-outline" id="exportByLeaderBtn">Exportar Filtrado</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DELETION REQUESTS SECTION -->
+            <section id="deletion-requests" class="section" style="display: none;">
+                <div class="section-header">
+                    <h2><i class="bi bi-trash-fill"></i> Solicitudes de Eliminación Masiva</h2>
+                    <p>Revisa y aprueba/rechaza las solicitudes de eliminación de registros de los líderes.</p>
+                </div>
+
+                <div class="modern-card" style="background: #fee2e2; border: 2px solid #dc2626; padding: 16px; margin-bottom: 24px;">
+                    <p style="color: #991b1b; font-size: 14px; line-height: 1.6; margin: 0;">
+                        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Importante:</strong> Al aprobar una solicitud, se eliminarán TODOS los registros del líder de forma permanente e irreversible.
+                    </p>
+                </div>
+
+                <div class="card" style="padding: 24px;">
+                    <div class="toolbar" style="margin-bottom: 20px; display: flex; gap: 12px; align-items: center;">
+                        <select id="deletionStatusFilter" class="form-select" style="max-width: 200px;" onchange="filterDeletionRequests()">
+                            <option value="pending">Pendientes</option>
+                            <option value="approved">Aprobadas</option>
+                            <option value="rejected">Rechazadas</option>
+                            <option value="">Todas</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="refreshDeletionRequests()">
+                            <i class="bi bi-arrow-clockwise"></i> Actualizar
+                        </button>
+                    </div>
+
+                    <div id="deletionRequestsContainer">
+                        <div style="text-align: center; padding: 60px 20px;">
+                            <i class="bi bi-hourglass-split" style="font-size: 48px; color: var(--text-muted);"></i>
+                            <p style="color: var(--text-muted); margin-top: 16px;">Cargando solicitudes...</p>
+                        </div>
                     </div>
                 </div>
             </section>

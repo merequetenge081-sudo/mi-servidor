@@ -1573,6 +1573,9 @@ function navigateToSection(section, updateHistory = true) {
             bindAnalyticsFilters();
             if (!analyticsLoaded) { loadAnalytics(); analyticsLoaded = true; }
         }
+        if (section === 'deletion-requests') {
+            loadDeletionRequests();
+        }
         const leaderSearchInput = document.getElementById('leaderSearchInput');
         if (leaderSearchInput && section === 'leaders' && !leaderSearchInput.hasListener) {
             leaderSearchInput.addEventListener('input', (e) => filterLeadersByName(e.target.value));
@@ -2496,6 +2499,182 @@ if (document.getElementById('saveEditLeaderBtn')) {
         }
     });
 }
+
+// ============== DELETION REQUESTS ==============
+
+let deletionRequests = [];
+
+async function loadDeletionRequests() {
+    try {
+        const response = await fetch(`${API_URL}/api/deletion-requests`, {
+            headers: { Authorization: `Bearer ${currentToken}` }
+        });
+
+        if (!response.ok) throw new Error('Error al cargar solicitudes');
+
+        const data = await response.json();
+        deletionRequests = data.requests || [];
+        renderDeletionRequests();
+    } catch (error) {
+        console.error('Error loading deletion requests:', error);
+        const container = document.getElementById('deletionRequestsContainer');
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: var(--danger);"></i>
+                    <p style="color: var(--text-muted); margin-top: 16px;">Error al cargar solicitudes</p>
+                </div>
+            `;
+        }
+    }
+}
+
+function filterDeletionRequests() {
+    const statusFilter = document.getElementById('deletionStatusFilter').value;
+    const filtered = statusFilter 
+        ? deletionRequests.filter(req => req.status === statusFilter)
+        : deletionRequests;
+    renderDeletionRequests(filtered);
+}
+
+function renderDeletionRequests(requests = deletionRequests) {
+    const container = document.getElementById('deletionRequestsContainer');
+    
+    if (!container) return;
+
+    if (requests.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="bi bi-inbox" style="font-size: 48px; color: var(--text-muted);"></i>
+                <p style="color: var(--text-muted); margin-top: 16px;">No hay solicitudes de eliminación</p>
+            </div>
+        `;
+        return;
+    }
+
+    const html = requests.map(req => {
+        const statusColors = {
+            pending: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e', icon: 'clock-history', label: 'Pendiente' },
+            approved: { bg: '#dcfce7', border: '#22c55e', text: '#166534', icon: 'check-circle-fill', label: 'Aprobada' },
+            rejected: { bg: '#fee2e2', border: '#dc2626', text: '#991b1b', icon: 'x-circle-fill', label: 'Rechazada' }
+        };
+        
+        const status = statusColors[req.status] || statusColors.pending;
+        const createdDate = new Date(req.createdAt).toLocaleString('es-CO');
+        const reviewedDate = req.reviewedAt ? new Date(req.reviewedAt).toLocaleString('es-CO') : '-';
+
+        return `
+            <div class="card" style="padding: 20px; margin-bottom: 16px; border-left: 4px solid ${status.border};">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <h4 style="margin: 0; color: var(--text-primary);">${req.leaderName}</h4>
+                            <span style="background: ${status.bg}; color: ${status.text}; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; border: 1px solid ${status.border};">
+                                <i class="bi bi-${status.icon}"></i> ${status.label}
+                            </span>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 14px; margin: 0;">
+                            <i class="bi bi-person-badge"></i> Leader ID: <code>${req.leaderId}</code>
+                        </p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: ${status.border};">
+                            ${req.registrationCount}
+                        </p>
+                        <p style="margin: 0; color: var(--text-muted); font-size: 13px;">registros</p>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+                        <strong>Razón:</strong> ${req.reason || 'Sin razón especificada'}
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                    <div>
+                        <i class="bi bi-calendar-event"></i> Solicitado: <strong>${createdDate}</strong>
+                    </div>
+                    ${req.reviewedAt ? `
+                        <div>
+                            <i class="bi bi-calendar-check"></i> Revisado: <strong>${reviewedDate}</strong>
+                        </div>
+                    ` : '<div></div>'}
+                    ${req.reviewedBy ? `
+                        <div>
+                            <i class="bi bi-person-check"></i> Por: <strong>${req.reviewedBy}</strong>
+                        </div>
+                    ` : '<div></div>'}
+                    ${req.reviewNotes ? `
+                        <div>
+                            <i class="bi bi-sticky"></i> Notas: <strong>${req.reviewNotes}</strong>
+                        </div>
+                    ` : '<div></div>'}
+                </div>
+
+                ${req.status === 'pending' ? `
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <button class="btn btn-outline" onclick="reviewDeletionRequest('${req._id}', 'reject')" style="flex: 1; border-color: var(--danger); color: var(--danger);">
+                            <i class="bi bi-x-circle"></i> Rechazar
+                        </button>
+                        <button class="btn btn-primary" onclick="reviewDeletionRequest('${req._id}', 'approve')" style="flex: 1; background: var(--danger); border: none;">
+                            <i class="bi bi-check-circle"></i> Aprobar y Eliminar
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+async function reviewDeletionRequest(requestId, action) {
+    const actionText = action === 'approve' ? 'aprobar' : 'rechazar';
+    const confirmText = action === 'approve' 
+        ? '⚠️ ADVERTENCIA: Esta acción ELIMINARÁ PERMANENTEMENTE todos los registros del líder. ¿Estás seguro?'
+        : '¿Estás seguro de rechazar esta solicitud?';
+
+    if (!confirm(confirmText)) return;
+
+    let notes = '';
+    if (action === 'reject') {
+        notes = prompt('Razón del rechazo (opcional):') || '';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/deletion-requests/${requestId}/review`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${currentToken}`
+            },
+            body: JSON.stringify({ action, notes })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al procesar solicitud');
+        }
+
+        showAlert(data.message || `Solicitud ${actionText}da exitosamente`, 'success');
+        await loadDeletionRequests();
+        
+        // Si se aprobó, recargar registros y líderes
+        if (action === 'approve') {
+            await loadAllLeaders();
+            await loadAllRegistrations();
+        }
+    } catch (error) {
+        console.error('Error reviewing deletion request:', error);
+        showAlert('Error: ' + error.message, 'error');
+    }
+}
+
+window.refreshDeletionRequests = loadDeletionRequests;
+window.filterDeletionRequests = filterDeletionRequests;
+window.reviewDeletionRequest = reviewDeletionRequest;
 
 // Close listeners for new modals if not already bound
 if (document.getElementById('closeEditLeaderModal')) {
