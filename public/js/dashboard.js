@@ -406,7 +406,8 @@ async function updateEventNameDisplay() {
 async function updateNotificationsBadge() {
     try {
         const leadersWithRequests = allLeaders.filter(l => l.passwordResetRequested);
-        const count = leadersWithRequests.length;
+        const pendingDeletionRequests = deletionRequests.filter(r => r.status === 'pending');
+        const count = leadersWithRequests.length + pendingDeletionRequests.length;
 
         // Actualizar badge en navbar (si existe)
         const badge = document.getElementById('notificationsBadge');
@@ -438,35 +439,70 @@ async function loadNotifications() {
     try {
         const content = document.getElementById('notificationsContent');
         const leadersWithRequests = allLeaders.filter(l => l.passwordResetRequested);
+        const pendingDeletionRequests = deletionRequests.filter(r => r.status === 'pending');
 
-        if (leadersWithRequests.length === 0) {
+        if (leadersWithRequests.length === 0 && pendingDeletionRequests.length === 0) {
             content.innerHTML = `
-                <div style="text-align: center; padding: 60px 20px; color: #999;">
-                    <i class="bi bi-bell-slash" style="font-size: 60px; opacity: 0.3; margin-bottom: 15px;"></i>
-                    <p style="font-size: 16px;">No hay solicitudes de restablecimiento</p>
+                <div class="empty-state">
+                    <i class="bi bi-bell-slash"></i>
+                    <p>Sin novedades</p>
                 </div>
             `;
             return;
         }
 
-        const html = leadersWithRequests.map(leader => `
-            <div style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
-                        <i class="bi bi-person-fill" style="color: #667eea;"></i> ${leader.name}
+        let html = '';
+
+        // Solicitudes de eliminación primero (más urgentes)
+        if (pendingDeletionRequests.length > 0) {
+            html += pendingDeletionRequests.map(request => {
+                const leader = allLeaders.find(l => l._id === request.leaderId);
+                const leaderName = leader ? leader.name : 'Líder desconocido';
+                return `
+                    <div style="padding: 15px; border-bottom: 1px solid #eee; background: #fef3f2;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #dc2626; margin-bottom: 5px;">
+                                    <i class="bi bi-trash-fill"></i> Solicitud de Eliminación
+                                </div>
+                                <div style="font-size: 13px; color: #666; margin-bottom: 3px;">
+                                    <i class="bi bi-person-fill"></i> <strong>${leaderName}</strong>
+                                </div>
+                                <div style="font-size: 13px; color: #666; margin-bottom: 3px;">
+                                    <i class="bi bi-file-text"></i> ${request.registrationCount} registros
+                                </div>
+                                ${request.reason ? `<div style="font-size: 12px; color: #999; font-style: italic; margin-top: 5px;">"${request.reason}"</div>` : ''}
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="navigateToSection('deletion-requests'); closeNotificationsDropdown();" style="width: 100%; margin-top: 8px;">
+                            <i class="bi bi-eye"></i> Revisar Solicitud
+                        </button>
                     </div>
-                    <div style="font-size: 13px; color: #666;">
-                        Usuario: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">${leader.username || '-'}</code>
+                `;
+            }).join('');
+        }
+
+        // Solicitudes de restablecimiento de contraseña
+        if (leadersWithRequests.length > 0) {
+            html += leadersWithRequests.map(leader => `
+                <div style="padding: 15px; border-bottom: 1px solid #eee;">
+                    <div>
+                        <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
+                            <i class="bi bi-key-fill" style="color: #667eea;"></i> Restablecimiento de Contraseña
+                        </div>
+                        <div style="font-size: 13px; color: #666;">
+                            <i class="bi bi-person-fill"></i> ${leader.name}
+                        </div>
+                        <div style="font-size: 13px; color: #666;">
+                            Usuario: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">${leader.username || '-'}</code>
+                        </div>
                     </div>
-                    <div style="font-size: 12px; color: #999; margin-top: 3px;">
-                        <i class="bi bi-clock"></i> Solicitud pendiente
-                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="generateNewPassword('${leader._id}'); closeNotificationsDropdown();" style="width: 100%; margin-top: 8px;">
+                        <i class="bi bi-key"></i> Generar Contraseña
+                    </button>
                 </div>
-                <button class="btn btn-sm btn-danger" onclick="generateNewPassword('${leader._id}'); document.getElementById('notificationsModal').classList.remove('active');" style="white-space: nowrap;">
-                    <i class="bi bi-key"></i> Generar Contraseña
-                </button>
-            </div>
-        `).join('');
+            `).join('');
+        }
 
         content.innerHTML = html;
     } catch (err) {
@@ -1645,11 +1681,8 @@ function toggleNotificationsDropdown() {
         dropdown.classList.remove('active');
     } else {
         dropdown.classList.add('active');
-        // Re-using loadNotifications logic for dropdown content if needed, 
-        // but current loadNotifications targets modal. 
-        // Adopting simpler logic for now or reusing if structures allow.
-        // For now, let's trigger the modal or update dropdown content if we had one.
-        // The original code uses a modal for detailed notifications mainly.
+        // Cargar notificaciones actualizadas
+        loadNotifications();
     }
 }
 
@@ -2518,6 +2551,9 @@ async function loadDeletionRequests() {
         
         // Cargar estadísticas de archivos
         await loadArchivedStats();
+        
+        // Actualizar badge de notificaciones
+        updateNotificationsBadge();
     } catch (error) {
         console.error('Error loading deletion requests:', error);
         const container = document.getElementById('deletionRequestsContainer');
@@ -2723,6 +2759,15 @@ window.reviewDeletionRequest = reviewDeletionRequest;
 if (document.getElementById('closeEditLeaderModal')) {
     document.getElementById('closeEditLeaderModal').addEventListener('click', () => {
         document.getElementById('editLeaderModal').classList.remove('active');
+    });
+}
+
+// Event listener para botón de notificaciones
+const notificationsBtn = document.getElementById('notificationsBtn');
+if (notificationsBtn) {
+    notificationsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleNotificationsDropdown();
     });
 }
 
