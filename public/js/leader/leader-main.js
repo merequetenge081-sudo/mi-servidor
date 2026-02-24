@@ -28,7 +28,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         AuthManager.checkAuth();
 
         // 2. Obtener datos del líder
-        const leaderId = StorageManager.getCurrentLeaderId();
+        let leaderId = StorageManager.getCurrentLeaderId();
+        if (!leaderId) {
+            try {
+                const verifyRes = await AuthManager.apiCall('/api/v2/auth/verify-token');
+                if (verifyRes.ok) {
+                    const verifyData = await verifyRes.json();
+                    const fallbackId = verifyData?.data?.userId || verifyData?.data?._id;
+                    if (fallbackId) {
+                        StorageManager.saveLeaderId(fallbackId);
+                        leaderId = fallbackId;
+                    }
+                }
+            } catch (error) {
+                console.error('Error verificando token:', error);
+            }
+        }
+
         if (!leaderId) {
             console.error('No se encontró leaderId');
             window.location.href = '/';
@@ -244,7 +260,7 @@ function connectEventListeners(leaderId, leaderData) {
     }
 
     // ========== MODAL DE EDICIÓN - UBICACIÓN ==========
-    const editUbicacionRadios = document.querySelectorAll('input[name="editUbicacion"]');
+    const editUbicacionRadios = document.querySelectorAll('input[name="editUbicacionTipo"]');
     editUbicacionRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             FormManager.toggleEditUbicacion(e.target.value);
@@ -351,7 +367,7 @@ function connectEventListeners(leaderId, leaderData) {
     }
 
     // ========== NUEVA REGISTRACIÓN - UBICACIÓN ==========
-    const ubicacionRadios = document.querySelectorAll('input[name="ubicacion"]');
+    const ubicacionRadios = document.querySelectorAll('input[name="ubicacionTipo"]');
     ubicacionRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             FormManager.toggleUbicacion(e.target.value);

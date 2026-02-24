@@ -326,7 +326,7 @@
                         <p>Completa todos los campos para agregar una nueva persona</p>
                     </div>
 
-                    <form id="newRegistrationForm" onsubmit="handleSubmit(event)">
+                    <form id="newRegForm">
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label required">Nombre</label>
@@ -355,16 +355,14 @@
                             <label class="form-label required">Ubicación</label>
                             <div class="ubicacion-selector">
                                 <div class="ubicacion-option">
-                                    <input type="radio" name="ubicacionTipo" id="ubicacionBogota" value="bogota"
-                                        onchange="toggleUbicacion('bogota')" checked>
+                                    <input type="radio" name="ubicacionTipo" id="ubicacionBogota" value="bogota" checked>
                                     <label for="ubicacionBogota" class="ubicacion-label">
                                         <i class="bi bi-buildings"></i>
                                         Bogotá D.C.
                                     </label>
                                 </div>
                                 <div class="ubicacion-option">
-                                    <input type="radio" name="ubicacionTipo" id="ubicacionResto" value="resto"
-                                        onchange="toggleUbicacion('resto')">
+                                    <input type="radio" name="ubicacionTipo" id="ubicacionResto" value="resto">
                                     <label for="ubicacionResto" class="ubicacion-label">
                                         <i class="bi bi-geo-alt"></i>
                                         Resto del país
@@ -602,7 +600,7 @@
             <button class="modal-close" onclick="closeEditModal()">&times;</button>
             <h4 style="margin-bottom: 20px; color: var(--primary);"><i class="bi bi-pencil-square"></i> Editar Registro
             </h4>
-            <form id="editForm" onsubmit="saveEditRegistration(event)">
+            <form id="editForm">
                 <input type="hidden" id="editId">
                 <div class="form-group">
                     <label class="form-label">Nombre</label>
@@ -624,16 +622,14 @@
                     <label class="form-label required">Ubicación</label>
                     <div class="ubicacion-selector">
                         <div class="ubicacion-option">
-                            <input type="radio" name="editUbicacionTipo" id="editUbicacionBogota" value="bogota"
-                                onchange="toggleEditUbicacion('bogota')">
+                            <input type="radio" name="editUbicacionTipo" id="editUbicacionBogota" value="bogota">
                             <label for="editUbicacionBogota" class="ubicacion-label">
                                 <i class="bi bi-buildings"></i>
                                 Bogotá D.C.
                             </label>
                         </div>
                         <div class="ubicacion-option">
-                            <input type="radio" name="editUbicacionTipo" id="editUbicacionResto" value="resto"
-                                onchange="toggleEditUbicacion('resto')">
+                            <input type="radio" name="editUbicacionTipo" id="editUbicacionResto" value="resto">
                             <label for="editUbicacionResto" class="ubicacion-label">
                                 <i class="bi bi-geo-alt"></i>
                                 Resto del país
