@@ -1,5 +1,6 @@
 import { Puestos } from "../models/index.js";
 import logger from "../config/logger.js";
+import { encontrarAlias } from "../utils/aliasPuestos.js";
 
 /**
  * GET /api/puestos?localidad=Kennedy
@@ -24,12 +25,16 @@ export async function getPuestosHandler(req, res) {
       .lean();
     
     // Agregar displayName con formato "Alias - Nombre" si tiene alias
-    const puestosConDisplay = puestos.map(puesto => ({
-      ...puesto,
-      displayName: puesto.alias 
-        ? `${puesto.alias} - ${puesto.nombre}` 
-        : puesto.nombre
-    }));
+    const puestosConDisplay = puestos.map(puesto => {
+      const aliasArray = Array.isArray(puesto.aliases) ? puesto.aliases : [];
+      const alias = aliasArray[0] || puesto.alias || encontrarAlias(puesto.nombre);
+
+      return {
+        ...puesto,
+        alias,
+        displayName: alias ? `${alias} - ${puesto.nombre}` : puesto.nombre
+      };
+    });
 
     logger.info(`Cargados ${puestos.length} puestos para ${localidad}`);
 

@@ -664,7 +664,8 @@
         function buildPuestoSearchText(puesto) {
             const nombreMostrar = puesto.displayName || puesto.nombre || '';
             const alias = puesto.alias || '';
-            const base = `${nombreMostrar} ${puesto.codigoPuesto || ''} ${alias}`;
+            const aliases = Array.isArray(puesto.aliases) ? puesto.aliases.join(' ') : '';
+            const base = `${nombreMostrar} ${puesto.codigoPuesto || ''} ${alias} ${aliases}`;
             return normalizePuestoTexto(base);
         }
 

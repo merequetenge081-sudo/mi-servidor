@@ -15,7 +15,7 @@ const puestosSchema = new mongoose.Schema({
   localidad: String,
   direccion: String,
   sitio: String,
-  alias: String,  // NUEVO CAMPO
+  aliases: [String],
   mesas: [Number],
   latitud: Number,
   longitud: Number,
@@ -57,7 +57,7 @@ async function actualizarAlias() {
       if (alias) {
         await Puestos.updateOne(
           { _id: puesto._id },
-          { $set: { alias: alias } }
+          { $set: { aliases: [alias] } }
         );
         
         actualizados++;
@@ -86,10 +86,11 @@ async function actualizarAlias() {
     // Verificar ejemplos
     console.log("🔍 VERIFICACIÓN - Ejemplos con alias:\n");
     
-    const ejemplos = await Puestos.find({ alias: { $exists: true, $ne: null } }).limit(5);
+    const ejemplos = await Puestos.find({ aliases: { $exists: true, $ne: [] } }).limit(5);
     
     ejemplos.forEach(p => {
-      console.log(`📍 ${p.alias} - ${p.nombre}`);
+      const aliasEjemplo = Array.isArray(p.aliases) ? p.aliases[0] : undefined;
+      console.log(`📍 ${aliasEjemplo || 'Sin alias'} - ${p.nombre}`);
       console.log(`   📮 ${p.localidad} - ${p.direccion}\n`);
     });
     
@@ -102,7 +103,8 @@ async function actualizarAlias() {
     
     if (veracruz) {
       console.log(`✅ Puesto encontrado:`);
-      console.log(`   Alias: ${veracruz.alias || 'No asignado'}`);
+      const aliasVeracruz = Array.isArray(veracruz.aliases) ? veracruz.aliases[0] : undefined;
+      console.log(`   Alias: ${aliasVeracruz || 'No asignado'}`);
       console.log(`   Nombre: ${veracruz.nombre}`);
       console.log(`   Dirección: ${veracruz.direccion}\n`);
     }
