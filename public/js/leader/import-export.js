@@ -41,6 +41,16 @@ export class ImportExportManager {
                 // Mostrar resultados si hay autocorrecciones, errores, o fallos
                 if (!response.ok || responseData.failed > 0 || (responseData.autocorrections && responseData.autocorrections.length > 0)) {
                     this.showImportResults(responseData);
+                    
+                    // Auto-cerrar modal después de 5 segundos si solo hay éxito (sin errores)
+                    if (responseData.imported > 0 && responseData.failed === 0) {
+                        setTimeout(() => {
+                            const modal = document.getElementById('errorModal');
+                            if (modal && modal.classList.contains('active')) {
+                                modal.classList.remove('active');
+                            }
+                        }, 5000);
+                    }
                 } else {
                     // Show success message
                     const message = `✅ Importación exitosa!\n\n` +
@@ -190,6 +200,24 @@ export class ImportExportManager {
         }
         
         modal.classList.add('active');
+        
+        // Auto-reload registrations after showing results
+        if (data && data.imported > 0) {
+            setTimeout(() => {
+                if (window.registrationsManager && window.registrationsManager.loadRegistrations) {
+                    const leaderId = sessionStorage.getItem('leaderId') || localStorage.getItem('leaderId');
+                    if (leaderId) {
+                        window.registrationsManager.loadRegistrations(leaderId).then(() => {
+                            window.registrationsManager.renderRegistrations();
+                            window.registrationsManager.checkRevisionPendiente();
+                            if (window.statisticsManager && window.registrationsManager.myRegistrations) {
+                                window.statisticsManager.loadStatistics(window.registrationsManager.myRegistrations);
+                            }
+                        });
+                    }
+                }
+            }, 500);
+        }
     }
 
     static showImportErrors(details) {
