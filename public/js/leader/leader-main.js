@@ -28,7 +28,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         AuthManager.checkAuth();
 
         // 2. Obtener datos del líder
-        const leaderId = StorageManager.getCurrentToken().split(':')[1];
+        const leaderId = StorageManager.getCurrentLeaderId();
+        if (!leaderId) {
+            console.error('No se encontró leaderId');
+            window.location.href = '/';
+            return;
+        }
+        
         const leaderData = await LeaderManager.loadLeaderData(leaderId);
 
         // 3. Inicializar tema oscuro
@@ -379,3 +385,36 @@ function connectEventListeners(leaderId, leaderData) {
 export function reinitializeEventListeners(leaderId, leaderData) {
     connectEventListeners(leaderId, leaderData);
 }
+
+// ========== EXPORTAR FUNCIONES GLOBALES PARA ONCLICK HANDLERS ==========
+// Las funciones deben estar disponibles globalmente para onclick en HTML
+
+window.goToView = (viewName) => UIManager.goToView(viewName);
+window.toggleHelpDrawer = () => UIManager.toggleHelpDrawer();
+window.closeHelpDrawer = () => UIManager.closeHelpDrawer();
+window.logout = () => AuthManager.logout();
+window.confirmLogout = () => AuthManager.confirmLogout();
+
+// Registrations
+window.filtrarRegistrosRevision = () => RegistrationsManager.applyFilters('revision', 'revision');
+window.refreshRegistrations = async () => {
+    const leaderId = StorageManager.getCurrentLeaderId();
+    if (leaderId) await RegistrationsManager.loadRegistrations(leaderId);
+};
+window.previousPage = () => RegistrationsManager.changePage(-1);
+window.nextPage = () => RegistrationsManager.changePage(1);
+
+// Forms
+window.copyLink = () => FormManager.copyLink();
+window.openQrModal = () => FormManager.openQrModal();
+window.filtrarPuestosLeader = () => FormManager.filtrarPuestos();
+window.mostrarDropdownPuestosLeader = () => FormManager.mostrarDropdownPuestos();
+
+// Import/Export
+window.downloadTemplate = () => ImportExportManager.downloadTemplate();
+window.exportToExcel = async () => {
+    const leaderId = StorageManager.getCurrentLeaderId();
+    if (!leaderId) return;
+    const leaderData = await LeaderManager.loadLeaderData(leaderId);
+    await ImportExportManager.exportToExcel(RegistrationsManager.myRegistrations, leaderData);
+};
