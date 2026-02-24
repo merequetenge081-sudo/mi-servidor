@@ -6,3 +6,4 @@ export { AuditLog } from "./AuditLog.js";
 export { Organization } from "./Organization.js";
 export { Puestos } from "./Puestos.js";
 export { DeletionRequest } from "./DeletionRequest.js";
+export { ArchivedRegistration } from "./ArchivedRegistration.js";

@@ -3,7 +3,7 @@ import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
 import { Organization } from "../models/Organization.js";
-import { Puestos, DeletionRequest } from "../models/index.js";
+import { Puestos, DeletionRequest, ArchivedRegistration } from "../models/index.js";
 import { AuditService } from "../services/audit.service.js";
 import { ValidationService } from "../services/validation.service.js";
 import { ConsentLogService } from "../services/consentLog.service.js";
@@ -895,6 +895,7 @@ export async function getAllDeletionRequests(req, res) {
 
 /**
  * Approve or reject deletion request (Admin only)
+ * Actions: 'reject', 'approve', 'approve-and-archive'
  */
 export async function reviewDeletionRequest(req, res) {
   try {
@@ -907,8 +908,8 @@ export async function reviewDeletionRequest(req, res) {
       return res.status(403).json({ error: "Acceso denegado" });
     }
 
-    if (!['approve', 'reject'].includes(action)) {
-      return res.status(400).json({ error: "Acción inválida. Use 'approve' o 'reject'" });
+    if (!['approve', 'approve-and-archive', 'reject'].includes(action)) {
+      return res.status(400).json({ error: "Acción inválida. Use 'approve', 'approve-and-archive' o 'reject'" });
     }
 
     const deletionRequest = await DeletionRequest.findOne({
@@ -925,14 +926,61 @@ export async function reviewDeletionRequest(req, res) {
     }
 
     // Actualizar estado de la solicitud
-    deletionRequest.status = action === 'approve' ? 'approved' : 'rejected';
+    deletionRequest.status = (action === 'approve' || action === 'approve-and-archive') ? 'approved' : 'rejected';
     deletionRequest.reviewedBy = user.username || user.email;
     deletionRequest.reviewedAt = new Date();
     deletionRequest.reviewNotes = notes || '';
     await deletionRequest.save();
 
-    // Si se aprueba, eliminar todos los registros del líder
-    if (action === 'approve') {
+    // Si se aprueba (con o sin archivo), eliminar registros
+    if (action === 'approve' || action === 'approve-and-archive') {
+      let archivedCount = 0;
+
+      // Si se solicitó archivar, copiar a ArchivedRegistration primero
+      if (action === 'approve-and-archive') {
+        const registrationsToArchive = await Registration.find({
+          leaderId: deletionRequest.leaderId,
+          organizationId: orgId
+        }).lean();
+
+        if (registrationsToArchive.length > 0) {
+          const archivedDocs = registrationsToArchive.map(reg => ({
+            originalId: reg._id,
+            leaderId: reg.leaderId,
+            leaderName: reg.leaderName,
+            eventId: reg.eventId,
+            firstName: reg.firstName,
+            lastName: reg.lastName,
+            cedula: reg.cedula,
+            email: reg.email,
+            phone: reg.phone,
+            localidad: reg.localidad,
+            departamento: reg.departamento,
+            capital: reg.capital,
+            votingPlace: reg.votingPlace,
+            votingTable: reg.votingTable,
+            puestoId: reg.puestoId,
+            mesa: reg.mesa,
+            registeredToVote: reg.registeredToVote,
+            confirmed: reg.confirmed,
+            date: reg.date,
+            organizationId: reg.organizationId,
+            archivedAt: new Date(),
+            archivedBy: user.username || user.email,
+            archivedReason: notes || 'Eliminación masiva aprobada con archivo',
+            deletionRequestId: deletionRequest._id,
+            originalCreatedAt: reg.createdAt,
+            originalUpdatedAt: reg.updatedAt
+          }));
+
+          const archiveResult = await ArchivedRegistration.insertMany(archivedDocs);
+          archivedCount = archiveResult.length;
+
+          logger.info(`Registrations archived before deletion - Leader: ${deletionRequest.leaderId}, Archived: ${archivedCount}`);
+        }
+      }
+
+      // Ahora eliminar los registros originales
       const deleteResult = await Registration.deleteMany({
         leaderId: deletionRequest.leaderId,
         organizationId: orgId
@@ -944,21 +992,22 @@ export async function reviewDeletionRequest(req, res) {
         { $set: { registrations: 0 } }
       );
 
-      logger.info(`Bulk deletion approved and executed - Leader: ${deletionRequest.leaderId}, Deleted: ${deleteResult.deletedCount}`);
+      logger.info(`Bulk deletion approved and executed - Leader: ${deletionRequest.leaderId}, Deleted: ${deleteResult.deletedCount}, Archived: ${archivedCount}`);
 
       await AuditService.log(
-        "DELETE_BULK",
+        action === 'approve-and-archive' ? "DELETE_BULK_WITH_ARCHIVE" : "DELETE_BULK",
         "Registration",
         deletionRequest.leaderId,
         user,
-        { deletedCount: deleteResult.deletedCount, requestId },
-        `Eliminación masiva aprobada: ${deleteResult.deletedCount} registros eliminados`
+        { deletedCount: deleteResult.deletedCount, archivedCount, requestId },
+        `Eliminación masiva aprobada: ${deleteResult.deletedCount} registros eliminados${archivedCount > 0 ? `, ${archivedCount} archivados` : ''}`
       );
 
       res.json({
         success: true,
-        message: `Solicitud aprobada. Se eliminaron ${deleteResult.deletedCount} registros.`,
-        deletedCount: deleteResult.deletedCount
+        message: `Solicitud aprobada. Se eliminaron ${deleteResult.deletedCount} registros${archivedCount > 0 ? ` y se archivaron ${archivedCount} para uso futuro` : ''}.`,
+        deletedCount: deleteResult.deletedCount,
+        archivedCount
       });
     } else {
       logger.info(`Bulk deletion rejected - Leader: ${deletionRequest.leaderId}, RequestId: ${requestId}`);
@@ -982,5 +1031,80 @@ export async function reviewDeletionRequest(req, res) {
   } catch (error) {
     logger.error("Review deletion request error:", error);
     res.status(500).json({ error: "Error al procesar solicitud" });
+  }
+}
+
+// ========== ARCHIVED REGISTRATIONS ==========
+
+/**
+ * Search archived registration by cedula (for autofill in future events)
+ */
+export async function searchArchivedByCedula(req, res) {
+  try {
+    const { cedula } = req.params;
+    const orgId = req.user?.organizationId;
+
+    if (!cedula) {
+      return res.status(400).json({ error: "Cédula requerida" });
+    }
+
+    const archived = await ArchivedRegistration.findOne({
+      cedula,
+      organizationId: orgId
+    })
+      .sort({ archivedAt: -1 })  // Más reciente primero
+      .lean();
+
+    if (!archived) {
+      return res.json({ found: false, data: null });
+    }
+
+    // Retornar solo los datos útiles para autofill
+    res.json({
+      found: true,
+      data: {
+        firstName: archived.firstName,
+        lastName: archived.lastName,
+        email: archived.email,
+        phone: archived.phone,
+        localidad: archived.localidad,
+        departamento: archived.departamento,
+        capital: archived.capital,
+        votingPlace: archived.votingPlace,
+        votingTable: archived.votingTable,
+        registeredToVote: archived.registeredToVote
+      }
+    });
+
+  } catch (error) {
+    logger.error("Search archived registration error:", error);
+    res.status(500).json({ error: "Error al buscar registro archivado" });
+  }
+}
+
+/**
+ * Get archived registrations count (Admin only)
+ */
+export async function getArchivedStats(req, res) {
+  try {
+    const user = req.user;
+    const orgId = user.organizationId;
+
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: "Acceso denegado" });
+    }
+
+    const totalArchived = await ArchivedRegistration.countDocuments({ organizationId: orgId });
+    const uniqueCedulas = await ArchivedRegistration.distinct('cedula', { organizationId: orgId });
+
+    res.json({
+      success: true,
+      totalArchived,
+      uniquePersons: uniqueCedulas.length
+    });
+
+  } catch (error) {
+    logger.error("Get archived stats error:", error);
+    res.status(500).json({ error: "Error al obtener estadísticas de archivos" });
   }
 }

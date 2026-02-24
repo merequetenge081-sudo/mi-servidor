@@ -7914,3 +7914,251 @@
 {"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:03:46"}
 {"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:03:46"}
 {"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:03:46"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:11:59"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 22:12:00"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:12:06"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 22:12:07"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:12:27"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 22:12:28"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:13:12"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 22:13:13"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-23 22:13:19"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"[BOOT] Environment: development","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"[BOOT] Mongo DB: seguimiento-datos-dev","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-23 22:13:20"}

@@ -2515,6 +2515,9 @@ async function loadDeletionRequests() {
         const data = await response.json();
         deletionRequests = data.requests || [];
         renderDeletionRequests();
+        
+        // Cargar estadísticas de archivos
+        await loadArchivedStats();
     } catch (error) {
         console.error('Error loading deletion requests:', error);
         const container = document.getElementById('deletionRequestsContainer');
@@ -2526,6 +2529,25 @@ async function loadDeletionRequests() {
                 </div>
             `;
         }
+    }
+}
+
+async function loadArchivedStats() {
+    try {
+        const response = await fetch(`${API_URL}/api/archived-registrations/stats`, {
+            headers: { Authorization: `Bearer ${currentToken}` }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const countElement = document.getElementById('archivedCount');
+            const personsElement = document.getElementById('archivedPersons');
+            
+            if (countElement) countElement.textContent = data.totalArchived || 0;
+            if (personsElement) personsElement.textContent = data.uniquePersons || 0;
+        }
+    } catch (error) {
+        console.error('Error loading archived stats:', error);
     }
 }
 
@@ -2613,12 +2635,22 @@ function renderDeletionRequests(requests = deletionRequests) {
                 </div>
 
                 ${req.status === 'pending' ? `
-                    <div style="display: flex; gap: 12px; margin-top: 16px;">
-                        <button class="btn btn-outline" onclick="reviewDeletionRequest('${req._id}', 'reject')" style="flex: 1; border-color: var(--danger); color: var(--danger);">
+                    <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 12px; margin-bottom: 12px;">
+                        <p style="margin: 0; color: #92400e; font-size: 13px; line-height: 1.6;">
+                            <i class="bi bi-info-circle-fill"></i> <strong>Opciones de aprobación:</strong><br>
+                            • <strong>Aprobar y Eliminar:</strong> Elimina permanentemente sin respaldo<br>
+                            • <strong>Aprobar y Archivar:</strong> Guarda copias en base de datos de archivo para reutilización futura
+                        </p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px;">
+                        <button class="btn btn-outline" onclick="reviewDeletionRequest('${req._id}', 'reject')" style="border-color: #6b7280; color: #6b7280;">
                             <i class="bi bi-x-circle"></i> Rechazar
                         </button>
-                        <button class="btn btn-primary" onclick="reviewDeletionRequest('${req._id}', 'approve')" style="flex: 1; background: var(--danger); border: none;">
-                            <i class="bi bi-check-circle"></i> Aprobar y Eliminar
+                        <button class="btn btn-outline" onclick="reviewDeletionRequest('${req._id}', 'approve-and-archive')" style="border-color: #2563eb; color: #2563eb;">
+                            <i class="bi bi-archive-fill"></i> Aprobar y Archivar
+                        </button>
+                        <button class="btn btn-primary" onclick="reviewDeletionRequest('${req._id}', 'approve')" style="background: var(--danger); border: none;">
+                            <i class="bi bi-trash-fill"></i> Aprobar y Eliminar
                         </button>
                     </div>
                 ` : ''}
@@ -2630,16 +2662,27 @@ function renderDeletionRequests(requests = deletionRequests) {
 }
 
 async function reviewDeletionRequest(requestId, action) {
-    const actionText = action === 'approve' ? 'aprobar' : 'rechazar';
-    const confirmText = action === 'approve' 
-        ? '⚠️ ADVERTENCIA: Esta acción ELIMINARÁ PERMANENTEMENTE todos los registros del líder. ¿Estás seguro?'
-        : '¿Estás seguro de rechazar esta solicitud?';
+    const actionTexts = {
+        'approve': 'aprobar',
+        'approve-and-archive': 'aprobar y archivar',
+        'reject': 'rechazar'
+    };
+    const actionText = actionTexts[action] || action;
+    
+    const confirmTexts = {
+        'approve': '⚠️ ADVERTENCIA: Esta acción ELIMINARÁ PERMANENTEMENTE todos los registros del líder SIN RESPALDO. ¿Estás seguro?',
+        'approve-and-archive': '✅ Esta acción eliminará los registros del líder actual PERO guardará copias en la base de datos de archivo para uso futuro (auto-rellenar en próximos eventos). ¿Continuar?',
+        'reject': '¿Estás seguro de rechazar esta solicitud?'
+    };
+    const confirmText = confirmTexts[action] || '¿Estás seguro?';
 
     if (!confirm(confirmText)) return;
 
     let notes = '';
     if (action === 'reject') {
         notes = prompt('Razón del rechazo (opcional):') || '';
+    } else if (action === 'approve-and-archive') {
+        notes = 'Aprobado con archivo para reutilización futura';
     }
 
     try {
@@ -2661,8 +2704,8 @@ async function reviewDeletionRequest(requestId, action) {
         showAlert(data.message || `Solicitud ${actionText}da exitosamente`, 'success');
         await loadDeletionRequests();
         
-        // Si se aprobó, recargar registros y líderes
-        if (action === 'approve') {
+        // Si se aprobó (con o sin archivo), recargar registros y líderes
+        if (action === 'approve' || action === 'approve-and-archive') {
             await loadAllLeaders();
             await loadAllRegistrations();
         }

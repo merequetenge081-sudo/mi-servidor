@@ -251,6 +251,10 @@ router.get("/registrations/deletion-request/status", authMiddleware, registratio
 router.get("/deletion-requests", authMiddleware, roleMiddleware("admin"), registrationController.getAllDeletionRequests);
 router.post("/deletion-requests/:requestId/review", authMiddleware, roleMiddleware("admin"), registrationController.reviewDeletionRequest);
 
+// ==================== ARCHIVED REGISTRATIONS ====================
+router.get("/archived-registrations/search/:cedula", authMiddleware, registrationController.searchArchivedByCedula);
+router.get("/archived-registrations/stats", authMiddleware, roleMiddleware("admin"), registrationController.getArchivedStats);
+
 // ==================== EVENTOS ====================
 router.post("/events", authMiddleware, roleMiddleware("admin"), eventController.createEvent);
 router.get("/events", authMiddleware, eventController.getEvents);
