@@ -2,6 +2,7 @@ import { Resend } from 'resend';
 import QRCode from 'qrcode';
 import logger from '../config/logger.js';
 import { decrypt } from '../utils/crypto.js';
+import { isTempPasswordExpired } from '../utils/tempPassword.js';
 
 class EmailService {
   constructor() {
@@ -156,9 +157,7 @@ class EmailService {
     const loginUrl = baseUrl || 'https://redsociaypolitica.fulars.com';
     
     let tempPassword = 'No disponible';
-    const ttlHours = parseInt(process.env.TEMP_PASSWORD_TTL_HOURS, 10) || 24;
-    const tempAgeMs = leader.tempPasswordCreatedAt ? (Date.now() - new Date(leader.tempPasswordCreatedAt).getTime()) : 0;
-    const isExpired = leader.tempPasswordCreatedAt ? tempAgeMs > ttlHours * 60 * 60 * 1000 : false;
+    const isExpired = isTempPasswordExpired(leader);
 
     if (isExpired) {
       logger.warn('🔑 Contraseña temporal expirada para este líder');

@@ -13,6 +13,7 @@ import crypto from 'crypto';
 import { encrypt, decrypt } from '../../../utils/crypto.js';
 import { emailService } from '../../../services/emailService.js';
 import config from '../../config/config.js';
+import { isTempPasswordExpired } from '../../../utils/tempPassword.js';
 
 const logger = createLogger('LeaderService');
 
@@ -48,6 +49,9 @@ export class LeaderService {
       passwordHash,
       token,
       isTemporaryPassword: true,
+      tempPasswordPlaintext: encrypt(tempPassword),
+      tempPasswordCreatedAt: new Date(),
+      passwordCanBeChanged: true,
       organizationId,
       active: true,
       registrations: 0
@@ -116,9 +120,7 @@ export class LeaderService {
 
     // Desencriptar contraseña temporal (si no expiro)
     let tempPassword = null;
-    const ttlHours = parseInt(process.env.TEMP_PASSWORD_TTL_HOURS, 10) || 24;
-    const tempAgeMs = leader.tempPasswordCreatedAt ? (Date.now() - new Date(leader.tempPasswordCreatedAt).getTime()) : 0;
-    const isExpired = leader.tempPasswordCreatedAt ? tempAgeMs > ttlHours * 60 * 60 * 1000 : false;
+    const isExpired = isTempPasswordExpired(leader);
 
     if (isExpired) {
       await Leader.updateOne(

@@ -10,6 +10,7 @@ import { config } from "../config/env.js";
 import logger from "../config/logger.js";
 import { findAdminWithFallback, findLeaderWithFallback, getTestCredentials } from "../utils/authFallback.js";
 import { validatePassword, getPasswordRequirements } from "../utils/passwordValidator.js";
+import { isTempPasswordExpired } from "../utils/tempPassword.js";
 
 export async function adminLogin(req, res) {
   try {
@@ -18,7 +19,6 @@ export async function adminLogin(req, res) {
     if (!username || !password) {
       return res.status(400).json({ error: "Username y password requeridos" });
     }
-
     const { data: admin, source } = await findAdminWithFallback(Admin, username);
 
     if (!admin) {
@@ -34,9 +34,9 @@ export async function adminLogin(req, res) {
     if (!isValid) {
       if (req.loginRateLimit) req.loginRateLimit.recordFailedAttempt();
       const remaining = req.loginRateLimit ? req.loginRateLimit.getAttemptsRemaining() : 5;
-      return res.status(401).json({ 
-        error: "Credenciales inválidas", 
-        attemptsRemaining: remaining 
+      return res.status(401).json({
+        error: "Credenciales inválidas",
+        attemptsRemaining: remaining
       });
     }
 
@@ -122,6 +122,14 @@ export async function leaderLogin(req, res) {
       });
     }
 
+    if (leader.isTemporaryPassword && isTempPasswordExpired(leader)) {
+      await Leader.updateOne(
+        { _id: leader._id },
+        { $unset: { tempPasswordPlaintext: "", tempPasswordCreatedAt: "" } }
+      );
+      return res.status(403).json({ error: "Contraseña temporal expirada. Solicita un reset." });
+    }
+
     if (!leader.active) {
       return res.status(403).json({ error: "Cuenta inactiva. Contacte al administrador." });
     }
@@ -187,6 +195,10 @@ export async function changePassword(req, res) {
       $set: {
         passwordHash: newHash,
         isTemporaryPassword: false
+      },
+      $unset: {
+        tempPasswordPlaintext: "",
+        tempPasswordCreatedAt: ""
       }
     });
 

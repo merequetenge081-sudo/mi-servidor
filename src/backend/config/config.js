@@ -37,6 +37,10 @@ const config = {
   // Paginación
   DEFAULT_PAGE_SIZE: 20,
   MAX_PAGE_SIZE: 100,
+
+  // Credenciales temporales
+  TEMP_PASSWORD_TTL_HOURS: parseInt(process.env.TEMP_PASSWORD_TTL_HOURS || '24', 10),
+  TEMP_PASSWORD_CLEANUP_INTERVAL_MINUTES: parseInt(process.env.TEMP_PASSWORD_CLEANUP_INTERVAL_MINUTES || '60', 10),
 };
 
 /**

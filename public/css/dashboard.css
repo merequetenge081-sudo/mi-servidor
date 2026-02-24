@@ -510,77 +510,6 @@ body {
     /* Default width */
 }
 
-.confirm-modal-card {
-    width: 560px;
-    max-width: 92%;
-    padding: 28px;
-}
-
-.confirm-modal-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.confirm-modal-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-.confirm-modal-icon.danger {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.confirm-modal-icon.warning {
-    background: #fef3c7;
-    color: #b45309;
-}
-
-.confirm-modal-icon.info {
-    background: #dbeafe;
-    color: #2563eb;
-}
-
-.confirm-modal-title {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-dark);
-}
-
-.confirm-modal-subtitle {
-    margin: 4px 0 0 0;
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-.confirm-modal-body {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 16px;
-    color: #334155;
-    font-size: 14px;
-    line-height: 1.6;
-}
-
-.confirm-modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 20px;
-    border-top: none;
-    padding-top: 0;
-}
-
 .modal-overlay.active .modal-card {
     transform: scale(1);
     opacity: 1;
@@ -919,7 +848,6 @@ body {
 }
 
 .action-btn {
-    position: relative;
     width: 42px;
     height: 42px;
     border-radius: 12px;
@@ -946,9 +874,8 @@ body {
 
 .action-btn .badge-notification {
     position: absolute;
-    top: 0;
-    right: 0;
-    transform: translate(35%, -35%);
+    top: -5px;
+    right: -5px;
     background: var(--danger);
     color: white;
     font-size: 0.7rem;
@@ -961,9 +888,6 @@ body {
     justify-content: center;
     border: 2px solid white;
     font-weight: 700;
-    line-height: 1;
-    z-index: 2;
-    pointer-events: none;
 }
 
 /* Sidebar Toggle Button (Specific) */
@@ -1291,12 +1215,6 @@ body.dark-mode .table-container,
 body.dark-mode .modal-card {
     background: #1e293b;
     border-color: #334155;
-    color: #e2e8f0;
-}
-
-body.dark-mode .confirm-modal-body {
-    background: #0b1220;
-    border-color: #1e293b;
     color: #e2e8f0;
 }
 

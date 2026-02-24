@@ -11,6 +11,8 @@
 import { RegistrationService } from "./registration.service.js";
 import { createLogger } from "../../core/Logger.js";
 import { AppError } from "../../core/AppError.js";
+import config from "../../config/config.js";
+import { parsePagination } from "../../../utils/pagination.js";
 
 const logger = createLogger("RegistrationController");
 const service = new RegistrationService();
@@ -80,8 +82,11 @@ export class RegistrationController {
     try {
       logger.info("GET getRegistrations", { orgId: req.orgId });
 
-      const page = Math.max(1, parseInt(req.query.page) || 1);
-      const pageSize = Math.min(100, parseInt(req.query.pageSize) || 20);
+      const { page, limit } = parsePagination(req.query, {
+        defaultLimit: config.DEFAULT_PAGE_SIZE,
+        maxLimit: config.MAX_PAGE_SIZE
+      });
+      const pageSize = limit;
 
       // Filtros
       const filter = {};

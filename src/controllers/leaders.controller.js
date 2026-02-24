@@ -8,6 +8,8 @@ import { Organization } from "../models/Organization.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
 import { emailService } from "../services/emailService.js";
 import { decrypt, encrypt } from "../utils/crypto.js";
+import { parseLimit } from "../utils/pagination.js";
+import { isTempPasswordExpired } from "../utils/tempPassword.js";
 
 // Generar token único de 32 caracteres hexadecimales
 function generateToken() {
@@ -216,9 +218,7 @@ export async function getLeaderCredentials(req, res) {
 
     // Si tiene contraseña temporal, desencriptarla (si no expiro)
     let tempPassword = null;
-    const ttlHours = parseInt(process.env.TEMP_PASSWORD_TTL_HOURS, 10) || 24;
-    const tempAgeMs = leader.tempPasswordCreatedAt ? (Date.now() - new Date(leader.tempPasswordCreatedAt).getTime()) : 0;
-    const isExpired = leader.tempPasswordCreatedAt ? tempAgeMs > ttlHours * 60 * 60 * 1000 : false;
+    const isExpired = isTempPasswordExpired(leader);
 
     if (isExpired) {
       await Leader.updateOne(
@@ -402,7 +402,7 @@ export async function deleteLeader(req, res) {
 
 export async function getTopLeaders(req, res) {
   try {
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseLimit(req.query.limit, { defaultLimit: 10, maxLimit: 100 });
     const filter = buildOrgFilter(req); // Multi-tenant filtering
     const leaders = await Leader.find({ ...filter, active: true }).sort({ registrations: -1 }).limit(limit);
     res.json(leaders);

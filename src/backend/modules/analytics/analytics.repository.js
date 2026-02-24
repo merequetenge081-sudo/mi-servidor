@@ -60,7 +60,7 @@ export async function getLeaderStats(eventId = null) {
     });
 
     const registrationsPerLeader = await Registration.aggregate([
-      ...(eventId && [{ $match: { eventId } }]),
+      ...(eventId ? [{ $match: { eventId } }] : []),
       {
         $group: {
           _id: '$leaderId',

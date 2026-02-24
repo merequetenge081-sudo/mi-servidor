@@ -10,6 +10,7 @@ import { ConsentLogService } from "../services/consentLog.service.js";
 import logger from "../config/logger.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
 import { matchPuesto, matchLocalidad, autocorrectRegistration } from "../utils/fuzzyMatch.js";
+import { parsePagination } from "../utils/pagination.js";
 import bcrypt from "bcryptjs";
 
 const normalizeRegistration = (registration) => {
@@ -190,8 +191,11 @@ export async function createRegistration(req, res) {
 
 export async function getRegistrations(req, res) {
   try {
-    const { eventId, leaderId, confirmed, cedula, requiereRevisionPuesto, page = 1, limit = 50 } = req.query;
+    const { eventId, leaderId, confirmed, cedula, requiereRevisionPuesto } = req.query;
     const filter = buildOrgFilter(req); // Multi-tenant filtering
+
+    const maxLimit = parseInt(process.env.REGISTRATIONS_MAX_LIMIT, 10) || 2000;
+    const { page, limit, skip } = parsePagination(req.query, { defaultLimit: 50, maxLimit });
 
     logger.debug('[RegistrationsController] getRegistrations', {
       organizationId: req.organizationId,
@@ -209,17 +213,11 @@ export async function getRegistrations(req, res) {
       filter.revisionPuestoResuelta = false;
     }
 
-    // Force maximum limit from env (default 2000)
-    const maxLimit = parseInt(process.env.REGISTRATIONS_MAX_LIMIT, 10) || 2000;
-    let parsedLimit = parseInt(limit, 10) || 50;
-    parsedLimit = Math.min(parsedLimit, maxLimit);
-
-    const skip = (page - 1) * parsedLimit;
     const registrations = await Registration.find(filter)
       .populate("puestoId", "nombre codigoPuesto localidad")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(parsedLimit)
+      .limit(limit)
       .lean();
 
     const total = await Registration.countDocuments(filter);
@@ -235,9 +233,9 @@ export async function getRegistrations(req, res) {
       data: registrations.map(normalizeRegistration),
       total,
       confirmedCount,
-      page: parseInt(page),
-      limit: parsedLimit,
-      pages: Math.ceil(total / parsedLimit)
+      page,
+      limit,
+      pages: Math.ceil(total / limit)
     });
   } catch (error) {
     logger.error("Get registrations error:", { error: error.message, stack: error.stack });

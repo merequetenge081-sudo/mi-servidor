@@ -112,14 +112,39 @@ export async function updateLeaderPassword(leaderId, newPassword) {
     const hashedPassword = await bcryptjs.hash(newPassword, 10);
     const leader = await Leader.findByIdAndUpdate(
       leaderId,
-      { passwordHash: hashedPassword, lastPasswordChange: new Date() },
+      {
+        passwordHash: hashedPassword,
+        lastPasswordChange: new Date(),
+        isTemporaryPassword: false,
+        passwordResetRequested: false
+      },
       { new: true }
     );
+    if (leader) {
+      await Leader.updateOne(
+        { _id: leader._id },
+        { $unset: { tempPasswordPlaintext: "", tempPasswordCreatedAt: "" } }
+      );
+    }
     logger.success('Contraseña de líder actualizada', { leaderId });
     return leader;
   } catch (error) {
     logger.error('Error actualizando contraseña líder', error);
     throw AppError.serverError('Error al actualizar contraseña');
+  }
+}
+
+/**
+ * Limpiar credenciales temporales expiradas
+ */
+export async function clearLeaderTempPassword(leaderId) {
+  try {
+    await Leader.updateOne(
+      { _id: leaderId },
+      { $unset: { tempPasswordPlaintext: "", tempPasswordCreatedAt: "" } }
+    );
+  } catch (error) {
+    logger.warn('Error limpiando credenciales temporales', { error: error.message, leaderId });
   }
 }
 
@@ -155,6 +180,7 @@ export default {
   findLeaderById,
   updateAdminPassword,
   updateLeaderPassword,
+  clearLeaderTempPassword,
   verifyPassword,
   hashPassword
 };
