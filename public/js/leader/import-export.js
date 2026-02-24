@@ -38,7 +38,8 @@ export class ImportExportManager {
                 const responseData = await response.json();
                 input.value = '';
 
-                if (!response.ok || responseData.failed > 0) {
+                // Mostrar resultados si hay autocorrecciones, errores, o fallos
+                if (!response.ok || responseData.failed > 0 || (responseData.autocorrections && responseData.autocorrections.length > 0)) {
                     this.showImportResults(responseData);
                 } else {
                     // Show success message

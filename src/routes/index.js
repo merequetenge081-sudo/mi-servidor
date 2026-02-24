@@ -230,6 +230,12 @@ router.post("/leaders/:id/send-access", authMiddleware, roleMiddleware("admin"),
 
 // ==================== REGISTRACIONES ====================
 router.post("/registrations", rateLimitMiddleware, registrationController.createRegistration);
+
+// ENDPOINT DE PRUEBA - SOLO DESARROLLO (sin autenticación para testing)
+if (process.env.NODE_ENV !== 'production') {
+  router.post("/registrations/bulk/test", registrationController.bulkCreateRegistrations);
+}
+
 router.post("/registrations/bulk", authMiddleware, registrationController.bulkCreateRegistrations);
 router.get("/registrations", authMiddleware, registrationController.getRegistrations);
 router.get("/registrations/leader/:leaderId", authMiddleware, registrationController.getRegistrationsByLeader);

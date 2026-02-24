@@ -267,9 +267,19 @@ export class RegistrationController {
       );
 
       res.status(201).json({
-        success: true,
-        message: `${result.created} registros creados`,
-        data: result.data
+        success: result.success,
+        imported: result.created,
+        requiresReview: result.requiresReview,
+        failed: result.failed,
+        autocorrected: result.autocorrected,
+        errors: result.errors,
+        autocorrections: result.autocorrections,
+        message: result.message,
+        data: {
+          created: result.created,
+          errors: result.errors,
+          autocorrections: result.autocorrections
+        }
       });
     } catch (error) {
       logger.error("Error bulkCreateRegistrations", { error: error.message });
