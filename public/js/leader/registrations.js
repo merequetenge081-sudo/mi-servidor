@@ -31,6 +31,7 @@ export class RegistrationsManager {
     }
 
     static parseRegistrationsResponse(data) {
+        if (!data) return [];
         if (Array.isArray(data)) return data;
         if (data.registrations && Array.isArray(data.registrations)) return data.registrations;
         if (data.data && Array.isArray(data.data)) return data.data;
