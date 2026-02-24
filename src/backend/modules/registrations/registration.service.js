@@ -525,7 +525,12 @@ export class RegistrationService {
     let leader = null;
 
     if (leaderId) {
-      leader = await Leader.findOne({ leaderId }).lean();
+      const isObjectId = /^[0-9a-fA-F]{24}$/.test(leaderId);
+      if (isObjectId) {
+        leader = await Leader.findOne({ $or: [{ leaderId }, { _id: leaderId }] }).lean();
+      } else {
+        leader = await Leader.findOne({ leaderId }).lean();
+      }
     }
 
     if (!leader && leaderToken) {
