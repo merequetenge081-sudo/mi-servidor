@@ -242,7 +242,7 @@ const DataService = {
      */
     async getPuestosByLocalidad(localidad) {
         try {
-            const response = await this.apiCall(`/api/puestos/${localidad}`);
+            const response = await this.apiCall(`/api/puestos?localidad=${encodeURIComponent(localidad)}`);
             const data = await response.json();
             return data.data || data || [];
         } catch (err) {
