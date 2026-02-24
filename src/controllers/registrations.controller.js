@@ -353,6 +353,23 @@ export async function updateRegistration(req, res) {
       changes.registeredToVote = { old: registration.registeredToVote, new: registeredToVote };
       registration.registeredToVote = registeredToVote;
     }
+
+    // Si el registro requería revisión de puesto y se actualizaron campos relacionados,
+    // marcar como resuelta la revisión
+    if (registration.requiereRevisionPuesto && !registration.revisionPuestoResuelta) {
+      const camposRelevantesActualizados = 
+        votingPlace !== undefined || 
+        localidad !== undefined || 
+        puestoId !== undefined ||
+        votingTable !== undefined;
+
+      if (camposRelevantesActualizados) {
+        registration.revisionPuestoResuelta = true;
+        changes.revisionPuestoResuelta = { old: false, new: true };
+        logger.info(`[UpdateRegistration] Marcando revisión de puesto como resuelta para registro ${registration._id}`);
+      }
+    }
+
     registration.updatedAt = new Date();
     await registration.save();
 

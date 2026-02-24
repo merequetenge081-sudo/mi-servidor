@@ -195,6 +195,21 @@ export class RegistrationService {
       const cleanUpdateData = { ...updateData };
       protectedFields.forEach(field => delete cleanUpdateData[field]);
 
+      // Si el registro requería revisión de puesto y se actualizaron campos relacionados,
+      // marcar como resuelta la revisión
+      if (registration.requiereRevisionPuesto && !registration.revisionPuestoResuelta) {
+        const camposRelevantesActualizados = 
+          updateData.votingPlace !== undefined || 
+          updateData.localidad !== undefined || 
+          updateData.puestoId !== undefined ||
+          updateData.votingTable !== undefined;
+
+        if (camposRelevantesActualizados) {
+          cleanUpdateData.revisionPuestoResuelta = true;
+          logger.info(`[UpdateRegistration] Marcando revisión de puesto como resuelta para registro ${registrationId}`);
+        }
+      }
+
       const updated = await repository.update(registrationId, cleanUpdateData);
 
       logger.success("Registration actualizada", { registrationId });
