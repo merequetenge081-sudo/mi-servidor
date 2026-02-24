@@ -5,6 +5,7 @@
  */
 
 import leaderRepository from './leader.repository.js';
+import { Leader } from '../../../models/Leader.js';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import bcryptjs from 'bcryptjs';
@@ -87,7 +88,8 @@ export class LeaderService {
    * Obtener credenciales de un líder
    */
   async getLeaderCredentials(id) {
-    const leader = await leaderRepository.findById(id);
+    const leader = await Leader.findById(id)
+      .select('username tempPasswordPlaintext tempPasswordCreatedAt isTemporaryPassword');
     
     if (!leader) {
       throw AppError.notFound('Líder');
@@ -112,9 +114,18 @@ export class LeaderService {
       };
     }
 
-    // Desencriptar contraseña temporal
+    // Desencriptar contraseña temporal (si no expiro)
     let tempPassword = null;
-    if (leader.tempPasswordPlaintext) {
+    const ttlHours = parseInt(process.env.TEMP_PASSWORD_TTL_HOURS, 10) || 24;
+    const tempAgeMs = leader.tempPasswordCreatedAt ? (Date.now() - new Date(leader.tempPasswordCreatedAt).getTime()) : 0;
+    const isExpired = leader.tempPasswordCreatedAt ? tempAgeMs > ttlHours * 60 * 60 * 1000 : false;
+
+    if (isExpired) {
+      await Leader.updateOne(
+        { _id: leader._id },
+        { $unset: { tempPasswordPlaintext: "", tempPasswordCreatedAt: "" } }
+      );
+    } else if (leader.tempPasswordPlaintext) {
       try {
         tempPassword = decrypt(leader.tempPasswordPlaintext);
       } catch (e) {
@@ -248,6 +259,7 @@ export class LeaderService {
 
     // Actualizar contraseña encriptada
     leader.tempPasswordPlaintext = encrypt(tempPassword);
+    leader.tempPasswordCreatedAt = new Date();
     await leader.save();
 
     // Enviar por email

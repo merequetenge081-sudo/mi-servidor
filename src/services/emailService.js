@@ -156,10 +156,15 @@ class EmailService {
     const loginUrl = baseUrl || 'https://redsociaypolitica.fulars.com';
     
     let tempPassword = 'No disponible';
-    if (leader.tempPasswordPlaintext) {
+    const ttlHours = parseInt(process.env.TEMP_PASSWORD_TTL_HOURS, 10) || 24;
+    const tempAgeMs = leader.tempPasswordCreatedAt ? (Date.now() - new Date(leader.tempPasswordCreatedAt).getTime()) : 0;
+    const isExpired = leader.tempPasswordCreatedAt ? tempAgeMs > ttlHours * 60 * 60 * 1000 : false;
+
+    if (isExpired) {
+      logger.warn('🔑 Contraseña temporal expirada para este líder');
+    } else if (leader.tempPasswordPlaintext) {
       try {
         tempPassword = decrypt(leader.tempPasswordPlaintext);
-        logger.info(`🔑 Contraseña desencriptada correctamente`);
       } catch (e) {
         logger.warn(`🔑 Error desencriptando: ${e.message}`);
         tempPassword = leader.tempPasswordPlaintext;

@@ -18,6 +18,7 @@ import { roleMiddleware } from "../middleware/role.middleware.js";
 import { organizationRoleMiddleware } from "../middleware/organization.middleware.js";
 import { rateLimitMiddleware, loginRateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
 import logger from "../config/logger.js";
+import { encrypt } from "../utils/crypto.js";
 
 const router = express.Router();
 const startTime = Date.now();
@@ -337,7 +338,8 @@ router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async
           isTemporaryPassword: true,
           passwordCanBeChanged: true,
           passwordResetRequested: false,
-          tempPasswordPlaintext: tempPassword
+          tempPasswordPlaintext: encrypt(tempPassword),
+          tempPasswordCreatedAt: new Date()
         }
       });
 
@@ -352,14 +354,7 @@ router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async
       logger.info(`[MIGRATION] ${leader.name} → ${username}`);
     }
 
-    // Print all to console for easy copy
-    console.log("\n╔══════════════════════════════════════════════════╗");
-    console.log("║     MIGRACIÓN DE USUARIOS - CREDENCIALES        ║");
-    console.log("╠══════════════════════════════════════════════════╣");
-    results.forEach(r => {
-      console.log(`║ ${r.name.padEnd(25)} │ ${r.username.padEnd(12)} │ ${r.tempPassword}`);
-    });
-    console.log("╚══════════════════════════════════════════════════╝\n");
+    logger.info(`[MIGRATION] Migrados ${results.length} líderes (credenciales entregadas via respuesta API)`);
 
     res.json({
       message: `${results.length} líderes migrados exitosamente`,

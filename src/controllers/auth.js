@@ -231,6 +231,7 @@ export async function adminResetPassword(req, res) {
     leader.isTemporaryPassword = true;
     leader.passwordResetRequested = false; // Clear the request flag
     leader.tempPasswordPlaintext = encrypt(tempPassword);
+    leader.tempPasswordCreatedAt = new Date();
     await leader.save();
 
     // Send email with temporary password
@@ -276,7 +277,7 @@ export async function leaderLoginById(req, res) {
       return res.status(400).json({ error: "LeaderId requerido" });
     }
 
-    console.log("👉 Login attempt with:", leaderId); // DEBUG LOG
+    logger.debug("Leader login attempt", { leaderId });
 
     let query = { leaderId };
 
@@ -378,7 +379,8 @@ export async function requestPasswordReset(req, res) {
         isTemporaryPassword: true,
         passwordResetRequested: true,
         passwordCanBeChanged: true,
-        tempPasswordPlaintext: encrypt(tempPassword)
+        tempPasswordPlaintext: encrypt(tempPassword),
+        tempPasswordCreatedAt: new Date()
       }
     });
 
@@ -454,13 +456,14 @@ export async function adminGenerateNewPassword(req, res) {
         isTemporaryPassword: true,
         passwordResetRequested: false,
         passwordCanBeChanged: true,
-        tempPasswordPlaintext: tempPassword // Guardar contraseña temporal para referencia del admin
+        tempPasswordPlaintext: encrypt(tempPassword),
+        tempPasswordCreatedAt: new Date()
       }
     });
 
     await AuditService.log("UPDATE", "Leader", leader._id.toString(), adminUser, {}, `Admin generó nueva contraseña temporal para ${leader.name}`);
 
-    logger.info(`Nueva contraseña temporal generada para ${leader.name}: ${tempPassword}`);
+    logger.info(`Nueva contraseña temporal generada para ${leader.name}`);
 
     res.json({ 
       message: "Nueva contraseña generada", 
@@ -514,7 +517,8 @@ export async function leaderChangePassword(req, res) {
         passwordResetRequested: false
       },
       $unset: {
-        tempPasswordPlaintext: "" // Borrar contraseña temporal ya que el líder configuró una nueva
+        tempPasswordPlaintext: "",
+        tempPasswordCreatedAt: ""
       }
     });
 

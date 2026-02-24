@@ -14,6 +14,7 @@ const leaderSchema = new mongoose.Schema({
   passwordResetRequested: { type: Boolean, default: false },
   passwordCanBeChanged: { type: Boolean, default: true },
   tempPasswordPlaintext: String,
+  tempPasswordCreatedAt: { type: Date, default: null },
 
   token: { type: String, required: true },
   active: { type: Boolean, default: true },

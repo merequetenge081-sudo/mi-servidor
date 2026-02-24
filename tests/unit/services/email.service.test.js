@@ -4,14 +4,22 @@
  */
 
 let emailService;
+let encrypt;
+
+process.env.ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'test-encryption-key';
 
 beforeAll(async () => {
   ({ emailService } = await import('../../../src/services/emailService.js'));
+  ({ encrypt } = await import('../../../src/utils/crypto.js'));
 });
 
 describe('EmailService', () => {
   beforeEach(() => {
     emailService.mockMode = true;
+  });
+
+  afterEach(() => {
+    delete process.env.TEMP_PASSWORD_TTL_HOURS;
   });
 
   describe('Configuración de EmailService', () => {
@@ -78,6 +86,36 @@ describe('EmailService', () => {
         username: 'jperez',
         tempPasswordPlaintext: 'temp123'
       };
+      const result = await emailService.sendCredentialsEmail(leader, 'http://localhost:3000');
+      expect(result.success).toBe(true);
+      expect(result.mock).toBe(true);
+    });
+
+    it('no debería incluir contraseña temporal expirada', async () => {
+      process.env.TEMP_PASSWORD_TTL_HOURS = '1';
+      const leader = {
+        email: 'test@example.com',
+        name: 'Juana Perez',
+        username: 'jperez',
+        tempPasswordPlaintext: encrypt('Temp1234'),
+        tempPasswordCreatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
+      };
+
+      const result = await emailService.sendCredentialsEmail(leader, 'http://localhost:3000');
+      expect(result.success).toBe(true);
+      expect(result.mock).toBe(true);
+    });
+
+    it('debería enviar credenciales con contraseña activa', async () => {
+      process.env.TEMP_PASSWORD_TTL_HOURS = '24';
+      const leader = {
+        email: 'test@example.com',
+        name: 'Juana Perez',
+        username: 'jperez',
+        tempPasswordPlaintext: encrypt('Temp1234'),
+        tempPasswordCreatedAt: new Date()
+      };
+
       const result = await emailService.sendCredentialsEmail(leader, 'http://localhost:3000');
       expect(result.success).toBe(true);
       expect(result.mock).toBe(true);

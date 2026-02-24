@@ -20,7 +20,14 @@ export async function createLeader(req, res) {
     let { leaderId } = req.body; // Allow modification
     const user = req.user;
 
-    console.log('[LeadersController] createLeader request:', { name, email, phone, customUsername, user: user?.username, role: user?.role });
+    logger.debug('[LeadersController] createLeader request', {
+      name,
+      hasEmail: Boolean(email),
+      hasPhone: Boolean(phone),
+      hasCustomUsername: Boolean(customUsername),
+      user: user?.username,
+      role: user?.role
+    });
 
     // Auto-generate leaderId if not provided
     if (!leaderId) {
@@ -82,18 +89,11 @@ export async function createLeader(req, res) {
 
     // 3. Mock Email Service
     const loginLink = `${process.env.BASE_URL || 'http://localhost:5000'}/`;
-    console.log("\n==================================================");
-    console.log(" ?? MOCK EMAIL SERVICE - WELCOME LEADER ??");
-    console.log(`To: ${email || 'No Email Provided'}`);
-    console.log(`Subject: Bienvenido a Red Política - Tus Credenciales`);
-    console.log("--------------------------------------------------");
-    console.log(`Hola ${name},`);
-    console.log(`Se ha creado tu cuenta de líder.`);
-    console.log(`Usuario: ${username}`);
-    console.log(`Contraseña Temporal: ${tempPassword}`);
-    console.log(`Ingresa aquí: ${loginLink}`);
-    console.log(`(Se te pedirá cambiar la contraseña al ingresar)`);
-    console.log("==================================================\n");
+    logger.info('Mock email generado para líder (sin credenciales en logs)', {
+      to: email || 'No Email Provided',
+      username,
+      loginLink
+    });
     // --- SECURITY UPGRADE END ---
 
     // Fix: Ensure organizationId is set
@@ -127,6 +127,7 @@ export async function createLeader(req, res) {
       passwordHash,
       isTemporaryPassword: true,
       tempPasswordPlaintext: encrypt(tempPassword),
+      tempPasswordCreatedAt: new Date(),
 
       token,
       registrations: 0,
@@ -163,9 +164,8 @@ export async function getLeaders(req, res) {
     const { eventId, active } = req.query;
     const filter = buildOrgFilter(req);
 
-    console.log('[LeadersController] getLeaders:', {
+    logger.debug('[LeadersController] getLeaders', {
       organizationId: req.organizationId,
-      filter,
       eventId,
       active
     });
@@ -177,7 +177,7 @@ export async function getLeaders(req, res) {
       .select('-passwordHash -tempPasswordPlaintext')
       .sort({ name: 1 });
 
-    console.log('[LeadersController] Líderes encontrados:', leaders.length);
+    logger.debug('[LeadersController] leaders encontrados', { count: leaders.length });
 
     res.json(leaders);
   } catch (error) {
@@ -192,7 +192,7 @@ export async function getLeaderCredentials(req, res) {
     const orgFilter = buildOrgFilter(req);
 
     const leader = await Leader.findOne({ _id: id, ...orgFilter })
-      .select('username tempPasswordPlaintext name isTemporaryPassword');
+      .select('username tempPasswordPlaintext tempPasswordCreatedAt name isTemporaryPassword');
 
     if (!leader) {
       return res.status(404).json({ error: "Líder no encontrado" });
@@ -214,9 +214,18 @@ export async function getLeaderCredentials(req, res) {
       });
     }
 
-    // Si tiene contraseña temporal, desencriptarla
+    // Si tiene contraseña temporal, desencriptarla (si no expiro)
     let tempPassword = null;
-    if (leader.tempPasswordPlaintext) {
+    const ttlHours = parseInt(process.env.TEMP_PASSWORD_TTL_HOURS, 10) || 24;
+    const tempAgeMs = leader.tempPasswordCreatedAt ? (Date.now() - new Date(leader.tempPasswordCreatedAt).getTime()) : 0;
+    const isExpired = leader.tempPasswordCreatedAt ? tempAgeMs > ttlHours * 60 * 60 * 1000 : false;
+
+    if (isExpired) {
+      await Leader.updateOne(
+        { _id: leader._id },
+        { $unset: { tempPasswordPlaintext: "", tempPasswordCreatedAt: "" } }
+      );
+    } else if (leader.tempPasswordPlaintext) {
       try {
         tempPassword = decrypt(leader.tempPasswordPlaintext);
       } catch (e) {
@@ -270,24 +279,24 @@ export async function updateLeader(req, res) {
     const orgId = req.user.organizationId; // Multi-tenant filter
 
     // DEBUG LOGS
-    console.log(`[UPDATE DEBUG] Search ID: ${req.params.id}, Requesting Org: ${orgId}`);
+    logger.debug('[LeaderUpdate] Search ID', { leaderId: req.params.id, orgId });
 
     // Find by ID first to allow adopting legacy records (missing organizationId)
     const leader = await Leader.findOne({ _id: req.params.id });
 
     if (!leader) {
-      console.log(`[UPDATE DEBUG] Leader NOT FOUND in DB`);
+      logger.debug('[LeaderUpdate] Leader not found in DB', { leaderId: req.params.id, orgId });
       return res.status(404).json({ error: "Líder no encontrado (DB miss)" });
     }
 
-    console.log(`[UPDATE DEBUG] Found Leader: ${leader.name}, Org: ${leader.organizationId}`);
+    logger.debug('[LeaderUpdate] Found leader', { leaderName: leader.name, leaderOrg: leader.organizationId });
 
     // Security check: If leader has orgId and it doesn't match, block access
     // UNLESS user is admin
     const isSuperAdmin = req.user.role === 'admin';
 
     if (!isSuperAdmin && leader.organizationId && leader.organizationId !== orgId) {
-      console.log(`[UPDATE DEBUG] Org Mismatch! Leader Org: ${leader.organizationId} !== Req Org: ${orgId}`);
+      logger.debug('[LeaderUpdate] Org mismatch', { leaderOrg: leader.organizationId, reqOrg: orgId });
       return res.status(404).json({ error: "Líder no encontrado (Org mismatch)" });
     }
 
@@ -339,7 +348,7 @@ export async function updateLeader(req, res) {
         leader.organizationId = defaultOrg._id.toString();
         // Also update changes object for audit log
         changes.organizationId = { old: null, new: leader.organizationId };
-        console.log(`[UPDATE FIX] Assigned leader to Default Org: ${leader.organizationId}`);
+        logger.info('Assigned leader to Default Org', { leaderId: leader._id.toString(), orgId: leader.organizationId });
       }
     }
 
@@ -559,7 +568,7 @@ export async function sendAccessEmail(req, res) {
 
     if (shouldSendCredentials) {
       try {
-        logger.info(`📧 Enviando credenciales - Username: ${leader.username}, hasTempPass: ${!!leader.tempPasswordPlaintext}`);
+        logger.info('📧 Enviando credenciales al líder', { leaderId: leader._id.toString() });
         emailResults.credentials = await emailService.sendCredentialsEmail(leader, baseUrl);
         logger.info(`✅ Email de credenciales: ${emailResults.credentials.success}`);
       } catch (err) {

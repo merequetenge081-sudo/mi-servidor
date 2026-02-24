@@ -193,9 +193,8 @@ export async function getRegistrations(req, res) {
     const { eventId, leaderId, confirmed, cedula, requiereRevisionPuesto, page = 1, limit = 50 } = req.query;
     const filter = buildOrgFilter(req); // Multi-tenant filtering
 
-    console.log('[RegistrationsController] getRegistrations:', {
+    logger.debug('[RegistrationsController] getRegistrations', {
       organizationId: req.organizationId,
-      filter,
       eventId,
       page,
       limit
@@ -210,9 +209,10 @@ export async function getRegistrations(req, res) {
       filter.revisionPuestoResuelta = false;
     }
 
-    // Force maximum limit of 100
-    let parsedLimit = parseInt(limit) || 50;
-    parsedLimit = Math.min(parsedLimit, 2000);
+    // Force maximum limit from env (default 2000)
+    const maxLimit = parseInt(process.env.REGISTRATIONS_MAX_LIMIT, 10) || 2000;
+    let parsedLimit = parseInt(limit, 10) || 50;
+    parsedLimit = Math.min(parsedLimit, maxLimit);
 
     const skip = (page - 1) * parsedLimit;
     const registrations = await Registration.find(filter)
@@ -225,7 +225,7 @@ export async function getRegistrations(req, res) {
     const total = await Registration.countDocuments(filter);
     const confirmedCount = await Registration.countDocuments({ ...filter, confirmed: true });
 
-    console.log('[RegistrationsController] Resultados:', {
+    logger.debug('[RegistrationsController] Resultados', {
       totalEncontrados: total,
       registracionesRetornadas: registrations.length,
       confirmedCount
@@ -274,7 +274,11 @@ export async function updateRegistration(req, res) {
     }
 
     // Ownership Check: Leaders can only update their own registrations
-    console.log(`[DEBUG] Update Check - User Role: ${user.role}, User LeaderId: ${user.leaderId}, Reg LeaderId: ${registration.leaderId}`);
+    logger.debug('[RegistrationsController] Update ownership check', {
+      role: user.role,
+      userLeaderId: user.leaderId,
+      registrationLeaderId: registration.leaderId
+    });
 
     if (user.role !== 'admin' && registration.leaderId !== user.leaderId) {
       return res.status(403).json({ error: `No tienes permiso. Tu ID: ${user.leaderId}, Dueño: ${registration.leaderId}` });
