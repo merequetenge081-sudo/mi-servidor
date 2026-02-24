@@ -52,7 +52,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 7. Conectar event listeners
         connectEventListeners(leaderId, leaderData);
 
-        // 8. Aplicar cerrar modales al hacer clic en backdrop
+        // 8. Inicializar formulario con valores predeterminados (Bogotá)
+        FormManager.toggleUbicacion('bogota');
+
+        // 9. Aplicar cerrar modales al hacer clic en backdrop
         UIManager.closeModalsOnBackdropClick();
 
     } catch (error) {
@@ -389,11 +392,16 @@ export function reinitializeEventListeners(leaderId, leaderData) {
 // ========== EXPORTAR FUNCIONES GLOBALES PARA ONCLICK HANDLERS ==========
 // Las funciones deben estar disponibles globalmente para onclick en HTML
 
+// UI
 window.goToView = (viewName) => UIManager.goToView(viewName);
 window.toggleHelpDrawer = () => UIManager.toggleHelpDrawer();
 window.closeHelpDrawer = () => UIManager.closeHelpDrawer();
+window.toggleDarkMode = () => UIManager.toggleDarkMode();
+
+// Auth
 window.logout = () => AuthManager.logout();
 window.confirmLogout = () => AuthManager.confirmLogout();
+window.closeLogoutModal = () => AuthManager.closeLogoutModal();
 
 // Registrations
 window.filtrarRegistrosRevision = () => RegistrationsManager.applyFilters('revision', 'revision');
@@ -404,17 +412,56 @@ window.refreshRegistrations = async () => {
 window.previousPage = () => RegistrationsManager.changePage(-1);
 window.nextPage = () => RegistrationsManager.changePage(1);
 
-// Forms
+// Forms - Nuevo registro
 window.copyLink = () => FormManager.copyLink();
 window.openQrModal = () => FormManager.openQrModal();
-window.filtrarPuestosLeader = () => FormManager.filtrarPuestos();
-window.mostrarDropdownPuestosLeader = () => FormManager.mostrarDropdownPuestos();
+window.closeQrModal = () => FormManager.closeQrModal();
+window.filtrarPuestosLeader = () => FormManager.filtrarPuestosLeader();
+window.mostrarDropdownPuestosLeader = () => FormManager.filtrarPuestosLeader();
+window.handleLocalidadChange = async () => {
+    const localidad = document.getElementById('localidad').value;
+    await FormManager.cargarPuestosLeader(localidad);
+};
+window.seleccionarPuestoLeader = (id, nombre, codigo) => FormManager.seleccionarPuestoLeader(id, nombre, codigo);
+window.toggleUbicacion = (tipo) => FormManager.toggleUbicacion(tipo);
+window.actualizarCapital = () => FormManager.actualizarCapital();
+
+// Forms - Modal de edición
+window.closeEditModal = () => FormManager.closeEditModal();
+window.toggleEditUbicacion = (tipo) => FormManager.toggleEditUbicacion(tipo);
+window.handleEditLocalidadChange = async () => {
+    const localidad = document.getElementById('editLocalidad').value;
+    const selectedId = document.getElementById('editPuestoId').value;
+    await FormManager.cargarEditPuestos(localidad, selectedId);
+};
+window.actualizarEditCapital = () => FormManager.actualizarEditCapital();
+window.filtrarEditPuestos = () => FormManager.filtrarEditPuestos();
+window.mostrarEditDropdownPuestos = () => FormManager.mostrarEditDropdownPuestos();
+
+// Modals
+window.closeSuccessModal = () => ModalsManager.closeSuccessModal();
+window.closeErrorModal = () => ModalsManager.closeErrorModal();
+window.showPolicyModal = (event) => ModalsManager.showPolicyModal(event);
+window.showConsentPolicyModalForm = (event) => ModalsManager.showPolicyModal(event);
+window.acceptLegalTerms = () => ModalsManager.acceptLegalTerms();
+
+// Delete
+window.closeDeleteConfirmModal = () => DeleteManager.closeDeleteConfirmModal();
 
 // Import/Export
 window.downloadTemplate = () => ImportExportManager.downloadTemplate();
+window.handleImport = async (input) => {
+    const leaderId = StorageManager.getCurrentLeaderId();
+    if (!leaderId) return;
+    const leaderData = await LeaderManager.loadLeaderData(leaderId);
+    await ImportExportManager.handleImport(input, leaderId, leaderData);
+};
 window.exportToExcel = async () => {
     const leaderId = StorageManager.getCurrentLeaderId();
     if (!leaderId) return;
     const leaderData = await LeaderManager.loadLeaderData(leaderId);
     await ImportExportManager.exportToExcel(RegistrationsManager.myRegistrations, leaderData);
 };
+
+// Crear instancia global de FormManager para onclick handlers en HTML
+window.formManager = FormManager;
