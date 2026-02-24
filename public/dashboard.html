@@ -636,6 +636,28 @@
 
 
             <!-- MODALS -->
+            <!-- Confirm Action Modal -->
+            <div class="modal-overlay" id="confirmActionModal">
+                <div class="modal-card confirm-modal-card">
+                    <div class="confirm-modal-header">
+                        <div class="confirm-modal-icon danger" id="confirmActionIcon">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 class="confirm-modal-title" id="confirmActionTitle">Confirmar accion</h3>
+                            <p class="confirm-modal-subtitle" id="confirmActionSubtitle">Esta accion es irreversible</p>
+                        </div>
+                        <button class="close-btn" id="confirmActionClose"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <div class="confirm-modal-body" id="confirmActionMessage">
+                        Esta accion eliminara permanentemente los registros seleccionados.
+                    </div>
+                    <div class="modal-footer confirm-modal-footer">
+                        <button class="btn btn-secondary" id="confirmActionCancel">Cancelar</button>
+                        <button class="btn btn-danger" id="confirmActionConfirm">Aceptar</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- New Leader Modal -->
             <div class="modal-overlay" id="leaderModal">

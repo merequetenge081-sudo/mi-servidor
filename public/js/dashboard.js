@@ -39,80 +39,107 @@ function enforceSessionTimeout() {
         window.location.href = '/';
         return true;
     }
-    return false;
-}
+    let confirmModalInitialized = false;
+    let confirmModalResolver = null;
 
-function bindSessionActivity() {
-    ['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt => {
-        document.addEventListener(evt, touchActivity, { passive: true });
-    });
-}
+    function handleConfirmKeydown(event) {
+        if (event.key === 'Escape') {
+            closeConfirmModal(false);
+        } else if (event.key === 'Enter') {
+            closeConfirmModal(true);
+        }
+    }
 
-function getBogotaLocalidades() {
-    return ['Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'];
-}
+    function closeConfirmModal(result) {
+        const modal = document.getElementById('confirmActionModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+        document.removeEventListener('keydown', handleConfirmKeydown);
+        if (confirmModalResolver) {
+            confirmModalResolver(result);
+            confirmModalResolver = null;
+        }
+    }
 
-function showAlert(message, type = 'info') {
-    return new Promise(resolve => {
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        const palette = {
-            info: { bg: '#667eea', text: 'Informacion' },
-            success: { bg: '#28a745', text: 'Listo' },
-            warning: { bg: '#f0ad4e', text: 'Atencion' },
-            error: { bg: '#dc3545', text: 'Error' }
-        };
-        const theme = palette[type] || palette.info;
+    function initConfirmModal() {
+        if (confirmModalInitialized) return;
+        const modal = document.getElementById('confirmActionModal');
+        if (!modal) return;
 
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+        const closeBtn = document.getElementById('confirmActionClose');
+        const cancelBtn = document.getElementById('confirmActionCancel');
+        const confirmBtn = document.getElementById('confirmActionConfirm');
 
-        const card = document.createElement('div');
-        card.style.cssText = `background: ${isDarkMode ? '#16213e' : '#ffffff'}; color: ${isDarkMode ? '#e0e0e0' : '#333'}; border-radius: 12px; padding: 24px; width: 92%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid ${isDarkMode ? '#2d3748' : '#e2e8f0'};`;
-
-        const header = document.createElement('div');
-        header.style.cssText = `display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-weight: 700; color: ${theme.bg};`;
-        header.textContent = theme.text;
-
-        const body = document.createElement('div');
-        body.style.cssText = 'font-size: 14px; line-height: 1.5; margin-bottom: 18px;';
-        body.textContent = message;
-
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.style.cssText = `width: 100%; border: none; border-radius: 8px; padding: 10px; background: ${theme.bg}; color: white; font-weight: 600; cursor: pointer;`;
-        btn.textContent = 'Aceptar';
-        btn.addEventListener('click', () => {
-            overlay.remove();
-            resolve(true);
-        });
-
-        card.appendChild(header);
-        card.appendChild(body);
-        card.appendChild(btn);
-        overlay.appendChild(card);
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                overlay.remove();
-                resolve(true);
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeConfirmModal(false);
             }
         });
-        document.body.appendChild(overlay);
-    });
-}
 
-function showConfirm(message) {
-    return new Promise(resolve => {
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; animation: fadeIn 0.2s ease-in;';
+        if (closeBtn) closeBtn.addEventListener('click', () => closeConfirmModal(false));
+        if (cancelBtn) cancelBtn.addEventListener('click', () => closeConfirmModal(false));
+        if (confirmBtn) confirmBtn.addEventListener('click', () => closeConfirmModal(true));
 
-        const card = document.createElement('div');
-        card.style.cssText = `background: ${isDarkMode ? '#1a2a3a' : '#ffffff'}; color: ${isDarkMode ? '#e0e0e0' : '#1f2937'}; border-radius: 16px; padding: 32px; width: 92%; max-width: 520px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); border: 1px solid ${isDarkMode ? '#2d4050' : '#e5e7eb'}; animation: slideUp 0.3s ease-out;`;
+        confirmModalInitialized = true;
+    }
 
-        const header = document.createElement('div');
-        header.style.cssText = 'font-weight: 700; margin-bottom: 4px; color: #dc2626; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;';
-        header.innerHTML = '<i class="bi bi-exclamation-triangle-fill" style="font-size: 18px; margin-right: 8px;"></i>ADVERTENCIA';
+    function showConfirm(message, options = {}) {
+        initConfirmModal();
 
+        const modal = document.getElementById('confirmActionModal');
+        if (!modal) {
+            return Promise.resolve(window.confirm(message || '¿Estás seguro?'));
+        }
+
+        const titleEl = document.getElementById('confirmActionTitle');
+        const subtitleEl = document.getElementById('confirmActionSubtitle');
+        const messageEl = document.getElementById('confirmActionMessage');
+        const iconEl = document.getElementById('confirmActionIcon');
+        const confirmBtn = document.getElementById('confirmActionConfirm');
+        const cancelBtn = document.getElementById('confirmActionCancel');
+
+        const tone = options.tone || 'warning';
+        const title = options.title || 'Confirmar accion';
+        const subtitle = options.subtitle || 'Por favor confirma para continuar';
+        const confirmText = options.confirmText || 'Aceptar';
+        const cancelText = options.cancelText || 'Cancelar';
+
+        if (titleEl) titleEl.textContent = title;
+        if (subtitleEl) subtitleEl.textContent = subtitle;
+        if (messageEl) {
+            messageEl.innerHTML = (message || '').replace(/\n/g, '<br>').replace(/⚠️/g, '').trim();
+        }
+
+        if (iconEl) {
+            iconEl.classList.remove('danger', 'warning', 'info');
+            iconEl.classList.add(tone);
+            const iconMap = {
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-exclamation-triangle',
+                info: 'bi-info-circle-fill'
+            };
+            const iconClass = iconMap[tone] || iconMap.warning;
+            iconEl.innerHTML = `<i class="bi ${iconClass}"></i>`;
+        }
+
+        if (confirmBtn) {
+            confirmBtn.textContent = confirmText;
+            confirmBtn.classList.remove('btn-primary', 'btn-danger');
+            confirmBtn.classList.add(tone === 'danger' ? 'btn-danger' : 'btn-primary');
+        }
+
+        if (cancelBtn) cancelBtn.textContent = cancelText;
+
+        modal.classList.add('active');
+        document.addEventListener('keydown', handleConfirmKeydown);
+
+        if (confirmBtn) confirmBtn.focus();
+
+        return new Promise((resolve) => {
+            confirmModalResolver = resolve;
+        });
+    }
         const subtitle = document.createElement('div');
         subtitle.style.cssText = 'font-size: 14px; color: #6b7280; margin-bottom: 20px;';
         subtitle.textContent = 'Por favor, confirma esta acción';
@@ -407,10 +434,15 @@ async function updateEventNameDisplay() {
 }
 
 // ====== NOTIFICACIONES ======
+function isPendingDeletionRequest(request) {
+    const status = (request?.status || 'pending').toString().toLowerCase();
+    return status === 'pending';
+}
+
 async function updateNotificationsBadge() {
     try {
         const leadersWithRequests = allLeaders.filter(l => l.passwordResetRequested);
-        const pendingDeletionRequests = deletionRequests.filter(r => r.status === 'pending');
+        const pendingDeletionRequests = deletionRequests.filter(isPendingDeletionRequest);
         const count = leadersWithRequests.length + pendingDeletionRequests.length;
 
         // Actualizar badge en navbar (si existe)
@@ -460,7 +492,7 @@ async function loadNotifications() {
     try {
         const content = document.getElementById('notificationsContent');
         const leadersWithRequests = allLeaders.filter(l => l.passwordResetRequested);
-        const pendingDeletionRequests = deletionRequests.filter(r => r.status === 'pending');
+        const pendingDeletionRequests = deletionRequests.filter(isPendingDeletionRequest);
 
         if (leadersWithRequests.length === 0 && pendingDeletionRequests.length === 0) {
             content.innerHTML = `
@@ -2647,7 +2679,8 @@ function renderDeletionRequests(requests = deletionRequests) {
             }
         };
         
-        const status = statusColors[req.status] || statusColors.pending;
+        const statusKey = (req.status || 'pending').toString().toLowerCase();
+        const status = statusColors[statusKey] || statusColors.pending;
         const createdDate = new Date(req.createdAt).toLocaleString('es-CO', { 
             year: 'numeric', month: 'short', day: 'numeric', 
             hour: '2-digit', minute: '2-digit' 
@@ -2777,7 +2810,29 @@ async function reviewDeletionRequest(requestId, action) {
     };
     const confirmText = confirmTexts[action] || '¿Estás seguro?';
 
-    if (!confirm(confirmText)) return;
+    const confirmOptions = {
+        'approve': {
+            tone: 'danger',
+            title: 'Eliminar registros',
+            subtitle: 'Esta accion es irreversible',
+            confirmText: 'Eliminar'
+        },
+        'approve-and-archive': {
+            tone: 'info',
+            title: 'Archivar y eliminar',
+            subtitle: 'Se guardaran copias para reutilizacion',
+            confirmText: 'Archivar'
+        },
+        'reject': {
+            tone: 'warning',
+            title: 'Rechazar solicitud',
+            subtitle: 'No se eliminaran registros',
+            confirmText: 'Rechazar'
+        }
+    };
+
+    const confirmed = await showConfirm(confirmText, confirmOptions[action] || {});
+    if (!confirmed) return;
 
     let notes = '';
     if (action === 'reject') {
