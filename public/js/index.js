@@ -34,10 +34,10 @@
         // MODULES (dependen de todo lo anterior)
         'modules/dashboard.module.js',
         'modules/analytics.module.js',
+        'modules/modals.module.js',
         'modules/leaders.module.js',
         'modules/registrations.module.js',
         'modules/notifications.module.js',
-        'modules/modals.module.js',
         'modules/export.module.js',
         
         // CORE EVENTS (delegacion centralizada)
