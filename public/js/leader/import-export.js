@@ -96,36 +96,35 @@ export class ImportExportManager {
         
         if (!modal || !list) {
             // Fallback to alert if modal not found
-            let message = `Importación completada con advertencias:\n\n`;
+            let message = `Importación completada:\n\n`;
             message += `✅ Importados: ${data.imported || 0}\n`;
+            if (data.autocorrected > 0) {
+                message += `🔧 Autocorregidos: ${data.autocorrected}\n`;
+            }
             if (data.requiresReview > 0) {
                 message += `⚠️ Requieren revisión: ${data.requiresReview}\n`;
             }
             if (data.failed > 0) {
-                message += `❌ Con errores: ${data.failed}\n\n`;
-                if (Array.isArray(data.errors)) {
-                    message += 'Errores:\n';
-                    data.errors.slice(0, 5).forEach(err => {
-                        message += `- Fila ${err.row}: ${err.error}\n`;
-                    });
-                    if (data.errors.length > 5) {
-                        message += `... y ${data.errors.length - 5} más\n`;
-                    }
-                }
+                message += `❌ Con errores: ${data.failed}\n`;
             }
+            message += `\n${data.message}`;
             alert(message);
             return;
         }
 
         // Update modal content
         if (errorTitle) {
-            errorTitle.textContent = data.imported > 0 ? 'Importación Completada con Advertencias' : 'Errores en Importación';
+            const hasIssues = data.requiresReview > 0 || data.failed > 0;
+            errorTitle.textContent = hasIssues ? 'Importación Completada con Advertencias' : 'Importación Exitosa';
         }
         
         if (errorMessage) {
             let msg = '';
             if (data.imported > 0) {
                 msg += `✅ ${data.imported} registro(s) importados correctamente\n`;
+            }
+            if (data.autocorrected > 0) {
+                msg += `🔧 ${data.autocorrected} registro(s) autocorregidos automáticamente\n`;
             }
             if (data.requiresReview > 0) {
                 msg += `⚠️ ${data.requiresReview} registro(s) requieren revisión de puesto\n`;
@@ -136,19 +135,56 @@ export class ImportExportManager {
             errorMessage.textContent = msg;
         }
 
-        // Show errors
+        // Show detailed information in list
         list.innerHTML = '';
+        
+        // 1. Show autocorrections
+        if (Array.isArray(data.autocorrections) && data.autocorrections.length > 0) {
+            const autoHeader = document.createElement('li');
+            autoHeader.textContent = '🔧 CORRECCIONES AUTOMÁTICAS:';
+            autoHeader.style.fontWeight = 'bold';
+            autoHeader.style.marginTop = '12px';
+            autoHeader.style.marginBottom = '8px';
+            autoHeader.style.color = '#2563eb';
+            list.appendChild(autoHeader);
+            
+            data.autocorrections.forEach(correction => {
+                const li = document.createElement('li');
+                const correctionsList = correction.corrections.map(c => 
+                    `${c.field}: "${c.original}" → "${c.corrected}" (${c.similarity} similitud)`
+                ).join('; ');
+                li.textContent = `Fila ${correction.row} - ${correction.name}: ${correctionsList}`;
+                li.style.marginBottom = '6px';
+                li.style.paddingLeft = '16px';
+                li.style.color = '#1d4ed8';
+                list.appendChild(li);
+            });
+        }
+        
+        // 2. Show errors
         if (Array.isArray(data.errors) && data.errors.length > 0) {
+            const errorHeader = document.createElement('li');
+            errorHeader.textContent = '❌ ERRORES:';
+            errorHeader.style.fontWeight = 'bold';
+            errorHeader.style.marginTop = '12px';
+            errorHeader.style.marginBottom = '8px';
+            errorHeader.style.color = '#dc2626';
+            list.appendChild(errorHeader);
+            
             data.errors.forEach(err => {
                 const li = document.createElement('li');
                 li.textContent = `Fila ${err.row} - ${err.name}: ${err.error}`;
-                li.style.marginBottom = '8px';
+                li.style.marginBottom = '6px';
+                li.style.paddingLeft = '16px';
+                li.style.color = '#991b1b';
                 list.appendChild(li);
             });
-        } else {
+        }
+        
+        if (list.children.length === 0) {
             const li = document.createElement('li');
-            li.textContent = 'No hay errores detallados';
-            li.style.color = '#666';
+            li.textContent = 'Importación completada sin advertencias';
+            li.style.color = '#059669';
             list.appendChild(li);
         }
         
