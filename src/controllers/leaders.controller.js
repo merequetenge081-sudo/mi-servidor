@@ -601,20 +601,26 @@ export async function sendAccessEmail(req, res) {
     // Registrar en auditoría
     if (req.user && req.user._id) {
       try {
-        AuditService.log({
-          action: 'SEND_ACCESS_EMAIL',
-          actor: req.user._id,
-          target: 'Leader',
-          targetId: id,
-          details: {
+        const auditUser = {
+          ...req.user,
+          organizationId: orgFilter._id || req.user.organizationId
+        };
+
+        await AuditService.log(
+          "SEND_ACCESS_EMAIL",
+          "Leader",
+          id,
+          auditUser,
+          {
             leaderEmail: leader.email,
             leaderName: leader.name,
-            emailResults,
+            emailResults
           },
-          organizationId: orgFilter._id || req.user.organizationId,
-        });
+          `Envío de acceso a ${leader.email}`,
+          req
+        );
       } catch (auditError) {
-        logger.warn('❌ Audit log error:', auditError.message);
+        logger.warn("❌ Audit log error:", auditError.message);
       }
     }
 
