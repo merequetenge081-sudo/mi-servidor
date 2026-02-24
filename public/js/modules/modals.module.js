@@ -242,6 +242,10 @@ const ModalsModule = {
     toggleDarkMode() {
         const isDark = document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        console.log('[ModalsModule] Dark mode toggled:', isDark ? 'ON' : 'OFF');
+        // Apply smooth transition
+        document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+        setTimeout(() => { document.body.style.transition = ''; }, 300);
     },
 
     /**
@@ -274,12 +278,13 @@ const ModalsModule = {
         const drawer = document.getElementById('helpDrawer');
         const overlay = document.getElementById('helpOverlay');
 
-        // Si los elementos no existen, mostrar alerta simple
         if (!drawer || !overlay) {
-            Helpers.showAlert('La ayuda estará disponible próximamente', 'info');
+            console.warn('[ModalsModule] Help drawer elements not found');
+            Helpers.showAlert('La ayuda está en construcción', 'info');
             return;
         }
 
+        console.log('[ModalsModule] Toggling help drawer');
         const isActive = drawer.classList.contains('active');
 
         this.closeNotificationsDropdown();
@@ -289,7 +294,10 @@ const ModalsModule = {
         } else {
             drawer.classList.add('active');
             overlay.classList.add('active');
+            drawer.setAttribute('aria-hidden', 'false');
+            overlay.setAttribute('aria-hidden', 'false');
             this.updateHelpContent();
+            console.log('[ModalsModule] Help drawer opened');
         }
     },
 
@@ -299,8 +307,15 @@ const ModalsModule = {
     closeHelpDrawer() {
         const drawer = document.getElementById('helpDrawer');
         const overlay = document.getElementById('helpOverlay');
-        if (drawer) drawer.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
+        if (drawer) {
+            drawer.classList.remove('active');
+            drawer.setAttribute('aria-hidden', 'true');
+        }
+        if (overlay) {
+            overlay.classList.remove('active');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+        console.log('[ModalsModule] Help drawer closed');
     },
 
     /**

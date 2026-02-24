@@ -1011,8 +1011,12 @@
                         </h3>
                     </div>
                     <div class="modal-body">
-                        <p style="color: var(--text-muted);">¿Estás seguro de que deseas eliminar este líder?<br>Esta
-                            acción no se puede deshacer.</p>
+                        <p style="color: var(--text-muted); margin-bottom: 15px;">¿Estás seguro de que deseas eliminar este líder?<br>Esta acción no se puede deshacer.</p>
+                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px; margin-bottom: 15px; text-align: left;">
+                            <p style="margin: 0 0 8px 0; color: #856404; font-weight: 600;"><i class="bi bi-exclamation-circle"></i> Confirma escribiendo el nombre del líder:</p>
+                            <input type="text" id="deleteLeaderInput" placeholder="Nombre del líder" class="form-control" style="margin-bottom: 8px;">
+                            <input type="text" id="deleteLeaderNameConfirm" placeholder="Confirma nuevamente" class="form-control">
+                        </div>
                     </div>
                     <div class="modal-footer" style="justify-content: center; display: flex; border-top: none;">
                         <button class="btn btn-secondary" id="cancelDeleteBtn">Cancelar</button>
@@ -1207,6 +1211,8 @@
     </main>
 
     <!-- Scripts -->
+    <!-- Fix para URLs malformadas (PRIMERO - antes de cualquier fetch) -->
+    <script src="/js/core/fetch-fix.js"></script>
     <!-- Arquitectura modular (PRIMERO) -->
     <script src="/js/index.js"></script>
     <!-- Dashboard principal (DESPUÉS de módulos) -->
