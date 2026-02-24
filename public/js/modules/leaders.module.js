@@ -633,6 +633,66 @@ const LeadersModule = (() => {
         }
     }
 
+    // ====== SAVE NEW LEADER ======
+    async function handleSaveLeader() {
+        const name = document.getElementById('leaderName')?.value;
+        const email = document.getElementById('leaderEmail')?.value;
+        const phone = document.getElementById('leaderPhone')?.value;
+        const customUsername = document.getElementById('leaderUsername')?.value.trim();
+
+        if (!name) return showAlert('Ingresa el nombre', 'warning');
+
+        try {
+            const eventId = AppState.user.eventId;
+            const body = {
+                name,
+                email: email || undefined,
+                phone: phone || undefined,
+                eventId,
+                customUsername: customUsername || undefined
+            };
+
+            const res = await DataService.apiCall('/api/leaders', {
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                // Cerrar modal y limpiar formulario
+                document.getElementById('leaderModal').classList.remove('active');
+                document.getElementById('leaderName').value = '';
+                document.getElementById('leaderEmail').value = '';
+                document.getElementById('leaderPhone').value = '';
+                document.getElementById('leaderUsername').value = '';
+
+                // Recargar datos
+                loadTable();
+
+                // Mostrar credenciales si se generaron
+                if (data._username && data._tempPassword) {
+                    document.getElementById('resetPassLeaderId').value = '';
+                    document.getElementById('resetPassLeaderName').value = data.name || name;
+                    document.getElementById('resetPassUsername').value = data._username;
+                    document.getElementById('resetPassPassword').value = data._tempPassword;
+                    document.getElementById('resultUsername').textContent = data._username;
+                    document.getElementById('resultPassword').textContent = data._tempPassword;
+                    document.getElementById('resetPassResult').style.display = 'block';
+                    document.getElementById('confirmResetPassBtn').style.display = 'none';
+                    document.getElementById('resetPasswordModal').classList.add('active');
+                } else {
+                    showAlert('¡Líder creado correctamente!', 'success');
+                }
+            } else {
+                showAlert('Error: ' + (data.error || 'No se pudo crear'), 'error');
+            }
+        } catch (err) {
+            console.error('[LeadersModule] Error creando líder:', err);
+            showAlert('Error de conexión', 'error');
+        }
+    }
+
     // ====== PUBLIC API ======
     return {
         init,
@@ -643,6 +703,7 @@ const LeadersModule = (() => {
         confirmSendAccessEmail,
         openResetPassModal,
         handleConfirmResetPassword,
+        handleSaveLeader,
         handleSaveEditLeader,
         showCredentials,
         populateLeaderFilter,

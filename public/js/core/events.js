@@ -122,6 +122,16 @@ const Events = (() => {
             }
 
             // =====================================
+            // NEW LEADER BUTTON
+            // =====================================
+
+            if (target.id === 'newLeaderBtn') {
+                const modal = document.getElementById('leaderModal');
+                if (modal) modal.classList.add('active');
+                return;
+            }
+
+            // =====================================
             // MODAL BUTTONS
             // =====================================
 
@@ -148,6 +158,21 @@ const Events = (() => {
                 if (user && pass) {
                     const text = `Usuario: ${user}\nContraseña: ${pass}`;
                     navigator.clipboard.writeText(text).then(() => {
+                        Helpers.showAlert('Credenciales copiadas al portapapeles', 'success');
+                    });
+                }
+                return;
+            }
+
+            // Save new leader button
+            if (target.id === 'saveLiderBtn') {
+                if (typeof LeadersModule !== 'undefined' && LeadersModule.handleSaveLeader) {
+                    LeadersModule.handleSaveLeader();
+                } else {
+                    console.error('[Events] LeadersModule.handleSaveLeader not available');
+                }
+                return;
+            }
                         target.innerHTML = '<i class="bi bi-check"></i> ¡Copiado!';
                         setTimeout(() => {
                             target.innerHTML = '<i class="bi bi-clipboard"></i> Copiar credenciales';
