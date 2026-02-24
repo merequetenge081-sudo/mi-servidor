@@ -364,7 +364,11 @@ async function loadDashboard() {
         if (document.getElementById('dashboard').classList.contains('active')) {
             requestAnimationFrame(() => { loadCharts(); chartsLoaded = true; });
         }
-        updateNotificationsBadge();
+        
+        // Cargar deletion requests para el badge de notificaciones
+        loadDeletionRequests().then(() => {
+            updateNotificationsBadge();
+        });
 
     } catch (err) {
         console.error('Error cargando dashboard:', err);
@@ -2023,6 +2027,18 @@ function loadDarkMode() {
 
 loadDarkMode();
 
+// Event listener para botón de tema
+const themeToggleBtn = document.querySelector('.theme-toggle');
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', toggleDarkMode);
+}
+
+// Event listener para botón de toggle sidebar
+const sidebarToggleBtn = document.querySelector('.sidebar-toggle-main');
+if (sidebarToggleBtn) {
+    sidebarToggleBtn.addEventListener('click', toggleSidebar);
+}
+
 // BUTTONS & MODAL TRIGGERS
 // Helper to safely add listeners if element exists
 function addListener(id, event, handler) {
@@ -2770,6 +2786,30 @@ if (notificationsBtn) {
         toggleNotificationsDropdown();
     });
 }
+
+// Event delegation para data-action (ayuda, tema, etc.)
+document.addEventListener('click', (e) => {
+    const actionBtn = e.target.closest('[data-action]');
+    if (actionBtn) {
+        const action = actionBtn.dataset.action;
+        e.stopPropagation();
+        
+        switch (action) {
+            case 'help-toggle':
+                toggleHelpDrawer();
+                break;
+            case 'notifications-mark-read':
+                // Implementar marcar como leídas si es necesario
+                break;
+            case 'close-modal':
+                const modalId = actionBtn.dataset.closeModal;
+                if (modalId) {
+                    document.getElementById(modalId)?.classList.remove('active');
+                }
+                break;
+        }
+    }
+});
 
 // Initialization
 (async function init() {
