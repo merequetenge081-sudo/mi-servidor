@@ -662,8 +662,9 @@
         }
 
         function buildPuestoSearchText(puesto) {
-            const aliases = Array.isArray(puesto.aliases) ? puesto.aliases.join(' ') : '';
-            const base = `${puesto.nombre || ''} ${puesto.codigoPuesto || ''} ${aliases}`;
+            const nombreMostrar = puesto.displayName || puesto.nombre || '';
+            const alias = puesto.alias || '';
+            const base = `${nombreMostrar} ${puesto.codigoPuesto || ''} ${alias}`;
             return normalizePuestoTexto(base);
         }
 
@@ -681,12 +682,16 @@
             if (puestosAMostrar.length === 0) {
                 dropdown.innerHTML = '<div style="padding: 12px; color: #999; text-align: center;">No hay resultados</div>';
             } else {
-                dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => `
-                    <div class="puesto-option" data-id="${p._id}" data-nombre="${p.nombre}" onclick="seleccionarPuesto('${p._id}', '${(p.nombre || '').replace(/'/g, "\\'")}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
-                        <strong>${p.nombre || 'Sin nombre'}</strong>
+                dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => {
+                    const nombreMostrar = p.displayName || p.nombre || 'Sin nombre';
+                    const nombreEscapado = nombreMostrar.replace(/'/g, "\\'");
+                    return `
+                    <div class="puesto-option" data-id="${p._id}" data-nombre="${nombreEscapado}" onclick="seleccionarPuesto('${p._id}', '${nombreEscapado}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+                        <strong>${nombreMostrar}</strong>
                         <span style="color: #666; font-size: 12px; margin-left: 8px;">${p.codigoPuesto || ''}</span>
                     </div>
-                `).join('');
+                `;
+                }).join('');
             }
             
             dropdown.style.display = 'block';

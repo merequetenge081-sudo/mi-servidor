@@ -8,7 +8,7 @@
  */
 
 // Version actual del sistema UI
-export const UI_VERSION = "2.7.0";
+export const UI_VERSION = "2.7.3";
 
 // Helper para generar URLs con versión
 export function versionedUrl(path) {
@@ -33,6 +33,7 @@ export const VERSIONED_RESOURCES = {
 
 // Log de versiones (para debugging)
 export const VERSION_HISTORY = [
+  { version: "2.7.3", date: "2026-02-24", changes: "Alias en puestos + cache busting" },
   { version: "2.7.0", date: "2026-02-23", changes: "Refactorización UI - Rutas absolutas y versionado unificado" },
   { version: "2.6.0", date: "2026-02-23", changes: "Rediseño SaaS de Solicitudes de Eliminación" },
   { version: "2.5.0", date: "2026-02-20", changes: "Integración sistema de notificaciones" }
