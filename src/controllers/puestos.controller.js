@@ -22,12 +22,20 @@ export async function getPuestosHandler(req, res) {
     })
       .sort({ nombre: 1 })
       .lean();
+    
+    // Agregar displayName con formato "Alias - Nombre" si tiene alias
+    const puestosConDisplay = puestos.map(puesto => ({
+      ...puesto,
+      displayName: puesto.alias 
+        ? `${puesto.alias} - ${puesto.nombre}` 
+        : puesto.nombre
+    }));
 
     logger.info(`Cargados ${puestos.length} puestos para ${localidad}`);
 
     res.status(200).json({
       success: true,
-      data: puestos,
+      data: puestosConDisplay,
       count: puestos.length
     });
   } catch (error) {

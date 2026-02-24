@@ -1,5 +1,6 @@
 // forms.js - Manejo de formularios (crear, editar, eliminar)
 import { AuthManager } from './auth.js';
+import { ModalsManager } from './modals.js';
 import { BOGOTA_LOCALIDADES, CAPITALES_COLOMBIA, normalizePuestoTexto, buildPuestoSearchText } from './utils.js';
 
 export class FormManager {
@@ -53,7 +54,9 @@ export class FormManager {
             if (selectedId) {
                 const puesto = this.editPuestosCache.find(p => p._id === selectedId);
                 if (puesto) {
-                    input.value = `${puesto.nombre} (${puesto.codigoPuesto || ''})`;
+                    // Usar displayName si está disponible (incluye alias)
+                    const nombreMostrar = puesto.displayName || puesto.nombre;
+                    input.value = `${nombreMostrar} (${puesto.codigoPuesto || ''})`;
                     hiddenInput.value = selectedId;
                 }
             }
@@ -94,12 +97,16 @@ export class FormManager {
         if (puestosAMostrar.length === 0) {
             dropdown.innerHTML = '<div style="padding: 12px; color: #999; text-align: center;">No hay resultados</div>';
         } else {
-            dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => `
-                <div onclick="formManager.seleccionarEditPuesto('${p._id}', '${(p.nombre || '').replace(/'/g, "\\'")}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
-                    <strong>${p.nombre || 'Sin nombre'}</strong>
+            dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => {
+                const nombreMostrar = p.displayName || p.nombre || 'Sin nombre';
+                const nombreEscapado = nombreMostrar.replace(/'/g, "\\'");
+                return `
+                <div onclick="formManager.seleccionarEditPuesto('${p._id}', '${nombreEscapado}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+                    <strong>${nombreMostrar}</strong>
                     <span style="color: #666; font-size: 12px; margin-left: 8px;">${p.codigoPuesto || ''}</span>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
         
         dropdown.style.display = 'block';
@@ -118,12 +125,16 @@ export class FormManager {
         if (puestosAMostrar.length === 0) {
             dropdown.innerHTML = '<div style="padding: 12px; color: #999; text-align: center;">No hay resultados</div>';
         } else {
-            dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => `
-                <div onclick="formManager.seleccionarPuestoLeader('${p._id}', '${(p.nombre || '').replace(/'/g, "\\'")}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
-                <strong>${p.nombre || 'Sin nombre'}</strong>
+            dropdown.innerHTML = puestosAMostrar.slice(0, 50).map(p => {
+                const nombreMostrar = p.displayName || p.nombre || 'Sin nombre';
+                const nombreEscapado = nombreMostrar.replace(/'/g, "\\'");
+                return `
+                <div onclick="formManager.seleccionarPuestoLeader('${p._id}', '${nombreEscapado}', '${p.codigoPuesto || ''}')" style="padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+                <strong>${nombreMostrar}</strong>
                 <span style="color: #666; font-size: 12px; margin-left: 8px;">${p.codigoPuesto || ''}</span>
             </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         dropdown.style.display = 'block';
@@ -215,6 +226,160 @@ export class FormManager {
             if (votingPlaceInput) {
                 votingPlaceInput.required = true;
             }
+        }
+    }
+
+    // === Reset formulario ===
+    static resetForm() {
+        const form = document.getElementById('newRegForm');
+        if (form) {
+            form.reset();
+        }
+
+        this.toggleUbicacion('bogota');
+
+        const consentCheckbox = document.getElementById('hasConsentToRegisterLeader');
+        if (consentCheckbox) {
+            consentCheckbox.checked = false;
+        }
+
+        const consentError = document.getElementById('consentErrorLeader');
+        if (consentError) {
+            consentError.style.display = 'none';
+        }
+
+        const puestoIdInput = document.getElementById('puestoId');
+        if (puestoIdInput) {
+            puestoIdInput.value = '';
+        }
+
+        const puestoSearchInput = document.getElementById('puestoBusquedaLeader');
+        if (puestoSearchInput) {
+            puestoSearchInput.value = '';
+        }
+
+        const capitalContainer = document.getElementById('capitalContainer');
+        if (capitalContainer) {
+            capitalContainer.style.display = 'none';
+        }
+
+        const capitalInput = document.getElementById('capital');
+        if (capitalInput) {
+            capitalInput.value = '';
+        }
+
+        this.puestosLeaderCache = [];
+    }
+
+    // === Guardar nueva registracion ===
+    static async saveNewRegistration(leaderId, leaderData) {
+        const consentCheckbox = document.getElementById('hasConsentToRegisterLeader');
+        const consentError = document.getElementById('consentErrorLeader');
+
+        if (consentError) {
+            consentError.style.display = 'none';
+        }
+
+        if (consentCheckbox && !consentCheckbox.checked) {
+            if (consentError) {
+                consentError.style.display = 'block';
+            }
+            return;
+        }
+
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const cedula = document.getElementById('cedula').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+
+        if (!firstName || !lastName || !cedula) {
+            alert('Por favor completa nombre, apellido y cedula');
+            return;
+        }
+
+        const ubicacionTipo = document.querySelector('input[name="ubicacionTipo"]:checked')?.value || 'bogota';
+        let localidad = '';
+        let departamento = '';
+        let capital = '';
+        let puestoId = null;
+        let mesa = null;
+        let votingPlace = null;
+        let votingTable = null;
+
+        if (ubicacionTipo === 'bogota') {
+            localidad = document.getElementById('localidad').value;
+            puestoId = document.getElementById('puestoId').value;
+            votingTable = document.getElementById('votingTable').value.trim();
+
+            if (!localidad || !puestoId || !votingTable) {
+                alert('Por favor completa la localidad, el puesto y la mesa');
+                return;
+            }
+
+            mesa = Number(votingTable);
+            if (!Number.isFinite(mesa)) {
+                alert('Numero de mesa invalido');
+                return;
+            }
+        } else {
+            departamento = document.getElementById('departamento').value;
+            capital = document.getElementById('capital').value;
+            localidad = departamento;
+            votingPlace = document.getElementById('votingPlace').value.trim();
+            votingTable = document.getElementById('votingTable').value.trim();
+
+            if (!departamento || !votingPlace || !votingTable) {
+                alert('Por favor completa el departamento, puesto y mesa');
+                return;
+            }
+        }
+
+        const resolvedLeaderId = leaderData?.leaderId || leaderData?._id || leaderId;
+        const payload = {
+            leaderId: resolvedLeaderId,
+            eventId: leaderData?.eventId || null,
+            firstName,
+            lastName,
+            cedula,
+            email: email || null,
+            phone: phone || null,
+            localidad,
+            departamento: departamento || null,
+            capital: capital || null,
+            puestoId: ubicacionTipo === 'bogota' ? puestoId : null,
+            mesa: ubicacionTipo === 'bogota' ? mesa : null,
+            votingPlace: ubicacionTipo === 'bogota' ? null : votingPlace,
+            votingTable: ubicacionTipo === 'bogota' ? null : votingTable,
+            registeredToVote: ubicacionTipo === 'bogota',
+            hasConsentToRegister: true
+        };
+
+        try {
+            const res = await AuthManager.apiCall('/api/registrations', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            const responseData = await res.json();
+            if (!res.ok || responseData.error) {
+                alert(responseData.error || 'Error al guardar registro');
+                return;
+            }
+
+            ModalsManager.showSuccessModal('Registro guardado', 'Registro creado exitosamente');
+            this.resetForm();
+
+            if (window.goToView) {
+                window.goToView('registrations');
+            }
+
+            if (window.refreshRegistrations) {
+                await window.refreshRegistrations();
+            }
+        } catch (error) {
+            console.error('Error al guardar registro:', error);
+            alert('Error al guardar registro');
         }
     }
 

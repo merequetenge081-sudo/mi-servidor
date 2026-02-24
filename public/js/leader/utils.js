@@ -68,7 +68,9 @@ export function normalizePuestoTexto(value) {
 
 export function buildPuestoSearchText(puesto) {
     const aliases = Array.isArray(puesto.aliases) ? puesto.aliases.join(' ') : '';
-    const base = `${puesto.nombre || ''} ${puesto.codigoPuesto || ''} ${aliases}`;
+    // Usar displayName si está disponible (incluye alias automático)
+    const nombreMostrar = puesto.displayName || puesto.nombre || '';
+    const base = `${nombreMostrar} ${puesto.codigoPuesto || ''} ${aliases}`;
     return normalizePuestoTexto(base);
 }
 
