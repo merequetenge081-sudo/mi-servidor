@@ -2860,21 +2860,25 @@ function initializeEventListeners() {
     }
 
     // Event delegation para data-action (ayuda, tema, etc.)
+    // NOTA: help-toggle y help-close son manejados en core/events.js, así que los ignoramos aquí
     document.addEventListener('click', (e) => {
         const actionBtn = e.target.closest('[data-action]');
         if (actionBtn) {
             const action = actionBtn.dataset.action;
+            
+            // Skip help drawer actions (handled by core/events.js)
+            if (action === 'help-toggle' || action === 'help-close') {
+                return;
+            }
+            
             console.log('[LISTENERS] data-action clicked:', action);
             e.stopPropagation();
 
-            if (hasModalsModule && (action === 'help-toggle' || action === 'help-close' || action === 'close-modal' || action === 'notifications-mark-read')) {
+            if (hasModalsModule && (action === 'close-modal' || action === 'notifications-mark-read')) {
                 return;
             }
             
             switch (action) {
-                case 'help-toggle':
-                    toggleHelpDrawer();
-                    break;
                 case 'notifications-mark-read':
                     // Implementar marcar como leídas si es necesario
                     break;

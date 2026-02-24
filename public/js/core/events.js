@@ -378,21 +378,63 @@ const Events = (() => {
             // HELP DRAWER
             // =====================================
 
-            // Toggle help drawer
+            // Toggle help drawer - use ModalsModule if available, fallback to direct manipulation
             if (target.closest('[data-action="help-toggle"]')) {
-                const drawer = document.getElementById('helpDrawer');
-                const overlay = document.getElementById('helpOverlay');
-                if (drawer) drawer.classList.toggle('active');
-                if (overlay) overlay.classList.toggle('active');
+                e.stopPropagation();
+                e.preventDefault();
+                try {
+                    if (typeof ModalsModule !== 'undefined' && ModalsModule.toggleHelpDrawer) {
+                        ModalsModule.toggleHelpDrawer();
+                    } else {
+                        const drawer = document.getElementById('helpDrawer');
+                        const overlay = document.getElementById('helpOverlay');
+                        if (drawer && overlay) {
+                            const isOpen = drawer.classList.contains('active');
+                            if (isOpen) {
+                                drawer.classList.remove('active');
+                                overlay.classList.remove('active');
+                            } else {
+                                drawer.classList.add('active');
+                                overlay.classList.add('active');
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error toggling help:', err);
+                }
                 return;
             }
 
             // Close help drawer
-            if (target.closest('[data-action="help-close"]') || target.id === 'helpOverlay') {
-                const drawer = document.getElementById('helpDrawer');
-                const overlay = document.getElementById('helpOverlay');
-                if (drawer) drawer.classList.remove('active');
-                if (overlay) overlay.classList.remove('active');
+            if (target.closest('[data-action="help-close"]')) {
+                e.stopPropagation();
+                e.preventDefault();
+                try {
+                    if (typeof ModalsModule !== 'undefined' && ModalsModule.closeHelpDrawer) {
+                        ModalsModule.closeHelpDrawer();
+                    } else {
+                        const drawer = document.getElementById('helpDrawer');
+                        const overlay = document.getElementById('helpOverlay');
+                        if (drawer) drawer.classList.remove('active');
+                        if (overlay) overlay.classList.remove('active');
+                    }
+                } catch (err) {
+                    console.error('Error closing help:', err);
+                }
+                return;
+            }
+
+            // Close help drawer when clicking overlay
+            if (target.id === 'helpOverlay' && target.classList.contains('active')) {
+                e.stopPropagation();
+                e.preventDefault();
+                try {
+                    target.classList.remove('active');
+                    const drawer = document.getElementById('helpDrawer');
+                    if (drawer) drawer.classList.remove('active');
+                } catch (err) {
+                    console.error('Error closing help overlay:', err);
+                }
                 return;
             }
 

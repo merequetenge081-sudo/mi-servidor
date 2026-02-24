@@ -5,12 +5,39 @@
 
 const ModalsModule = {
     /**
-     * Inicializa el módulo
+     * Init - bind all event listeners
      */
     init() {
         console.log('[ModalsModule] Inicializando...');
         this.bindCloseButtons();
         this.bindOverlayClose();
+        this.bindHelpDrawerClose();
+    },
+
+    /**
+     * Bind help drawer close on overlay click
+     */
+    bindHelpDrawerClose() {
+        const overlay = document.getElementById('helpOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.closeHelpDrawer();
+                }
+            });
+        }
+
+        // Also bind close button in help drawer
+        document.addEventListener('click', (e) => {
+            const closeBtn = e.target.closest('[data-action="help-close"]');
+            if (closeBtn && (closeBtn.closest('#helpDrawer') || closeBtn.id === 'helpOverlay')) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.closeHelpDrawer();
+            }
+        });
     },
 
     /**
