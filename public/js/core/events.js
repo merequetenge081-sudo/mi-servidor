@@ -173,14 +173,6 @@ const Events = (() => {
                 }
                 return;
             }
-                        target.innerHTML = '<i class="bi bi-check"></i> ¡Copiado!';
-                        setTimeout(() => {
-                            target.innerHTML = '<i class="bi bi-clipboard"></i> Copiar credenciales';
-                        }, 2000);
-                    });
-                }
-                return;
-            }
 
             // Confirm reset password button
             if (target.id === 'confirmResetPassBtn') {
