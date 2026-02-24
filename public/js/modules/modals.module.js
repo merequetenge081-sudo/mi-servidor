@@ -237,12 +237,21 @@ const ModalsModule = {
     },
 
     /**
-     * Toggle dark mode
+     * Toggle dark mode (con debounce para evitar múltiples toggles rápidos)
      */
     toggleDarkMode() {
+        // Prevenir múltiples toggles en mismo frame
+        if (this._darkModeToggling) return;
+        this._darkModeToggling = true;
+        
+        setTimeout(() => {
+            this._darkModeToggling = false;
+        }, 100);
+        
         const isDark = document.body.classList.toggle('dark-mode');
         localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
         console.log('[ModalsModule] Dark mode toggled:', isDark ? 'ON' : 'OFF');
+        
         // Apply smooth transition
         document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
         setTimeout(() => { document.body.style.transition = ''; }, 300);

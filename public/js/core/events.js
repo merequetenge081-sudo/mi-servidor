@@ -301,14 +301,18 @@ const Events = (() => {
                 return;
             }
 
-            // Dark mode toggle
+            // Dark mode toggle - Prevenir bubbling
             if (target.closest('.theme-toggle')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.toggleDarkMode();
                 return;
             }
 
             // Notifications dropdown
             if (target.closest('#notificationsBtn')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.toggleNotificationsDropdown();
                 return;
             }
@@ -330,18 +334,24 @@ const Events = (() => {
 
             // Open logout modal
             if (target.closest('[data-action="open-logout"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.openModal('logoutModal');
                 return;
             }
 
             // Confirm logout
             if (target.closest('[data-action="confirm-logout"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 Helpers.confirmLogout();
                 return;
             }
 
             // Open registrations from dashboard
             if (target.closest('[data-action="open-registrations"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 Router.navigate('registrations');
                 return;
             }
