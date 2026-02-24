@@ -103,13 +103,13 @@ export class RegistrationsManager {
                 <td>${formatDate(reg.date)}</td>
                 <td>${statusBadge} ${revisionBadge}</td>
                 <td>
-                    <button class="action-btn action-btn-confirm" onclick="registrationsManager.toggleConfirm('${reg._id}', ${reg.confirmed})" title="${reg.confirmed ? 'Marcar como pendiente' : 'Confirmar'}">
+                    <button class="action-btn action-btn-confirm" onclick="window.registrationsManager.toggleConfirm('${reg._id}', ${reg.confirmed}).then(() => window.refreshRegistrations())" title="${reg.confirmed ? 'Marcar como pendiente' : 'Confirmar'}">
                         <i class="bi bi-check-circle"></i>
                     </button>
-                    <button class="action-btn action-btn-edit" onclick="editManager.openEditModal('${reg._id}')">
+                    <button class="action-btn action-btn-edit" onclick="window.formManager.openEditModal(window.registrationsManager.myRegistrations, '${reg._id}')">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="action-btn action-btn-delete" onclick="deleteManager.confirmDelete('${reg._id}')">
+                    <button class="action-btn action-btn-delete" onclick="window.deleteManager.confirmDelete('${reg._id}')">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
