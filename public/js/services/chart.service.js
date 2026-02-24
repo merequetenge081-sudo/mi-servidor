@@ -26,6 +26,12 @@ const ChartService = (() => {
                     return null;
                 }
 
+                // Chart.js registry fallback (si hay instancia huérfana)
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart && typeof existingChart.destroy === 'function') {
+                    existingChart.destroy();
+                }
+
                 // Limpia el canvas completamente
                 const ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -63,6 +69,13 @@ const ChartService = (() => {
                     localChart.destroy();
                 }
                 
+                // Último recurso: Chart.js registry
+                const canvas = document.getElementById(canvasId);
+                const registryChart = canvas ? Chart.getChart(canvas) : null;
+                if (registryChart && typeof registryChart.destroy === 'function') {
+                    registryChart.destroy();
+                }
+
                 // Limpia referencias
                 AppState.destroyChart(canvasId);
                 chartsMap.delete(canvasId);
