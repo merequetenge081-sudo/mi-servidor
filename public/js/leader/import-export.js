@@ -38,11 +38,27 @@ export class ImportExportManager {
                 const responseData = await response.json();
                 input.value = '';
 
-                if (responseData.error) {
-                    this.showImportErrors(responseData.details || responseData.error);
+                if (!response.ok || responseData.failed > 0) {
+                    this.showImportResults(responseData);
                 } else {
-                    return responseData;
+                    // Show success message
+                    const message = `✅ Importación exitosa!\n\n` +
+                        `📊 Registros importados: ${responseData.imported}\n` +
+                        (responseData.requiresReview > 0 ? `⚠️ Requieren revisión: ${responseData.requiresReview}\n` : '') +
+                        `\n${responseData.message}`;
+                    
+                    alert(message);
+                    
+                    // Reload registrations
+                    if (window.registrationsManager && window.registrationsManager.loadRegistrations) {
+                        const leaderId = sessionStorage.getItem('leaderId') || localStorage.getItem('leaderId');
+                        if (leaderId) {
+                            await window.registrationsManager.loadRegistrations(leaderId);
+                        }
+                    }
                 }
+                
+                return responseData;
             } catch (err) {
                 console.error(err);
                 alert("Error al leer el archivo Excel");
@@ -56,28 +72,92 @@ export class ImportExportManager {
         if (!Array.isArray(rows)) return [];
         
         return rows.map(row => ({
-            firstName: row['Nombre'],
-            lastName: row['Apellido'],
-            cedula: row['Cédula'] || row['Cedula'],
-            email: row['Email'],
-            phone: row['Celular'] || row['Telefono'],
-            votingTable: row['Mesa'],
-            localidad: row['Localidad'],
-            votingPlace: row['Puesto Votación'] || row['Puesto Votacion']
+            firstName: row['Nombre'] || row['nombre'],
+            lastName: row['Apellido'] || row['apellido'],
+            cedula: (row['Cédula'] || row['Cedula'] || row['cedula'] || '').toString().trim(),
+            email: row['Email'] || row['email'],
+            phone: (row['Celular'] || row['Telefono'] || row['celular'] || row['telefono'] || '').toString().trim(),
+            votingTable: row['Mesa'] || row['mesa'],
+            localidad: row['Localidad'] || row['localidad'],
+            votingPlace: row['Puesto Votación'] || row['Puesto Votacion'] || row['puesto_votacion'] || row['Puesto']
         }));
     }
 
-    static showImportErrors(details) {
-        if (Array.isArray(details)) {
-            const list = document.getElementById('errorList');
-            list.innerHTML = '';
-            details.forEach(err => {
+    static showImportResults(data) {
+        const modal = document.getElementById('errorModal');
+        const list = document.getElementById('errorList');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        if (!modal || !list) {
+            // Fallback to alert if modal not found
+            let message = `Importación completada con advertencias:\n\n`;
+            message += `✅ Importados: ${data.imported || 0}\n`;
+            if (data.requiresReview > 0) {
+                message += `⚠️ Requieren revisión: ${data.requiresReview}\n`;
+            }
+            if (data.failed > 0) {
+                message += `❌ Con errores: ${data.failed}\n\n`;
+                if (Array.isArray(data.errors)) {
+                    message += 'Errores:\n';
+                    data.errors.slice(0, 5).forEach(err => {
+                        message += `- Fila ${err.row}: ${err.error}\n`;
+                    });
+                    if (data.errors.length > 5) {
+                        message += `... y ${data.errors.length - 5} más\n`;
+                    }
+                }
+            }
+            alert(message);
+            return;
+        }
+
+        // Update modal content
+        if (errorTitle) {
+            errorTitle.textContent = data.imported > 0 ? 'Importación Completada con Advertencias' : 'Errores en Importación';
+        }
+        
+        if (errorMessage) {
+            let msg = '';
+            if (data.imported > 0) {
+                msg += `✅ ${data.imported} registro(s) importados correctamente\n`;
+            }
+            if (data.requiresReview > 0) {
+                msg += `⚠️ ${data.requiresReview} registro(s) requieren revisión de puesto\n`;
+            }
+            if (data.failed > 0) {
+                msg += `❌ ${data.failed} registro(s) con errores\n`;
+            }
+            errorMessage.textContent = msg;
+        }
+
+        // Show errors
+        list.innerHTML = '';
+        if (Array.isArray(data.errors) && data.errors.length > 0) {
+            data.errors.forEach(err => {
                 const li = document.createElement('li');
                 li.textContent = `Fila ${err.row} - ${err.name}: ${err.error}`;
+                li.style.marginBottom = '8px';
                 list.appendChild(li);
             });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = 'No hay errores detallados';
+            li.style.color = '#666';
+            list.appendChild(li);
         }
-        document.getElementById('errorModal').classList.add('active');
+        
+        modal.classList.add('active');
+    }
+
+    static showImportErrors(details) {
+        // Legacy method - redirect to showImportResults
+        this.showImportResults({
+            imported: 0,
+            requiresReview: 0,
+            failed: Array.isArray(details) ? details.length : 1,
+            errors: Array.isArray(details) ? details : [{ row: 0, name: 'Error', error: details }]
+        });
     }
 
     static exportToExcel(registrations, leaderData) {
