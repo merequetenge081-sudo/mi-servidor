@@ -191,12 +191,24 @@ const BootstrapService = (() => {
     }
 
     /**
-     * Cargar charts
+     * Cargar charts (con limpieza previa)
      */
     function loadCharts() {
-        if (typeof DashboardModule !== 'undefined' && DashboardModule.loadCharts) {
-            DashboardModule.loadCharts();
-            console.log('[Bootstrap] ✅ Charts cargados');
+        try {
+            // Destruye todos los gráficos anteriores ANTES de cargar nuevos
+            if (typeof ChartService !== 'undefined' && ChartService.destroyAllCharts) {
+                ChartService.destroyAllCharts();
+            }
+            
+            // Pequeño delay para asegurar limpieza
+            setTimeout(() => {
+                if (typeof DashboardModule !== 'undefined' && DashboardModule.loadCharts) {
+                    DashboardModule.loadCharts();
+                    console.log('[Bootstrap] ✅ Charts cargados correctamente');
+                }
+            }, 50);
+        } catch (err) {
+            console.warn('[Bootstrap] Warning en loadCharts:', err);
         }
     }
 

@@ -90,14 +90,25 @@ const DashboardModule = (() => {
     // CARGAR GRÁFICOS (Chart.js)
     // ===================================
     function loadCharts() {
-        const registrations = AppState.data.registrations || [];
-        
-        // Destruir gráficos existentes antes de crear nuevos
-        ChartService.destroyChart('confirmationChart');
-        ChartService.destroyChart('topLeadersChart');
-
-        loadConfirmationChart(registrations);
-        loadTopLeadersChart(registrations);
+        try {
+            const registrations = AppState.data.registrations || [];
+            
+            // Destruir gráficos existentes PRIMERO con verificación
+            console.log('[DashboardModule] Limpiando gráficos previos...');
+            if (typeof ChartService !== 'undefined') {
+                ChartService.destroyChart('confirmationChart');
+                ChartService.destroyChart('topLeadersChart');
+            }
+            
+            // Pequeño delay para asegurar destrucción completa
+            setTimeout(() => {
+                loadConfirmationChart(registrations);
+                loadTopLeadersChart(registrations);
+                console.log('[DashboardModule] ✅ Gráficos cargados exitosamente');
+            }, 10);
+        } catch (err) {
+            console.error('[DashboardModule] Error en loadCharts:', err);
+        }
     }
 
     function loadConfirmationChart(registrations) {
