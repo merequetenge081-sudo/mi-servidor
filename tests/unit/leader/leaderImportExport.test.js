@@ -4,6 +4,8 @@
  * @jest-environment jsdom
  */
 
+import { jest } from '@jest/globals';
+
 describe('Frontend ImportExportManager', () => {
   
   // ========== Mock Setup ==========

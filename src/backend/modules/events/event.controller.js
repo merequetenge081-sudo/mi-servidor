@@ -6,6 +6,8 @@
 import { EventService } from "./event.service.js";
 import { createLogger } from "../../core/Logger.js";
 import { AppError } from "../../core/AppError.js";
+import config from "../../config/config.js";
+import { parsePagination } from "../../../utils/pagination.js";
 
 const logger = createLogger("EventController");
 const service = new EventService();
@@ -54,8 +56,11 @@ export class EventController {
     try {
       logger.info("GET getEvents", { orgId: req.orgId });
 
-      const page = Math.max(1, parseInt(req.query.page) || 1);
-      const pageSize = Math.min(100, parseInt(req.query.pageSize) || 20);
+      const { page, limit } = parsePagination(req.query, {
+        defaultLimit: config.DEFAULT_PAGE_SIZE,
+        maxLimit: config.MAX_PAGE_SIZE
+      });
+      const pageSize = limit;
       const active = req.query.active;
 
       const result = await service.getEvents(req.orgId, {

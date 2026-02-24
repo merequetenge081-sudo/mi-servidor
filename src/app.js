@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import xss from "xss-clean";
 import hpp from "hpp";
 import { fileURLToPath } from "url";
+import crypto from "crypto";
 import { dirname, join } from "path";
 import mongoose from "mongoose";
 import logger from "./config/logger.js";
@@ -120,21 +121,39 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // ==================== MIDDLEWARE ====================
+app.use((req, res, next) => {
+  req.requestId = req.headers["x-request-id"] || crypto.randomUUID();
+  res.setHeader("x-request-id", req.requestId);
+  next();
+});
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(express.static(join(__dirname, "../public")));
 
 // Request logging
 app.use((req, res, next) => {
-  logger.info(
-    `[${currentEnv.toUpperCase()}] ${req.method} ${req.originalUrl}`,
-    { ip: req.ip }
-  );
+  logger.info("http_request", {
+    requestId: req.requestId,
+    env: currentEnv,
+    method: req.method,
+    path: req.originalUrl,
+    ip: req.ip
+  });
 
   const start = Date.now();
   res.on("finish", () => {
-    const duration = Date.now() - start;
-    logger.info(`${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+    const durationMs = Date.now() - start;
+    logger.info("http_response", {
+      requestId: req.requestId,
+      env: currentEnv,
+      method: req.method,
+      path: req.originalUrl,
+      statusCode: res.statusCode,
+      durationMs,
+      userId: req.user?._id || req.user?.userId || null,
+      userRole: req.user?.role || null
+    });
   });
   next();
 });
@@ -186,11 +205,6 @@ app.get("/login", (req, res) => {
 
 // Dashboard Admin
 app.get("/dashboard.html", (req, res) => {
-  res.sendFile(join(__dirname, "../public/dashboard.html"));
-});
-
-// Dashboard Admin SPA routes (History API support)
-app.get("/dashboard.html/:section", (req, res) => {
   res.sendFile(join(__dirname, "../public/dashboard.html"));
 });
 

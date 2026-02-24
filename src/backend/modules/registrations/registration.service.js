@@ -12,6 +12,8 @@ import { Leader } from "../../../models/Leader.js";
 import { ValidationService } from '../../../services/validation.service.js';
 import { AuditService } from '../../../services/audit.service.js';
 import { ConsentLogService } from '../../../services/consentLog.service.js';
+import { matchPuesto, matchLocalidad } from '../../../utils/fuzzyMatch.js';
+import { Puestos } from '../../../models/index.js';
 import { createLogger } from "../../core/Logger.js";
 import { AppError } from "../../core/AppError.js";
 
@@ -193,6 +195,21 @@ export class RegistrationService {
       const cleanUpdateData = { ...updateData };
       protectedFields.forEach(field => delete cleanUpdateData[field]);
 
+      // Si el registro requería revisión de puesto y se actualizaron campos relacionados,
+      // marcar como resuelta la revisión
+      if (registration.requiereRevisionPuesto && !registration.revisionPuestoResuelta) {
+        const camposRelevantesActualizados = 
+          updateData.votingPlace !== undefined || 
+          updateData.localidad !== undefined || 
+          updateData.puestoId !== undefined ||
+          updateData.votingTable !== undefined;
+
+        if (camposRelevantesActualizados) {
+          cleanUpdateData.revisionPuestoResuelta = true;
+          logger.info(`[UpdateRegistration] Marcando revisión de puesto como resuelta para registro ${registrationId}`);
+        }
+      }
+
       const updated = await repository.update(registrationId, cleanUpdateData);
 
       logger.success("Registration actualizada", { registrationId });
@@ -299,7 +316,7 @@ export class RegistrationService {
    */
   async bulkCreateRegistrations(registrationsData, organizationId, userId) {
     try {
-      logger.info("Bulk create registrations", { count: registrationsData.length });
+      logger.info("Bulk create registrations con fuzzy matching", { count: registrationsData.length });
 
       if (!Array.isArray(registrationsData) || registrationsData.length === 0) {
         throw AppError.badRequest("Datos inválidos");
@@ -309,30 +326,189 @@ export class RegistrationService {
         throw AppError.badRequest("Máximo 1000 registros por operación");
       }
 
-      // Enriquecer datos
-      const enrichedData = registrationsData.map(reg => ({
-        ...reg,
+      const SIMILARITY_THRESHOLD = 0.80;
+      
+      // ========== STEP 1: Load ALL puestos for fuzzy matching ==========
+      const allPuestos = await Puestos.find({
         organizationId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        confirmed: false
-      }));
+        activo: true
+      }).lean();
 
-      const results = await repository.bulkCreate(enrichedData);
+      logger.info(`Loaded ${allPuestos.length} active puestos for fuzzy matching`);
 
-      // Log en audit
+      // ========== STEP 2: Check duplicates ==========
+      const cedulas = registrationsData.map(r => r.cedula).filter(Boolean);
+      const { Registration } = await import('../../../models/index.js');
+      
+      const existingRegs = await Registration.find({
+        cedula: { $in: cedulas },
+        organizationId
+      }).select('cedula').lean();
+
+      const existingCedulasSet = new Set(existingRegs.map(r => r.cedula));
+
+      // ========== STEP 3: Process each row with fuzzy matching ==========
+      const errors = [];
+      const validRegistrations = [];
+      const autocorrections = [];
+      let requiresReviewCount = 0;
+
+      for (let i = 0; i < registrationsData.length; i++) {
+        const reg = registrationsData[i];
+        const rowNum = i + 2; // Excel row (assuming row 1 is headers)
+
+        // Validación de campos requeridos
+        const missing = [];
+        if (!reg.firstName || !reg.firstName.toString().trim()) missing.push("Nombre");
+        if (!reg.lastName || !reg.lastName.toString().trim()) missing.push("Apellido");
+        if (!reg.cedula || !reg.cedula.toString().trim()) missing.push("Cédula");
+        if (!reg.email || !reg.email.toString().trim()) missing.push("Email");
+        if (!reg.phone || !reg.phone.toString().trim()) missing.push("Celular");
+
+        if (missing.length > 0) {
+          errors.push({
+            row: rowNum,
+            name: `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || 'Desconocido',
+            error: `Faltan campos requeridos: ${missing.join(', ')}`
+          });
+          continue;
+        }
+
+        // Validar mesa
+        let mesa = null;
+        if (reg.votingTable !== undefined && reg.votingTable !== null) {
+          mesa = Number(reg.votingTable);
+          if (Number.isNaN(mesa)) {
+            errors.push({
+              row: rowNum,
+              name: `${reg.firstName} ${reg.lastName}`,
+              error: `Mesa inválida: "${reg.votingTable}" no es un número válido`
+            });
+            continue;
+          }
+        }
+
+        // Check duplicates
+        const cedulaStr = reg.cedula.toString().trim();
+        if (existingCedulasSet.has(cedulaStr)) {
+          errors.push({
+            row: rowNum,
+            name: `${reg.firstName} ${reg.lastName}`,
+            error: `Ya existe un registro con cédula ${cedulaStr}`
+          });
+          continue;
+        }
+
+        // ========== STEP 4: Fuzzy matching y autocorrección ==========
+        let puestoId = null;
+        let localidad = reg.localidad ? reg.localidad.toString().trim() : null;
+        let votingPlace = reg.votingPlace ? reg.votingPlace.toString().trim() : null;
+        let requiereRevisionPuesto = false;
+        const rowCorrections = [];
+
+        // 4.1: Autocorregir localidad si es de Bogotá
+        if (localidad) {
+          const localidadMatch = matchLocalidad(localidad, SIMILARITY_THRESHOLD);
+          if (localidadMatch) {
+            if (localidadMatch.corrected) {
+              rowCorrections.push({
+                field: 'localidad',
+                original: localidad,
+                corrected: localidadMatch.match,
+                similarity: (localidadMatch.similarity * 100).toFixed(1) + '%'
+              });
+            }
+            localidad = localidadMatch.match;
+          }
+        }
+
+        // 4.2: Fuzzy matching de puesto de votación
+        if (votingPlace && allPuestos.length > 0) {
+          const puestoMatch = matchPuesto(votingPlace, allPuestos, SIMILARITY_THRESHOLD);
+          
+          if (puestoMatch) {
+            puestoId = puestoMatch.puesto._id;
+            localidad = puestoMatch.puesto.localidad || localidad;
+            requiereRevisionPuesto = false;
+
+            if (puestoMatch.corrected) {
+              rowCorrections.push({
+                field: 'votingPlace',
+                original: votingPlace,
+                corrected: puestoMatch.puesto.nombre,
+                similarity: (puestoMatch.similarity * 100).toFixed(1) + '%'
+              });
+              votingPlace = puestoMatch.puesto.nombre;
+            }
+          } else {
+            // No match - requiere revisión
+            requiereRevisionPuesto = true;
+            requiresReviewCount++;
+          }
+        } else if (votingPlace && allPuestos.length === 0) {
+          requiereRevisionPuesto = true;
+          requiresReviewCount++;
+        }
+
+        // Registrar autocorrecciones
+        if (rowCorrections.length > 0) {
+          autocorrections.push({
+            row: rowNum,
+            name: `${reg.firstName} ${reg.lastName}`,
+            corrections: rowCorrections
+          });
+        }
+
+        // Agregar a validRegistrations
+        validRegistrations.push({
+          organizationId,
+          firstName: reg.firstName.toString().trim(),
+          lastName: reg.lastName.toString().trim(),
+          cedula: cedulaStr,
+          email: reg.email.toString().trim(),
+          phone: reg.phone.toString().trim(),
+          votingPlace: votingPlace,
+          puestoId: puestoId,
+          mesa: mesa,
+          localidad: localidad,
+          departamento: reg.departamento ? reg.departamento.toString().trim() : null,
+          capital: reg.capital ? reg.capital.toString().trim() : null,
+          requiereRevisionPuesto: requiereRevisionPuesto,
+          revisionPuestoResuelta: !requiereRevisionPuesto,
+          registeredToVote: true,
+          confirmed: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+
+      // ========== STEP 5: Bulk insert ==========
+      let insertedCount = 0;
+      if (validRegistrations.length > 0) {
+        await repository.bulkCreate(validRegistrations);
+        insertedCount = validRegistrations.length;
+      }
+
+      // ========== STEP 6: Log audit ==========
       await AuditService.logAction({
         action: "BULK_CREATE_REGISTRATIONS",
         userId,
         resourceType: "Registration",
         organizationId,
-        description: `${results.length} registros creados en bulk`
+        description: `${insertedCount} registros creados, ${autocorrections.length} autocorregidos, ${requiresReviewCount} requieren revisión`
       });
 
-      logger.success("Bulk registrations creados", { count: results.length });
+      logger.info(`Bulk import completed - Imported: ${insertedCount}, Autocorrected: ${autocorrections.length}, Review: ${requiresReviewCount}, Errors: ${errors.length}`);
+
       return {
-        created: results.length,
-        data: results
+        success: true,
+        created: insertedCount,
+        requiresReview: requiresReviewCount,
+        failed: errors.length,
+        autocorrected: autocorrections.length,
+        errors: errors,
+        autocorrections: autocorrections,
+        message: `Importación completada: ${insertedCount} registros importados${autocorrections.length > 0 ? `, ${autocorrections.length} autocorregidos` : ''}${requiresReviewCount > 0 ? `, ${requiresReviewCount} requieren revisión` : ''}${errors.length > 0 ? `, ${errors.length} errores` : ''}.`
       };
     } catch (error) {
       logger.error("Error bulk create", { error: error.message });
@@ -349,7 +525,12 @@ export class RegistrationService {
     let leader = null;
 
     if (leaderId) {
-      leader = await Leader.findOne({ leaderId }).lean();
+      const isObjectId = /^[0-9a-fA-F]{24}$/.test(leaderId);
+      if (isObjectId) {
+        leader = await Leader.findOne({ $or: [{ leaderId }, { _id: leaderId }] }).lean();
+      } else {
+        leader = await Leader.findOne({ leaderId }).lean();
+      }
     }
 
     if (!leader && leaderToken) {

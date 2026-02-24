@@ -36,7 +36,10 @@ export function errorMiddleware(err, req, res, next) {
 
   // Log del error
   const logLevel = error.statusCode >= 500 ? 'error' : 'warn';
-  logger[logLevel](`${req.method} ${req.path} - ${error.statusCode}`, error);
+  logger[logLevel](`${req.method} ${req.path} - ${error.statusCode}`, {
+    requestId: req.requestId,
+    error
+  });
 
   // Respuesta HTTP
   res.status(error.statusCode).json(error.toJSON());

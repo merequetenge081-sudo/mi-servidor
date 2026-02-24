@@ -5,6 +5,7 @@
  */
 
 import leaderRepository from './leader.repository.js';
+import { Leader } from '../../../models/Leader.js';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import bcryptjs from 'bcryptjs';
@@ -12,6 +13,7 @@ import crypto from 'crypto';
 import { encrypt, decrypt } from '../../../utils/crypto.js';
 import { emailService } from '../../../services/emailService.js';
 import config from '../../config/config.js';
+import { isTempPasswordExpired } from '../../../utils/tempPassword.js';
 
 const logger = createLogger('LeaderService');
 
@@ -47,6 +49,9 @@ export class LeaderService {
       passwordHash,
       token,
       isTemporaryPassword: true,
+      tempPasswordPlaintext: encrypt(tempPassword),
+      tempPasswordCreatedAt: new Date(),
+      passwordCanBeChanged: true,
       organizationId,
       active: true,
       registrations: 0
@@ -87,7 +92,8 @@ export class LeaderService {
    * Obtener credenciales de un líder
    */
   async getLeaderCredentials(id) {
-    const leader = await leaderRepository.findById(id);
+    const leader = await Leader.findById(id)
+      .select('username tempPasswordPlaintext tempPasswordCreatedAt isTemporaryPassword');
     
     if (!leader) {
       throw AppError.notFound('Líder');
@@ -112,9 +118,16 @@ export class LeaderService {
       };
     }
 
-    // Desencriptar contraseña temporal
+    // Desencriptar contraseña temporal (si no expiro)
     let tempPassword = null;
-    if (leader.tempPasswordPlaintext) {
+    const isExpired = isTempPasswordExpired(leader);
+
+    if (isExpired) {
+      await Leader.updateOne(
+        { _id: leader._id },
+        { $unset: { tempPasswordPlaintext: "", tempPasswordCreatedAt: "" } }
+      );
+    } else if (leader.tempPasswordPlaintext) {
       try {
         tempPassword = decrypt(leader.tempPasswordPlaintext);
       } catch (e) {
@@ -248,6 +261,7 @@ export class LeaderService {
 
     // Actualizar contraseña encriptada
     leader.tempPasswordPlaintext = encrypt(tempPassword);
+    leader.tempPasswordCreatedAt = new Date();
     await leader.save();
 
     // Enviar por email

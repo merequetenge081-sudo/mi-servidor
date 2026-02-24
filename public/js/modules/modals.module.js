@@ -5,12 +5,39 @@
 
 const ModalsModule = {
     /**
-     * Inicializa el módulo
+     * Init - bind all event listeners
      */
     init() {
         console.log('[ModalsModule] Inicializando...');
         this.bindCloseButtons();
         this.bindOverlayClose();
+        this.bindHelpDrawerClose();
+    },
+
+    /**
+     * Bind help drawer close on overlay click
+     */
+    bindHelpDrawerClose() {
+        const overlay = document.getElementById('helpOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.closeHelpDrawer();
+                }
+            });
+        }
+
+        // Also bind close button in help drawer
+        document.addEventListener('click', (e) => {
+            const closeBtn = e.target.closest('[data-action="help-close"]');
+            if (closeBtn && (closeBtn.closest('#helpDrawer') || closeBtn.id === 'helpOverlay')) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.closeHelpDrawer();
+            }
+        });
     },
 
     /**
@@ -237,12 +264,31 @@ const ModalsModule = {
     },
 
     /**
-     * Toggle dark mode
+     * Toggle dark mode (con debounce para evitar múltiples toggles rápidos)
      */
     toggleDarkMode() {
-        const isDark = document.body.classList.toggle('dark-mode');
-        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    },
+        // Prevenir múltiples toggles en mismo frame
+        if (this._darkModeToggling) return;
+        this._darkModeToggling = true;
+        
+        const clearFlag = () => {
+            this._darkModeToggling = false;
+        };
+        
+        try {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+            console.log('[ModalsModule] Dark mode toggled:', isDark ? 'ON' : 'OFF');
+            
+            // Apply smooth transition
+            document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+            setTimeout(() => { document.body.style.transition = ''; }, 300);
+        } catch (e) {
+            console.error('[ModalsModule] Error toggling dark mode:', e);
+        } finally {
+            setTimeout(clearFlag, 100);
+        }
+    }
 
     /**
      * Toggle notifications dropdown
@@ -271,36 +317,71 @@ const ModalsModule = {
      * Toggle help drawer
      */
     toggleHelpDrawer() {
-        const drawer = document.getElementById('helpDrawer');
-        const overlay = document.getElementById('helpOverlay');
+        try {
+            const drawer = document.getElementById('helpDrawer');
+            const overlay = document.getElementById('helpOverlay');
 
-        // Si los elementos no existen, mostrar alerta simple
-        if (!drawer || !overlay) {
-            Helpers.showAlert('La ayuda estará disponible próximamente', 'info');
-            return;
+            if (!drawer || !overlay) {
+                console.warn('[ModalsModule] Help drawer elements not found');
+                if (typeof Helpers !== 'undefined' && Helpers.showAlert) {
+                    Helpers.showAlert('La ayuda está en construcción', 'info');
+                }
+                return;
+            }
+
+            console.log('[ModalsModule] Toggling help drawer');
+            const isActive = drawer.classList.contains('active');
+
+            this.closeNotificationsDropdown();
+
+            if (isActive) {
+                this.closeHelpDrawer();
+            } else {
+                // Cierra otros dropdowns primero
+                this.closeNotificationsDropdown();
+                
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+                drawer.setAttribute('aria-hidden', 'false');
+                overlay.setAttribute('aria-hidden', 'false');
+                
+                // Prevenir bubbling inmediato
+                setTimeout(() => {
+                    this.updateHelpContent();
+                }, 50);
+                
+                console.log('[ModalsModule] Help drawer opened');
+            }
+        } catch (e) {
+            console.error('[ModalsModule] Error toggling help drawer:', e);
         }
-
-        const isActive = drawer.classList.contains('active');
-
-        this.closeNotificationsDropdown();
-
-        if (isActive) {
-            this.closeHelpDrawer();
-        } else {
-            drawer.classList.add('active');
-            overlay.classList.add('active');
-            this.updateHelpContent();
-        }
-    },
+    }
 
     /**
      * Close help drawer
      */
     closeHelpDrawer() {
-        const drawer = document.getElementById('helpDrawer');
-        const overlay = document.getElementById('helpOverlay');
-        if (drawer) drawer.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
+        try {
+            const drawer = document.getElementById('helpDrawer');
+            const overlay = document.getElementById('helpOverlay');
+            
+            // Prevenir cierre múltiple
+            if (drawer && !drawer.classList.contains('active')) {
+                return; // Ya está cerrado
+            }
+            
+            if (drawer) {
+                drawer.classList.remove('active');
+                drawer.setAttribute('aria-hidden', 'true');
+            }
+            if (overlay) {
+                overlay.classList.remove('active');
+                overlay.setAttribute('aria-hidden', 'true');
+            }
+            console.log('[ModalsModule] Help drawer closed');
+        } catch (e) {
+            console.error('[ModalsModule] Error closing help drawer:', e);
+        }
     },
 
     /**

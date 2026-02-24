@@ -4,6 +4,7 @@
 
 import { AppError } from '../core/AppError.js';
 import { createLogger } from '../core/Logger.js';
+import { buildUserFromToken, decodeJwtToken, extractBearerToken } from '../../utils/jwt.js';
 
 const logger = createLogger('AuthMiddleware');
 
@@ -12,22 +13,26 @@ const logger = createLogger('AuthMiddleware');
  */
 export async function authMiddleware(req, res, next) {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = extractBearerToken(req.headers.authorization);
 
     if (!token) {
       throw AppError.unauthorized('Token no proporcionado');
     }
 
-    // Nota: La verificación real del JWT debe estar en tu middleware existente
-    // Este es un placeholder que asume que req.user ya está poblado
-    if (!req.user) {
-      throw AppError.unauthorized('Usuario no autenticado');
-    }
+    const decoded = decodeJwtToken(token);
+    req.user = buildUserFromToken(decoded);
+    req.organizationId = req.user.organizationId || null;
+    req.orgId = req.user.organizationId || null;
 
     logger.debug('Usuario autenticado', { userId: req.user._id });
     next();
   } catch (error) {
-    next(error);
+    if (error instanceof AppError) {
+      return next(error);
+    }
+
+    logger.warn('Token inválido', { error: error.message });
+    return next(AppError.unauthorized('Token inválido o expirado'));
   }
 }
 
@@ -90,6 +95,8 @@ export function organizationMiddleware(req, res, next) {
 
     // Agregar filtro de organización al request
     req.orgFilter = { organizationId: req.user.organizationId };
+    req.organizationId = req.user.organizationId;
+    req.orgId = req.user.organizationId;
 
     next();
   } catch (error) {

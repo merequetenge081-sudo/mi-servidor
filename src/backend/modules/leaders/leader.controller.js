@@ -7,6 +7,8 @@
 import leaderService from './leader.service.js';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
+import config from '../../config/config.js';
+import { parseLimit, parsePagination } from '../../../utils/pagination.js';
 
 const logger = createLogger('LeaderController');
 
@@ -44,8 +46,13 @@ export async function createLeader(req, res, next) {
  */
 export async function getLeaders(req, res, next) {
   try {
-    const { page = 1, limit = 20, eventId, active, search } = req.query;
+    const { eventId, active, search } = req.query;
     const organizationId = req.user.organizationId;
+
+    const { page, limit } = parsePagination(req.query, {
+      defaultLimit: config.DEFAULT_PAGE_SIZE,
+      maxLimit: config.MAX_PAGE_SIZE
+    });
 
     logger.info('Listar líderes', { page, limit });
 
@@ -62,10 +69,7 @@ export async function getLeaders(req, res, next) {
       ];
     }
 
-    const result = await leaderService.getLeaders(filter, {
-      page: parseInt(page),
-      limit: parseInt(limit)
-    });
+    const result = await leaderService.getLeaders(filter, { page, limit });
 
     res.json({
       success: true,
@@ -184,7 +188,10 @@ export async function deleteLeader(req, res, next) {
  */
 export async function getTopLeaders(req, res, next) {
   try {
-    const { limit = 10 } = req.query;
+    const limit = parseLimit(req.query.limit, {
+      defaultLimit: 10,
+      maxLimit: config.MAX_PAGE_SIZE
+    });
     const organizationId = req.user.organizationId;
 
     logger.info('Obtener líderes destacados', { limit });

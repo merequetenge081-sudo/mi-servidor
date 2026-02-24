@@ -10,6 +10,7 @@ import { config } from "../config/env.js";
 import logger from "../config/logger.js";
 import { findAdminWithFallback, findLeaderWithFallback, getTestCredentials } from "../utils/authFallback.js";
 import { validatePassword, getPasswordRequirements } from "../utils/passwordValidator.js";
+import { isTempPasswordExpired } from "../utils/tempPassword.js";
 
 export async function adminLogin(req, res) {
   try {
@@ -18,7 +19,6 @@ export async function adminLogin(req, res) {
     if (!username || !password) {
       return res.status(400).json({ error: "Username y password requeridos" });
     }
-
     const { data: admin, source } = await findAdminWithFallback(Admin, username);
 
     if (!admin) {
@@ -34,9 +34,9 @@ export async function adminLogin(req, res) {
     if (!isValid) {
       if (req.loginRateLimit) req.loginRateLimit.recordFailedAttempt();
       const remaining = req.loginRateLimit ? req.loginRateLimit.getAttemptsRemaining() : 5;
-      return res.status(401).json({ 
-        error: "Credenciales inválidas", 
-        attemptsRemaining: remaining 
+      return res.status(401).json({
+        error: "Credenciales inválidas",
+        attemptsRemaining: remaining
       });
     }
 
@@ -122,6 +122,14 @@ export async function leaderLogin(req, res) {
       });
     }
 
+    if (leader.isTemporaryPassword && isTempPasswordExpired(leader)) {
+      await Leader.updateOne(
+        { _id: leader._id },
+        { $unset: { tempPasswordPlaintext: "", tempPasswordCreatedAt: "" } }
+      );
+      return res.status(403).json({ error: "Contraseña temporal expirada. Solicita un reset." });
+    }
+
     if (!leader.active) {
       return res.status(403).json({ error: "Cuenta inactiva. Contacte al administrador." });
     }
@@ -187,6 +195,10 @@ export async function changePassword(req, res) {
       $set: {
         passwordHash: newHash,
         isTemporaryPassword: false
+      },
+      $unset: {
+        tempPasswordPlaintext: "",
+        tempPasswordCreatedAt: ""
       }
     });
 
@@ -231,6 +243,7 @@ export async function adminResetPassword(req, res) {
     leader.isTemporaryPassword = true;
     leader.passwordResetRequested = false; // Clear the request flag
     leader.tempPasswordPlaintext = encrypt(tempPassword);
+    leader.tempPasswordCreatedAt = new Date();
     await leader.save();
 
     // Send email with temporary password
@@ -276,7 +289,7 @@ export async function leaderLoginById(req, res) {
       return res.status(400).json({ error: "LeaderId requerido" });
     }
 
-    console.log("👉 Login attempt with:", leaderId); // DEBUG LOG
+    logger.debug("Leader login attempt", { leaderId });
 
     let query = { leaderId };
 
@@ -378,7 +391,8 @@ export async function requestPasswordReset(req, res) {
         isTemporaryPassword: true,
         passwordResetRequested: true,
         passwordCanBeChanged: true,
-        tempPasswordPlaintext: encrypt(tempPassword)
+        tempPasswordPlaintext: encrypt(tempPassword),
+        tempPasswordCreatedAt: new Date()
       }
     });
 
@@ -454,13 +468,14 @@ export async function adminGenerateNewPassword(req, res) {
         isTemporaryPassword: true,
         passwordResetRequested: false,
         passwordCanBeChanged: true,
-        tempPasswordPlaintext: tempPassword // Guardar contraseña temporal para referencia del admin
+        tempPasswordPlaintext: encrypt(tempPassword),
+        tempPasswordCreatedAt: new Date()
       }
     });
 
     await AuditService.log("UPDATE", "Leader", leader._id.toString(), adminUser, {}, `Admin generó nueva contraseña temporal para ${leader.name}`);
 
-    logger.info(`Nueva contraseña temporal generada para ${leader.name}: ${tempPassword}`);
+    logger.info(`Nueva contraseña temporal generada para ${leader.name}`);
 
     res.json({ 
       message: "Nueva contraseña generada", 
@@ -514,7 +529,8 @@ export async function leaderChangePassword(req, res) {
         passwordResetRequested: false
       },
       $unset: {
-        tempPasswordPlaintext: "" // Borrar contraseña temporal ya que el líder configuró una nueva
+        tempPasswordPlaintext: "",
+        tempPasswordCreatedAt: ""
       }
     });
 

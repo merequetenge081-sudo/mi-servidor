@@ -11,6 +11,9 @@ const state = {
   leaderIdParam: new URLSearchParams(window.location.search).get('leaderId')
 };
 
+const API_V1_BASE = '/api';
+const API_V2_BASE = '/api/v2';
+
 // ==================== VALIDATION RULES ====================
 const validators = {
   name: (value) => {
@@ -71,6 +74,36 @@ function showToast(message, type = 'success') {
     toast.style.transform = 'translateX(400px)';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+async function fetchJsonWithFallback(primaryUrl, fallbackUrl, options = {}) {
+  try {
+    const response = await fetch(primaryUrl, options);
+    if (response.ok) {
+      return await response.json();
+    }
+    if (response.status === 404 && fallbackUrl) {
+      const fallbackResponse = await fetch(fallbackUrl, options);
+      if (fallbackResponse.ok) {
+        return await fallbackResponse.json();
+      }
+      const fallbackError = new Error('Error al conectar con el servidor');
+      fallbackError.status = fallbackResponse.status;
+      throw fallbackError;
+    }
+    const error = new Error('Error al conectar con el servidor');
+    error.status = response.status;
+    throw error;
+  } catch (error) {
+    throw error;
+  }
+}
+
+function unwrapData(response) {
+  if (response && response.success === true && response.data !== undefined) {
+    return response.data;
+  }
+  return response;
 }
 
 function clearFieldError(fieldId) {
@@ -170,7 +203,7 @@ function setupRealtimeValidation() {
 // ==================== ANTI-DUPLICATE CHECK ====================
 async function checkDuplicateCedula(cedula) {
   try {
-    const response = await fetch(`/api/registrations?cedula=${encodeURIComponent(cedula)}`);
+    const response = await fetch(`${API_V1_BASE}/registrations?cedula=${encodeURIComponent(cedula)}`);
     
     if (!response.ok) {
       if (response.status === 404) {
@@ -200,21 +233,31 @@ async function loadLeaderInfo() {
   try {
     if (state.tokenParam) {
       // Validate and load leader by token
-      const response = await fetch(`/api/registro/${state.tokenParam}`);
-      
-      if (!response.ok) {
+      try {
+        const responseData = await fetchJsonWithFallback(
+          `${API_V2_BASE}/leaders/token/${state.tokenParam}`,
+          `${API_V1_BASE}/registro/${state.tokenParam}`
+        );
+        const leaderData = unwrapData(responseData);
+
+        if (!leaderData) {
+          showErrorScreen('Error al validar el token');
+          hideLoader();
+          return false;
+        }
+
+        state.leaderData = leaderData;
+      } catch (error) {
         let errorMsg = 'Error al validar el token';
-        if (response.status === 404) {
+        if (error.status === 404) {
           errorMsg = 'Token inválido. Verifica el enlace del QR.';
-        } else if (response.status === 403) {
+        } else if (error.status === 403) {
           errorMsg = 'El líder está inactivo. Contacta con el administrador.';
         }
         showErrorScreen(errorMsg);
         hideLoader();
         return false;
       }
-      
-      state.leaderData = await response.json();
     } else if (state.leaderIdParam) {
       // Fallback: load by leaderId (legacy support, requires manual data)
       state.leaderData = { leaderId: state.leaderIdParam, name: 'Líder' };
@@ -242,10 +285,13 @@ async function loadLeaderInfo() {
 // ==================== LOAD ACTIVE EVENT ====================
 async function loadActiveEvent() {
   try {
-    const response = await fetch('/api/events/active');
-    
-    if (response.ok) {
-      state.activeEvent = await response.json();
+    const responseData = await fetchJsonWithFallback(
+      `${API_V2_BASE}/events/active/current`,
+      `${API_V1_BASE}/events/active`
+    );
+    const activeEvent = unwrapData(responseData);
+    if (activeEvent) {
+      state.activeEvent = activeEvent;
       const eventName = document.getElementById('event-name');
       if (eventName && state.activeEvent.name) {
         eventName.textContent = `Evento: ${state.activeEvent.name}`;
@@ -300,32 +346,42 @@ async function submitRegistration(skipDuplicateCheck = false) {
   };
   
   try {
-    const response = await fetch('/api/registrations', {
+    const response = await fetch(`${API_V2_BASE}/registrations`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    
-    if (!response.ok) {
+    let finalResponse = response;
+
+    if (response.status === 404) {
+      finalResponse = await fetch(`${API_V1_BASE}/registrations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    if (!finalResponse.ok) {
       let errorMsg = 'Error al enviar el registro';
-      
-      if (response.status === 400) {
-        const error = await response.json();
+
+      if (finalResponse.status === 400) {
+        const error = await finalResponse.json();
         errorMsg = error.error || 'Datos inválidos';
-      } else if (response.status === 500) {
+      } else if (finalResponse.status === 500) {
         errorMsg = 'Error del servidor. Intenta más tarde.';
       }
-      
+
       hideLoader();
       showToast(errorMsg, 'error');
       return;
     }
-    
-    const result = await response.json();
+
+    const result = await finalResponse.json();
+    const registrationData = unwrapData(result);
     hideLoader();
-    
+
     showToast('¡Registro enviado exitosamente!', 'success');
-    openSuccessModal(result.id || 'N/A');
+    openSuccessModal(registrationData?.id || 'N/A');
     
   } catch (error) {
     console.error('Error submitting registration:', error);

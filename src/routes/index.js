@@ -18,6 +18,7 @@ import { roleMiddleware } from "../middleware/role.middleware.js";
 import { organizationRoleMiddleware } from "../middleware/organization.middleware.js";
 import { rateLimitMiddleware, loginRateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
 import logger from "../config/logger.js";
+import { encrypt } from "../utils/crypto.js";
 
 const router = express.Router();
 const startTime = Date.now();
@@ -230,6 +231,12 @@ router.post("/leaders/:id/send-access", authMiddleware, roleMiddleware("admin"),
 
 // ==================== REGISTRACIONES ====================
 router.post("/registrations", rateLimitMiddleware, registrationController.createRegistration);
+
+// ENDPOINT DE PRUEBA - SOLO DESARROLLO (sin autenticación para testing)
+if (process.env.NODE_ENV !== 'production') {
+  router.post("/registrations/bulk/test", registrationController.bulkCreateRegistrations);
+}
+
 router.post("/registrations/bulk", authMiddleware, registrationController.bulkCreateRegistrations);
 router.get("/registrations", authMiddleware, registrationController.getRegistrations);
 router.get("/registrations/leader/:leaderId", authMiddleware, registrationController.getRegistrationsByLeader);
@@ -238,6 +245,16 @@ router.put("/registrations/:id", authMiddleware, registrationController.updateRe
 router.delete("/registrations/:id", authMiddleware, registrationController.deleteRegistration);
 router.post("/registrations/:id/confirm", authMiddleware, registrationController.confirmRegistration);
 router.post("/registrations/:id/unconfirm", authMiddleware, roleMiddleware("admin"), registrationController.unconfirmRegistration);
+
+// ==================== DELETION REQUESTS ====================
+router.post("/registrations/deletion-request", authMiddleware, registrationController.requestBulkDeletion);
+router.get("/registrations/deletion-request/status", authMiddleware, registrationController.getDeletionRequestStatus);
+router.get("/deletion-requests", authMiddleware, roleMiddleware("admin"), registrationController.getAllDeletionRequests);
+router.post("/deletion-requests/:requestId/review", authMiddleware, roleMiddleware("admin"), registrationController.reviewDeletionRequest);
+
+// ==================== ARCHIVED REGISTRATIONS ====================
+router.get("/archived-registrations/search/:cedula", authMiddleware, registrationController.searchArchivedByCedula);
+router.get("/archived-registrations/stats", authMiddleware, roleMiddleware("admin"), registrationController.getArchivedStats);
 
 // ==================== EVENTOS ====================
 router.post("/events", authMiddleware, roleMiddleware("admin"), eventController.createEvent);
@@ -321,7 +338,8 @@ router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async
           isTemporaryPassword: true,
           passwordCanBeChanged: true,
           passwordResetRequested: false,
-          tempPasswordPlaintext: tempPassword
+          tempPasswordPlaintext: encrypt(tempPassword),
+          tempPasswordCreatedAt: new Date()
         }
       });
 
@@ -336,14 +354,7 @@ router.post("/migrate-usernames", authMiddleware, roleMiddleware("admin"), async
       logger.info(`[MIGRATION] ${leader.name} → ${username}`);
     }
 
-    // Print all to console for easy copy
-    console.log("\n╔══════════════════════════════════════════════════╗");
-    console.log("║     MIGRACIÓN DE USUARIOS - CREDENCIALES        ║");
-    console.log("╠══════════════════════════════════════════════════╣");
-    results.forEach(r => {
-      console.log(`║ ${r.name.padEnd(25)} │ ${r.username.padEnd(12)} │ ${r.tempPassword}`);
-    });
-    console.log("╚══════════════════════════════════════════════════╝\n");
+    logger.info(`[MIGRATION] Migrados ${results.length} líderes (credenciales entregadas via respuesta API)`);
 
     res.json({
       message: `${results.length} líderes migrados exitosamente`,

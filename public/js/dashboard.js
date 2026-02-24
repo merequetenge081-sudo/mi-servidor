@@ -364,7 +364,11 @@ async function loadDashboard() {
         if (document.getElementById('dashboard').classList.contains('active')) {
             requestAnimationFrame(() => { loadCharts(); chartsLoaded = true; });
         }
-        updateNotificationsBadge();
+        
+        // Cargar deletion requests para el badge de notificaciones
+        loadDeletionRequests().then(() => {
+            updateNotificationsBadge();
+        });
 
     } catch (err) {
         console.error('Error cargando dashboard:', err);
@@ -403,10 +407,16 @@ async function updateEventNameDisplay() {
 }
 
 // ====== NOTIFICACIONES ======
+function isPendingDeletionRequest(request) {
+    const status = (request?.status || 'pending').toString().toLowerCase();
+    return status === 'pending';
+}
+
 async function updateNotificationsBadge() {
     try {
         const leadersWithRequests = allLeaders.filter(l => l.passwordResetRequested);
-        const count = leadersWithRequests.length;
+        const pendingDeletionRequests = deletionRequests.filter(isPendingDeletionRequest);
+        const count = leadersWithRequests.length + pendingDeletionRequests.length;
 
         // Actualizar badge en navbar (si existe)
         const badge = document.getElementById('notificationsBadge');
@@ -417,6 +427,23 @@ async function updateNotificationsBadge() {
             } else {
                 badge.style.display = 'none';
             }
+        }
+        
+        // Actualizar badge de solicitudes de eliminación
+        const deletionBadge = document.getElementById('deletionRequestsBadge');
+        if (deletionBadge) {
+            if (pendingDeletionRequests.length > 0) {
+                deletionBadge.textContent = pendingDeletionRequests.length;
+                deletionBadge.style.display = 'flex';
+            } else {
+                deletionBadge.style.display = 'none';
+            }
+        }
+        
+        // Actualizar contador en la sección
+        const pendingCountElement = document.getElementById('pendingRequestsCount');
+        if (pendingCountElement) {
+            pendingCountElement.textContent = pendingDeletionRequests.length;
         }
 
         // Actualizar badge en menú hamburguesa
@@ -438,35 +465,70 @@ async function loadNotifications() {
     try {
         const content = document.getElementById('notificationsContent');
         const leadersWithRequests = allLeaders.filter(l => l.passwordResetRequested);
+        const pendingDeletionRequests = deletionRequests.filter(isPendingDeletionRequest);
 
-        if (leadersWithRequests.length === 0) {
+        if (leadersWithRequests.length === 0 && pendingDeletionRequests.length === 0) {
             content.innerHTML = `
-                <div style="text-align: center; padding: 60px 20px; color: #999;">
-                    <i class="bi bi-bell-slash" style="font-size: 60px; opacity: 0.3; margin-bottom: 15px;"></i>
-                    <p style="font-size: 16px;">No hay solicitudes de restablecimiento</p>
+                <div class="empty-state">
+                    <i class="bi bi-bell-slash"></i>
+                    <p>Sin novedades</p>
                 </div>
             `;
             return;
         }
 
-        const html = leadersWithRequests.map(leader => `
-            <div style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
-                        <i class="bi bi-person-fill" style="color: #667eea;"></i> ${leader.name}
+        let html = '';
+
+        // Solicitudes de eliminación primero (más urgentes)
+        if (pendingDeletionRequests.length > 0) {
+            html += pendingDeletionRequests.map(request => {
+                const leader = allLeaders.find(l => l._id === request.leaderId);
+                const leaderName = leader ? leader.name : 'Líder desconocido';
+                return `
+                    <div style="padding: 15px; border-bottom: 1px solid #eee; background: #fef3f2;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #dc2626; margin-bottom: 5px;">
+                                    <i class="bi bi-trash-fill"></i> Solicitud de Eliminación
+                                </div>
+                                <div style="font-size: 13px; color: #666; margin-bottom: 3px;">
+                                    <i class="bi bi-person-fill"></i> <strong>${leaderName}</strong>
+                                </div>
+                                <div style="font-size: 13px; color: #666; margin-bottom: 3px;">
+                                    <i class="bi bi-file-text"></i> ${request.registrationCount} registros
+                                </div>
+                                ${request.reason ? `<div style="font-size: 12px; color: #999; font-style: italic; margin-top: 5px;">"${request.reason}"</div>` : ''}
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="navigateToSection('deletion-requests'); closeNotificationsDropdown();" style="width: 100%; margin-top: 8px;">
+                            <i class="bi bi-eye"></i> Revisar Solicitud
+                        </button>
                     </div>
-                    <div style="font-size: 13px; color: #666;">
-                        Usuario: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">${leader.username || '-'}</code>
+                `;
+            }).join('');
+        }
+
+        // Solicitudes de restablecimiento de contraseña
+        if (leadersWithRequests.length > 0) {
+            html += leadersWithRequests.map(leader => `
+                <div style="padding: 15px; border-bottom: 1px solid #eee;">
+                    <div>
+                        <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
+                            <i class="bi bi-key-fill" style="color: #667eea;"></i> Restablecimiento de Contraseña
+                        </div>
+                        <div style="font-size: 13px; color: #666;">
+                            <i class="bi bi-person-fill"></i> ${leader.name}
+                        </div>
+                        <div style="font-size: 13px; color: #666;">
+                            Usuario: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">${leader.username || '-'}</code>
+                        </div>
                     </div>
-                    <div style="font-size: 12px; color: #999; margin-top: 3px;">
-                        <i class="bi bi-clock"></i> Solicitud pendiente
-                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="generateNewPassword('${leader._id}'); closeNotificationsDropdown();" style="width: 100%; margin-top: 8px;">
+                        <i class="bi bi-key"></i> Generar Contraseña
+                    </button>
                 </div>
-                <button class="btn btn-sm btn-danger" onclick="generateNewPassword('${leader._id}'); document.getElementById('notificationsModal').classList.remove('active');" style="white-space: nowrap;">
-                    <i class="bi bi-key"></i> Generar Contraseña
-                </button>
-            </div>
-        `).join('');
+            `).join('');
+        }
 
         content.innerHTML = html;
     } catch (err) {
@@ -1573,6 +1635,9 @@ function navigateToSection(section, updateHistory = true) {
             bindAnalyticsFilters();
             if (!analyticsLoaded) { loadAnalytics(); analyticsLoaded = true; }
         }
+        if (section === 'deletion-requests') {
+            loadDeletionRequests();
+        }
         const leaderSearchInput = document.getElementById('leaderSearchInput');
         if (leaderSearchInput && section === 'leaders' && !leaderSearchInput.hasListener) {
             leaderSearchInput.addEventListener('input', (e) => filterLeadersByName(e.target.value));
@@ -1591,21 +1656,6 @@ window.addEventListener('popstate', (e) => {
     const section = e.state?.section || getSectionFromUrl();
     navigateToSection(section, false);
 });
-
-// NAV LINKS
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const section = link.dataset.section;
-        navigateToSection(section);
-    });
-});
-
-// Initial route on page load
-const initialSection = getSectionFromUrl();
-if (initialSection !== 'dashboard') {
-    navigateToSection(initialSection, false);
-}
 
 // ============== HAMBURGER MENU ==============
 function toggleHamburgerMenu() {
@@ -1642,11 +1692,8 @@ function toggleNotificationsDropdown() {
         dropdown.classList.remove('active');
     } else {
         dropdown.classList.add('active');
-        // Re-using loadNotifications logic for dropdown content if needed, 
-        // but current loadNotifications targets modal. 
-        // Adopting simpler logic for now or reusing if structures allow.
-        // For now, let's trigger the modal or update dropdown content if we had one.
-        // The original code uses a modal for detailed notifications mainly.
+        // Cargar notificaciones actualizadas
+        loadNotifications();
     }
 }
 
@@ -2497,16 +2544,427 @@ if (document.getElementById('saveEditLeaderBtn')) {
     });
 }
 
-// Close listeners for new modals if not already bound
-if (document.getElementById('closeEditLeaderModal')) {
-    document.getElementById('closeEditLeaderModal').addEventListener('click', () => {
-        document.getElementById('editLeaderModal').classList.remove('active');
+// ============== DELETION REQUESTS ==============
+
+let deletionRequests = [];
+window.deletionRequests = deletionRequests;
+
+async function loadDeletionRequests() {
+    try {
+        const response = await fetch(`${API_URL}/api/deletion-requests`, {
+            headers: { Authorization: `Bearer ${currentToken}` }
+        });
+
+        if (!response.ok) throw new Error('Error al cargar solicitudes');
+
+        const data = await response.json();
+        deletionRequests = data.requests || [];
+        window.deletionRequests = deletionRequests;
+        renderDeletionRequests();
+        
+        // Cargar estadísticas de archivos
+        await loadArchivedStats();
+        
+        // Actualizar badge de notificaciones
+        updateNotificationsBadge();
+    } catch (error) {
+        console.error('Error loading deletion requests:', error);
+        const container = document.getElementById('deletionRequestsContainer');
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: var(--danger);"></i>
+                    <p style="color: var(--text-muted); margin-top: 16px;">Error al cargar solicitudes</p>
+                </div>
+            `;
+        }
+    }
+}
+
+async function loadArchivedStats() {
+    try {
+        const response = await fetch(`${API_URL}/api/archived-registrations/stats`, {
+            headers: { Authorization: `Bearer ${currentToken}` }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const countElement = document.getElementById('archivedCount');
+            const personsElement = document.getElementById('archivedPersons');
+            
+            if (countElement) countElement.textContent = data.totalArchived || 0;
+            if (personsElement) personsElement.textContent = data.uniquePersons || 0;
+        }
+    } catch (error) {
+        console.error('Error loading archived stats:', error);
+    }
+}
+
+function filterDeletionRequests() {
+    const statusFilter = document.getElementById('deletionStatusFilter').value;
+    const filtered = statusFilter 
+        ? deletionRequests.filter(req => req.status === statusFilter)
+        : deletionRequests;
+    renderDeletionRequests(filtered);
+}
+
+function renderDeletionRequests(requests = deletionRequests) {
+    const container = document.getElementById('deletionRequestsContainer');
+    
+    if (!container) return;
+
+    if (requests.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 80px 20px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: #f1f5f9; border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-inbox" style="font-size: 40px; color: #94a3b8;"></i>
+                </div>
+                <h3 style="color: #0f172a; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">No hay solicitudes</h3>
+                <p style="color: #64748b; margin: 0; font-size: 14px;">No hay solicitudes de eliminación en este momento</p>
+            </div>
+        `;
+        return;
+    }
+
+    const html = requests.map(req => {
+        const statusColors = {
+            pending: { 
+                border: '#f59e0b', 
+                text: '#92400e', 
+                icon: 'clock-history', 
+                label: 'Pendiente',
+                badgeBg: '#fef3c7',
+                badgeBorder: '#fed7aa'
+            },
+            approved: { 
+                border: '#22c55e', 
+                text: '#065f46', 
+                icon: 'check-circle-fill', 
+                label: 'Aprobada',
+                badgeBg: '#d1fae5',
+                badgeBorder: '#a7f3d0'
+            },
+            rejected: { 
+                border: '#dc2626', 
+                text: '#991b1b', 
+                icon: 'x-circle-fill', 
+                label: 'Rechazada',
+                badgeBg: '#fee2e2',
+                badgeBorder: '#fecaca'
+            }
+        };
+        
+        const statusKey = (req.status || 'pending').toString().toLowerCase();
+        const status = statusColors[statusKey] || statusColors.pending;
+        const createdDate = new Date(req.createdAt).toLocaleString('es-CO', { 
+            year: 'numeric', month: 'short', day: 'numeric', 
+            hour: '2-digit', minute: '2-digit' 
+        });
+        const reviewedDate = req.reviewedAt ? new Date(req.reviewedAt).toLocaleString('es-CO', {
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        }) : '-';
+
+        return `
+            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: all 0.2s;" onmouseover="this.style.boxShadow='0 8px 20px rgba(0,0,0,0.08)'; this.style.borderColor='#cbd5e1';" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.04)'; this.style.borderColor='#e2e8f0';">
+                
+                <!-- Header: Leader info and status -->
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 44px; height: 44px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-person-fill" style="font-size: 20px; color: #64748b;"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 4px 0; color: #0f172a; font-size: 16px; font-weight: 600;">${req.leaderName}</h4>
+                            <p style="color: #64748b; font-size: 13px; margin: 0;">
+                                <i class="bi bi-hash"></i> ${req.leaderId.slice(-8)}
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="background: ${status.badgeBg}; color: ${status.text}; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; border: 1px solid ${status.badgeBorder};">
+                            <i class="bi bi-${status.icon}"></i> ${status.label}
+                        </div>
+                        <div style="text-align: center; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div style="font-size: 20px; font-weight: 700; color: #0f172a; line-height: 1;">${req.registrationCount}</div>
+                            <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Registros</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Reason -->
+                ${req.reason ? `
+                    <div style="background: #f8fafc; border-left: 3px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                        <p style="margin: 0; color: #0f172a; font-size: 14px; line-height: 1.6;">
+                            <span style="text-transform: uppercase; font-size: 11px; color: #64748b; font-weight: 600; letter-spacing: 0.5px;">
+                                <i class="bi bi-chat-left-quote" style="color: #3b82f6;"></i> Razón
+                            </span><br>
+                            <span style="color: #334155; margin-top: 6px; display: inline-block;">${req.reason}</span>
+                        </p>
+                    </div>
+                ` : ''}
+
+                <!-- Metadata Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                        <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;">
+                            <i class="bi bi-calendar-event"></i> Solicitado
+                        </div>
+                        <div style="color: #0f172a; font-size: 13px; font-weight: 500;">${createdDate}</div>
+                    </div>
+                    ${req.reviewedAt ? `
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                            <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;">
+                                <i class="bi bi-calendar-check"></i> Revisado
+                            </div>
+                            <div style="color: #0f172a; font-size: 13px; font-weight: 500;">${reviewedDate}</div>
+                        </div>
+                    ` : ''}
+                    ${req.reviewedBy ? `
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                            <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;">
+                                <i class="bi bi-person-check"></i> Revisado por
+                            </div>
+                            <div style="color: #0f172a; font-size: 13px; font-weight: 500;">${req.reviewedBy}</div>
+                        </div>
+                    ` : ''}
+                    ${req.reviewNotes ? `
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9; grid-column: 1 / -1;">
+                            <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;">
+                                <i class="bi bi-sticky"></i> Notas de revisión
+                            </div>
+                            <div style="color: #0f172a; font-size: 13px; font-weight: 500;">${req.reviewNotes}</div>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Action Buttons for Pending Requests -->
+                ${req.status === 'pending' ? `
+                    <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <i class="bi bi-lightbulb" style="font-size: 16px; color: #f59e0b; flex-shrink: 0; margin-top: 2px;"></i>
+                            <div style="color: #92400e; font-size: 13px; line-height: 1.5;">
+                                <strong style="display: block; margin-bottom: 6px; color: #78350f;">Opciones de aprobación:</strong>
+                                <div style="color: #92400e;">
+                                    <div style="margin-bottom: 3px;">• <strong>Aprobar y Archivar:</strong> Guarda copias para reutilización futura</div>
+                                    <div>• <strong>Aprobar y Eliminar:</strong> Eliminación permanente sin respaldo</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn" onclick="reviewDeletionRequest('${req._id}', 'reject')" style="background: white; color: #64748b; border: 1px solid #e2e8f0; padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#cbd5e1';" onmouseout="this.style.background='white'; this.style.borderColor='#e2e8f0';">
+                            <i class="bi bi-x-circle"></i> Rechazar
+                        </button>
+                        <button class="btn" onclick="reviewDeletionRequest('${req._id}', 'approve-and-archive')" style="background: white; color: #2563eb; border: 1px solid #2563eb; padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='white';">
+                            <i class="bi bi-archive-fill"></i> Archivar
+                        </button>
+                        <button class="btn" onclick="reviewDeletionRequest('${req._id}', 'approve')" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 14px; box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3); transition: all 0.2s;" onmouseover="this.style.background='#b91c1c'; this.style.boxShadow='0 4px 12px rgba(220, 38, 38, 0.4)';" onmouseout="this.style.background='#dc2626'; this.style.boxShadow='0 1px 3px rgba(220, 38, 38, 0.3)';">
+                            <i class="bi bi-trash-fill"></i> Eliminar
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+async function reviewDeletionRequest(requestId, action) {
+    const actionTexts = {
+        'approve': 'aprobar',
+        'approve-and-archive': 'aprobar y archivar',
+        'reject': 'rechazar'
+    };
+    const actionText = actionTexts[action] || action;
+    
+    const confirmTexts = {
+        'approve': '⚠️ ADVERTENCIA: Esta acción ELIMINARÁ PERMANENTEMENTE todos los registros del líder SIN RESPALDO. ¿Estás seguro?',
+        'approve-and-archive': '✅ Esta acción eliminará los registros del líder actual PERO guardará copias en la base de datos de archivo para uso futuro (auto-rellenar en próximos eventos). ¿Continuar?',
+        'reject': '¿Estás seguro de rechazar esta solicitud?'
+    };
+    const confirmText = confirmTexts[action] || '¿Estás seguro?';
+
+    if (!confirm(confirmText)) return;
+
+    let notes = '';
+    if (action === 'reject') {
+        notes = prompt('Razón del rechazo (opcional):') || '';
+    } else if (action === 'approve-and-archive') {
+        notes = 'Aprobado con archivo para reutilización futura';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/deletion-requests/${requestId}/review`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${currentToken}`
+            },
+            body: JSON.stringify({ action, notes })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al procesar solicitud');
+        }
+
+        showAlert(data.message || `Solicitud ${actionText}da exitosamente`, 'success');
+        await loadDeletionRequests();
+        
+        // Si se aprobó (con o sin archivo), recargar registros y líderes
+        if (action === 'approve' || action === 'approve-and-archive') {
+            await loadAllLeaders();
+            await loadAllRegistrations();
+        }
+    } catch (error) {
+        console.error('Error reviewing deletion request:', error);
+        showAlert('Error: ' + error.message, 'error');
+    }
+}
+
+window.refreshDeletionRequests = loadDeletionRequests;
+window.loadDeletionRequests = loadDeletionRequests;
+window.filterDeletionRequests = filterDeletionRequests;
+window.reviewDeletionRequest = reviewDeletionRequest;
+
+// ============== EVENT LISTENERS INITIALIZATION ==============
+// Ejecutar cuando el DOM esté completamente listo
+function initializeEventListeners() {
+    console.log('[LISTENERS] Inicializando event listeners...');
+    const hasModalsModule = typeof ModalsModule !== 'undefined';
+    
+    // Close listeners for modals
+    const closeEditLeaderModal = document.getElementById('closeEditLeaderModal');
+    if (closeEditLeaderModal) {
+        closeEditLeaderModal.addEventListener('click', () => {
+            document.getElementById('editLeaderModal').classList.remove('active');
+        });
+        console.log('[LISTENERS] ✅ closeEditLeaderModal');
+    }
+
+    // Event listener para botón de notificaciones
+    if (!hasModalsModule) {
+        const notificationsBtn = document.getElementById('notificationsBtn');
+        if (notificationsBtn) {
+            notificationsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('[LISTENERS] Notificaciones btn clicked');
+                toggleNotificationsDropdown();
+            });
+            console.log('[LISTENERS] ✅ notificationsBtn');
+        } else {
+            console.warn('[LISTENERS] ❌ notificationsBtn NOT FOUND');
+        }
+    }
+
+    // Event delegation para data-action (ayuda, tema, etc.)
+    // NOTA: help-toggle y help-close son manejados en core/events.js, así que los ignoramos aquí
+    document.addEventListener('click', (e) => {
+        const actionBtn = e.target.closest('[data-action]');
+        if (actionBtn) {
+            const action = actionBtn.dataset.action;
+            
+            // Skip help drawer actions (handled by core/events.js)
+            if (action === 'help-toggle' || action === 'help-close') {
+                return;
+            }
+            
+            console.log('[LISTENERS] data-action clicked:', action);
+            e.stopPropagation();
+
+            if (hasModalsModule && (action === 'close-modal' || action === 'notifications-mark-read')) {
+                return;
+            }
+            
+            switch (action) {
+                case 'notifications-mark-read':
+                    // Implementar marcar como leídas si es necesario
+                    break;
+                case 'close-modal':
+                    const modalId = actionBtn.dataset.closeModal;
+                    if (modalId) {
+                        document.getElementById(modalId)?.classList.remove('active');
+                    }
+                    break;
+            }
+        }
     });
+    console.log('[LISTENERS] ✅ data-action delegation');
+    
+    // Event listener para botón de tema
+    if (!hasModalsModule) {
+        const themeToggleBtn = document.querySelector('.theme-toggle');
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', toggleDarkMode);
+            console.log('[LISTENERS] ✅ themeToggleBtn');
+        } else {
+            console.warn('[LISTENERS] ❌ themeToggleBtn NOT FOUND');
+        }
+    }
+
+    // Event listener para botón de toggle sidebar
+    if (!hasModalsModule) {
+        const sidebarToggleBtn = document.querySelector('.sidebar-toggle-main');
+        if (sidebarToggleBtn) {
+            sidebarToggleBtn.addEventListener('click', toggleSidebar);
+            console.log('[LISTENERS] ✅ sidebarToggleBtn');
+        } else {
+            console.warn('[LISTENERS] ❌ sidebarToggleBtn NOT FOUND');
+        }
+    }
+    
+    // Event listener para botón de solicitudes de eliminación
+    const deletionRequestsBtn = document.getElementById('deletionRequestsBtn');
+    if (deletionRequestsBtn) {
+        deletionRequestsBtn.addEventListener('click', () => {
+            console.log('[LISTENERS] DeletionRequests btn clicked');
+            navigateToSection('deletion-requests');
+        });
+        console.log('[LISTENERS] ✅ deletionRequestsBtn');
+    } else {
+        console.warn('[LISTENERS] ❌ deletionRequestsBtn NOT FOUND');
+    }
+    
+    // NAV LINKS - Event listeners para navegación
+    const navLinks = document.querySelectorAll('.nav-link');
+    if (navLinks.length > 0) {
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.dataset.section;
+                console.log('[LISTENERS] Navegando a sección:', section);
+                navigateToSection(section);
+            });
+        });
+        console.log(`[LISTENERS] ✅ ${navLinks.length} nav-links`);
+    } else {
+        console.warn('[LISTENERS] ❌ nav-links NOT FOUND');
+    }
+    
+    // Initial route on page load
+    const initialSection = getSectionFromUrl();
+    if (initialSection !== 'dashboard') {
+        console.log('[LISTENERS] Navegando a sección inicial:', initialSection);
+        navigateToSection(initialSection, false);
+    }
+    
+    console.log('[LISTENERS] Todos los event listeners inicializados');
 }
 
 // Initialization
 (async function init() {
     console.log('[INIT] Iniciando dashboard. Token:', currentToken ? 'Presente' : 'FALTANTE', 'Event:', currentEventId);
+    
+    // Esperar a que el DOM esté completamente listo
+    if (document.readyState === 'loading') {
+        await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve));
+    }
+    
+    // Inicializar event listeners
+    initializeEventListeners();
+    
     if (enforceSessionTimeout()) return;
     touchActivity();
     bindSessionActivity();

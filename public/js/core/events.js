@@ -29,6 +29,38 @@ const Events = (() => {
             const target = e.target;
 
             // =====================================
+            // DATA-ACTION HANDLERS (TOP BAR)
+            // =====================================
+            const actionBtn = target.closest('[data-action]');
+            if (actionBtn) {
+                const action = actionBtn.dataset.action;
+
+                if (action === 'notifications-toggle') {
+                    if (typeof toggleNotificationsDropdown === 'function') {
+                        toggleNotificationsDropdown();
+                    } else if (typeof NotificationsModule !== 'undefined' && NotificationsModule.toggleDropdown) {
+                        NotificationsModule.toggleDropdown();
+                    }
+                    return;
+                }
+
+                if (action === 'deletion-requests') {
+                    if (typeof navigateToSection === 'function') {
+                        navigateToSection('deletion-requests');
+                    } else if (typeof Router !== 'undefined' && Router.navigate) {
+                        Router.navigate('deletion-requests');
+                    }
+
+                    if (typeof loadDeletionRequests === 'function') {
+                        loadDeletionRequests();
+                    } else if (typeof window !== 'undefined' && typeof window.loadDeletionRequests === 'function') {
+                        window.loadDeletionRequests();
+                    }
+                    return;
+                }
+            }
+
+            // =====================================
             // NAVIGATION & SIDEBAR
             // =====================================
             const navLink = target.closest('[data-section]');
@@ -269,43 +301,57 @@ const Events = (() => {
                 return;
             }
 
-            // Dark mode toggle
+            // Dark mode toggle - Prevenir bubbling
             if (target.closest('.theme-toggle')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.toggleDarkMode();
                 return;
             }
 
             // Notifications dropdown
             if (target.closest('#notificationsBtn')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.toggleNotificationsDropdown();
                 return;
             }
 
-            // Help drawer
+            // Help drawer - PRIMERO el toggle para prevenir bubbling
             if (target.closest('[data-action="help-toggle"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.toggleHelpDrawer();
                 return;
             }
 
             if (target.closest('[data-action="help-close"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.closeHelpDrawer();
                 return;
             }
 
             // Open logout modal
             if (target.closest('[data-action="open-logout"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.openModal('logoutModal');
                 return;
             }
 
             // Confirm logout
             if (target.closest('[data-action="confirm-logout"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 Helpers.confirmLogout();
                 return;
             }
 
             // Open registrations from dashboard
             if (target.closest('[data-action="open-registrations"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 Router.navigate('registrations');
                 return;
             }
@@ -332,21 +378,63 @@ const Events = (() => {
             // HELP DRAWER
             // =====================================
 
-            // Toggle help drawer
+            // Toggle help drawer - use ModalsModule if available, fallback to direct manipulation
             if (target.closest('[data-action="help-toggle"]')) {
-                const drawer = document.getElementById('helpDrawer');
-                const overlay = document.getElementById('helpOverlay');
-                if (drawer) drawer.classList.toggle('active');
-                if (overlay) overlay.classList.toggle('active');
+                e.stopPropagation();
+                e.preventDefault();
+                try {
+                    if (typeof ModalsModule !== 'undefined' && ModalsModule.toggleHelpDrawer) {
+                        ModalsModule.toggleHelpDrawer();
+                    } else {
+                        const drawer = document.getElementById('helpDrawer');
+                        const overlay = document.getElementById('helpOverlay');
+                        if (drawer && overlay) {
+                            const isOpen = drawer.classList.contains('active');
+                            if (isOpen) {
+                                drawer.classList.remove('active');
+                                overlay.classList.remove('active');
+                            } else {
+                                drawer.classList.add('active');
+                                overlay.classList.add('active');
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error toggling help:', err);
+                }
                 return;
             }
 
             // Close help drawer
-            if (target.closest('[data-action="help-close"]') || target.id === 'helpOverlay') {
-                const drawer = document.getElementById('helpDrawer');
-                const overlay = document.getElementById('helpOverlay');
-                if (drawer) drawer.classList.remove('active');
-                if (overlay) overlay.classList.remove('active');
+            if (target.closest('[data-action="help-close"]')) {
+                e.stopPropagation();
+                e.preventDefault();
+                try {
+                    if (typeof ModalsModule !== 'undefined' && ModalsModule.closeHelpDrawer) {
+                        ModalsModule.closeHelpDrawer();
+                    } else {
+                        const drawer = document.getElementById('helpDrawer');
+                        const overlay = document.getElementById('helpOverlay');
+                        if (drawer) drawer.classList.remove('active');
+                        if (overlay) overlay.classList.remove('active');
+                    }
+                } catch (err) {
+                    console.error('Error closing help:', err);
+                }
+                return;
+            }
+
+            // Close help drawer when clicking overlay
+            if (target.id === 'helpOverlay' && target.classList.contains('active')) {
+                e.stopPropagation();
+                e.preventDefault();
+                try {
+                    target.classList.remove('active');
+                    const drawer = document.getElementById('helpDrawer');
+                    if (drawer) drawer.classList.remove('active');
+                } catch (err) {
+                    console.error('Error closing help overlay:', err);
+                }
                 return;
             }
 

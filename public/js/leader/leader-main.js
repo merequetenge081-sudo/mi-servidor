@@ -2,7 +2,7 @@
 import { AuthManager } from './auth.js';
 import { UIManager } from './ui.js';
 import { RegistrationsManager } from './registrations.js';
-import { FormManager } from './forms.js';
+import { FormManager } from './forms.js?v=2.7.2';
 import { DeleteManager } from './delete.js';
 import { StatisticsManager } from './statistics.js';
 import { ImportExportManager } from './import-export.js';
@@ -28,7 +28,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         AuthManager.checkAuth();
 
         // 2. Obtener datos del líder
-        const leaderId = StorageManager.getCurrentLeaderId();
+        let leaderId = StorageManager.getCurrentLeaderId();
+        if (!leaderId) {
+            try {
+                const verifyRes = await AuthManager.apiCall('/api/v2/auth/verify-token');
+                if (verifyRes.ok) {
+                    const verifyData = await verifyRes.json();
+                    const fallbackId = verifyData?.data?.userId || verifyData?.data?._id;
+                    if (fallbackId) {
+                        StorageManager.saveLeaderId(fallbackId);
+                        leaderId = fallbackId;
+                    }
+                }
+            } catch (error) {
+                console.error('Error verificando token:', error);
+            }
+        }
+
         if (!leaderId) {
             console.error('No se encontró leaderId');
             window.location.href = '/';
@@ -192,7 +208,11 @@ function connectEventListeners(leaderId, leaderData) {
     if (newRegForm) {
         newRegForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            await FormManager.saveNewRegistration(leaderId, leaderData);
+            if (typeof FormManager.saveNewRegistration === 'function') {
+                await FormManager.saveNewRegistration(leaderId, leaderData);
+            } else {
+                await saveNewRegistrationFallback(leaderId, leaderData);
+            }
         });
     }
 
@@ -244,7 +264,7 @@ function connectEventListeners(leaderId, leaderData) {
     }
 
     // ========== MODAL DE EDICIÓN - UBICACIÓN ==========
-    const editUbicacionRadios = document.querySelectorAll('input[name="editUbicacion"]');
+    const editUbicacionRadios = document.querySelectorAll('input[name="editUbicacionTipo"]');
     editUbicacionRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             FormManager.toggleEditUbicacion(e.target.value);
@@ -351,7 +371,7 @@ function connectEventListeners(leaderId, leaderData) {
     }
 
     // ========== NUEVA REGISTRACIÓN - UBICACIÓN ==========
-    const ubicacionRadios = document.querySelectorAll('input[name="ubicacion"]');
+    const ubicacionRadios = document.querySelectorAll('input[name="ubicacionTipo"]');
     ubicacionRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             FormManager.toggleUbicacion(e.target.value);
@@ -388,6 +408,119 @@ function connectEventListeners(leaderId, leaderData) {
             if (editModal) editModal.style.display = 'none';
         }
     });
+}
+
+async function saveNewRegistrationFallback(leaderId, leaderData) {
+    const consentCheckbox = document.getElementById('hasConsentToRegisterLeader');
+    const consentError = document.getElementById('consentErrorLeader');
+
+    if (consentError) {
+        consentError.style.display = 'none';
+    }
+
+    if (consentCheckbox && !consentCheckbox.checked) {
+        if (consentError) {
+            consentError.style.display = 'block';
+        }
+        return;
+    }
+
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const cedula = document.getElementById('cedula').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    if (!firstName || !lastName || !cedula) {
+        alert('Por favor completa nombre, apellido y cedula');
+        return;
+    }
+
+    const ubicacionTipo = document.querySelector('input[name="ubicacionTipo"]:checked')?.value || 'bogota';
+    let localidad = '';
+    let departamento = '';
+    let capital = '';
+    let puestoId = null;
+    let mesa = null;
+    let votingPlace = null;
+    let votingTable = null;
+
+    if (ubicacionTipo === 'bogota') {
+        localidad = document.getElementById('localidad').value;
+        puestoId = document.getElementById('puestoId').value;
+        votingTable = document.getElementById('votingTable').value.trim();
+
+        if (!localidad || !puestoId || !votingTable) {
+            alert('Por favor completa la localidad, el puesto y la mesa');
+            return;
+        }
+
+        mesa = Number(votingTable);
+        if (!Number.isFinite(mesa)) {
+            alert('Numero de mesa invalido');
+            return;
+        }
+    } else {
+        departamento = document.getElementById('departamento').value;
+        capital = document.getElementById('capital').value;
+        localidad = departamento;
+        votingPlace = document.getElementById('votingPlace').value.trim();
+        votingTable = document.getElementById('votingTable').value.trim();
+
+        if (!departamento || !votingPlace || !votingTable) {
+            alert('Por favor completa el departamento, puesto y mesa');
+            return;
+        }
+    }
+
+    const resolvedLeaderId = leaderData?.leaderId || leaderData?._id || leaderId;
+    const payload = {
+        leaderId: resolvedLeaderId,
+        eventId: leaderData?.eventId || null,
+        firstName,
+        lastName,
+        cedula,
+        email: email || null,
+        phone: phone || null,
+        localidad,
+        departamento: departamento || null,
+        capital: capital || null,
+        puestoId: ubicacionTipo === 'bogota' ? puestoId : null,
+        mesa: ubicacionTipo === 'bogota' ? mesa : null,
+        votingPlace: ubicacionTipo === 'bogota' ? null : votingPlace,
+        votingTable: ubicacionTipo === 'bogota' ? null : votingTable,
+        registeredToVote: ubicacionTipo === 'bogota',
+        hasConsentToRegister: true
+    };
+
+    try {
+        const res = await AuthManager.apiCall('/api/registrations', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        const responseData = await res.json();
+        if (!res.ok || responseData.error) {
+            alert(responseData.error || 'Error al guardar registro');
+            return;
+        }
+
+        ModalsManager.showSuccessModal('Registro guardado', 'Registro creado exitosamente');
+        if (typeof FormManager.resetForm === 'function') {
+            FormManager.resetForm();
+        }
+
+        if (window.goToView) {
+            window.goToView('registrations');
+        }
+
+        if (window.refreshRegistrations) {
+            await window.refreshRegistrations();
+        }
+    } catch (error) {
+        console.error('Error al guardar registro:', error);
+        alert('Error al guardar registro');
+    }
 }
 
 // Exportar para permitir reinicios si es necesario
@@ -476,3 +609,122 @@ window.exportToExcel = async () => {
 
 // Crear instancia global de FormManager para onclick handlers en HTML
 window.formManager = FormManager;
+
+// ========== BULK DELETE FUNCTIONS ==========
+
+/**
+ * Abrir modal de eliminación masiva
+ */
+window.openBulkDeleteModal = async () => {
+    const modal = document.getElementById('bulkDeleteModal');
+    const countElement = document.getElementById('bulkDeleteCount');
+    const pendingAlert = document.getElementById('bulkDeletePendingAlert');
+    const form = document.getElementById('bulkDeleteForm');
+    
+    // Mostrar cantidad de registros
+    if (countElement) {
+        const count = RegistrationsManager.myRegistrations.length;
+        countElement.textContent = `${count} registro${count !== 1 ? 's' : ''}`;
+    }
+    
+    // Verificar si hay solicitud pendiente
+    try {
+        const response = await AuthManager.apiCall('/api/registrations/deletion-request/status');
+        const data = await response.json();
+        
+        if (data.hasPendingRequest && data.request) {
+            pendingAlert.style.display = 'block';
+            form.style.display = 'none';
+        } else {
+            pendingAlert.style.display = 'none';
+            form.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error checking deletion request status:', error);
+    }
+    
+    // Limpiar form
+    document.getElementById('bulkDeletePassword').value = '';
+    document.getElementById('bulkDeleteReason').value = '';
+    
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+};
+
+/**
+ * Cerrar modal de eliminación masiva
+ */
+window.closeBulkDeleteModal = () => {
+    const modal = document.getElementById('bulkDeleteModal');
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+};
+
+/**
+ * Toggle password visibility
+ */
+window.toggleBulkDeletePassword = () => {
+    const passwordInput = document.getElementById('bulkDeletePassword');
+    const icon = document.getElementById('bulkDeletePasswordIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+};
+
+/**
+ * Enviar solicitud de eliminación masiva
+ */
+window.submitBulkDelete = async (event) => {
+    event.preventDefault();
+    
+    const password = document.getElementById('bulkDeletePassword').value;
+    const reason = document.getElementById('bulkDeleteReason').value;
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    
+    if (!password) {
+        ModalsManager.showError('Debes ingresar tu contraseña');
+        return;
+    }
+    
+    // Deshabilitar botón durante la petición
+    const originalBtnContent = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
+    
+    try {
+        const response = await AuthManager.apiCall('/api/registrations/deletion-request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password, reason })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al enviar solicitud');
+        }
+        
+        // Éxito
+        window.closeBulkDeleteModal();
+        ModalsManager.showSuccess(
+            '¡Solicitud Enviada!',
+            data.message || 'Tu solicitud ha sido enviada y está pendiente de aprobación por un administrador.'
+        );
+        
+    } catch (error) {
+        console.error('Error al solicitar eliminación masiva:', error);
+        ModalsManager.showError(error.message || 'Error al enviar solicitud de eliminación');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnContent;
+    }
+};

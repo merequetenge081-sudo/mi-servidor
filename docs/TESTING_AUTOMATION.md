@@ -22,7 +22,7 @@ npm run report:json        # Generar reporte JSON (tests.json)
 npm run report:dashboard   # Generar dashboard HTML
 npm run report:full        # ★ Completo: tests + json + dashboard + docs
 ```
-
+ 
 ### 🔄 Combinados
 ```bash
 npm run docs:auto          # Tests + documentación markdown

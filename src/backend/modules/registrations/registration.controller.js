@@ -11,6 +11,8 @@
 import { RegistrationService } from "./registration.service.js";
 import { createLogger } from "../../core/Logger.js";
 import { AppError } from "../../core/AppError.js";
+import config from "../../config/config.js";
+import { parsePagination } from "../../../utils/pagination.js";
 
 const logger = createLogger("RegistrationController");
 const service = new RegistrationService();
@@ -80,8 +82,11 @@ export class RegistrationController {
     try {
       logger.info("GET getRegistrations", { orgId: req.orgId });
 
-      const page = Math.max(1, parseInt(req.query.page) || 1);
-      const pageSize = Math.min(100, parseInt(req.query.pageSize) || 20);
+      const { page, limit } = parsePagination(req.query, {
+        defaultLimit: config.DEFAULT_PAGE_SIZE,
+        maxLimit: config.MAX_PAGE_SIZE
+      });
+      const pageSize = limit;
 
       // Filtros
       const filter = {};
@@ -267,9 +272,19 @@ export class RegistrationController {
       );
 
       res.status(201).json({
-        success: true,
-        message: `${result.created} registros creados`,
-        data: result.data
+        success: result.success,
+        imported: result.created,
+        requiresReview: result.requiresReview,
+        failed: result.failed,
+        autocorrected: result.autocorrected,
+        errors: result.errors,
+        autocorrections: result.autocorrections,
+        message: result.message,
+        data: {
+          created: result.created,
+          errors: result.errors,
+          autocorrections: result.autocorrections
+        }
       });
     } catch (error) {
       logger.error("Error bulkCreateRegistrations", { error: error.message });

@@ -18,6 +18,13 @@ const puestoSchema = new mongoose.Schema({
   mesas: [Number], // Array de números de mesa, ej: [1, 2, 3, 4, ...]
   aliases: [String], // Alias conocidos del lugar (sitio, nombres populares)
   
+  // Multi-tenant
+  organizationId: {
+    type: String,
+    required: false, // Puede ser null para datos públicos
+    index: true
+  },
+  
   // Metadata
   activo: { type: Boolean, default: true },
   fuente: { type: String, default: "IDECA" }, // De dónde se importó

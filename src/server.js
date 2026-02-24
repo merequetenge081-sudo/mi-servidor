@@ -4,6 +4,7 @@ import app from "./app.js";
 import { connectDB } from "./config/db.js";
 import { initMemoryAuth } from "./utils/authFallback.js";
 import logger from "./config/logger.js";
+import { startTempPasswordCleanup } from "./services/tempPasswordCleanup.service.js";
 
 async function startServer() {
   try {
@@ -39,6 +40,8 @@ async function startServer() {
 
     // Conectar a MongoDB antes del listen
     await connectDB();
+
+    startTempPasswordCleanup();
 
     const PORT = process.env.PORT || 3000;
     const server = http.createServer(app);

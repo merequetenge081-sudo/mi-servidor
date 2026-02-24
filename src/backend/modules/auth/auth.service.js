@@ -9,8 +9,10 @@ import { AppError } from '../../core/AppError.js';
 import authRepository from './auth.repository.js';
 import { emailService } from '../../../services/emailService.js';
 import config from '../../config/config.js';
+import { decodeJwtToken } from '../../../utils/jwt.js';
 import crypto from 'crypto';
 import * as authFallback from '../../../utils/authFallback.js';
+import { isTempPasswordExpired } from '../../../utils/tempPassword.js';
 
 const { findAdminLocal, findLeaderLocal, verifyPasswordLocal } = authFallback;
 
@@ -132,6 +134,11 @@ export async function leaderLogin(email, password) {
       logger.warn('Intento de login con contraseña incorrecta', { email });
       throw AppError.unauthorized('Credenciales inválidas');
     }
+
+      if (isTempPasswordExpired(leader)) {
+        await authRepository.clearLeaderTempPassword(leader._id);
+        throw AppError.unauthorized('Contraseña temporal expirada. Solicita un reset.');
+      }
 
     logger.success('Líder login exitoso', { email });
 
@@ -309,7 +316,7 @@ export async function resetPasswordWithToken(token, newPassword, role = 'leader'
  */
 export function verifyToken(token) {
   try {
-    const decoded = jwt.verify(token, config.jwtSecret);
+    const decoded = decodeJwtToken(token);
     logger.debug('Token verificado', { userId: decoded.userId });
     return decoded;
   } catch (error) {
