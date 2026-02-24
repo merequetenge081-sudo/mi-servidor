@@ -9,6 +9,7 @@ import { ValidationService } from "../services/validation.service.js";
 import { ConsentLogService } from "../services/consentLog.service.js";
 import logger from "../config/logger.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
+import { matchPuesto, matchLocalidad, autocorrectRegistration } from "../utils/fuzzyMatch.js";
 
 const normalizeRegistration = (registration) => {
   if (!registration) return registration;
@@ -511,35 +512,14 @@ export async function bulkCreateRegistrations(req, res) {
       return res.status(400).json({ error: "El líder no está asociado a ningún evento. Contacte al administrador." });
     }
 
-    // ========== STEP 1: Batch lookup puestos ==========
-    // Collect unique votingPlace values (case-insensitive normalization)
-    const votingPlacesSet = new Set();
-    registrations.forEach(reg => {
-      if (reg.votingPlace && typeof reg.votingPlace === 'string') {
-        votingPlacesSet.add(reg.votingPlace.trim().toLowerCase());
-      }
-    });
+    // ========== STEP 1: Batch lookup ALL puestos for fuzzy matching ==========
+    // Load ALL active puestos for the organization (for fuzzy matching)
+    const allPuestos = await Puestos.find({
+      organizationId: leader.organizationId,
+      activo: true
+    }).lean();
 
-    const uniqueVotingPlaces = Array.from(votingPlacesSet);
-
-    // Batch query: match by nombre (case insensitive), organizationId, and active status
-    let puestosMap = new Map(); // lowercase nombre -> puesto object
-    
-    if (uniqueVotingPlaces.length > 0) {
-      const puestos = await Puestos.find({
-        nombre: { 
-          $in: uniqueVotingPlaces.map(name => new RegExp(`^${name}$`, 'i'))
-        },
-        organizationId: leader.organizationId,
-        activo: true
-      }).lean();
-
-      // Build in-memory map
-      puestos.forEach(puesto => {
-        const normalizedName = puesto.nombre.trim().toLowerCase();
-        puestosMap.set(normalizedName, puesto);
-      });
-    }
+    logger.info(`[BulkImport] Loaded ${allPuestos.length} active puestos for fuzzy matching`);
 
     // ========== STEP 2: Batch check duplicates ==========
     // Extract all cedulas to check for duplicates in one query
@@ -551,10 +531,12 @@ export async function bulkCreateRegistrations(req, res) {
 
     const existingCedulasSet = new Set(existingRegistrations.map(r => r.cedula));
 
-    // ========== STEP 3: Process each row ==========
+    // ========== STEP 3: Process each row with fuzzy matching ==========
     const errors = [];
     const validRegistrations = [];
+    const autocorrections = []; // Track autocorrections
     let requiresReviewCount = 0;
+    const SIMILARITY_THRESHOLD = 0.80; // 80% similarity for autocorrection
 
     for (let i = 0; i < registrations.length; i++) {
       const reg = registrations[i];
@@ -602,28 +584,71 @@ export async function bulkCreateRegistrations(req, res) {
         continue;
       }
 
-      // ========== STEP 4: Match votingPlace to puesto ==========
+      // ========== STEP 4: Fuzzy matching y autocorrección ==========
       let puestoId = null;
       let localidad = reg.localidad || null;
+      let votingPlace = reg.votingPlace ? reg.votingPlace.trim() : null;
       let requiereRevisionPuesto = false;
       let revisionPuestoResuelta = false;
+      const rowCorrections = [];
 
-      if (reg.votingPlace && typeof reg.votingPlace === 'string') {
-        const normalizedVotingPlace = reg.votingPlace.trim().toLowerCase();
-        const matchedPuesto = puestosMap.get(normalizedVotingPlace);
+      // 4.1: Autocorregir localidad si es de Bogotá
+      if (localidad) {
+        const localidadMatch = matchLocalidad(localidad, SIMILARITY_THRESHOLD);
+        if (localidadMatch) {
+          if (localidadMatch.corrected) {
+            rowCorrections.push({
+              field: 'localidad',
+              original: localidad,
+              corrected: localidadMatch.match,
+              similarity: (localidadMatch.similarity * 100).toFixed(1) + '%'
+            });
+          }
+          localidad = localidadMatch.match; // Usar el valor corregido
+        }
+      }
 
-        if (matchedPuesto) {
-          // Puesto found
-          puestoId = matchedPuesto._id;
-          localidad = matchedPuesto.localidad || localidad;
+      // 4.2: Fuzzy matching de puesto de votación
+      if (votingPlace && allPuestos.length > 0) {
+        const puestoMatch = matchPuesto(votingPlace, allPuestos, SIMILARITY_THRESHOLD);
+        
+        if (puestoMatch) {
+          // Match encontrado con alta similitud
+          puestoId = puestoMatch.puesto._id;
+          localidad = puestoMatch.puesto.localidad || localidad;
           requiereRevisionPuesto = false;
           revisionPuestoResuelta = true;
+
+          if (puestoMatch.corrected) {
+            // El puesto fue autocorregido
+            rowCorrections.push({
+              field: 'votingPlace',
+              original: votingPlace,
+              corrected: puestoMatch.puesto.nombre,
+              similarity: (puestoMatch.similarity * 100).toFixed(1) + '%'
+            });
+            votingPlace = puestoMatch.puesto.nombre; // Usar el valor corregido
+          }
         } else {
-          // Puesto not found - requires review but still import
+          // No se encontró match con suficiente similitud - requiere revisión manual
           requiereRevisionPuesto = true;
           revisionPuestoResuelta = false;
           requiresReviewCount++;
         }
+      } else if (votingPlace) {
+        // votingPlace proporcionado pero no hay puestos disponibles
+        requiereRevisionPuesto = true;
+        revisionPuestoResuelta = false;
+        requiresReviewCount++;
+      }
+
+      // Registrar autocorrecciones si existieron
+      if (rowCorrections.length > 0) {
+        autocorrections.push({
+          row: rowNum,
+          name: `${reg.firstName} ${reg.lastName}`,
+          corrections: rowCorrections
+        });
       }
 
       // Add to valid registrations
@@ -637,10 +662,12 @@ export async function bulkCreateRegistrations(req, res) {
         cedula: cedulaStr,
         email: reg.email.trim(),
         phone: reg.phone.toString().trim(),
-        votingPlace: reg.votingPlace ? reg.votingPlace.trim() : null,
+        votingPlace: votingPlace,
         puestoId: puestoId,
         mesa: mesa,
         localidad: localidad,
+        departamento: reg.departamento || null,
+        capital: reg.capital || null,
         requiereRevisionPuesto: requiereRevisionPuesto,
         revisionPuestoResuelta: revisionPuestoResuelta,
         registeredToVote: true,
@@ -662,18 +689,20 @@ export async function bulkCreateRegistrations(req, res) {
       );
     }
 
-    // ========== STEP 6: Return structured response ==========
+    // ========== STEP 6: Return structured response with autocorrections ==========
     const response = {
       success: true,
       imported: insertedCount,
       requiresReview: requiresReviewCount,
       failed: errors.length,
+      autocorrected: autocorrections.length,
       errors: errors,
-      message: `Importación completada: ${insertedCount} registros importados${requiresReviewCount > 0 ? `, ${requiresReviewCount} requieren revisión de puesto` : ''}${errors.length > 0 ? `, ${errors.length} errores` : ''}.`
+      autocorrections: autocorrections,
+      message: `Importación completada: ${insertedCount} registros importados${autocorrections.length > 0 ? `, ${autocorrections.length} autocorregidos` : ''}${requiresReviewCount > 0 ? `, ${requiresReviewCount} requieren revisión de puesto` : ''}${errors.length > 0 ? `, ${errors.length} errores` : ''}.`
     };
 
     // Log import summary
-    logger.info(`Bulk import completed - Leader: ${leaderId}, Imported: ${insertedCount}, Review: ${requiresReviewCount}, Errors: ${errors.length}`);
+    logger.info(`Bulk import completed - Leader: ${leaderId}, Imported: ${insertedCount}, Autocorrected: ${autocorrections.length}, Review: ${requiresReviewCount}, Errors: ${errors.length}`);
 
     res.json(response);
 
