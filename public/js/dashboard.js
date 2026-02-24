@@ -1635,21 +1635,6 @@ window.addEventListener('popstate', (e) => {
     navigateToSection(section, false);
 });
 
-// NAV LINKS
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const section = link.dataset.section;
-        navigateToSection(section);
-    });
-});
-
-// Initial route on page load
-const initialSection = getSectionFromUrl();
-if (initialSection !== 'dashboard') {
-    navigateToSection(initialSection, false);
-}
-
 // ============== HAMBURGER MENU ==============
 function toggleHamburgerMenu() {
     const menu = document.getElementById('hamburgerMenu');
@@ -2026,18 +2011,6 @@ function loadDarkMode() {
 }
 
 loadDarkMode();
-
-// Event listener para botón de tema
-const themeToggleBtn = document.querySelector('.theme-toggle');
-if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', toggleDarkMode);
-}
-
-// Event listener para botón de toggle sidebar
-const sidebarToggleBtn = document.querySelector('.sidebar-toggle-main');
-if (sidebarToggleBtn) {
-    sidebarToggleBtn.addEventListener('click', toggleSidebar);
-}
 
 // BUTTONS & MODAL TRIGGERS
 // Helper to safely add listeners if element exists
@@ -2771,49 +2744,115 @@ window.refreshDeletionRequests = loadDeletionRequests;
 window.filterDeletionRequests = filterDeletionRequests;
 window.reviewDeletionRequest = reviewDeletionRequest;
 
-// Close listeners for new modals if not already bound
-if (document.getElementById('closeEditLeaderModal')) {
-    document.getElementById('closeEditLeaderModal').addEventListener('click', () => {
-        document.getElementById('editLeaderModal').classList.remove('active');
-    });
-}
-
-// Event listener para botón de notificaciones
-const notificationsBtn = document.getElementById('notificationsBtn');
-if (notificationsBtn) {
-    notificationsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleNotificationsDropdown();
-    });
-}
-
-// Event delegation para data-action (ayuda, tema, etc.)
-document.addEventListener('click', (e) => {
-    const actionBtn = e.target.closest('[data-action]');
-    if (actionBtn) {
-        const action = actionBtn.dataset.action;
-        e.stopPropagation();
-        
-        switch (action) {
-            case 'help-toggle':
-                toggleHelpDrawer();
-                break;
-            case 'notifications-mark-read':
-                // Implementar marcar como leídas si es necesario
-                break;
-            case 'close-modal':
-                const modalId = actionBtn.dataset.closeModal;
-                if (modalId) {
-                    document.getElementById(modalId)?.classList.remove('active');
-                }
-                break;
-        }
+// ============== EVENT LISTENERS INITIALIZATION ==============
+// Ejecutar cuando el DOM esté completamente listo
+function initializeEventListeners() {
+    console.log('[LISTENERS] Inicializando event listeners...');
+    
+    // Close listeners for modals
+    const closeEditLeaderModal = document.getElementById('closeEditLeaderModal');
+    if (closeEditLeaderModal) {
+        closeEditLeaderModal.addEventListener('click', () => {
+            document.getElementById('editLeaderModal').classList.remove('active');
+        });
+        console.log('[LISTENERS] ✅ closeEditLeaderModal');
     }
-});
+
+    // Event listener para botón de notificaciones
+    const notificationsBtn = document.getElementById('notificationsBtn');
+    if (notificationsBtn) {
+        notificationsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log('[LISTENERS] Notificaciones btn clicked');
+            toggleNotificationsDropdown();
+        });
+        console.log('[LISTENERS] ✅ notificationsBtn');
+    } else {
+        console.warn('[LISTENERS] ❌ notificationsBtn NOT FOUND');
+    }
+
+    // Event delegation para data-action (ayuda, tema, etc.)
+    document.addEventListener('click', (e) => {
+        const actionBtn = e.target.closest('[data-action]');
+        if (actionBtn) {
+            const action = actionBtn.dataset.action;
+            console.log('[LISTENERS] data-action clicked:', action);
+            e.stopPropagation();
+            
+            switch (action) {
+                case 'help-toggle':
+                    toggleHelpDrawer();
+                    break;
+                case 'notifications-mark-read':
+                    // Implementar marcar como leídas si es necesario
+                    break;
+                case 'close-modal':
+                    const modalId = actionBtn.dataset.closeModal;
+                    if (modalId) {
+                        document.getElementById(modalId)?.classList.remove('active');
+                    }
+                    break;
+            }
+        }
+    });
+    console.log('[LISTENERS] ✅ data-action delegation');
+    
+    // Event listener para botón de tema
+    const themeToggleBtn = document.querySelector('.theme-toggle');
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', toggleDarkMode);
+        console.log('[LISTENERS] ✅ themeToggleBtn');
+    } else {
+        console.warn('[LISTENERS] ❌ themeToggleBtn NOT FOUND');
+    }
+
+    // Event listener para botón de toggle sidebar
+    const sidebarToggleBtn = document.querySelector('.sidebar-toggle-main');
+    if (sidebarToggleBtn) {
+        sidebarToggleBtn.addEventListener('click', toggleSidebar);
+        console.log('[LISTENERS] ✅ sidebarToggleBtn');
+    } else {
+        console.warn('[LISTENERS] ❌ sidebarToggleBtn NOT FOUND');
+    }
+    
+    // NAV LINKS - Event listeners para navegación
+    const navLinks = document.querySelectorAll('.nav-link');
+    if (navLinks.length > 0) {
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.dataset.section;
+                console.log('[LISTENERS] Navegando a sección:', section);
+                navigateToSection(section);
+            });
+        });
+        console.log(`[LISTENERS] ✅ ${navLinks.length} nav-links`);
+    } else {
+        console.warn('[LISTENERS] ❌ nav-links NOT FOUND');
+    }
+    
+    // Initial route on page load
+    const initialSection = getSectionFromUrl();
+    if (initialSection !== 'dashboard') {
+        console.log('[LISTENERS] Navegando a sección inicial:', initialSection);
+        navigateToSection(initialSection, false);
+    }
+    
+    console.log('[LISTENERS] Todos los event listeners inicializados');
+}
 
 // Initialization
 (async function init() {
     console.log('[INIT] Iniciando dashboard. Token:', currentToken ? 'Presente' : 'FALTANTE', 'Event:', currentEventId);
+    
+    // Esperar a que el DOM esté completamente listo
+    if (document.readyState === 'loading') {
+        await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve));
+    }
+    
+    // Inicializar event listeners
+    initializeEventListeners();
+    
     if (enforceSessionTimeout()) return;
     touchActivity();
     bindSessionActivity();
