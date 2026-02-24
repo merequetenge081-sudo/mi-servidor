@@ -50,7 +50,12 @@ export async function createRegistration(req, res) {
 
     let leader = null;
     if (leaderId) {
-      leader = await Leader.findOne({ leaderId });
+      const isObjectId = /^[0-9a-fA-F]{24}$/.test(leaderId);
+      if (isObjectId) {
+        leader = await Leader.findOne({ $or: [{ leaderId }, { _id: leaderId }] });
+      } else {
+        leader = await Leader.findOne({ leaderId });
+      }
     }
 
     if (!leader && leaderToken) {
