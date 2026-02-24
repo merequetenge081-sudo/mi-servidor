@@ -2,7 +2,7 @@
 import { AuthManager } from './auth.js';
 import { UIManager } from './ui.js';
 import { RegistrationsManager } from './registrations.js';
-import { FormManager } from './forms.js?v=2.7.1';
+import { FormManager } from './forms.js?v=2.7.2';
 import { DeleteManager } from './delete.js';
 import { StatisticsManager } from './statistics.js';
 import { ImportExportManager } from './import-export.js';
@@ -208,7 +208,11 @@ function connectEventListeners(leaderId, leaderData) {
     if (newRegForm) {
         newRegForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            await FormManager.saveNewRegistration(leaderId, leaderData);
+            if (typeof FormManager.saveNewRegistration === 'function') {
+                await FormManager.saveNewRegistration(leaderId, leaderData);
+            } else {
+                await saveNewRegistrationFallback(leaderId, leaderData);
+            }
         });
     }
 
@@ -404,6 +408,119 @@ function connectEventListeners(leaderId, leaderData) {
             if (editModal) editModal.style.display = 'none';
         }
     });
+}
+
+async function saveNewRegistrationFallback(leaderId, leaderData) {
+    const consentCheckbox = document.getElementById('hasConsentToRegisterLeader');
+    const consentError = document.getElementById('consentErrorLeader');
+
+    if (consentError) {
+        consentError.style.display = 'none';
+    }
+
+    if (consentCheckbox && !consentCheckbox.checked) {
+        if (consentError) {
+            consentError.style.display = 'block';
+        }
+        return;
+    }
+
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const cedula = document.getElementById('cedula').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    if (!firstName || !lastName || !cedula) {
+        alert('Por favor completa nombre, apellido y cedula');
+        return;
+    }
+
+    const ubicacionTipo = document.querySelector('input[name="ubicacionTipo"]:checked')?.value || 'bogota';
+    let localidad = '';
+    let departamento = '';
+    let capital = '';
+    let puestoId = null;
+    let mesa = null;
+    let votingPlace = null;
+    let votingTable = null;
+
+    if (ubicacionTipo === 'bogota') {
+        localidad = document.getElementById('localidad').value;
+        puestoId = document.getElementById('puestoId').value;
+        votingTable = document.getElementById('votingTable').value.trim();
+
+        if (!localidad || !puestoId || !votingTable) {
+            alert('Por favor completa la localidad, el puesto y la mesa');
+            return;
+        }
+
+        mesa = Number(votingTable);
+        if (!Number.isFinite(mesa)) {
+            alert('Numero de mesa invalido');
+            return;
+        }
+    } else {
+        departamento = document.getElementById('departamento').value;
+        capital = document.getElementById('capital').value;
+        localidad = departamento;
+        votingPlace = document.getElementById('votingPlace').value.trim();
+        votingTable = document.getElementById('votingTable').value.trim();
+
+        if (!departamento || !votingPlace || !votingTable) {
+            alert('Por favor completa el departamento, puesto y mesa');
+            return;
+        }
+    }
+
+    const resolvedLeaderId = leaderData?.leaderId || leaderData?._id || leaderId;
+    const payload = {
+        leaderId: resolvedLeaderId,
+        eventId: leaderData?.eventId || null,
+        firstName,
+        lastName,
+        cedula,
+        email: email || null,
+        phone: phone || null,
+        localidad,
+        departamento: departamento || null,
+        capital: capital || null,
+        puestoId: ubicacionTipo === 'bogota' ? puestoId : null,
+        mesa: ubicacionTipo === 'bogota' ? mesa : null,
+        votingPlace: ubicacionTipo === 'bogota' ? null : votingPlace,
+        votingTable: ubicacionTipo === 'bogota' ? null : votingTable,
+        registeredToVote: ubicacionTipo === 'bogota',
+        hasConsentToRegister: true
+    };
+
+    try {
+        const res = await AuthManager.apiCall('/api/registrations', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        const responseData = await res.json();
+        if (!res.ok || responseData.error) {
+            alert(responseData.error || 'Error al guardar registro');
+            return;
+        }
+
+        ModalsManager.showSuccessModal('Registro guardado', 'Registro creado exitosamente');
+        if (typeof FormManager.resetForm === 'function') {
+            FormManager.resetForm();
+        }
+
+        if (window.goToView) {
+            window.goToView('registrations');
+        }
+
+        if (window.refreshRegistrations) {
+            await window.refreshRegistrations();
+        }
+    } catch (error) {
+        console.error('Error al guardar registro:', error);
+        alert('Error al guardar registro');
+    }
 }
 
 // Exportar para permitir reinicios si es necesario
