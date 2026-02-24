@@ -316,16 +316,14 @@ const api = {
 
   // Endpoints específicos para el sistema
 
-  // Estadísticas (Migradas a v2 con fallback)
-  getStats: () => apiRequestWithFallback(
+  // Estadísticas (v2 only - v1 endpoints don't exist)
+  getStats: () => apiRequest(
     `${API_V2_BASE}/analytics/dashboard`,
-    `${API_V1_BASE}/stats`,
     { method: "GET" }
   ).then(normalizeAnalyticsResponse),
   
-  getDailyStats: () => apiRequestWithFallback(
+  getDailyStats: () => apiRequest(
     `${API_V2_BASE}/analytics/trends`,
-    `${API_V1_BASE}/stats/daily`,
     { method: "GET" }
   ).then(normalizeAnalyticsResponse),
 
@@ -455,11 +453,33 @@ const api = {
     { method: "GET" }
   ).then(unwrapData),
 
-  // Exportar
+  // Exportar (v2 endpoints)
   exportData: (type) => {
     const token = getToken();
-    const url = `${baseUrl}${API_V1_BASE}/export/${type}`;
+    const url = `${baseUrl}${API_V2_BASE}/exports/${type}`;
     window.open(`${url}?token=${token}`, "_blank");
+  },
+  
+  // Export by type (with parameters)
+  exportRegistrations: (params = {}) => {
+    const token = getToken();
+    const queryString = new URLSearchParams({ type: 'registrations', ...params }).toString();
+    const url = `${baseUrl}${API_V2_BASE}/exports/registrations?${queryString}&token=${token}`;
+    window.open(url, "_blank");
+  },
+  
+  exportLeaders: (params = {}) => {
+    const token = getToken();
+    const queryString = new URLSearchParams({ type: 'leaders', ...params }).toString();
+    const url = `${baseUrl}${API_V2_BASE}/exports/leaders?${queryString}&token=${token}`;
+    window.open(url, "_blank");
+  },
+  
+  exportByLeader: (leaderId, params = {}) => {
+    const token = getToken();
+    const queryString = new URLSearchParams({ leaderId, ...params }).toString();
+    const url = `${baseUrl}${API_V2_BASE}/exports/by-leader?${queryString}&token=${token}`;
+    window.open(url, "_blank");
   }
 };
 
