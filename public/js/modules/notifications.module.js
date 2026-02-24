@@ -16,7 +16,32 @@ const NotificationsModule = {
      * Vincula eventos
      */
     bindEvents() {
-        // Se vinculan automáticamente a través de la navegación
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const btn = document.getElementById('notificationsBtn');
+
+            if (!dropdown || !dropdown.classList.contains('active')) return;
+
+            if (!dropdown.contains(e.target) && (!btn || !btn.contains(e.target))) {
+                dropdown.classList.remove('active');
+            }
+        });
+    },
+
+    async toggleDropdown() {
+        const dropdown = document.getElementById('notificationsDropdown');
+        if (!dropdown) return;
+
+        if (dropdown.classList.contains('active')) {
+            dropdown.classList.remove('active');
+            return;
+        }
+
+        dropdown.classList.add('active');
+        if (typeof window.loadDeletionRequests === 'function') {
+            await window.loadDeletionRequests();
+        }
+        await this.loadNotifications();
     },
 
     /**
@@ -26,7 +51,8 @@ const NotificationsModule = {
         try {
             const leaders = AppState.getData('leaders');
             const leadersWithRequests = leaders.filter(l => l.passwordResetRequested);
-            const count = leadersWithRequests.length;
+            const pendingDeletion = this.getPendingDeletionRequests();
+            const count = leadersWithRequests.length + pendingDeletion.length;
 
             this.setBadge(count);
         } catch (err) {
@@ -70,8 +96,9 @@ const NotificationsModule = {
 
             const leaders = AppState.getData('leaders');
             const leadersWithRequests = leaders.filter(l => l.passwordResetRequested);
+            const pendingDeletion = this.getPendingDeletionRequests();
 
-            if (leadersWithRequests.length === 0) {
+            if (leadersWithRequests.length === 0 && pendingDeletion.length === 0) {
                 content.innerHTML = `
                     <div style="text-align: center; padding: 60px 20px; color: #999;">
                         <i class="bi bi-bell-slash" style="font-size: 60px; opacity: 0.3; margin-bottom: 15px;"></i>
@@ -81,7 +108,29 @@ const NotificationsModule = {
                 return;
             }
 
-            const html = leadersWithRequests.map(leader => `
+            let html = '';
+
+            if (pendingDeletion.length > 0) {
+                html += pendingDeletion.map(req => {
+                    const leader = leaders.find(l => l._id === req.leaderId);
+                    const leaderName = leader ? leader.name : 'Líder desconocido';
+                    return `
+                        <div style="padding: 15px; border-bottom: 1px solid #eee; background: #fef3f2;">
+                            <div style="font-weight: 600; color: #dc2626; margin-bottom: 6px;">
+                                <i class="bi bi-trash-fill"></i> Solicitud de Eliminación
+                            </div>
+                            <div style="font-size: 13px; color: #666;">
+                                <i class="bi bi-person-fill"></i> ${leaderName}
+                            </div>
+                            <div style="font-size: 12px; color: #999; margin-top: 4px;">
+                                <i class="bi bi-file-text"></i> ${req.registrationCount || 0} registros
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            html += leadersWithRequests.map(leader => `
                 <div style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
@@ -112,6 +161,11 @@ const NotificationsModule = {
                 `;
             }
         }
+    },
+
+    getPendingDeletionRequests() {
+        const requests = Array.isArray(window.deletionRequests) ? window.deletionRequests : [];
+        return requests.filter(req => (req?.status || 'pending').toString().toLowerCase() === 'pending');
     }
 };
 

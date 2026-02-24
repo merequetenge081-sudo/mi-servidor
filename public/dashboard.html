@@ -111,7 +111,7 @@
                 </button>
 
                 <div class="notification-wrapper">
-                    <button class="action-btn" id="notificationsBtn" title="Notificaciones">
+                    <button class="action-btn" id="notificationsBtn" data-action="notifications-toggle" title="Notificaciones">
                         <i class="bi bi-bell"></i>
                         <span class="badge-notification" id="notificationsBadge" style="display: none;">0</span>
                     </button>
@@ -130,7 +130,7 @@
                     </div>
                 </div>
 
-                <button class="action-btn" id="deletionRequestsBtn" title="Solicitudes de Eliminación">
+                <button class="action-btn" id="deletionRequestsBtn" data-action="deletion-requests" title="Solicitudes de Eliminación">
                     <i class="bi bi-trash-fill"></i>
                     <span class="badge-notification" id="deletionRequestsBadge" style="display: none; background: #dc2626;">0</span>
                 </button>
@@ -994,7 +994,7 @@
                     </div>
                     <div class="modal-body" id="notificationsModalBody">
                         <!-- Same content as dropdown but bigger -->
-                        <div id="notificationsContent"></div>
+                        <div id="notificationsModalContent"></div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-close-modal="notificationsModal">Cerrar</button>

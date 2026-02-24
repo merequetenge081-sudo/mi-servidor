@@ -63,7 +63,8 @@ const Router = {
             'leaders': 'Líderes',
             'registrations': 'Registros',
             'analytics': 'Análisis y Reportes',
-            'export': 'Centro de Descargas'
+            'export': 'Centro de Descargas',
+            'deletion-requests': 'Solicitudes de Eliminación'
         };
         const pageTitle = document.getElementById('pageTitle');
         if (pageTitle) {
@@ -112,6 +113,13 @@ const Router = {
                     RegistrationsModule.load();
                 } else if (typeof filterRegistrations === 'function') {
                     filterRegistrations();
+                }
+                break;
+            case 'deletion-requests':
+                if (typeof loadDeletionRequests === 'function') {
+                    loadDeletionRequests();
+                } else if (typeof window !== 'undefined' && typeof window.loadDeletionRequests === 'function') {
+                    window.loadDeletionRequests();
                 }
                 break;
             case 'leaders':

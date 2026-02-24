@@ -29,6 +29,38 @@ const Events = (() => {
             const target = e.target;
 
             // =====================================
+            // DATA-ACTION HANDLERS (TOP BAR)
+            // =====================================
+            const actionBtn = target.closest('[data-action]');
+            if (actionBtn) {
+                const action = actionBtn.dataset.action;
+
+                if (action === 'notifications-toggle') {
+                    if (typeof toggleNotificationsDropdown === 'function') {
+                        toggleNotificationsDropdown();
+                    } else if (typeof NotificationsModule !== 'undefined' && NotificationsModule.toggleDropdown) {
+                        NotificationsModule.toggleDropdown();
+                    }
+                    return;
+                }
+
+                if (action === 'deletion-requests') {
+                    if (typeof navigateToSection === 'function') {
+                        navigateToSection('deletion-requests');
+                    } else if (typeof Router !== 'undefined' && Router.navigate) {
+                        Router.navigate('deletion-requests');
+                    }
+
+                    if (typeof loadDeletionRequests === 'function') {
+                        loadDeletionRequests();
+                    } else if (typeof window !== 'undefined' && typeof window.loadDeletionRequests === 'function') {
+                        window.loadDeletionRequests();
+                    }
+                    return;
+                }
+            }
+
+            // =====================================
             // NAVIGATION & SIDEBAR
             // =====================================
             const navLink = target.closest('[data-section]');
