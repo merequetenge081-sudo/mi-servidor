@@ -423,6 +423,23 @@ async function updateNotificationsBadge() {
                 badge.style.display = 'none';
             }
         }
+        
+        // Actualizar badge de solicitudes de eliminación
+        const deletionBadge = document.getElementById('deletionRequestsBadge');
+        if (deletionBadge) {
+            if (pendingDeletionRequests.length > 0) {
+                deletionBadge.textContent = pendingDeletionRequests.length;
+                deletionBadge.style.display = 'flex';
+            } else {
+                deletionBadge.style.display = 'none';
+            }
+        }
+        
+        // Actualizar contador en la sección
+        const pendingCountElement = document.getElementById('pendingRequestsCount');
+        if (pendingCountElement) {
+            pendingCountElement.textContent = pendingDeletionRequests.length;
+        }
 
         // Actualizar badge en menú hamburguesa
         const badgeMenu = document.getElementById('notificationsBadgeMenu');
@@ -2591,9 +2608,12 @@ function renderDeletionRequests(requests = deletionRequests) {
 
     if (requests.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 60px 20px;">
-                <i class="bi bi-inbox" style="font-size: 48px; color: var(--text-muted);"></i>
-                <p style="color: var(--text-muted); margin-top: 16px;">No hay solicitudes de eliminación</p>
+            <div style="text-align: center; padding: 80px 20px;">
+                <div style="width: 100px; height: 100px; margin: 0 auto 24px; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 24px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-inbox" style="font-size: 48px; color: #9ca3af;"></i>
+                </div>
+                <h3 style="color: #4b5563; margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">No hay solicitudes</h3>
+                <p style="color: #9ca3af; margin: 0; font-size: 14px;">No hay solicitudes de eliminación en este momento</p>
             </div>
         `;
         return;
@@ -2601,84 +2621,138 @@ function renderDeletionRequests(requests = deletionRequests) {
 
     const html = requests.map(req => {
         const statusColors = {
-            pending: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e', icon: 'clock-history', label: 'Pendiente' },
-            approved: { bg: '#dcfce7', border: '#22c55e', text: '#166534', icon: 'check-circle-fill', label: 'Aprobada' },
-            rejected: { bg: '#fee2e2', border: '#dc2626', text: '#991b1b', icon: 'x-circle-fill', label: 'Rechazada' }
+            pending: { 
+                bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', 
+                border: '#f59e0b', 
+                text: '#92400e', 
+                icon: 'clock-history', 
+                label: 'Pendiente',
+                badgeBg: '#fef3c7'
+            },
+            approved: { 
+                bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)', 
+                border: '#22c55e', 
+                text: '#166534', 
+                icon: 'check-circle-fill', 
+                label: 'Aprobada',
+                badgeBg: '#dcfce7'
+            },
+            rejected: { 
+                bg: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)', 
+                border: '#dc2626', 
+                text: '#991b1b', 
+                icon: 'x-circle-fill', 
+                label: 'Rechazada',
+                badgeBg: '#fee2e2'
+            }
         };
         
         const status = statusColors[req.status] || statusColors.pending;
-        const createdDate = new Date(req.createdAt).toLocaleString('es-CO');
-        const reviewedDate = req.reviewedAt ? new Date(req.reviewedAt).toLocaleString('es-CO') : '-';
+        const createdDate = new Date(req.createdAt).toLocaleString('es-CO', { 
+            year: 'numeric', month: 'short', day: 'numeric', 
+            hour: '2-digit', minute: '2-digit' 
+        });
+        const reviewedDate = req.reviewedAt ? new Date(req.reviewedAt).toLocaleString('es-CO', {
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        }) : '-';
 
         return `
-            <div class="card" style="padding: 20px; margin-bottom: 16px; border-left: 4px solid ${status.border};">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-                    <div>
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                            <h4 style="margin: 0; color: var(--text-primary);">${req.leaderName}</h4>
-                            <span style="background: ${status.bg}; color: ${status.text}; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; border: 1px solid ${status.border};">
+            <div style="background: white; border-radius: 16px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; transition: all 0.2s;">
+                <div style="background: ${status.bg}; padding: 20px; border-bottom: 1px solid ${status.border};">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                <div style="width: 48px; height: 48px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                    <i class="bi bi-person-fill" style="font-size: 24px; color: ${status.border};"></i>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0 0 4px 0; color: #1f2937; font-size: 18px; font-weight: 700;">${req.leaderName}</h4>
+                                    <p style="color: #6b7280; font-size: 13px; margin: 0;">
+                                        <i class="bi bi-hash"></i> ${req.leaderId.slice(-8)}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="background: ${status.badgeBg}; color: ${status.text}; padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; border: 2px solid ${status.border}; margin-bottom: 8px;">
                                 <i class="bi bi-${status.icon}"></i> ${status.label}
-                            </span>
+                            </div>
+                            <div style="background: white; padding: 8px 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                <div style="font-size: 28px; font-weight: 700; color: ${status.border}; line-height: 1;">${req.registrationCount}</div>
+                                <div style="color: #6b7280; font-size: 12px; font-weight: 500;">registros</div>
+                            </div>
                         </div>
-                        <p style="color: var(--text-muted); font-size: 14px; margin: 0;">
-                            <i class="bi bi-person-badge"></i> Leader ID: <code>${req.leaderId}</code>
-                        </p>
-                    </div>
-                    <div style="text-align: right;">
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: ${status.border};">
-                            ${req.registrationCount}
-                        </p>
-                        <p style="margin: 0; color: var(--text-muted); font-size: 13px;">registros</p>
                     </div>
                 </div>
 
-                <div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                    <p style="margin: 0; color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
-                        <strong>Razón:</strong> ${req.reason || 'Sin razón especificada'}
-                    </p>
-                </div>
+                <div style="padding: 24px;">
+                    ${req.reason ? `
+                        <div style="background: #f9fafb; border-left: 3px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                            <p style="margin: 0; color: #1f2937; font-size: 14px; line-height: 1.6;">
+                                <i class="bi bi-chat-left-quote" style="color: #3b82f6;"></i> <strong>Razón:</strong><br>
+                                <span style="color: #4b5563; margin-left: 24px;">${req.reason}</span>
+                            </p>
+                        </div>
+                    ` : ''}
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
-                    <div>
-                        <i class="bi bi-calendar-event"></i> Solicitado: <strong>${createdDate}</strong>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                        <div style="background: #f9fafb; padding: 12px; border-radius: 10px;">
+                            <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px;">
+                                <i class="bi bi-calendar-event"></i> Solicitado
+                            </div>
+                            <div style="color: #1f2937; font-size: 13px; font-weight: 600;">${createdDate}</div>
+                        </div>
+                        ${req.reviewedAt ? `
+                            <div style="background: #f9fafb; padding: 12px; border-radius: 10px;">
+                                <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px;">
+                                    <i class="bi bi-calendar-check"></i> Revisado
+                                </div>
+                                <div style="color: #1f2937; font-size: 13px; font-weight: 600;">${reviewedDate}</div>
+                            </div>
+                        ` : ''}
+                        ${req.reviewedBy ? `
+                            <div style="background: #f9fafb; padding: 12px; border-radius: 10px;">
+                                <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px;">
+                                    <i class="bi bi-person-check"></i> Revisado por
+                                </div>
+                                <div style="color: #1f2937; font-size: 13px; font-weight: 600;">${req.reviewedBy}</div>
+                            </div>
+                        ` : ''}
+                        ${req.reviewNotes ? `
+                            <div style="background: #f9fafb; padding: 12px; border-radius: 10px; grid-column: 1 / -1;">
+                                <div style="color: #6b7280; font-size: 12px; margin-bottom: 4px;">
+                                    <i class="bi bi-sticky"></i> Notas de revisión
+                                </div>
+                                <div style="color: #1f2937; font-size: 13px; font-weight: 600;">${req.reviewNotes}</div>
+                            </div>
+                        ` : ''}
                     </div>
-                    ${req.reviewedAt ? `
-                        <div>
-                            <i class="bi bi-calendar-check"></i> Revisado: <strong>${reviewedDate}</strong>
-                        </div>
-                    ` : '<div></div>'}
-                    ${req.reviewedBy ? `
-                        <div>
-                            <i class="bi bi-person-check"></i> Por: <strong>${req.reviewedBy}</strong>
-                        </div>
-                    ` : '<div></div>'}
-                    ${req.reviewNotes ? `
-                        <div>
-                            <i class="bi bi-sticky"></i> Notas: <strong>${req.reviewNotes}</strong>
-                        </div>
-                    ` : '<div></div>'}
-                </div>
 
-                ${req.status === 'pending' ? `
-                    <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 12px; margin-bottom: 12px;">
-                        <p style="margin: 0; color: #92400e; font-size: 13px; line-height: 1.6;">
-                            <i class="bi bi-info-circle-fill"></i> <strong>Opciones de aprobación:</strong><br>
-                            • <strong>Aprobar y Eliminar:</strong> Elimina permanentemente sin respaldo<br>
-                            • <strong>Aprobar y Archivar:</strong> Guarda copias en base de datos de archivo para reutilización futura
-                        </p>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px;">
-                        <button class="btn btn-outline" onclick="reviewDeletionRequest('${req._id}', 'reject')" style="border-color: #6b7280; color: #6b7280;">
-                            <i class="bi bi-x-circle"></i> Rechazar
-                        </button>
-                        <button class="btn btn-outline" onclick="reviewDeletionRequest('${req._id}', 'approve-and-archive')" style="border-color: #2563eb; color: #2563eb;">
-                            <i class="bi bi-archive-fill"></i> Aprobar y Archivar
-                        </button>
-                        <button class="btn btn-primary" onclick="reviewDeletionRequest('${req._id}', 'approve')" style="background: var(--danger); border: none;">
-                            <i class="bi bi-trash-fill"></i> Aprobar y Eliminar
-                        </button>
-                    </div>
-                ` : ''}
+                    ${req.status === 'pending' ? `
+                        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                            <div style="display: flex; gap: 12px;">
+                                <i class="bi bi-lightbulb-fill" style="font-size: 20px; color: #f59e0b; flex-shrink: 0;"></i>
+                                <div style="color: #92400e; font-size: 13px; line-height: 1.7;">
+                                    <strong style="display: block; margin-bottom: 8px; font-size: 14px;">Opciones de aprobación:</strong>
+                                    <div style="margin-bottom: 4px;">✓ <strong>Aprobar y Archivar:</strong> Guarda copias para reutilización futura</div>
+                                    <div>✓ <strong>Aprobar y Eliminar:</strong> Eliminación permanente sin respaldo</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                            <button class="btn" onclick="reviewDeletionRequest('${req._id}', 'reject')" style="background: #f3f4f6; color: #4b5563; border: 2px solid #e5e7eb; font-weight: 600;">
+                                <i class="bi bi-x-circle"></i> Rechazar
+                            </button>
+                            <button class="btn" onclick="reviewDeletionRequest('${req._id}', 'approve-and-archive')" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; border: 2px solid #2563eb; font-weight: 600;">
+                                <i class="bi bi-archive-fill"></i> Archivar
+                            </button>
+                            <button class="btn" onclick="reviewDeletionRequest('${req._id}', 'approve')" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border: none; font-weight: 600; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);">
+                                <i class="bi bi-trash-fill"></i> Eliminar
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
             </div>
         `;
     }).join('');
@@ -2813,6 +2887,18 @@ function initializeEventListeners() {
         console.log('[LISTENERS] ✅ sidebarToggleBtn');
     } else {
         console.warn('[LISTENERS] ❌ sidebarToggleBtn NOT FOUND');
+    }
+    
+    // Event listener para botón de solicitudes de eliminación
+    const deletionRequestsBtn = document.getElementById('deletionRequestsBtn');
+    if (deletionRequestsBtn) {
+        deletionRequestsBtn.addEventListener('click', () => {
+            console.log('[LISTENERS] DeletionRequests btn clicked');
+            navigateToSection('deletion-requests');
+        });
+        console.log('[LISTENERS] ✅ deletionRequestsBtn');
+    } else {
+        console.warn('[LISTENERS] ❌ deletionRequestsBtn NOT FOUND');
     }
     
     // NAV LINKS - Event listeners para navegación
