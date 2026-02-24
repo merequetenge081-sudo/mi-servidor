@@ -292,11 +292,19 @@ const ModalsModule = {
         if (isActive) {
             this.closeHelpDrawer();
         } else {
+            // Cierra otros dropdowns primero
+            this.closeNotificationsDropdown();
+            
             drawer.classList.add('active');
             overlay.classList.add('active');
             drawer.setAttribute('aria-hidden', 'false');
             overlay.setAttribute('aria-hidden', 'false');
-            this.updateHelpContent();
+            
+            // Prevenir bubbling inmediato
+            setTimeout(() => {
+                this.updateHelpContent();
+            }, 50);
+            
             console.log('[ModalsModule] Help drawer opened');
         }
     },
@@ -307,6 +315,12 @@ const ModalsModule = {
     closeHelpDrawer() {
         const drawer = document.getElementById('helpDrawer');
         const overlay = document.getElementById('helpOverlay');
+        
+        // Prevenir cierre múltiple
+        if (drawer && !drawer.classList.contains('active')) {
+            return; // Ya está cerrado
+        }
+        
         if (drawer) {
             drawer.classList.remove('active');
             drawer.setAttribute('aria-hidden', 'true');

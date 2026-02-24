@@ -313,13 +313,17 @@ const Events = (() => {
                 return;
             }
 
-            // Help drawer
+            // Help drawer - PRIMERO el toggle para prevenir bubbling
             if (target.closest('[data-action="help-toggle"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.toggleHelpDrawer();
                 return;
             }
 
             if (target.closest('[data-action="help-close"]')) {
+                e.stopPropagation();
+                e.preventDefault();
                 ModalsModule.closeHelpDrawer();
                 return;
             }
