@@ -176,7 +176,10 @@ if (document.readyState !== 'loading') {
     document.addEventListener('DOMContentLoaded', () => NotificationsModule.init());
 }
 
-// Export
+// Export to window
+window.NotificationsModule = NotificationsModule;
+
+// Export for CommonJS
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = NotificationsModule;
 }

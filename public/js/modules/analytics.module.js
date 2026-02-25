@@ -693,3 +693,7 @@ if (document.readyState === 'loading') {
     AnalyticsModule.init();
 }
 
+// Export to window
+window.AnalyticsModule = AnalyticsModule;
+
+
