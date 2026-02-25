@@ -86,6 +86,22 @@ export async function findLeaderById(id) {
 }
 
 /**
+ * Buscar líder por token (token público para acceso sin contraseña desde URLs)
+ */
+export async function findLeaderByToken(token) {
+  try {
+    const leader = await Leader.findOne({ token });
+    if (leader) {
+      logger.debug('Líder encontrado por token', { leaderId: leader._id });
+    }
+    return leader;
+  } catch (error) {
+    logger.error('Error buscando líder por token', error);
+    throw AppError.serverError('Error al buscar líder');
+  }
+}
+
+/**
  * Actualizar contraseña de admin
  */
 export async function updateAdminPassword(adminId, newPassword) {
@@ -178,6 +194,7 @@ export default {
   findLeaderByCedula,
   findAdminById,
   findLeaderById,
+  findLeaderByToken,
   updateAdminPassword,
   updateLeaderPassword,
   clearLeaderTempPassword,

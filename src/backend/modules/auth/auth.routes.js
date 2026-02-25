@@ -58,6 +58,14 @@ router.post('/reset-password', authController.resetPassword);
 router.post('/verify-token', authMiddleware, authController.verifyToken);
 
 /**
+ * POST /api/v2/auth/verify-leader-token
+ * @public (SIN autenticación requerida)
+ * Verifica un token público de líder y genera un JWT temporal para acceso desde URLs
+ * @param {string} token - Token público del líder (UUID)
+ */
+router.post('/verify-leader-token', authController.verifyLeaderToken);
+
+/**
  * POST /api/v2/auth/logout
  * @protected
  * Logout del usuario (simplemente confirma)

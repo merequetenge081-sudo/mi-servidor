@@ -957,6 +957,64 @@
         </div>
     </div>
 
+    <!-- AUTO-VERIFY TOKEN FROM URL PARAMETER -->
+    <script>
+        (async function() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const tokenFromUrl = params.get('token');
+                
+                // Si hay un token en la URL y NO hay uno en storage, intenta verificarlo
+                if (tokenFromUrl && !localStorage.getItem('token') && !sessionStorage.getItem('token')) {
+                    console.log('🔍 Token encontrado en URL, validando...', tokenFromUrl.substring(0, 20) + '...');
+                    
+                    try {
+                        // Llamar al endpoint de verificación SIN estar autenticado (para obtener el token inicial)
+                        const verifyResponse = await fetch('/api/v2/auth/verify-leader-token', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: tokenFromUrl })
+                        });
+                        
+                        if (verifyResponse.ok) {
+                            const verifyData = await verifyResponse.json();
+                            
+                            // Guardar token en storage
+                            const jwtToken = verifyData.data?.token || verifyData.token;
+                            const leaderId = verifyData.data?.leaderId || verifyData.data?._id || verifyData.leaderId;
+                            
+                            if (jwtToken) {
+                                localStorage.setItem('token', jwtToken);
+                                sessionStorage.setItem('token', jwtToken);
+                                console.log('✅ Token guardado desde URL, líder:', leaderId);
+                            }
+                            
+                            if (leaderId) {
+                                localStorage.setItem('leaderId', leaderId);
+                                sessionStorage.setItem('leaderId', leaderId);
+                            }
+                            
+                            // Limpiar el parámetro token de la URL
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                            
+                        } else {
+                            const errorData = await verifyResponse.json();
+                            console.error('❌ Token inválido:', errorData.error || 'Error desconocido');
+                            alert('❌ Token inválido o expirado. Por favor, solicita un nuevo enlace al administrador.');
+                            window.location.href = '/';
+                        }
+                    } catch (verifyError) {
+                        console.error('Error verificando token desde URL:', verifyError);
+                        // Continuar de todas formas, quizás el usuario tiene otra forma de autenticarse
+                    }
+                }
+            } catch (error) {
+                console.error('Error en verificación automática de token:', error);
+                // No interrumpir el flujo principal si hay errores
+            }
+        })();
+    </script>
+
     <script type="module" src="/js/leader/leader-main.js?v=2.7.3"></script>
     <!-- FOOTER LEGAL -->
     <footer class="site-footer">

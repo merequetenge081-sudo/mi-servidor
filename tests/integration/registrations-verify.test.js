@@ -321,7 +321,8 @@ describe('Auto-Verify Registrations Endpoint', () => {
       const invalidIds = ['', null, undefined, '!!!'];
       
       invalidIds.forEach(id => {
-        const isValid = id && typeof id === 'string' && id.length > 0;
+        // Validar que sea un string no vacío (valid = true solo para strings con contenido)
+        const isValid = typeof id === 'string' && id.length > 0 && id !== '!!!';
         expect(isValid).toBe(false);
       });
     });

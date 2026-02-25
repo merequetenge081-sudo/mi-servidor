@@ -171,6 +171,35 @@ export async function verifyToken(req, res, next) {
 }
 
 /**
+ * POST /api/v2/auth/verify-leader-token
+ * Verificar token público del líder (para acceso desde URLs sin contraseña)
+ * @public - SIN autenticación requerida
+ * @param {string} token - Token público del líder
+ */
+export async function verifyLeaderToken(req, res, next) {
+  try {
+    const { token } = req.body;
+
+    logger.info('Verificación de token público de líder');
+
+    if (!token) {
+      throw AppError.badRequest('Token requerido');
+    }
+
+    const result = await authService.verifyLeaderToken(token);
+    
+    logger.success('Líder verificado exitosamente por token', { leaderId: result.leaderId });
+    res.json({
+      success: true,
+      message: 'Token válido',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * POST /api/v2/auth/logout
  * Logout (simplemente retorna confirmación)
  */
@@ -194,5 +223,6 @@ export default {
   requestPasswordReset,
   resetPassword,
   verifyToken,
+  verifyLeaderToken,
   logout
 };

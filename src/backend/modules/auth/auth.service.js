@@ -164,6 +164,58 @@ export async function leaderLogin(email, password) {
 }
 
 /**
+ * Verificar token público del líder (para acceso sin contraseña desde URLs)
+ * Genera un JWT temporal pero válido para iniciar sesión
+ */
+export async function verifyLeaderToken(token) {
+  try {
+    if (!token || typeof token !== 'string') {
+      throw AppError.badRequest('Token requerido y debe ser string');
+    }
+
+    // Buscar el líder por su token público
+    const leader = await authRepository.findLeaderByToken(token);
+
+    if (!leader) {
+      logger.warn('Intento de acceso con token inválido');
+      throw AppError.unauthorized('Token inválido o expirado');
+    }
+
+    logger.success('Líder verificado por token público', { leaderId: leader._id });
+
+    // Generar JWT temporal (24 horas)
+    const jwtToken = jwt.sign(
+      {
+        userId: leader._id,
+        role: 'leader',
+        email: leader.email,
+        name: leader.name,
+        organizationId: leader.organizationId,
+        source: 'token_verification'
+      },
+      config.jwtSecret,
+      { expiresIn: '24h' }
+    );
+
+    return { 
+      token: jwtToken, 
+      leaderId: leader._id,
+      leader: { 
+        _id: leader._id,
+        leaderId: leader.leaderId,
+        name: leader.name,
+        email: leader.email,
+        organizationId: leader.organizationId
+      } 
+    };
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Líder token verification error', error);
+    throw AppError.serverError('Error verificando token');
+  }
+}
+
+/**
  * Cambiar contraseña
  */
 export async function changePassword(userId, role, oldPassword, newPassword) {
@@ -335,6 +387,7 @@ export function generateTemporaryPassword() {
 export default {
   adminLogin,
   leaderLogin,
+  verifyLeaderToken,
   changePassword,
   requestPasswordReset,
   resetPasswordWithToken,
