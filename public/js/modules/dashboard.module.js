@@ -240,3 +240,7 @@ if (document.readyState === 'loading') {
 } else {
     DashboardModule.init();
 }
+
+// Export to window
+window.DashboardModule = DashboardModule;
+

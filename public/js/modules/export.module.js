@@ -20,7 +20,12 @@ const ExportsModule = (() => {
 
     // ====== HELPER: showAlert ======
     function showAlert(message, type = 'info') {
-        return ModalsModule.showAlert(message, type);
+        if (typeof ModalsModule !== 'undefined' && ModalsModule.showAlert) {
+            return ModalsModule.showAlert(message, type);
+        }
+        // Fallback
+        alert(message);
+        return Promise.resolve(true);
     }
 
     // ====== PRIVATE HELPERS ======
