@@ -8,6 +8,7 @@ import logger from "../config/logger.js";
 export async function importarPuestosSimpleHandler(req, res) {
   try {
     const { puestos } = req.body;
+    const organizationId = req.user?.organizationId ?? null;
     
     if (!Array.isArray(puestos)) {
       return res.status(400).json({
@@ -18,10 +19,15 @@ export async function importarPuestosSimpleHandler(req, res) {
 
     logger.info(`📦 Importando ${puestos.length} puestos...`);
 
-    // Limpiar y reinsertarlet
-    await Puestos.deleteMany({});
+    const deleteFilter = organizationId ? { organizationId } : {};
+    await Puestos.deleteMany(deleteFilter);
+
+    const puestosConOrg = puestos.map((puesto) => ({
+      ...puesto,
+      organizationId: puesto.organizationId ?? organizationId ?? null
+    }));
     
-    const resultado = await Puestos.insertMany(puestos);
+    const resultado = await Puestos.insertMany(puestosConOrg);
     
     logger.info(`✅ Importados ${resultado.length} puestos`);
 

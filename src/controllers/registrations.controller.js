@@ -555,9 +555,18 @@ export async function bulkCreateRegistrations(req, res) {
 
     // ========== STEP 1: Batch lookup ALL puestos for fuzzy matching ==========
     // Load ALL active puestos for the organization (for fuzzy matching)
+    const orgFilters = [
+      { organizationId: null },
+      { organizationId: { $exists: false } }
+    ];
+
+    if (leader.organizationId) {
+      orgFilters.unshift({ organizationId: leader.organizationId });
+    }
+
     const allPuestos = await Puestos.find({
-      organizationId: leader.organizationId,
-      activo: true
+      activo: true,
+      $or: orgFilters
     }).lean();
 
     logger.info(`[BulkImport] Loaded ${allPuestos.length} active puestos for fuzzy matching`);
@@ -789,9 +798,18 @@ export async function verifyLeaderRegistrations(req, res) {
       return res.status(403).json({ error: "Organización inválida" });
     }
 
+    const orgFilters = [
+      { organizationId: null },
+      { organizationId: { $exists: false } }
+    ];
+
+    if (leader.organizationId) {
+      orgFilters.unshift({ organizationId: leader.organizationId });
+    }
+
     const allPuestos = await Puestos.find({
-      organizationId: leader.organizationId,
-      activo: true
+      activo: true,
+      $or: orgFilters
     }).lean();
 
     const registrations = await Registration.find({

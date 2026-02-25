@@ -122,6 +122,7 @@ export async function getLocalidadesHandler(req, res) {
 export async function importarPuestosHandler(req, res) {
   try {
     const { puestos } = req.body;
+    const organizationId = req.user?.organizationId ?? null;
 
     if (!Array.isArray(puestos) || puestos.length === 0) {
       return res.status(400).json({
@@ -142,10 +143,15 @@ export async function importarPuestosHandler(req, res) {
       });
     }
 
-    // Borrar puestos existentes o actualizar
-    await Puestos.deleteMany({});
+    const deleteFilter = organizationId ? { organizationId } : {};
+    await Puestos.deleteMany(deleteFilter);
 
-    const resultado = await Puestos.insertMany(puestosValidos);
+    const puestosConOrg = puestosValidos.map((puesto) => ({
+      ...puesto,
+      organizationId: puesto.organizationId ?? organizationId ?? null
+    }));
+
+    const resultado = await Puestos.insertMany(puestosConOrg);
 
     logger.info(`Se importaron ${resultado.length} puestos de votación`);
 

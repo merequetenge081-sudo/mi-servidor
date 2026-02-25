@@ -45,6 +45,8 @@ const PUESTOS_BOGOTA_EJEMPLO = [
 export async function importarPuestosAPIHandler(req, res) {
   try {
     logger.info("📍 Iniciando importación de puestos vía API...");
+
+    const organizationId = req.user?.organizationId ?? null;
     
     // Requerir puestos del request
     const { puestos: puestosRequest } = req.body || {};
@@ -74,12 +76,17 @@ export async function importarPuestosAPIHandler(req, res) {
 
     logger.info(`📦 Validados ${puestosValidos.length} puestos`);
 
-    // Limpiar colección anterior
-    await Puestos.deleteMany({});
+    const deleteFilter = organizationId ? { organizationId } : {};
+    await Puestos.deleteMany(deleteFilter);
     logger.info(`🗑️  Colección anterior limpiada`);
 
     // Insertar nuevos puestos
-    const resultado = await Puestos.insertMany(puestosValidos);
+    const puestosConOrg = puestosValidos.map((puesto) => ({
+      ...puesto,
+      organizationId: puesto.organizationId ?? organizationId ?? null
+    }));
+
+    const resultado = await Puestos.insertMany(puestosConOrg);
     logger.info(`✅ Se importaron ${resultado.length} puestos de votación`);
 
     // Calcular estadísticas
@@ -132,6 +139,8 @@ export async function importarPuestosAPIHandler(req, res) {
 export async function importarPuestosDesdeGeoJSON(req, res) {
   try {
     logger.info("🔄 Iniciando importación desde GeoJSON...");
+
+    const organizationId = req.user?.organizationId ?? null;
 
     // Leer GeoJSON
     const geoJsonPath = path.join(__dirname, "../../tools/pvo.geojson");
@@ -186,6 +195,7 @@ export async function importarPuestosDesdeGeoJSON(req, res) {
           activa: true
         })),
         aliases: [...new Set(aliases)],
+        organizationId,
         activo: true,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -195,9 +205,10 @@ export async function importarPuestosDesdeGeoJSON(req, res) {
     logger.info(`📋 Procesados ${puestosProcessados.length} puestos`);
 
     // Backup si hay puestos
-    const countActuales = await Puestos.countDocuments();
+    const backupFilter = organizationId ? { organizationId } : {};
+    const countActuales = await Puestos.countDocuments(backupFilter);
     if (countActuales > 0) {
-      const backup = await Puestos.find().lean();
+      const backup = await Puestos.find(backupFilter).lean();
       const backupFile = path.join(__dirname, `../../tools/puestos-backup-${Date.now()}.json`);
       fs.writeFileSync(backupFile, JSON.stringify(backup, null, 2));
       logger.info(`💾 Backup guardado: ${backupFile}`);
@@ -205,7 +216,7 @@ export async function importarPuestosDesdeGeoJSON(req, res) {
 
     // Limpiar colección
     logger.info("🧹 Limpiando colección anterior");
-    await Puestos.deleteMany({});
+    await Puestos.deleteMany(backupFilter);
 
     // Importar
     logger.info(`📥 Importando ${puestosProcessados.length} puestos...`);
