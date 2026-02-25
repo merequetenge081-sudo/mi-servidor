@@ -156,6 +156,29 @@ export class RegistrationsManager {
         }
     }
 
+    static async autoVerifyRegistrations(leaderId, threshold = 0.85) {
+        try {
+            const res = await AuthManager.apiCall(
+                `/api/registrations/leader/${leaderId}/verify`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ threshold })
+                }
+            );
+
+            const data = await res.json();
+            if (!res.ok || data.error) {
+                throw new Error(data.error || 'Error al verificar registros');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Error en verificacion automatica:', error);
+            throw error;
+        }
+    }
+
     static applyFilters(searchTerm, statusFilter) {
         this.filteredRegistrations = this.myRegistrations.filter(reg => {
             const matchSearch = !searchTerm ||

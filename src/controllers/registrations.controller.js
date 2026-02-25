@@ -9,7 +9,8 @@ import { ValidationService } from "../services/validation.service.js";
 import { ConsentLogService } from "../services/consentLog.service.js";
 import logger from "../config/logger.js";
 import { buildOrgFilter } from "../middleware/organization.middleware.js";
-import { matchPuesto, matchLocalidad, autocorrectRegistration } from "../utils/fuzzyMatch.js";
+import { matchPuesto, matchLocalidad, autocorrectRegistration, normalizeString } from "../utils/fuzzyMatch.js";
+import { aliasPuestos } from "../utils/aliasPuestos.js";
 import { parsePagination } from "../utils/pagination.js";
 import bcrypt from "bcryptjs";
 
@@ -33,6 +34,21 @@ const normalizeRegistration = (registration) => {
     requiereRevisionPuesto: registration.requiereRevisionPuesto || false,
     revisionPuestoResuelta: registration.revisionPuestoResuelta || false
   };
+};
+
+const stripLeadingCode = (value) => {
+  if (!value) return '';
+  return value.toString().replace(/^\s*\d+\s*[-–]\s*/g, '').trim();
+};
+
+const resolvePuestoInput = (value) => {
+  const raw = stripLeadingCode(value);
+  if (!raw) return raw;
+  const normalized = normalizeString(raw);
+  const aliasKey = Object.keys(aliasPuestos).find(
+    (alias) => normalizeString(alias) === normalized
+  );
+  return aliasKey ? aliasPuestos[aliasKey] : raw;
 };
 
 export async function createRegistration(req, res) {
@@ -737,6 +753,161 @@ export async function bulkCreateRegistrations(req, res) {
       success: false,
       error: "Error interno al procesar importación",
       details: error.message 
+    });
+  }
+}
+
+export async function verifyLeaderRegistrations(req, res) {
+  try {
+    const user = req.user;
+    const { leaderId } = req.params;
+    const similarityThreshold = Number(req.body?.threshold);
+    const threshold = Number.isFinite(similarityThreshold)
+      ? Math.max(0, Math.min(similarityThreshold, 1))
+      : 0.85;
+
+    if (!user || user.role !== "leader") {
+      return res.status(403).json({ error: "Solo líderes pueden ejecutar esta verificación" });
+    }
+
+    const leader = await Leader.findOne({
+      $or: [{ leaderId }, { _id: leaderId }]
+    }).lean();
+
+    if (!leader) return res.status(404).json({ error: "Líder no encontrado" });
+
+    const userLeaderId = user.leaderId || user.userId || user._id;
+    const leaderIdMatch =
+      (leader.leaderId && leader.leaderId === userLeaderId) ||
+      (leader._id && leader._id.toString() === userLeaderId);
+
+    if (!leaderIdMatch) {
+      return res.status(403).json({ error: "No autorizado para verificar estos registros" });
+    }
+
+    if (user.organizationId && leader.organizationId && user.organizationId !== leader.organizationId) {
+      return res.status(403).json({ error: "Organización inválida" });
+    }
+
+    const allPuestos = await Puestos.find({
+      organizationId: leader.organizationId,
+      activo: true
+    }).lean();
+
+    const registrations = await Registration.find({
+      leaderId: leader.leaderId,
+      eventId: leader.eventId,
+      organizationId: leader.organizationId
+    }).lean();
+
+    const summary = {
+      total: registrations.length,
+      updated: 0,
+      corrected: 0,
+      requiresReview: 0,
+      unchanged: 0
+    };
+
+    const corrections = [];
+
+    for (const reg of registrations) {
+      const updates = {};
+      const rowCorrections = [];
+      let hasCorrections = false;
+      let requiresReview = false;
+
+      if (reg.localidad) {
+        const localidadMatch = matchLocalidad(reg.localidad, threshold);
+        if (localidadMatch && localidadMatch.corrected) {
+          updates.localidad = localidadMatch.match;
+          rowCorrections.push({
+            field: "localidad",
+            original: reg.localidad,
+            corrected: localidadMatch.match,
+            similarity: (localidadMatch.similarity * 100).toFixed(1) + "%"
+          });
+          hasCorrections = true;
+        }
+      }
+
+      const votingPlaceInput = resolvePuestoInput(reg.votingPlace);
+      if (votingPlaceInput) {
+        const puestoMatch = matchPuesto(votingPlaceInput, allPuestos, threshold);
+        if (puestoMatch) {
+          const matchedName = puestoMatch.puesto.nombre;
+          updates.votingPlace = matchedName;
+          updates.puestoId = puestoMatch.puesto._id;
+          if (puestoMatch.puesto.localidad) {
+            updates.localidad = puestoMatch.puesto.localidad;
+          }
+          updates.requiereRevisionPuesto = false;
+          updates.revisionPuestoResuelta = true;
+
+          if (normalizeString(reg.votingPlace || "") !== normalizeString(matchedName)) {
+            rowCorrections.push({
+              field: "votingPlace",
+              original: reg.votingPlace,
+              corrected: matchedName,
+              similarity: (puestoMatch.similarity * 100).toFixed(1) + "%"
+            });
+            hasCorrections = true;
+          }
+        } else {
+          updates.requiereRevisionPuesto = true;
+          updates.revisionPuestoResuelta = false;
+          requiresReview = true;
+        }
+      }
+
+      const keys = Object.keys(updates);
+      if (keys.length === 0) {
+        summary.unchanged++;
+        continue;
+      }
+
+      let changed = false;
+      for (const key of keys) {
+        const currentValue = reg[key] ?? null;
+        const nextValue = updates[key] ?? null;
+        if (String(currentValue) !== String(nextValue)) {
+          changed = true;
+          break;
+        }
+      }
+
+      if (!changed) {
+        summary.unchanged++;
+        continue;
+      }
+
+      updates.updatedAt = new Date();
+      await Registration.updateOne({ _id: reg._id }, { $set: updates });
+
+      summary.updated++;
+      if (hasCorrections) summary.corrected++;
+      if (requiresReview) summary.requiresReview++;
+
+      if (rowCorrections.length > 0) {
+        corrections.push({
+          id: reg._id,
+          cedula: reg.cedula,
+          corrections: rowCorrections
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      threshold,
+      ...summary,
+      corrections: corrections.slice(0, 50)
+    });
+  } catch (error) {
+    logger.error("Error verifying leader registrations:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error interno al verificar registros",
+      details: error.message
     });
   }
 }

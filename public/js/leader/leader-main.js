@@ -553,6 +553,39 @@ window.refreshRegistrations = async () => {
         StatisticsManager.loadStatistics(RegistrationsManager.myRegistrations);
     }
 };
+window.autoVerifyRegistrations = async () => {
+    const leaderId = StorageManager.getCurrentLeaderId();
+    if (!leaderId) return;
+
+    const proceed = confirm('Esto verificara localidad y puesto de tus registros. Deseas continuar?');
+    if (!proceed) return;
+
+    const btn = document.getElementById('autoVerifyBtn');
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Verificando...';
+    }
+
+    try {
+        const result = await RegistrationsManager.autoVerifyRegistrations(leaderId, 0.85);
+        const message = `Registros revisados: ${result.total}\n` +
+            `Actualizados: ${result.updated}\n` +
+            `Autocorregidos: ${result.corrected}\n` +
+            `Requieren revision: ${result.requiresReview}\n` +
+            `Sin cambios: ${result.unchanged}`;
+
+        ModalsManager.showSuccessModal('Verificacion automatica', message);
+        await window.refreshRegistrations();
+    } catch (error) {
+        alert(error.message || 'Error al verificar registros');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+};
 window.previousPage = () => RegistrationsManager.changePage(-1);
 window.nextPage = () => RegistrationsManager.changePage(1);
 

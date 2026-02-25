@@ -58,8 +58,9 @@ export const CAPITALES_COLOMBIA = {
  */
 export function normalizeString(str) {
   if (!str) return '';
-  return str
-    .toString()
+  const raw = str.toString();
+  const withoutCode = raw.replace(/^\s*\d+\s*[-–]\s*/g, '');
+  return withoutCode
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
     .toLowerCase()

@@ -240,6 +240,7 @@ if (process.env.NODE_ENV !== 'production') {
 router.post("/registrations/bulk", authMiddleware, registrationController.bulkCreateRegistrations);
 router.get("/registrations", authMiddleware, registrationController.getRegistrations);
 router.get("/registrations/leader/:leaderId", authMiddleware, registrationController.getRegistrationsByLeader);
+router.post("/registrations/leader/:leaderId/verify", authMiddleware, registrationController.verifyLeaderRegistrations);
 router.get("/registrations/:id", authMiddleware, registrationController.getRegistration);
 router.put("/registrations/:id", authMiddleware, registrationController.updateRegistration);
 router.delete("/registrations/:id", authMiddleware, registrationController.deleteRegistration);
