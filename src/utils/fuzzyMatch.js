@@ -152,12 +152,50 @@ export function matchCapital(input, threshold = 0.80) {
  */
 export function matchPuesto(input, puestos, threshold = 0.80) {
   if (!input || !puestos || puestos.length === 0) return null;
+
+  const normalizedInput = normalizeString(input);
+  const codeMatch = input.toString().match(/^\s*(\d+)\s*[-–]/);
+  const inputCode = codeMatch ? codeMatch[1] : null;
+  const normalizeCode = (value) => {
+    if (!value) return '';
+    return value.toString().trim().replace(/^0+/, '') || '0';
+  };
+  if (inputCode) {
+    const normalizedCode = normalizeCode(inputCode);
+    const codeHit = puestos.find((puesto) => {
+      const puestoCode = normalizeCode(puesto.codigoPuesto);
+      return puestoCode === normalizedCode;
+    });
+
+    if (codeHit) {
+      return {
+        puesto: codeHit,
+        similarity: 1,
+        original: input,
+        corrected: normalizeString(codeHit.nombre) !== normalizedInput
+      };
+    }
+  }
   
   let bestMatch = null;
   let bestSimilarity = 0;
   
   for (const puesto of puestos) {
-    const similarity = calculateSimilarity(input, puesto.nombre);
+    const aliases = Array.isArray(puesto.aliases) ? puesto.aliases : [];
+    const candidates = [
+      puesto.nombre,
+      ...aliases,
+      puesto.localidad ? `${puesto.nombre} ${puesto.localidad}` : null,
+      puesto.localidad ? `${puesto.localidad} ${puesto.nombre}` : null
+    ].filter(Boolean);
+
+    let similarity = 0;
+    for (const candidate of candidates) {
+      const candidateSimilarity = calculateSimilarity(input, candidate);
+      if (candidateSimilarity > similarity) {
+        similarity = candidateSimilarity;
+      }
+    }
     
     if (similarity > bestSimilarity) {
       bestSimilarity = similarity;
