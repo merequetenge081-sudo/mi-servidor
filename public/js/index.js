@@ -55,7 +55,7 @@
             const script = document.createElement('script');
             // Agregar cache busting para forzar recarga
             const cacheBuster = `?v=${Date.now()}`;
-            script.src = `js/${src}${cacheBuster}`;
+            script.src = `/js/${src}${cacheBuster}`;
             script.onload = () => {
                 loadedCount++;
                 console.log(`[${loadedCount}/${totalModules}] ✅ ${src}`);
