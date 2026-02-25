@@ -327,3 +327,15 @@ export function autocorrectRegistration(registro, puestos, threshold = 0.80) {
     corrections
   };
 }
+/**
+ * Función simplificada para hacer fuzzy matching entre dos strings
+ * @param {string} search - String a buscar
+ * @param {string} target - String objetivo
+ * @param {number} threshold - Umbral de similitud mínima (0-1)
+ * @returns {boolean} - true si la similitud >= threshold
+ */
+export function fuzzyMatch(search, target, threshold = 0.85) {
+  if (!search || !target) return false;
+  const similarity = calculateSimilarity(search, target);
+  return similarity >= threshold;
+}
