@@ -24,67 +24,73 @@ export async function initializePuestosIfEmpty() {
 
     logger.info('📍 Colección de Puestos vacía. Iniciando importación automática...');
 
-    // Leer GeoJSON
+    // Intentar leer archivo actualizado con aliases
+    let puestosData = null;
+    const puestosActualizadosPath = path.join(__dirname, '../..', 'tools/puestos-actualizados.json');
     const geoJsonPath = path.join(__dirname, '../..', 'tools/pvo.geojson');
-    if (!fs.existsSync(geoJsonPath)) {
-      logger.warn(`⚠️ GeoJSON no encontrado: ${geoJsonPath}`);
+    
+    if (fs.existsSync(puestosActualizadosPath)) {
+      logger.info('📄 Usando puestos-actualizados.json (con aliases y cambios)');
+      puestosData = JSON.parse(fs.readFileSync(puestosActualizadosPath, 'utf8'));
+    } else if (fs.existsSync(geoJsonPath)) {
+      logger.info('📄 Usando pvo.geojson (sin aliases, generándolos dinamicamente)');
+      const geojson = JSON.parse(fs.readFileSync(geoJsonPath, 'utf8'));
+      const features = geojson.features || [];
+
+      puestosData = features.map((feature) => {
+        const props = feature.properties;
+        const nombre = props.PVONOMBRE || '';
+
+        // Crear aliases
+        const aliases = [nombre];
+
+        const nombreSimple = nombre
+          .replace(/^Colegio\s+/i, '')
+          .replace(/^Escuela\s+/i, '')
+          .replace(/^Centro\s+/i, '')
+          .replace(/\s+-\s+Sede\s+[A-Z]\d*$/i, '')
+          .trim();
+
+        if (nombreSimple !== nombre && nombreSimple.length > 3) {
+          aliases.push(nombreSimple);
+        }
+
+        aliases.push(props.LOCNOMBRE);
+
+        if (props.PVONSITIO && props.PVONSITIO !== nombre) {
+          aliases.push(props.PVONSITIO);
+        }
+
+        return {
+          codigoPuesto: props.PVOCODIGO,
+          nombre: nombre,
+          localidad: props.LOCNOMBRE,
+          codigoLocalidad: props.LOCCODIGO,
+          direccion: props.PVODIRECCI || '',
+          sitio: props.PVONSITIO || '',
+          numeroMesas: parseInt(props.PVONPUESTO) || 1,
+          mesas: Array.from({ length: parseInt(props.PVONPUESTO) || 1 }, (_, i) => ({
+            numero: i + 1,
+            activa: true
+          })),
+          aliases: [...new Set(aliases)],
+          activo: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+      });
+    } else {
+      logger.error('❌ No se encontraron archivos de puestos');
       return;
     }
 
-    const geojson = JSON.parse(fs.readFileSync(geoJsonPath, 'utf8'));
-    const features = geojson.features || [];
-
-    logger.info(`🔄 Procesando ${features.length} puestos desde GeoJSON...`);
-
-    // Procesar features
-    const puestosProcessados = features.map((feature) => {
-      const props = feature.properties;
-      const nombre = props.PVONOMBRE || '';
-
-      // Crear aliases
-      const aliases = [nombre];
-
-      const nombreSimple = nombre
-        .replace(/^Colegio\s+/i, '')
-        .replace(/^Escuela\s+/i, '')
-        .replace(/^Centro\s+/i, '')
-        .replace(/\s+-\s+Sede\s+[A-Z]\d*$/i, '')
-        .trim();
-
-      if (nombreSimple !== nombre && nombreSimple.length > 3) {
-        aliases.push(nombreSimple);
-      }
-
-      aliases.push(props.LOCNOMBRE);
-
-      if (props.PVONSITIO && props.PVONSITIO !== nombre) {
-        aliases.push(props.PVONSITIO);
-      }
-
-      return {
-        codigoPuesto: props.PVOCODIGO,
-        nombre: nombre,
-        localidad: props.LOCNOMBRE,
-        codigoLocalidad: props.LOCCODIGO,
-        direccion: props.PVODIRECCI || '',
-        sitio: props.PVONSITIO || '',
-        numeroMesas: parseInt(props.PVONPUESTO) || 1,
-        mesas: Array.from({ length: parseInt(props.PVONPUESTO) || 1 }, (_, i) => ({
-          numero: i + 1,
-          activa: true
-        })),
-        aliases: [...new Set(aliases)],
-        activo: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-    });
+    logger.info(`🔄 Procesando ${puestosData.length} puestos...`);
 
     // Importar
-    logger.info(`📥 Importando ${puestosProcessados.length} puestos...`);
-    await Puestos.insertMany(puestosProcessados, { ordered: false });
+    logger.info(`📥 Importando ${puestosData.length} puestos...`);
+    await Puestos.insertMany(puestosData, { ordered: false });
 
-    logger.info(`✅ Importación completada: ${puestosProcessados.length} puestos en BD`);
+    logger.info(`✅ Importación completada: ${puestosData.length} puestos en BD`);
 
     // Verificar específicos
     const salitre = await Puestos.findOne({ nombre: /salitre/i });
