@@ -784,9 +784,16 @@ export async function verifyLeaderRegistrations(req, res) {
       return res.status(403).json({ error: "Solo líderes pueden ejecutar esta verificación" });
     }
 
-    const leader = await Leader.findOne({
-      $or: [{ leaderId }, { _id: leaderId }]
-    }).lean();
+    // Buscar líder - validar que leaderId no sea un ObjectId inválido
+    let leader = null;
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(leaderId);
+    if (isValidObjectId) {
+      leader = await Leader.findOne({
+        $or: [{ leaderId }, { _id: new mongoose.Types.ObjectId(leaderId) }]
+      }).lean();
+    } else {
+      leader = await Leader.findOne({ leaderId }).lean();
+    }
 
     if (!leader) return res.status(404).json({ error: "Líder no encontrado" });
 
@@ -832,6 +839,7 @@ export async function verifyLeaderRegistrations(req, res) {
     };
 
     const corrections = [];
+    const bulkOps = [];
 
     for (const reg of registrations) {
       const updates = {};
@@ -904,7 +912,14 @@ export async function verifyLeaderRegistrations(req, res) {
       }
 
       updates.updatedAt = new Date();
-      await Registration.updateOne({ _id: reg._id }, { $set: updates });
+      
+      // Agregar operación a bulk
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: new mongoose.Types.ObjectId(reg._id.toString()) },
+          update: { $set: updates }
+        }
+      });
 
       summary.updated++;
       if (hasCorrections) summary.corrected++;
@@ -919,6 +934,16 @@ export async function verifyLeaderRegistrations(req, res) {
       }
     }
 
+    // Ejecutar bulk operations si hay algo que actualizar
+    if (bulkOps.length > 0) {
+      try {
+        await Registration.bulkWrite(bulkOps);
+      } catch (bulkError) {
+        logger.error("Bulk write error:", bulkError);
+        throw bulkError;
+      }
+    }
+
     res.json({
       success: true,
       threshold,
@@ -926,11 +951,17 @@ export async function verifyLeaderRegistrations(req, res) {
       corrections: corrections.slice(0, 50)
     });
   } catch (error) {
-    logger.error("Error verifying leader registrations:", error);
+    logger.error("Error verifying leader registrations:", {
+      message: error.message,
+      stack: error.stack,
+      leaderId: req.params.leaderId,
+      threshold: req.body?.threshold
+    });
     res.status(500).json({
       success: false,
       error: "Error interno al verificar registros",
-      details: error.message
+      details: error.message,
+      code: error.code
     });
   }
 }
