@@ -140,6 +140,16 @@ export class RegistrationsManager {
         }
     }
 
+    static changePage(delta) {
+        const totalPages = Math.ceil(this.filteredRegistrations.length / this.itemsPerPage);
+        const nextPage = this.currentPage + delta;
+
+        if (nextPage < 1 || nextPage > totalPages) return;
+
+        this.currentPage = nextPage;
+        this.renderRegistrations();
+    }
+
     static async toggleConfirm(id, currentStatus) {
         try {
             const endpoint = currentStatus 

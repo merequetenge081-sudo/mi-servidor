@@ -226,7 +226,15 @@ export function matchPuesto(input, puestos, threshold = 0.80, localidadFiltro = 
 
     let similarity = 0;
     for (const candidate of candidates) {
-      const candidateSimilarity = calculateSimilarity(input, candidate);
+      let candidateSimilarity = calculateSimilarity(input, candidate);
+      const normalizedCandidate = normalizeString(candidate);
+
+      if (normalizedInput.length >= 4) {
+        if (normalizedCandidate.includes(normalizedInput) || normalizedInput.includes(normalizedCandidate)) {
+          candidateSimilarity = Math.max(candidateSimilarity, 0.9);
+        }
+      }
+
       if (candidateSimilarity > similarity) {
         similarity = candidateSimilarity;
       }
