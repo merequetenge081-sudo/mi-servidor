@@ -420,7 +420,10 @@ if (document.readyState !== 'loading') {
     document.addEventListener('DOMContentLoaded', () => ModalsModule.init());
 }
 
-// Export
+// Export to window
+window.ModalsModule = ModalsModule;
+
+// Export for CommonJS
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ModalsModule;
 }

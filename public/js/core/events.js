@@ -145,10 +145,14 @@ const Events = (() => {
             if (genPassBtn) {
                 closeAllActionMenus();
                 if (genPassBtn.dataset.canGenerate === 'false') {
-                    Helpers.showAlert('Solo puedes generar una nueva contraseña si el líder la solicita.', 'warning');
+                    if (typeof Helpers !== 'undefined' && Helpers.showAlert) {
+                        Helpers.showAlert('Solo puedes generar una nueva contraseña si el líder la solicita.', 'warning');
+                    }
                     return;
                 }
-                LeadersModule.openResetPassModal(genPassBtn.dataset.leaderId);
+                if (typeof LeadersModule !== 'undefined' && LeadersModule.openResetPassModal) {
+                    LeadersModule.openResetPassModal(genPassBtn.dataset.leaderId);
+                }
                 return;
             }
 
@@ -174,7 +178,11 @@ const Events = (() => {
             const qrBtn = target.closest('.qr-btn');
             if (qrBtn) {
                 closeAllActionMenus();
-                ModalsModule.showQR(qrBtn.dataset.leaderId, qrBtn.dataset.leaderName);
+                if (typeof ModalsModule !== 'undefined' && ModalsModule.showQR) {
+                    ModalsModule.showQR(qrBtn.dataset.leaderId, qrBtn.dataset.leaderName);
+                } else {
+                    console.warn('[Events] ModalsModule.showQR not available');
+                }
                 return;
             }
 

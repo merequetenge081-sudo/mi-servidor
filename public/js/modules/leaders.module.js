@@ -24,11 +24,20 @@ const LeadersModule = (() => {
 
     // ====== HELPERS ======
     function showAlert(message, type = 'info') {
-        return ModalsModule.showAlert(message, type);
+        if (typeof ModalsModule !== 'undefined' && ModalsModule.showAlert) {
+            return ModalsModule.showAlert(message, type);
+        }
+        // Fallback to simple alert
+        alert(message);
+        return Promise.resolve(true);
     }
 
     function showConfirm(message) {
-        return ModalsModule.showConfirm(message);
+        if (typeof ModalsModule !== 'undefined' && ModalsModule.showConfirm) {
+            return ModalsModule.showConfirm(message);
+        }
+        // Fallback to confirm
+        return Promise.resolve(confirm(message));
     }
 
     // ====== INITIALIZATION ======
