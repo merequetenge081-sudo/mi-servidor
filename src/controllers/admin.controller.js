@@ -6,6 +6,12 @@
 
 import { Puestos } from "../models/index.js";
 import logger from "../config/logger.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Datos de ejemplo
 const PUESTOS_BOGOTA_EJEMPLO = [
@@ -114,6 +120,152 @@ export async function importarPuestosAPIHandler(req, res) {
       success: false,
       message: "Error al importar puestos",
       error: error.message
+    });
+  }
+}
+
+/**
+ * Importar puestos desde GeoJSON oficial (965 puestos Bogotá)
+ * POST /api/admin/import-geojson-puestos
+ * Requiere: JWT con role "admin"
+ */
+export async function importarPuestosDesdeGeoJSON(req, res) {
+  try {
+    logger.info("🔄 Iniciando importación desde GeoJSON...");
+
+    // Leer GeoJSON
+    const geoJsonPath = path.join(__dirname, "../../tools/pvo.geojson");
+    if (!fs.existsSync(geoJsonPath)) {
+      logger.error(`GeoJSON no encontrado: ${geoJsonPath}`);
+      return res.status(400).json({
+        success: false,
+        error: `GeoJSON no encontrado: ${geoJsonPath}`
+      });
+    }
+
+    const geojson = JSON.parse(fs.readFileSync(geoJsonPath, "utf8"));
+    const features = geojson.features || [];
+
+    logger.info(`📊 Procesando ${features.length} puestos desde GeoJSON`);
+
+    // Procesar features
+    const puestosProcessados = features.map((feature) => {
+      const props = feature.properties;
+      const nombre = props.PVONOMBRE || "";
+
+      // Crear aliases automáticos
+      const aliases = [nombre];
+
+      const nombreSimple = nombre
+        .replace(/^Colegio\s+/i, "")
+        .replace(/^Escuela\s+/i, "")
+        .replace(/^Centro\s+/i, "")
+        .replace(/\s+-\s+Sede\s+[A-Z]\d*$/i, "")
+        .trim();
+
+      if (nombreSimple !== nombre && nombreSimple.length > 3) {
+        aliases.push(nombreSimple);
+      }
+
+      aliases.push(props.LOCNOMBRE);
+
+      if (props.PVONSITIO && props.PVONSITIO !== nombre) {
+        aliases.push(props.PVONSITIO);
+      }
+
+      return {
+        codigoPuesto: props.PVOCODIGO,
+        nombre: nombre,
+        localidad: props.LOCNOMBRE,
+        codigoLocalidad: props.LOCCODIGO,
+        direccion: props.PVODIRECCI || "",
+        sitio: props.PVONSITIO || "",
+        numeroMesas: parseInt(props.PVONPUESTO) || 1,
+        mesas: Array.from({ length: parseInt(props.PVONPUESTO) || 1 }, (_, i) => ({
+          numero: i + 1,
+          activa: true
+        })),
+        aliases: [...new Set(aliases)],
+        activo: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+    });
+
+    logger.info(`📋 Procesados ${puestosProcessados.length} puestos`);
+
+    // Backup si hay puestos
+    const countActuales = await Puestos.countDocuments();
+    if (countActuales > 0) {
+      const backup = await Puestos.find().lean();
+      const backupFile = path.join(__dirname, `../../tools/puestos-backup-${Date.now()}.json`);
+      fs.writeFileSync(backupFile, JSON.stringify(backup, null, 2));
+      logger.info(`💾 Backup guardado: ${backupFile}`);
+    }
+
+    // Limpiar colección
+    logger.info("🧹 Limpiando colección anterior");
+    await Puestos.deleteMany({});
+
+    // Importar
+    logger.info(`📥 Importando ${puestosProcessados.length} puestos...`);
+    const resultado = await Puestos.insertMany(puestosProcessados, { ordered: false });
+    logger.info(`✅ Importados: ${resultado.length} puestos`);
+
+    // Estadísticas
+    const stats = await Puestos.aggregate([
+      {
+        $group: {
+          _id: "$localidad",
+          count: { $sum: 1 },
+          totalMesas: { $sum: "$numeroMesas" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Verificaciones específicas
+    const salitre = await Puestos.findOne({ nombre: /salitre/i });
+    const provinma = await Puestos.findOne({ nombre: /provinma/i });
+
+    const response = {
+      success: true,
+      message: "✅ Importación completada exitosamente",
+      data: {
+        totalPuestos: puestosProcessados.length,
+        totalMesas: stats.reduce((sum, s) => sum + s.totalMesas, 0),
+        totalLocalidades: stats.length,
+        estadisticasLocalidades: stats,
+        verificacion: {
+          salitreEncontrado: !!salitre,
+          salitreDetalles: salitre
+            ? {
+                nombre: salitre.nombre,
+                localidad: salitre.localidad,
+                codigo: salitre.codigoPuesto
+              }
+            : null,
+          provinmaEncontrado: !!provinma,
+          provinmaDetalles: provinma
+            ? {
+                nombre: provinma.nombre,
+                localidad: provinma.localidad,
+                codigo: provinma.codigoPuesto
+              }
+            : null
+        },
+        timestamp: new Date().toISOString()
+      }
+    };
+
+    logger.info("✅ Importación completada");
+    res.json(response);
+  } catch (error) {
+    logger.error(`❌ Error en importación GeoJSON: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      details: error.stack
     });
   }
 }

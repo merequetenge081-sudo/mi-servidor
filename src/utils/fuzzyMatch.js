@@ -148,19 +148,29 @@ export function matchCapital(input, threshold = 0.80) {
  * @param {string} input - Nombre del puesto de entrada
  * @param {Array<Object>} puestos - Array de objetos puesto con campo 'nombre'
  * @param {number} threshold - Umbral de similitud
+ * @param {string} localidadFiltro - Opcional: filtrar por localidad específica
  * @returns {Object|null} - El puesto matched o null
  */
-export function matchPuesto(input, puestos, threshold = 0.80) {
+export function matchPuesto(input, puestos, threshold = 0.80, localidadFiltro = null) {
   if (!input || !puestos || puestos.length === 0) return null;
 
   const normalizedInput = normalizeString(input);
+  
+  // Intenta extraer número local (ej: "44 - Escuela" → numero = 44)
+  const localNumberMatch = input.toString().match(/^\s*(\d+)\s*[-–\s]/);
+  const localNumber = localNumberMatch ? parseInt(localNumberMatch[1]) : null;
+  
+  // También intenta extraer código PVOCODIGO (ej: "160010101" o "44" como código)
   const codeMatch = input.toString().match(/^\s*(\d+)\s*[-–]/);
   const inputCode = codeMatch ? codeMatch[1] : null;
+  
   const normalizeCode = (value) => {
     if (!value) return '';
     return value.toString().trim().replace(/^0+/, '') || '0';
   };
-  if (inputCode) {
+
+  // Estrategia 1: Buscar por PVOCODIGO exacto
+  if (inputCode && inputCode.length >= 9) {
     const normalizedCode = normalizeCode(inputCode);
     const codeHit = puestos.find((puesto) => {
       const puestoCode = normalizeCode(puesto.codigoPuesto);
@@ -174,6 +184,31 @@ export function matchPuesto(input, puestos, threshold = 0.80) {
         original: input,
         corrected: normalizeString(codeHit.nombre) !== normalizedInput
       };
+    }
+  }
+  
+  // Estrategia 2: Buscar por número local dentro de localidad (ej: "44" en Usaquén)
+  if (localNumber && localidadFiltro) {
+    const puestosLocalidad = puestos.filter(p => 
+      p.localidad && p.localidad.toLowerCase() === localidadFiltro.toLowerCase()
+    );
+    
+    if (puestosLocalidad.length > 0) {
+      // Buscar puesto que contenga este número en el nombre o en metadatos
+      const localNumberHit = puestosLocalidad.find(p => {
+        const nombreMatch = p.nombre.match(/^(\d+)\s*[-–]/);
+        return nombreMatch && parseInt(nombreMatch[1]) === localNumber;
+      });
+      
+      if (localNumberHit) {
+        return {
+          puesto: localNumberHit,
+          similarity: 1,
+          original: input,
+          corrected: false,
+          source: 'local_number_match'
+        };
+      }
     }
   }
   

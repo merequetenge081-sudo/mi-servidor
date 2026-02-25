@@ -217,6 +217,7 @@ router.post("/puestos/import", authMiddleware, roleMiddleware("admin"), puestosC
 // Admin - Importación vía API (para Render Free sin SSH)
 router.post("/admin/import-puestos", authMiddleware, roleMiddleware("admin"), adminController.importarPuestosAPIHandler);
 router.post("/admin/import-puestos-simple", authMiddleware, roleMiddleware("admin"), importarPuestosSimpleHandler);
+router.post("/admin/import-geojson-puestos", authMiddleware, roleMiddleware("admin"), adminController.importarPuestosDesdeGeoJSON);
 
 // ==================== LÍDERES ====================
 router.post("/leaders", authMiddleware, roleMiddleware("admin"), leaderController.createLeader);

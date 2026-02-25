@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import { initMemoryAuth } from "./utils/authFallback.js";
 import logger from "./config/logger.js";
 import { startTempPasswordCleanup } from "./services/tempPasswordCleanup.service.js";
+import { initializePuestosIfEmpty } from "./utils/initializePuestos.js";
 
 async function startServer() {
   try {
@@ -40,6 +41,9 @@ async function startServer() {
 
     // Conectar a MongoDB antes del listen
     await connectDB();
+
+    // Inicializar puestos si la colección está vacía
+    await initializePuestosIfEmpty();
 
     startTempPasswordCleanup();
 
