@@ -182,7 +182,6 @@ const Events = (() => {
                     ModalsModule.showQR(qrBtn.dataset.leaderId, qrBtn.dataset.leaderName);
                 } else {
                     // Fallback: Generate QR directly
-                    console.warn('[Events] ModalsModule.showQR not available, using fallback');
                     const leaderId = qrBtn.dataset.leaderId;
                     const qrContainer = document.getElementById('qrCode');
                     

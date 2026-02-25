@@ -216,8 +216,6 @@ const ModalsModule = {
      * Muestra QR code de líder
      */
     showQR(leaderId, leaderName) {
-        console.log('[ModalsModule] showQR called', { leaderId, leaderName });
-        
         const qrContainer = document.getElementById('qrCode');
         if (!qrContainer) {
             console.error('[ModalsModule] qrCode container not found');
@@ -254,7 +252,6 @@ const ModalsModule = {
         if (typeof QRCode !== 'undefined') {
             try {
                 new QRCode(qrContainer, { text: link, width: 250, height: 250 });
-                console.log('[ModalsModule] QR code generated successfully');
             } catch (e) {
                 console.error('[ModalsModule] Error generating QR:', e);
                 qrContainer.textContent = 'Error generando QR: ' + e.message;
@@ -265,7 +262,6 @@ const ModalsModule = {
         }
 
         this.openModal('qrModal');
-        console.log('[ModalsModule] QR modal opened');
     },
 
     /**
@@ -302,7 +298,6 @@ const ModalsModule = {
         try {
             const isDark = document.body.classList.toggle('dark-mode');
             localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-            console.log('[ModalsModule] Dark mode toggled:', isDark ? 'ON' : 'OFF');
             
             // Apply smooth transition
             document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
@@ -341,13 +336,11 @@ const ModalsModule = {
      * Toggle help drawer
      */
     toggleHelpDrawer() {
-        console.log('[ModalsModule] toggleHelpDrawer called');
         try {
             const drawer = document.getElementById('helpDrawer');
             const overlay = document.getElementById('helpOverlay');
 
             if (!drawer || !overlay) {
-                console.warn('[ModalsModule] Help drawer elements not found', { drawer: !!drawer, overlay: !!overlay });
                 if (typeof Helpers !== 'undefined' && Helpers.showAlert) {
                     Helpers.showAlert('La ayuda está en construcción', 'info');
                 } else {
@@ -355,17 +348,13 @@ const ModalsModule = {
                 }
                 return;
             }
-
-            console.log('[ModalsModule] Help elements found, toggling');
             const isActive = drawer.classList.contains('active');
 
             this.closeNotificationsDropdown();
 
             if (isActive) {
-                console.log('[ModalsModule] Closing help drawer');
                 this.closeHelpDrawer();
             } else {
-                console.log('[ModalsModule] Opening help drawer');
                 // Cierra otros dropdowns primero
                 this.closeNotificationsDropdown();
                 
@@ -378,8 +367,6 @@ const ModalsModule = {
                 setTimeout(() => {
                     this.updateHelpContent();
                 }, 50);
-                
-                console.log('[ModalsModule] Help drawer opened');
             }
         } catch (e) {
             console.error('[ModalsModule] Error toggling help drawer:', e);
@@ -408,7 +395,6 @@ const ModalsModule = {
                 overlay.classList.remove('active');
                 overlay.setAttribute('aria-hidden', 'true');
             }
-            console.log('[ModalsModule] Help drawer closed');
         } catch (e) {
             console.error('[ModalsModule] Error closing help drawer:', e);
         }
