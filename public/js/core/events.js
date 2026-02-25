@@ -181,7 +181,37 @@ const Events = (() => {
                 if (typeof ModalsModule !== 'undefined' && ModalsModule.showQR) {
                     ModalsModule.showQR(qrBtn.dataset.leaderId, qrBtn.dataset.leaderName);
                 } else {
-                    console.warn('[Events] ModalsModule.showQR not available');
+                    // Fallback: Generate QR directly
+                    console.warn('[Events] ModalsModule.showQR not available, using fallback');
+                    const leaderId = qrBtn.dataset.leaderId;
+                    const qrContainer = document.getElementById('qrCode');
+                    
+                    if (qrContainer && typeof AppState !== 'undefined' && AppState.data && AppState.data.leaders) {
+                        qrContainer.innerHTML = '';
+                        const leader = AppState.data.leaders.find(l => l._id === leaderId);
+                        const token = leader ? (leader.token || leader.leaderId || leaderId) : leaderId;
+                        const link = `${window.location.origin}/form.html?token=${token}`;
+                        
+                        const linkInput = document.getElementById('qrLink');
+                        if (linkInput) linkInput.value = link;
+                        
+                        if (typeof QRCode !== 'undefined') {
+                            try {
+                                new QRCode(qrContainer, { text: link, width: 250, height: 250 });
+                            } catch (e) {
+                                console.error('[Events] Error generating QR:', e);
+                                qrContainer.textContent = 'Error: ' + e.message;
+                            }
+                        } else {
+                            qrContainer.textContent = 'Error: Librería QR no cargada';
+                        }
+                        
+                        const modal = document.getElementById('qrModal');
+                        if (modal) modal.classList.add('active');
+                    } else {
+                        console.error('[Events] Cannot generate QR: missing dependencies');
+                        alert('Error: No se puede generar el código QR');
+                    }
                 }
                 return;
             }
