@@ -203,7 +203,13 @@ const Events = (() => {
             // Close modal buttons
             const closeModalBtn = target.closest('[data-close-modal]');
             if (closeModalBtn) {
-                ModalsModule.closeModal(closeModalBtn.dataset.closeModal);
+                const modalId = closeModalBtn.dataset.closeModal;
+                if (typeof ModalsModule !== 'undefined' && ModalsModule.closeModal) {
+                    ModalsModule.closeModal(modalId);
+                } else {
+                    const modal = document.getElementById(modalId);
+                    if (modal) modal.classList.remove('active');
+                }
                 return;
             }
 
@@ -330,7 +336,14 @@ const Events = (() => {
 
             // Sidebar toggle
             if (target.closest('.sidebar-toggle-main') || target.closest('.sidebar-overlay')) {
-                ModalsModule.toggleSidebar();
+                if (typeof ModalsModule !== 'undefined' && ModalsModule.toggleSidebar) {
+                    ModalsModule.toggleSidebar();
+                } else {
+                    const sidebar = document.getElementById('sidebar');
+                    const overlay = document.querySelector('.sidebar-overlay');
+                    if (sidebar) sidebar.classList.toggle('active');
+                    if (overlay) overlay.classList.toggle('active');
+                }
                 return;
             }
 
@@ -338,7 +351,13 @@ const Events = (() => {
             if (target.closest('.theme-toggle')) {
                 e.stopPropagation();
                 e.preventDefault();
-                ModalsModule.toggleDarkMode();
+                if (typeof ModalsModule !== 'undefined' && ModalsModule.toggleDarkMode) {
+                    ModalsModule.toggleDarkMode();
+                } else {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+                }
                 return;
             }
 
@@ -346,7 +365,11 @@ const Events = (() => {
             if (target.closest('#notificationsBtn')) {
                 e.stopPropagation();
                 e.preventDefault();
-                ModalsModule.toggleNotificationsDropdown();
+                if (typeof ModalsModule !== 'undefined' && ModalsModule.toggleNotificationsDropdown) {
+                    ModalsModule.toggleNotificationsDropdown();
+                } else if (typeof NotificationsModule !== 'undefined' && NotificationsModule.toggleDropdown) {
+                    NotificationsModule.toggleDropdown();
+                }
                 return;
             }
 
@@ -383,7 +406,13 @@ const Events = (() => {
             if (target.closest('[data-action="open-logout"]')) {
                 e.stopPropagation();
                 e.preventDefault();
-                ModalsModule.openModal('logoutModal');
+                if (typeof ModalsModule !== 'undefined' && ModalsModule.openModal) {
+                    ModalsModule.openModal('logoutModal');
+                } else {
+                    // Fallback directo
+                    const modal = document.getElementById('logoutModal');
+                    if (modal) modal.classList.add('active');
+                }
                 return;
             }
 
