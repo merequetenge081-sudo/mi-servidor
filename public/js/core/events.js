@@ -373,20 +373,7 @@ const Events = (() => {
                 return;
             }
 
-            // Help drawer - PRIMERO el toggle para prevenir bubbling
-            if (target.closest('[data-action="help-toggle"]')) {
-                e.stopPropagation();
-                e.preventDefault();
-                ModalsModule.toggleHelpDrawer();
-                return;
-            }
-
-            if (target.closest('[data-action="help-close"]')) {
-                e.stopPropagation();
-                e.preventDefault();
-                ModalsModule.closeHelpDrawer();
-                return;
-            }
+            // Help drawer handlers moved down to avoid duplication (see line ~458)
 
             // Close send-email modal
             if (target.closest('[data-action="close-send-email"]')) {

@@ -216,16 +216,33 @@ const ModalsModule = {
      * Muestra QR code de líder
      */
     showQR(leaderId, leaderName) {
+        console.log('[ModalsModule] showQR called', { leaderId, leaderName });
+        
         const qrContainer = document.getElementById('qrCode');
         if (!qrContainer) {
             console.error('[ModalsModule] qrCode container not found');
+            if (typeof Helpers !== 'undefined' && Helpers.showAlert) {
+                Helpers.showAlert('Error: Contenedor QR no encontrado', 'error');
+            }
             return;
         }
 
         qrContainer.innerHTML = '';
 
         // Find leader to get token
+        if (!AppState || !AppState.data || !AppState.data.leaders) {
+            console.error('[ModalsModule] AppState.data.leaders not available');
+            if (typeof Helpers !== 'undefined' && Helpers.showAlert) {
+                Helpers.showAlert('Error: Datos de líderes no disponibles', 'error');
+            }
+            return;
+        }
+
         const leader = AppState.data.leaders.find(l => l._id === leaderId);
+        if (!leader) {
+            console.error('[ModalsModule] Leader not found:', leaderId);
+        }
+        
         const token = leader ? (leader.token || leader.leaderId || leaderId) : leaderId;
 
         const API_URL = window.location.origin;
@@ -235,13 +252,20 @@ const ModalsModule = {
 
         // Check if QRCode library is loaded
         if (typeof QRCode !== 'undefined') {
-            new QRCode(qrContainer, { text: link, width: 250, height: 250 });
+            try {
+                new QRCode(qrContainer, { text: link, width: 250, height: 250 });
+                console.log('[ModalsModule] QR code generated successfully');
+            } catch (e) {
+                console.error('[ModalsModule] Error generating QR:', e);
+                qrContainer.textContent = 'Error generando QR: ' + e.message;
+            }
         } else {
             console.error('[ModalsModule] QRCode library not loaded');
             qrContainer.textContent = 'Error: Librería QR no cargada';
         }
 
         this.openModal('qrModal');
+        console.log('[ModalsModule] QR modal opened');
     },
 
     /**
@@ -317,26 +341,31 @@ const ModalsModule = {
      * Toggle help drawer
      */
     toggleHelpDrawer() {
+        console.log('[ModalsModule] toggleHelpDrawer called');
         try {
             const drawer = document.getElementById('helpDrawer');
             const overlay = document.getElementById('helpOverlay');
 
             if (!drawer || !overlay) {
-                console.warn('[ModalsModule] Help drawer elements not found');
+                console.warn('[ModalsModule] Help drawer elements not found', { drawer: !!drawer, overlay: !!overlay });
                 if (typeof Helpers !== 'undefined' && Helpers.showAlert) {
                     Helpers.showAlert('La ayuda está en construcción', 'info');
+                } else {
+                    alert('La ayuda está en construcción');
                 }
                 return;
             }
 
-            console.log('[ModalsModule] Toggling help drawer');
+            console.log('[ModalsModule] Help elements found, toggling');
             const isActive = drawer.classList.contains('active');
 
             this.closeNotificationsDropdown();
 
             if (isActive) {
+                console.log('[ModalsModule] Closing help drawer');
                 this.closeHelpDrawer();
             } else {
+                console.log('[ModalsModule] Opening help drawer');
                 // Cierra otros dropdowns primero
                 this.closeNotificationsDropdown();
                 
@@ -354,6 +383,7 @@ const ModalsModule = {
             }
         } catch (e) {
             console.error('[ModalsModule] Error toggling help drawer:', e);
+            alert('Error abriendo ayuda: ' + e.message);
         }
     }
 
