@@ -332,6 +332,14 @@ const Events = (() => {
                 return;
             }
 
+            // Close send-email modal
+            if (target.closest('[data-action="close-send-email"]')) {
+                e.stopPropagation();
+                e.preventDefault();
+                ModalsModule.closeModal('sendEmailModal');
+                return;
+            }
+
             // Open logout modal
             if (target.closest('[data-action="open-logout"]')) {
                 e.stopPropagation();
