@@ -38,7 +38,12 @@ const normalizeRegistration = (registration) => {
 
 const stripLeadingCode = (value) => {
   if (!value) return '';
-  return value.toString().replace(/^\s*\d+\s*[-–]\s*/g, '').trim();
+  const raw = value.toString();
+  const withHyphen = raw.replace(/^\s*\d+\s*[-–]\s*/g, '').trim();
+  if (withHyphen !== raw.trim()) return withHyphen;
+
+  // Strip leading numeric prefix only when followed by text (avoid PVOCODIGO-only inputs)
+  return raw.replace(/^\s*\d+\s+(?=[A-Za-zÁÉÍÓÚÑáéíóúñ])/g, '').trim();
 };
 
 const resolvePuestoInput = (value) => {
