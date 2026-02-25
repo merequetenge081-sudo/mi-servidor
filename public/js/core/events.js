@@ -20,8 +20,33 @@ const Events = (() => {
 
         console.log('[Events] ✅ Delegador modular inicializado');
         bindGlobalClicks();
+        bindKeyboard();
         bindFilters();
         bindTabs();
+    }
+
+    function bindKeyboard() {
+        document.addEventListener('keydown', (e) => {
+            // ESC key closes modal
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                // Close send-email modal
+                const sendEmailModal = document.getElementById('sendEmailModal');
+                if (sendEmailModal && sendEmailModal.classList.contains('active')) {
+                    e.preventDefault();
+                    sendEmailModal.classList.remove('active');
+                    return;
+                }
+
+                // Close any active modal
+                const activeModals = document.querySelectorAll('.modal-overlay.active');
+                if (activeModals.length > 0) {
+                    e.preventDefault();
+                    activeModals.forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                }
+            }
+        });
     }
 
     function bindGlobalClicks() {
@@ -336,7 +361,13 @@ const Events = (() => {
             if (target.closest('[data-action="close-send-email"]')) {
                 e.stopPropagation();
                 e.preventDefault();
-                ModalsModule.closeModal('sendEmailModal');
+                const modal = document.getElementById('sendEmailModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    if (typeof ModalsModule !== 'undefined' && ModalsModule.closeModal) {
+                        ModalsModule.closeModal('sendEmailModal');
+                    }
+                }
                 return;
             }
 
