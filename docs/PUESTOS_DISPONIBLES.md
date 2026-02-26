@@ -1,6 +1,6 @@
 # Puestos de votacion disponibles (Base de Datos)
 
-Total: 1673
+Total: 1674
 
 | Codigo | Nombre | Localidad | Direccion |
 |---|---|---|---|
@@ -1498,6 +1498,7 @@ Alfonso Reyes Echandía | Bosa | Punto de votación 8 |
 | 1700013 | Tunjuelito B | Tunjuelito | Cl 58 Sur No 12A-45 |
 | 1700009 | Venecia A | Tunjuelito | Kr 55 # 49-25 Sur |
 | 1700012 | Venecia B | Tunjuelito | Dg 49 Sur # 48 - 71 |
+| 0100000-NUEVO | Colegio Eucaristico Villa Guadalupe | Usaquen | Calle 170 #17A-32 |
 | 01100456 | Alessandro Volta | Usaquén | Cll 119 No 4-79 |
 | 001897 | Almacén Carulla Calle 140 - Parqueadero | Usaquén | Punto de votación 1 |
 | 01100014 | Alta Blanca | Usaquén | Calle 159 No. 8-56 |
