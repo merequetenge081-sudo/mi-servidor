@@ -167,18 +167,30 @@
         <!-- Header Controls -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             
-            <!-- Region Toggle -->
-            <div class="flex items-center mb-4 md:mb-0">
-                <span class="mr-3 text-gray-700 font-semibold" id="label-nacional">Nacional</span>
-                <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                    <input type="checkbox" name="toggle" id="region-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10"/>
-                    <label for="region-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-300"></label>
+            <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
+                <!-- Region Toggle -->
+                <div class="flex items-center">
+                    <span class="mr-3 text-gray-700 font-semibold" id="label-nacional">Nacional</span>
+                    <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="toggle" id="region-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10"/>
+                        <label for="region-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-300"></label>
+                    </div>
+                    <span class="ml-3 text-gray-400 font-semibold" id="label-bogota">Bogotá</span>
                 </div>
-                <span class="ml-3 text-gray-400 font-semibold" id="label-bogota">Bogotá</span>
+
+                <!-- Data Status Filter -->
+                <div class="flex items-center">
+                    <label for="data-status-filter" class="mr-2 text-sm font-medium text-gray-700">Mostrar:</label>
+                    <select id="data-status-filter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
+                        <option value="all">Todos los datos</option>
+                        <option value="confirmed">Solo datos confirmados</option>
+                        <option value="unconfirmed">Solo datos sin confirmar</option>
+                    </select>
+                </div>
             </div>
             
             <!-- Simulation Trigger -->
-            <button id="btn-start-simulation" class="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 flex items-center">
+            <button id="btn-start-simulation" class="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 flex items-center mt-4 md:mt-0">
                 <i class="fas fa-play-circle text-2xl mr-2"></i>
                 <span>Iniciar Simulación de Campaña</span>
             </button>
@@ -379,6 +391,7 @@
         const loadingIndicator = document.getElementById('loading-indicator');
         const dashboardContent = document.getElementById('dashboard-content');
         const leaderFilter = document.getElementById('leader-filter');
+        const dataStatusFilter = document.getElementById('data-status-filter');
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -389,6 +402,11 @@
                 currentRegion = e.target.checked ? 'bogota' : 'nacional';
                 updateToggleLabels();
                 renderDashboard();
+            });
+
+            // Data Status Filter Event Listener
+            dataStatusFilter.addEventListener('change', () => {
+                fetchAnalyticsData();
             });
             
             // Leader Filter Event Listener
@@ -419,8 +437,12 @@
         
         async function fetchAnalyticsData() {
             try {
+                loadingIndicator.classList.remove('hidden');
+                dashboardContent.classList.add('hidden');
+
                 const token = localStorage.getItem('token');
-                const response = await fetch('/api/v2/analytics/advanced', {
+                const status = dataStatusFilter.value;
+                const response = await fetch(`/api/v2/analytics/advanced?status=${status}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

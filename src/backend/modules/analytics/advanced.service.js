@@ -29,7 +29,10 @@ export async function runGlobalVerification() {
     
     let matchedCount = 0;
     for (const reg of registrations) {
-      const searchRegex = new RegExp(reg.votingPlace.trim(), 'i');
+      // Escape special regex characters to prevent SyntaxError
+      const safeString = reg.votingPlace.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(safeString, 'i');
+      
       const puesto = await Puestos.findOne({
         $or: [
           { nombre: searchRegex },
@@ -40,7 +43,7 @@ export async function runGlobalVerification() {
       if (puesto) {
         reg.puestoId = puesto._id;
         if (!reg.mesa && reg.votingTable) {
-          const mesaMatch = reg.votingTable.match(/\d+/);
+          const mesaMatch = String(reg.votingTable).match(/\d+/);
           if (mesaMatch) reg.mesa = parseInt(mesaMatch[0], 10);
         }
         await reg.save();
@@ -49,19 +52,25 @@ export async function runGlobalVerification() {
     }
     
     logger.info(`Verificación global completada. ${matchedCount} registros actualizados.`);
-    return { success: true, matchedCount, totalChecked: registrations.length };
+    return { success: true, data: { processed: registrations.length, updated: matchedCount, errors: 0 } };
   } catch (error) {
     logger.error('Error en verificación global', error);
     throw AppError.serverError('Error al ejecutar verificación global');
   }
 }
 
-export async function getAdvancedAnalytics(eventId = null) {
+export async function getAdvancedAnalytics(eventId = null, status = 'all') {
   try {
     const matchQuery = eventId ? { eventId } : {};
+    
+    if (status === 'confirmed') {
+      matchQuery.puestoId = { $ne: null };
+    } else if (status === 'unconfirmed') {
+      matchQuery.puestoId = null;
+    }
 
     const registrations = await Registration.aggregate([
-      { $match: { ...matchQuery, puestoId: { $ne: null } } },
+      { $match: { ...matchQuery } },
       {
         $lookup: {
           from: 'puestos',
@@ -70,7 +79,11 @@ export async function getAdvancedAnalytics(eventId = null) {
           as: 'puesto'
         }
       },
-      { $unwind: '$puesto' }
+      {
+        $addFields: {
+          puesto: { $arrayElemAt: ['$puesto', 0] }
+        }
+      }
     ]);
 
     const data = {
@@ -79,10 +92,11 @@ export async function getAdvancedAnalytics(eventId = null) {
     };
 
     registrations.forEach(reg => {
-      const region = isBogota(reg.departamento, reg.puesto.localidad) ? 'bogota' : 'nacional';
-      const loc = reg.puesto.localidad || 'Desconocida';
-      const puestoName = reg.puesto.nombre;
-      const mesa = reg.mesa || 'Sin Mesa';
+      const isBogotaRegion = isBogota(reg.departamento, reg.puesto?.localidad || reg.localidad);
+      const region = isBogotaRegion ? 'bogota' : 'nacional';
+      const loc = reg.puesto?.localidad || reg.localidad || 'Desconocida';
+      const puestoName = reg.puesto?.nombre || reg.votingPlace || 'Desconocido';
+      const mesa = reg.mesa || reg.votingTable || 'Sin Mesa';
       const leader = reg.leaderName || 'Desconocido';
 
       if (!data[region].topPuestos[puestoName]) data[region].topPuestos[puestoName] = { count: 0, localidad: loc };
