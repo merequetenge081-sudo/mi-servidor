@@ -233,6 +233,17 @@ export function matchPuesto(input, puestos, threshold = 0.80, localidadFiltro = 
         if (normalizedCandidate.includes(normalizedInput) || normalizedInput.includes(normalizedCandidate)) {
           candidateSimilarity = Math.max(candidateSimilarity, 0.9);
         }
+        
+        // Nueva lógica: Si todas las palabras clave del candidato están en el input (o viceversa)
+        const inputWords = normalizedInput.split(' ').filter(w => w.length > 2);
+        const candidateWords = normalizedCandidate.split(' ').filter(w => w.length > 2);
+        
+        if (inputWords.length > 0 && candidateWords.length > 0) {
+          const allCandidateWordsInInput = candidateWords.every(cw => normalizedInput.includes(cw));
+          if (allCandidateWordsInInput) {
+            candidateSimilarity = Math.max(candidateSimilarity, 0.85);
+          }
+        }
       }
 
       if (candidateSimilarity > similarity) {
