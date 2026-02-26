@@ -22,9 +22,9 @@ const isBogota = (departamento, localidad) => {
   return false;
 };
 
-export async function validateAndFixLocation(registrationId) {
+export async function validateAndFixLocation(registrationId, providedReg = null, providedPuesto = null) {
   try {
-    const reg = await Registration.findById(registrationId);
+    const reg = providedReg || await Registration.findById(registrationId);
     if (!reg) throw new Error('Registro no encontrado');
     
     if (!reg.puestoId) {
@@ -37,7 +37,7 @@ export async function validateAndFixLocation(registrationId) {
       };
     }
 
-    const puesto = await Puestos.findById(reg.puestoId);
+    const puesto = providedPuesto || await Puestos.findById(reg.puestoId);
     if (!puesto) throw new Error('Puesto no encontrado');
 
     let score = 40; // Coincidencia de puestoId
@@ -126,42 +126,55 @@ export async function runGlobalVerification(eventId = null) {
     const unassignedRegistrations = await Registration.find(unassignedQuery);
     let matchedCount = 0;
     
-    for (const reg of unassignedRegistrations) {
-      const safeString = reg.votingPlace.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const searchRegex = new RegExp(safeString, 'i');
-      
-      const puesto = await Puestos.findOne({
-        $or: [
-          { nombre: searchRegex },
-          { aliases: searchRegex }
-        ]
-      });
+    // Procesar en lotes
+    const unassignedBatchSize = 50;
+    for (let i = 0; i < unassignedRegistrations.length; i += unassignedBatchSize) {
+      const batch = unassignedRegistrations.slice(i, i + unassignedBatchSize);
+      await Promise.all(batch.map(async (reg) => {
+        const safeString = reg.votingPlace.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const searchRegex = new RegExp(safeString, 'i');
+        
+        const puesto = await Puestos.findOne({
+          $or: [
+            { nombre: searchRegex },
+            { aliases: searchRegex }
+          ]
+        });
 
-      if (puesto) {
-        reg.puestoId = puesto._id;
-        if (!reg.mesa && reg.votingTable) {
-          const mesaMatch = String(reg.votingTable).match(/\d+/);
-          if (mesaMatch) reg.mesa = parseInt(mesaMatch[0], 10);
+        if (puesto) {
+          reg.puestoId = puesto._id;
+          if (!reg.mesa && reg.votingTable) {
+            const mesaMatch = String(reg.votingTable).match(/\d+/);
+            if (mesaMatch) reg.mesa = parseInt(mesaMatch[0], 10);
+          }
+          await reg.save();
+          matchedCount++;
         }
-        await reg.save();
-        matchedCount++;
-      }
+      }));
     }
     
     // 2. Ejecutar validación inteligente para todos los que tienen puestoId
     const assignedQuery = { ...baseQuery, puestoId: { $ne: null } };
-    const assignedRegistrations = await Registration.find(assignedQuery);
+    const assignedRegistrations = await Registration.find(assignedQuery).populate('puestoId');
     let autoCorrectedCount = 0;
     let needsReviewCount = 0;
     let severeInconsistencyCount = 0;
 
-    for (const reg of assignedRegistrations) {
-      const result = await validateAndFixLocation(reg._id);
-      if (result.success) {
-        if (result.autoCorrected) autoCorrectedCount++;
-        else if (result.needsReview) needsReviewCount++;
-        else severeInconsistencyCount++;
-      }
+    // Procesar en lotes para evitar timeouts
+    const batchSize = 50;
+    for (let i = 0; i < assignedRegistrations.length; i += batchSize) {
+      const batch = assignedRegistrations.slice(i, i + batchSize);
+      await Promise.all(batch.map(async (reg) => {
+        const puesto = reg.puestoId;
+        if (!puesto) return;
+        
+        const result = await validateAndFixLocation(reg._id, reg, puesto);
+        if (result.success) {
+          if (result.autoCorrected) autoCorrectedCount++;
+          else if (result.needsReview) needsReviewCount++;
+          else severeInconsistencyCount++;
+        }
+      }));
     }
     
     logger.info(`Verificación global completada. ${matchedCount} puestos asignados. ${autoCorrectedCount} autocorregidos, ${needsReviewCount} para revisión, ${severeInconsistencyCount} inconsistencias graves.`);
@@ -219,7 +232,7 @@ export async function getAdvancedAnalytics(eventId = null, status = 'all') {
       const isBogotaRegion = isBogota(reg.departamento, reg.puesto?.localidad || reg.localidad);
       const region = isBogotaRegion ? 'bogota' : 'nacional';
       const loc = reg.puesto?.localidad || reg.localidad || 'Desconocida';
-      const puestoName = reg.puesto?.nombre || reg.votingPlace || 'Desconocido';
+      const puestoName = reg.puesto?.nombre || 'Sin Puesto Asignado';
       const mesa = reg.mesa || reg.votingTable || 'Sin Mesa';
       const leader = reg.leaderName || 'Desconocido';
 
@@ -241,6 +254,7 @@ export async function getAdvancedAnalytics(eventId = null, status = 'all') {
 
     const formatRegionData = (regionData) => {
       const topPuestosArr = Object.entries(regionData.topPuestos)
+        .filter(([nombre]) => nombre !== 'Sin Puesto Asignado')
         .map(([nombre, info]) => ({ _id: nombre, totalVotos: info.count, localidad: info.localidad }))
         .sort((a, b) => b.totalVotos - a.totalVotos)
         .slice(0, 15);
@@ -250,21 +264,20 @@ export async function getAdvancedAnalytics(eventId = null, status = 'all') {
         .sort((a, b) => b.totalVotos - a.totalVotos);
 
       const leadersArr = Object.entries(regionData.leadersByLocalidad).map(([loc, leaders]) => {
-        const sortedLeaders = Object.entries(leaders)
-          .map(([name, count]) => ({ liderNombre: name, totalVotos: count }))
-          .sort((a, b) => b.totalVotos - a.totalVotos);
-        return sortedLeaders;
-      }).flat().sort((a, b) => b.totalVotos - a.totalVotos);
+        return Object.entries(leaders).map(([name, count]) => ({ liderNombre: name, totalVotos: count }));
+      }).flat();
       
-      // Remove duplicates from leadersArr
-      const uniqueLeaders = [];
-      const leaderNames = new Set();
+      // Sumar votos del mismo líder en diferentes localidades
+      const leaderTotals = {};
       for (const leader of leadersArr) {
-        if (!leaderNames.has(leader.liderNombre)) {
-          uniqueLeaders.push(leader);
-          leaderNames.add(leader.liderNombre);
+        const name = leader.liderNombre.trim().toUpperCase(); // Normalizar nombre
+        if (!leaderTotals[name]) {
+          leaderTotals[name] = { liderNombre: leader.liderNombre, totalVotos: 0 };
         }
+        leaderTotals[name].totalVotos += leader.totalVotos;
       }
+      
+      const uniqueLeaders = Object.values(leaderTotals).sort((a, b) => b.totalVotos - a.totalVotos);
 
       const jerarquia = Object.entries(regionData.topMesas).map(([localidad, puestos]) => {
         const puestosArr = Object.entries(puestos).map(([puesto, mesas]) => {
