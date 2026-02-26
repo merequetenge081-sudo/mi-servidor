@@ -602,7 +602,7 @@ export async function bulkCreateRegistrations(req, res) {
       if (!reg.firstName || !reg.firstName.trim()) missing.push("Nombre");
       if (!reg.lastName || !reg.lastName.trim()) missing.push("Apellido");
       if (!reg.cedula || !reg.cedula.toString().trim()) missing.push("Cédula");
-      if (!reg.email || !reg.email.trim()) missing.push("Email");
+      // Email es opcional, no lo requerimos
       if (!reg.phone || !reg.phone.toString().trim()) missing.push("Celular");
 
       if (missing.length > 0) {
