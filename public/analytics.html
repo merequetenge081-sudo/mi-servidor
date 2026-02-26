@@ -24,19 +24,138 @@
             height: 300px;
             width: 100%;
         }
+        
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #4F46E5;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #4F46E5;
+        }
+        
+        /* Spotify Wrapped Simulation Styles */
+        #simulation-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1DB954, #191414);
+            z-index: 9999;
+            color: white;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .sim-slide {
+            display: none;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+        }
+        
+        .sim-slide.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .loading-spinner {
+            border: 8px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 8px solid white;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .big-number {
+            font-size: 6rem;
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin: 1rem 0;
+            color: #fff;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: white;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        .sim-btn {
+            background: white;
+            color: #191414;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .sim-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Hierarchical Table Styles */
+        .table-row-locality { background-color: #f8fafc; font-weight: bold; cursor: pointer; }
+        .table-row-puesto { background-color: #ffffff; padding-left: 2rem !important; cursor: pointer; display: none; }
+        .table-row-mesa { background-color: #f1f5f9; padding-left: 4rem !important; display: none; font-size: 0.9em; color: #475569; }
+        
+        .expanded .fa-chevron-right { transform: rotate(90deg); }
+        .chevron-icon { transition: transform 0.2s; display: inline-block; width: 20px; }
     </style>
 </head>
 <body>
-    <nav class="bg-indigo-600 text-white shadow-lg">
+    <nav class="bg-indigo-900 text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <i class="fas fa-chart-pie text-2xl mr-3"></i>
-                    <span class="font-bold text-xl">Análisis Avanzado</span>
+                    <i class="fas fa-chart-pie text-2xl mr-3 text-indigo-300"></i>
+                    <span class="font-bold text-xl tracking-wide">Análisis Avanzado</span>
                 </div>
-                <div>
-                    <a href="/dashboard.html" class="text-white hover:bg-indigo-500 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                        <i class="fas fa-arrow-left mr-2"></i>Volver al Admin
+                <div class="flex items-center space-x-4">
+                    <button id="btn-verify-global" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-md flex items-center">
+                        <i class="fas fa-database mr-2"></i>Verificar Datos
+                    </button>
+                    <a href="/dashboard.html" class="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-indigo-700">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver
                     </a>
                 </div>
             </div>
@@ -45,199 +164,652 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- Simulación de Campaña -->
-        <div class="card bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-            <h2 class="text-2xl font-bold mb-4"><i class="fas fa-rocket mr-2"></i>Simulación de Campaña</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="simulation-container">
-                <div class="text-center p-4 bg-white bg-opacity-20 rounded-lg">
-                    <p class="text-sm uppercase tracking-wide">Total Actual</p>
-                    <p class="text-3xl font-bold" id="sim-current">Cargando...</p>
+        <!-- Header Controls -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            
+            <!-- Region Toggle -->
+            <div class="flex items-center mb-4 md:mb-0">
+                <span class="mr-3 text-gray-700 font-semibold" id="label-nacional">Nacional</span>
+                <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                    <input type="checkbox" name="toggle" id="region-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10"/>
+                    <label for="region-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-300"></label>
                 </div>
-                <div class="text-center p-4 bg-white bg-opacity-20 rounded-lg">
-                    <p class="text-sm uppercase tracking-wide">Proyección 30 Días</p>
-                    <p class="text-3xl font-bold" id="sim-30">Cargando...</p>
-                </div>
-                <div class="text-center p-4 bg-white bg-opacity-20 rounded-lg">
-                    <p class="text-sm uppercase tracking-wide">Proyección 60 Días</p>
-                    <p class="text-3xl font-bold" id="sim-60">Cargando...</p>
-                </div>
-                <div class="text-center p-4 bg-white bg-opacity-20 rounded-lg">
-                    <p class="text-sm uppercase tracking-wide">Crecimiento Diario</p>
-                    <p class="text-3xl font-bold" id="sim-rate">Cargando...</p>
-                </div>
+                <span class="ml-3 text-gray-400 font-semibold" id="label-bogota">Bogotá</span>
             </div>
+            
+            <!-- Simulation Trigger -->
+            <button id="btn-start-simulation" class="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 flex items-center">
+                <i class="fas fa-play-circle text-2xl mr-2"></i>
+                <span>Iniciar Simulación de Campaña</span>
+            </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-indigo-600 mb-4"></i>
+            <p class="text-gray-600 font-medium">Cargando datos analíticos...</p>
+        </div>
+
+        <!-- Dashboard Content (Hidden until loaded) -->
+        <div id="dashboard-content" class="hidden">
             
-            <!-- Puestos más concurridos -->
-            <div class="card">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                    <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>Puestos de Votación Más Concurridos
-                </h3>
-                <div class="chart-container">
-                    <canvas id="puestosChart"></canvas>
+            <!-- Top Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-blue-100 text-sm font-semibold uppercase tracking-wider">Total Votos</p>
+                            <h3 class="text-4xl font-bold mt-1" id="stat-total-votos">0</h3>
+                        </div>
+                        <i class="fas fa-users text-5xl opacity-20"></i>
+                    </div>
+                </div>
+                <div class="card bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-emerald-100 text-sm font-semibold uppercase tracking-wider">Total Puestos</p>
+                            <h3 class="text-4xl font-bold mt-1" id="stat-total-puestos">0</h3>
+                        </div>
+                        <i class="fas fa-map-marker-alt text-5xl opacity-20"></i>
+                    </div>
+                </div>
+                <div class="card bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-purple-100 text-sm font-semibold uppercase tracking-wider">Total Líderes</p>
+                            <h3 class="text-4xl font-bold mt-1" id="stat-total-lideres">0</h3>
+                        </div>
+                        <i class="fas fa-user-tie text-5xl opacity-20"></i>
+                    </div>
                 </div>
             </div>
 
-            <!-- Localidades con más votos -->
-            <div class="card">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                    <i class="fas fa-city text-blue-500 mr-2"></i>Localidades con Más Votos
-                </h3>
-                <div class="chart-container">
-                    <canvas id="localidadesChart"></canvas>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Puestos Chart -->
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-chart-bar text-indigo-500 mr-2"></i>Top 10 Puestos de Votación
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="puestosChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Mesas con más votos -->
-            <div class="card">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                    <i class="fas fa-table text-green-500 mr-2"></i>Mesas con Más Votos
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puesto</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mesa</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Votos</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200" id="mesas-table-body">
-                            <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">Cargando datos...</td></tr>
-                        </tbody>
-                    </table>
+                <!-- Localidades Chart -->
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-chart-pie text-pink-500 mr-2"></i>Distribución por Localidad/Municipio
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="localidadesChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Líderes por Localidad -->
-            <div class="card">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
-                    <i class="fas fa-users text-purple-500 mr-2"></i>Líderes Destacados por Localidad
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localidad</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mejor Líder</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Votos del Líder</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200" id="leaders-table-body">
-                            <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">Cargando datos...</td></tr>
-                        </tbody>
-                    </table>
+                <!-- Hierarchical Table: Localidad -> Puesto -> Mesa -->
+                <div class="card lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex justify-between items-center">
+                        <span><i class="fas fa-sitemap text-green-500 mr-2"></i>Estructura de Votación (Jerárquica)</span>
+                        <span class="text-sm font-normal text-gray-500">Clic para expandir</span>
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200" id="hierarchical-table">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ubicación</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Votos</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="hierarchical-table-body">
+                                <!-- Rows will be generated here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
+                <!-- Top Leaders Table -->
+                <div class="card lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            <i class="fas fa-star text-yellow-500 mr-2"></i>Top Líderes
+                        </h3>
+                        <div class="relative">
+                            <input type="text" id="leader-filter" placeholder="Filtrar líder..." class="pl-8 pr-4 py-1 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <i class="fas fa-search absolute left-3 top-2 text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Líder</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Votos Aportados</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="leaders-table-body">
+                                <!-- Rows will be generated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Spotify Wrapped Style Simulation Overlay -->
+    <div id="simulation-overlay">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="sim-progress"></div>
+        </div>
+        
+        <!-- Slide 1: Loading -->
+        <div class="sim-slide active" id="slide-loading">
+            <div class="loading-spinner mb-8"></div>
+            <h2 class="text-3xl font-bold mb-2">Analizando datos de campaña...</h2>
+            <p class="text-xl opacity-80">Calculando proyecciones y tendencias</p>
+        </div>
+        
+        <!-- Slide 2: Intro -->
+        <div class="sim-slide" id="slide-intro">
+            <h2 class="text-4xl font-bold mb-4">Tu Campaña en Resumen</h2>
+            <p class="text-2xl opacity-90 mb-8">Hemos analizado todos los datos hasta hoy.</p>
+            <i class="fas fa-chart-line text-6xl mb-8" style="animation: pulse 2s infinite;"></i>
+            <p class="text-xl">Prepárate para ver los resultados...</p>
+        </div>
+        
+        <!-- Slide 3: Current Status -->
+        <div class="sim-slide" id="slide-current">
+            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">Hasta el momento tienes</p>
+            <div class="big-number text-green-400" id="sim-val-current">0</div>
+            <p class="text-3xl font-bold">Votos Asegurados</p>
+            <p class="mt-6 text-xl opacity-80">¡Un excelente punto de partida!</p>
+        </div>
+        
+        <!-- Slide 4: Growth Rate -->
+        <div class="sim-slide" id="slide-rate">
+            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">Tu ritmo de crecimiento es de</p>
+            <div class="big-number text-blue-400" id="sim-val-rate">0</div>
+            <p class="text-3xl font-bold">Votos por Día</p>
+            <div class="mt-8 flex items-center justify-center space-x-4">
+                <i class="fas fa-fire text-4xl text-orange-500"></i>
+                <p class="text-xl">La campaña está en movimiento</p>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Projection 30 Days -->
+        <div class="sim-slide" id="slide-proj30">
+            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">En 30 días alcanzarás</p>
+            <div class="big-number text-purple-400" id="sim-val-30">0</div>
+            <p class="text-3xl font-bold">Votos Proyectados</p>
+            <p class="mt-6 text-xl opacity-80">Manteniendo el ritmo actual</p>
+        </div>
+        
+        <!-- Slide 6: Projection 60 Days -->
+        <div class="sim-slide" id="slide-proj60">
+            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">Y para el día de las elecciones (60 días)</p>
+            <div class="big-number text-yellow-400" id="sim-val-60">0</div>
+            <p class="text-3xl font-bold">Votos Totales Estimados</p>
+            <i class="fas fa-trophy text-6xl text-yellow-400 mt-8" style="animation: pulse 2s infinite;"></i>
+        </div>
+        
+        <!-- Slide 7: Outro -->
+        <div class="sim-slide" id="slide-outro">
+            <h2 class="text-5xl font-bold mb-6">¡Sigue así!</h2>
+            <p class="text-2xl mb-8">Cada voto cuenta. El trabajo en equipo de tus líderes está dando frutos.</p>
+            <button class="sim-btn" onclick="closeSimulation()">Volver al Panel</button>
+        </div>
+        
+        <!-- Navigation hints -->
+        <div class="absolute bottom-8 left-0 w-full text-center opacity-50 text-sm tracking-widest uppercase" id="sim-hint">
+            Toca para continuar
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        // Global State
+        let analyticsData = null;
+        let currentRegion = 'nacional'; // 'nacional' or 'bogota'
+        let charts = {};
+        
+        // DOM Elements
+        const toggleCheckbox = document.getElementById('region-toggle');
+        const labelNacional = document.getElementById('label-nacional');
+        const labelBogota = document.getElementById('label-bogota');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const dashboardContent = document.getElementById('dashboard-content');
+        const leaderFilter = document.getElementById('leader-filter');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAnalyticsData();
+            
+            // Toggle Event Listener
+            toggleCheckbox.addEventListener('change', (e) => {
+                currentRegion = e.target.checked ? 'bogota' : 'nacional';
+                updateToggleLabels();
+                renderDashboard();
+            });
+            
+            // Leader Filter Event Listener
+            leaderFilter.addEventListener('input', (e) => {
+                renderLeadersTable(e.target.value);
+            });
+            
+            // Verify Global Button
+            document.getElementById('btn-verify-global').addEventListener('click', runGlobalVerification);
+            
+            // Simulation Button
+            document.getElementById('btn-start-simulation').addEventListener('click', startSimulation);
+        });
+        
+        function updateToggleLabels() {
+            if (currentRegion === 'bogota') {
+                labelBogota.classList.remove('text-gray-400');
+                labelBogota.classList.add('text-indigo-600');
+                labelNacional.classList.remove('text-indigo-600');
+                labelNacional.classList.add('text-gray-400');
+            } else {
+                labelNacional.classList.remove('text-gray-400');
+                labelNacional.classList.add('text-indigo-600');
+                labelBogota.classList.remove('text-indigo-600');
+                labelBogota.classList.add('text-gray-400');
+            }
+        }
+        
+        async function fetchAnalyticsData() {
             try {
                 const token = localStorage.getItem('token');
-                if (!token) {
-                    window.location.href = '/login.html';
-                    return;
-                }
-
                 const response = await fetch('/api/v2/analytics/advanced', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
-                if (!response.ok) throw new Error('Error al cargar datos');
-
+                
+                if (!response.ok) throw new Error('Error fetching data');
+                
                 const result = await response.json();
-                const data = result.data;
-
-                // 1. Simulación
-                document.getElementById('sim-current').textContent = data.simulation.currentTotal;
-                document.getElementById('sim-30').textContent = data.simulation.projected30Days;
-                document.getElementById('sim-60').textContent = data.simulation.projected60Days;
-                document.getElementById('sim-rate').textContent = `+${data.simulation.dailyGrowthRate}/día`;
-
-                // 2. Gráfico de Puestos
-                const ctxPuestos = document.getElementById('puestosChart').getContext('2d');
-                new Chart(ctxPuestos, {
-                    type: 'bar',
-                    data: {
-                        labels: data.topPuestos.map(p => p.nombre.substring(0, 20) + '...'),
-                        datasets: [{
-                            label: 'Votos',
-                            data: data.topPuestos.map(p => p.count),
-                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                            borderColor: 'rgb(239, 68, 68)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } }
-                    }
-                });
-
-                // 3. Gráfico de Localidades
-                const ctxLocalidades = document.getElementById('localidadesChart').getContext('2d');
-                new Chart(ctxLocalidades, {
-                    type: 'doughnut',
-                    data: {
-                        labels: data.topLocalidades.map(l => l._id),
-                        datasets: [{
-                            data: data.topLocalidades.map(l => l.count),
-                            backgroundColor: [
-                                '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
-                                '#6366f1', '#ec4899', '#14b8a6', '#f97316', '#06b6d4'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'right' }
-                        }
-                    }
-                });
-
-                // 4. Tabla de Mesas
-                const mesasBody = document.getElementById('mesas-table-body');
-                mesasBody.innerHTML = data.topMesas.map(m => `
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${m.puestoNombre}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">Mesa ${m.mesa}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                ${m.count} votos
-                            </span>
-                        </td>
-                    </tr>
-                `).join('');
-
-                // 5. Tabla de Líderes por Localidad
-                const leadersBody = document.getElementById('leaders-table-body');
-                leadersBody.innerHTML = data.leadersByLocalidad.map(l => `
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${l._id}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${l.topLeader || 'Desconocido'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                                ${l.maxVotes} votos
-                            </span>
-                        </td>
-                    </tr>
-                `).join('');
-
+                if (result.success) {
+                    analyticsData = result.data;
+                    loadingIndicator.classList.add('hidden');
+                    dashboardContent.classList.remove('hidden');
+                    updateToggleLabels();
+                    renderDashboard();
+                }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Hubo un error al cargar los datos analíticos.');
+                loadingIndicator.innerHTML = `<div class="text-red-500"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Error al cargar los datos.</p></div>`;
             }
-        });
+        }
+        
+        function renderDashboard() {
+            if (!analyticsData) return;
+            
+            const data = analyticsData[currentRegion];
+            
+            // Update Top Stats
+            document.getElementById('stat-total-votos').textContent = data.totalVotos.toLocaleString();
+            document.getElementById('stat-total-puestos').textContent = data.topPuestos.length.toLocaleString();
+            document.getElementById('stat-total-lideres').textContent = data.topLideres.length.toLocaleString();
+            
+            // Render Charts
+            renderPuestosChart(data.topPuestos);
+            renderLocalidadesChart(data.topLocalidades);
+            
+            // Render Tables
+            renderHierarchicalTable(data.jerarquia);
+            renderLeadersTable();
+        }
+        
+        function renderPuestosChart(puestosData) {
+            const ctx = document.getElementById('puestosChart').getContext('2d');
+            
+            if (charts.puestos) charts.puestos.destroy();
+            
+            const labels = puestosData.slice(0, 10).map(p => p._id || 'Desconocido');
+            const data = puestosData.slice(0, 10).map(p => p.totalVotos);
+            
+            charts.puestos = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Votos',
+                        data: data,
+                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+        
+        function renderLocalidadesChart(localidadesData) {
+            const ctx = document.getElementById('localidadesChart').getContext('2d');
+            
+            if (charts.localidades) charts.localidades.destroy();
+            
+            const labels = localidadesData.slice(0, 8).map(l => l._id || 'Desconocido');
+            const data = localidadesData.slice(0, 8).map(l => l.totalVotos);
+            
+            // Generate colors
+            const colors = [
+                '#ec4899', '#8b5cf6', '#3b82f6', '#10b981', 
+                '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'
+            ];
+            
+            charts.localidades = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, data.length),
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+        
+        function renderHierarchicalTable(jerarquia) {
+            const tbody = document.getElementById('hierarchical-table-body');
+            tbody.innerHTML = '';
+            
+            if (!jerarquia || jerarquia.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">No hay datos disponibles</td></tr>';
+                return;
+            }
+            
+            jerarquia.forEach((loc, locIndex) => {
+                const locId = `loc-${locIndex}`;
+                
+                // Locality Row
+                const trLoc = document.createElement('tr');
+                trLoc.className = 'table-row-locality';
+                trLoc.onclick = () => toggleChildren(locId);
+                trLoc.innerHTML = `
+                    <td class="px-6 py-3 whitespace-nowrap">
+                        <span class="chevron-icon" id="icon-${locId}"><i class="fas fa-chevron-right"></i></span>
+                        <i class="fas fa-city text-blue-500 mr-2"></i>${loc.localidad || 'Desconocida'}
+                    </td>
+                    <td class="px-6 py-3 whitespace-nowrap text-right font-bold text-indigo-600">${loc.totalVotos}</td>
+                `;
+                tbody.appendChild(trLoc);
+                
+                // Puestos Rows
+                if (loc.puestos) {
+                    loc.puestos.forEach((puesto, pIndex) => {
+                        const puestoId = `${locId}-p-${pIndex}`;
+                        
+                        const trPuesto = document.createElement('tr');
+                        trPuesto.className = `table-row-puesto child-of-${locId}`;
+                        trPuesto.onclick = (e) => {
+                            e.stopPropagation();
+                            toggleChildren(puestoId);
+                        };
+                        trPuesto.innerHTML = `
+                            <td class="px-6 py-2 whitespace-nowrap">
+                                <span class="chevron-icon" id="icon-${puestoId}"><i class="fas fa-chevron-right"></i></span>
+                                <i class="fas fa-map-marker-alt text-red-400 mr-2"></i>${puesto.puesto || 'Desconocido'}
+                            </td>
+                            <td class="px-6 py-2 whitespace-nowrap text-right font-semibold">${puesto.totalVotos}</td>
+                        `;
+                        tbody.appendChild(trPuesto);
+                        
+                        // Mesas Rows
+                        if (puesto.mesas) {
+                            puesto.mesas.forEach(mesa => {
+                                const trMesa = document.createElement('tr');
+                                trMesa.className = `table-row-mesa child-of-${puestoId}`;
+                                trMesa.innerHTML = `
+                                    <td class="px-6 py-1 whitespace-nowrap">
+                                        <i class="fas fa-table text-green-400 mr-2"></i>Mesa ${mesa.mesa || 'N/A'}
+                                    </td>
+                                    <td class="px-6 py-1 whitespace-nowrap text-right">${mesa.totalVotos}</td>
+                                `;
+                                tbody.appendChild(trMesa);
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        
+        function toggleChildren(parentId) {
+            const icon = document.getElementById(`icon-${parentId}`);
+            const children = document.querySelectorAll(`.child-of-${parentId}`);
+            
+            let isExpanding = false;
+            
+            if (icon) {
+                icon.classList.toggle('expanded');
+                isExpanding = icon.classList.contains('expanded');
+            }
+            
+            children.forEach(child => {
+                if (isExpanding) {
+                    child.style.display = 'table-row';
+                } else {
+                    child.style.display = 'none';
+                    // If collapsing, also collapse all sub-children
+                    const childIcon = child.querySelector('.chevron-icon');
+                    if (childIcon && childIcon.classList.contains('expanded')) {
+                        childIcon.classList.remove('expanded');
+                        const childId = childIcon.id.replace('icon-', '');
+                        const subChildren = document.querySelectorAll(`.child-of-${childId}`);
+                        subChildren.forEach(sc => sc.style.display = 'none');
+                    }
+                }
+            });
+        }
+        
+        function renderLeadersTable(filterText = '') {
+            if (!analyticsData) return;
+            
+            const data = analyticsData[currentRegion].topLideres;
+            const tbody = document.getElementById('leaders-table-body');
+            tbody.innerHTML = '';
+            
+            const filteredData = data.filter(l => {
+                const name = l.liderNombre ? l.liderNombre.toLowerCase() : 'desconocido';
+                return name.includes(filterText.toLowerCase());
+            });
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">No se encontraron líderes</td></tr>';
+                return;
+            }
+            
+            filteredData.slice(0, 20).forEach(lider => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-3 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                                ${lider.liderNombre ? lider.liderNombre.charAt(0).toUpperCase() : '?'}
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${lider.liderNombre || 'Desconocido'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-3 whitespace-nowrap text-right text-sm font-bold text-gray-900">
+                        ${lider.totalVotos}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // --- Global Verification ---
+        async function runGlobalVerification() {
+            const btn = document.getElementById('btn-verify-global');
+            const originalHtml = btn.innerHTML;
+            
+            try {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verificando...';
+                btn.disabled = true;
+                
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/v2/analytics/verify-global', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Verificación completada.\n\nRegistros procesados: ${result.data.processed}\nActualizados: ${result.data.updated}\nErrores: ${result.data.errors}`);
+                    // Reload data to reflect changes
+                    fetchAnalyticsData();
+                } else {
+                    alert('Error en la verificación: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión al verificar datos.');
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+        
+        // --- Spotify Wrapped Simulation ---
+        let simSlides = [];
+        let currentSlideIndex = 0;
+        let simInterval = null;
+        let simData = null;
+        
+        async function startSimulation() {
+            try {
+                // Fetch simulation data
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/v2/analytics/simulation', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    simData = result.data;
+                    
+                    // Populate data in slides
+                    document.getElementById('sim-val-current').textContent = simData.currentTotal.toLocaleString();
+                    document.getElementById('sim-val-rate').textContent = simData.dailyGrowthRate.toLocaleString();
+                    document.getElementById('sim-val-30').textContent = simData.projection30Days.toLocaleString();
+                    document.getElementById('sim-val-60').textContent = simData.projection60Days.toLocaleString();
+                    
+                    // Setup UI
+                    const overlay = document.getElementById('simulation-overlay');
+                    overlay.style.display = 'flex';
+                    
+                    simSlides = Array.from(document.querySelectorAll('.sim-slide'));
+                    currentSlideIndex = 0;
+                    
+                    showSlide(0);
+                    
+                    // Auto advance loading slide
+                    setTimeout(() => {
+                        nextSlide();
+                        setupSimulationInteraction();
+                    }, 2500);
+                }
+            } catch (error) {
+                console.error('Error starting simulation:', error);
+                alert('No se pudo cargar la simulación.');
+            }
+        }
+        
+        function setupSimulationInteraction() {
+            const overlay = document.getElementById('simulation-overlay');
+            
+            // Click to advance
+            overlay.onclick = (e) => {
+                // Don't advance if clicking the close button
+                if (e.target.tagName === 'BUTTON') return;
+                
+                if (currentSlideIndex > 0 && currentSlideIndex < simSlides.length - 1) {
+                    nextSlide();
+                }
+            };
+            
+            // Auto advance every 5 seconds
+            startAutoAdvance();
+        }
+        
+        function startAutoAdvance() {
+            clearInterval(simInterval);
+            simInterval = setInterval(() => {
+                if (currentSlideIndex > 0 && currentSlideIndex < simSlides.length - 1) {
+                    nextSlide();
+                } else {
+                    clearInterval(simInterval);
+                }
+            }, 5000);
+        }
+        
+        function showSlide(index) {
+            simSlides.forEach(s => s.classList.remove('active'));
+            simSlides[index].classList.add('active');
+            
+            // Update progress bar
+            const progress = ((index) / (simSlides.length - 1)) * 100;
+            document.getElementById('sim-progress').style.width = `${progress}%`;
+            
+            // Hide hint on last slide
+            if (index === simSlides.length - 1) {
+                document.getElementById('sim-hint').style.display = 'none';
+            } else if (index > 0) {
+                document.getElementById('sim-hint').style.display = 'block';
+            }
+            
+            // Change background color based on slide
+            const overlay = document.getElementById('simulation-overlay');
+            const colors = [
+                'linear-gradient(135deg, #1DB954, #191414)', // Loading
+                'linear-gradient(135deg, #8A2387, #E94057, #F27121)', // Intro
+                'linear-gradient(135deg, #11998e, #38ef7d)', // Current
+                'linear-gradient(135deg, #2193b0, #6dd5ed)', // Rate
+                'linear-gradient(135deg, #8E2DE2, #4A00E0)', // 30 days
+                'linear-gradient(135deg, #f12711, #f5af19)', // 60 days
+                'linear-gradient(135deg, #1DB954, #191414)'  // Outro
+            ];
+            
+            if (colors[index]) {
+                overlay.style.background = colors[index];
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlideIndex < simSlides.length - 1) {
+                currentSlideIndex++;
+                showSlide(currentSlideIndex);
+                startAutoAdvance(); // Reset timer
+            }
+        }
+        
+        function closeSimulation() {
+            clearInterval(simInterval);
+            document.getElementById('simulation-overlay').style.display = 'none';
+        }
     </script>
 </body>
 </html>

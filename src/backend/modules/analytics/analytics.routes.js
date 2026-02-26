@@ -25,6 +25,18 @@ router.get('/summary', analyticsController.getSummary);
  * Analíticas avanzadas (público)
  */
 router.get('/advanced', analyticsController.getAdvanced);
+
+/**
+ * GET /api/v2/analytics/simulation
+ * Simulación de campaña (público)
+ */
+router.get('/simulation', analyticsController.getSimulation);
+
+/**
+ * POST /api/v2/analytics/verify-global
+ * Verificación global de matching (protegido)
+ */
+router.post('/verify-global', authMiddleware, analyticsController.runGlobalVerification);
 /**
  * GET /api/v2/analytics/registrations
  * Estadísticas de registraciones (público)

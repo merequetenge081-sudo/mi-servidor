@@ -248,6 +248,41 @@ export async function getAdvanced(req, res, next) {
   }
 }
 
+/**
+ * GET /api/v2/analytics/simulation
+ * Obtiene datos de simulación de campaña
+ */
+export async function getSimulation(req, res, next) {
+  try {
+    const { eventId } = req.query;
+    logger.info('Simulation data request', { eventId });
+
+    const data = await advancedService.getSimulationData(eventId);
+
+    res.json({
+      success: true,
+      message: 'Simulation Data',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/v2/analytics/verify-global
+ * Ejecuta verificación global de matching
+ */
+export async function runGlobalVerification(req, res, next) {
+  try {
+    logger.info('Global verification request');
+    const result = await advancedService.runGlobalVerification();
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   getDashboard,
   getRegistrationStats,
@@ -258,5 +293,7 @@ export default {
   getTrends,
   comparePeriods,
   getSummary,
-  getAdvanced
+  getAdvanced,
+  getSimulation,
+  runGlobalVerification
 };
