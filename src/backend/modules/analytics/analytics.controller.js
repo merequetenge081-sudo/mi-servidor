@@ -6,6 +6,7 @@
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import analyticsService from './analytics.service.js';
+import advancedService from './advanced.service.js';
 
 const logger = createLogger('AnalyticsController');
 
@@ -226,6 +227,27 @@ export async function getSummary(req, res, next) {
   }
 }
 
+/**
+ * GET /api/v2/analytics/advanced
+ * Obtiene analíticas avanzadas para el panel de análisis
+ */
+export async function getAdvanced(req, res, next) {
+  try {
+    const { eventId } = req.query;
+    logger.info('Advanced analytics request', { eventId });
+
+    const data = await advancedService.getAdvancedAnalytics(eventId);
+
+    res.json({
+      success: true,
+      message: 'Advanced Analytics',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   getDashboard,
   getRegistrationStats,
@@ -235,5 +257,6 @@ export default {
   getPuestoStats,
   getTrends,
   comparePeriods,
-  getSummary
+  getSummary,
+  getAdvanced
 };

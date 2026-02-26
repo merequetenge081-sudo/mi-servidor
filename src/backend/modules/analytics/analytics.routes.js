@@ -20,7 +20,11 @@ router.get('/dashboard', analyticsController.getDashboard);
  * Resumen ejecutivo (público)
  */
 router.get('/summary', analyticsController.getSummary);
-
+/**
+ * GET /api/v2/analytics/advanced
+ * Analíticas avanzadas (público)
+ */
+router.get('/advanced', analyticsController.getAdvanced);
 /**
  * GET /api/v2/analytics/registrations
  * Estadísticas de registraciones (público)
