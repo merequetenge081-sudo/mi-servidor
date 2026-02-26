@@ -10,13 +10,37 @@ export class ImportExportManager {
         const reader = new FileReader();
         reader.onload = async (e) => {
             try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                let jsonData = [];
+                
+                // Si es un archivo CSV, intentamos parsearlo manualmente para manejar punto y coma
+                if (file.name.toLowerCase().endsWith('.csv')) {
+                    // Usamos windows-1252 porque Excel en español suele exportar CSVs con esta codificación
+                    const text = new TextDecoder("windows-1252").decode(e.target.result);
+                    // Detectar separador (coma o punto y coma)
+                    const separator = text.includes(';') ? ';' : ',';
+                    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+                    
+                    if (lines.length > 0) {
+                        const headers = lines[0].split(separator).map(h => h.trim());
+                        for (let i = 1; i < lines.length; i++) {
+                            const values = lines[i].split(separator);
+                            const row = {};
+                            headers.forEach((header, index) => {
+                                row[header] = values[index] ? values[index].trim() : '';
+                            });
+                            jsonData.push(row);
+                        }
+                    }
+                } else {
+                    // Para Excel (.xlsx, .xls)
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                }
 
                 if (jsonData.length === 0) {
-                    alert("El archivo está vacío");
+                    alert("El archivo está vacío o no se pudo leer correctamente");
                     input.value = '';
                     return;
                 }
@@ -87,16 +111,44 @@ export class ImportExportManager {
     static mapImportRows(rows) {
         if (!Array.isArray(rows)) return [];
         
-        return rows.map(row => ({
-            firstName: row['Nombre'] || row['nombre'],
-            lastName: row['Apellido'] || row['apellido'],
-            cedula: (row['Cédula'] || row['Cedula'] || row['cedula'] || '').toString().trim(),
-            email: row['Email'] || row['email'],
-            phone: (row['Celular'] || row['Telefono'] || row['celular'] || row['telefono'] || '').toString().trim(),
-            votingTable: row['Mesa'] || row['mesa'],
-            localidad: row['Localidad'] || row['localidad'],
-            votingPlace: row['Puesto Votación'] || row['Puesto Votacion'] || row['puesto_votacion'] || row['Puesto']
-        }));
+        return rows.map(row => {
+            // Normalizar las llaves para ignorar espacios, mayúsculas y caracteres raros
+            const normalizedRow = {};
+            for (const key in row) {
+                if (Object.hasOwnProperty.call(row, key)) {
+                    let normKey = key.toLowerCase()
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                        .replace(/[^a-z0-9]/g, '')
+                        .trim();
+                    normalizedRow[normKey] = row[key];
+                }
+            }
+
+            let firstName = (normalizedRow['nombre'] || normalizedRow['nombres'] || '').toString().trim();
+            let lastName = (normalizedRow['apellido'] || normalizedRow['apellidos'] || '').toString().trim();
+
+            // Si no hay apellido pero el nombre tiene espacios, lo dividimos
+            if (!lastName && firstName && firstName.includes(' ')) {
+                const parts = firstName.split(/\s+/);
+                if (parts.length >= 2) {
+                    // Asumimos que la primera mitad es nombre y la segunda apellido
+                    const half = Math.ceil(parts.length / 2);
+                    firstName = parts.slice(0, half).join(' ');
+                    lastName = parts.slice(half).join(' ');
+                }
+            }
+
+            return {
+                firstName: firstName || 'Desconocido',
+                lastName: lastName || '.', // El backend requiere lastName
+                cedula: (normalizedRow['cedula'] || normalizedRow['cdula'] || normalizedRow['cc'] || '').toString().trim(),
+                email: (normalizedRow['email'] || normalizedRow['correo'] || '').toString().trim(),
+                phone: (normalizedRow['celular'] || normalizedRow['telefono'] || '').toString().trim(),
+                votingTable: (normalizedRow['mesa'] || '').toString().trim(),
+                localidad: (normalizedRow['localidad'] || '').toString().trim(),
+                votingPlace: (normalizedRow['puestovotacion'] || normalizedRow['puesto'] || '').toString().trim()
+            };
+        });
     }
 
     static showImportResults(data) {
