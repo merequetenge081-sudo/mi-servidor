@@ -103,31 +103,64 @@ export async function getAdvancedAnalytics(eventId = null) {
 
     const formatRegionData = (regionData) => {
       const topPuestosArr = Object.entries(regionData.topPuestos)
-        .map(([nombre, info]) => ({ nombre, count: info.count, localidad: info.localidad }))
-        .sort((a, b) => b.count - a.count)
+        .map(([nombre, info]) => ({ _id: nombre, totalVotos: info.count, localidad: info.localidad }))
+        .sort((a, b) => b.totalVotos - a.totalVotos)
         .slice(0, 15);
 
       const topLocalidadesArr = Object.entries(regionData.topLocalidades)
-        .map(([nombre, count]) => ({ _id: nombre, count }))
-        .sort((a, b) => b.count - a.count);
+        .map(([nombre, count]) => ({ _id: nombre, totalVotos: count }))
+        .sort((a, b) => b.totalVotos - a.totalVotos);
 
       const leadersArr = Object.entries(regionData.leadersByLocalidad).map(([loc, leaders]) => {
         const sortedLeaders = Object.entries(leaders)
-          .map(([name, count]) => ({ name, count }))
-          .sort((a, b) => b.count - a.count);
+          .map(([name, count]) => ({ liderNombre: name, totalVotos: count }))
+          .sort((a, b) => b.totalVotos - a.totalVotos);
+        return sortedLeaders;
+      }).flat().sort((a, b) => b.totalVotos - a.totalVotos);
+      
+      // Remove duplicates from leadersArr
+      const uniqueLeaders = [];
+      const leaderNames = new Set();
+      for (const leader of leadersArr) {
+        if (!leaderNames.has(leader.liderNombre)) {
+          uniqueLeaders.push(leader);
+          leaderNames.add(leader.liderNombre);
+        }
+      }
+
+      const jerarquia = Object.entries(regionData.topMesas).map(([localidad, puestos]) => {
+        const puestosArr = Object.entries(puestos).map(([puesto, mesas]) => {
+          const mesasArr = Object.entries(mesas).map(([mesa, count]) => ({
+            mesa,
+            totalVotos: count
+          })).sort((a, b) => b.totalVotos - a.totalVotos);
+          
+          const totalPuesto = mesasArr.reduce((sum, m) => sum + m.totalVotos, 0);
+          
+          return {
+            puesto,
+            totalVotos: totalPuesto,
+            mesas: mesasArr
+          };
+        }).sort((a, b) => b.totalVotos - a.totalVotos);
+        
+        const totalLocalidad = puestosArr.reduce((sum, p) => sum + p.totalVotos, 0);
+        
         return {
-          localidad: loc,
-          topLeader: sortedLeaders[0]?.name,
-          maxVotes: sortedLeaders[0]?.count,
-          allLeaders: sortedLeaders
+          localidad,
+          totalVotos: totalLocalidad,
+          puestos: puestosArr
         };
-      }).sort((a, b) => b.maxVotes - a.maxVotes);
+      }).sort((a, b) => b.totalVotos - a.totalVotos);
+
+      const totalVotos = topLocalidadesArr.reduce((sum, loc) => sum + loc.totalVotos, 0);
 
       return {
+        totalVotos,
         topPuestos: topPuestosArr,
-        topMesas: regionData.topMesas,
-        leadersByLocalidad: leadersArr,
-        topLocalidades: topLocalidadesArr
+        topLocalidades: topLocalidadesArr,
+        topLideres: uniqueLeaders,
+        jerarquia
       };
     };
 
@@ -188,6 +221,10 @@ export async function getSimulationData(eventId = null) {
     ]);
 
     return {
+      currentTotal: totalRegistrations,
+      dailyGrowthRate: Math.round(dailyGrowthRate),
+      projection30Days: Math.round(totalRegistrations + (dailyGrowthRate * 30)),
+      projection60Days: Math.round(totalRegistrations + (dailyGrowthRate * 60)),
       projectedTotal: Math.round(totalRegistrations + (dailyGrowthRate * 60)),
       topLocalidad: topLocAgg[0]?._id || 'Desconocida',
       topPuesto: topMesaAgg[0]?.puesto?.nombre || 'Desconocido',
