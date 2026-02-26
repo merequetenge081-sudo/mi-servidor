@@ -86,13 +86,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 function connectEventListeners(leaderId, leaderData) {
     // ========== SEARCH Y FILTROS ==========
     const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
+    const statusFilter = document.getElementById('filterStatus');
+    const filterRevision = document.getElementById('filterRevision');
 
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value;
             const statusValue = statusFilter ? statusFilter.value : 'todos';
-            RegistrationsManager.applyFilters(searchTerm, statusValue);
+            const revisionValue = filterRevision ? filterRevision.value : 'todos';
+            RegistrationsManager.applyFilters(searchTerm, statusValue, revisionValue);
         });
     }
 
@@ -100,7 +102,17 @@ function connectEventListeners(leaderId, leaderData) {
         statusFilter.addEventListener('change', (e) => {
             const statusValue = e.target.value;
             const searchTerm = searchInput ? searchInput.value : '';
-            RegistrationsManager.applyFilters(searchTerm, statusValue);
+            const revisionValue = filterRevision ? filterRevision.value : 'todos';
+            RegistrationsManager.applyFilters(searchTerm, statusValue, revisionValue);
+        });
+    }
+
+    if (filterRevision) {
+        filterRevision.addEventListener('change', (e) => {
+            const revisionValue = e.target.value;
+            const searchTerm = searchInput ? searchInput.value : '';
+            const statusValue = statusFilter ? statusFilter.value : 'todos';
+            RegistrationsManager.applyFilters(searchTerm, statusValue, revisionValue);
         });
     }
 
@@ -543,7 +555,18 @@ window.confirmLogout = () => AuthManager.confirmLogout();
 window.closeLogoutModal = () => AuthManager.closeLogoutModal();
 
 // Registrations
-window.filtrarRegistrosRevision = () => RegistrationsManager.applyFilters('revision', 'revision');
+window.filtrarRegistrosRevision = () => {
+    const searchInput = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    const filterRevision = document.getElementById('filterRevision');
+    
+    if (searchInput) searchInput.value = '';
+    if (filterStatus) filterStatus.value = '';
+    if (filterRevision) filterRevision.value = 'true';
+    
+    RegistrationsManager.applyFilters('', '', 'true');
+    UIManager.goToView('registrations');
+};
 window.refreshRegistrations = async () => {
     const leaderId = StorageManager.getCurrentLeaderId();
     if (leaderId) {

@@ -189,7 +189,7 @@ export class RegistrationsManager {
         }
     }
 
-    static applyFilters(searchTerm, statusFilter) {
+    static applyFilters(searchTerm, statusFilter, revisionFilter) {
         this.filteredRegistrations = this.myRegistrations.filter(reg => {
             const matchSearch = !searchTerm ||
                 (reg.firstName && reg.firstName.toLowerCase().includes(searchTerm)) ||
@@ -197,12 +197,16 @@ export class RegistrationsManager {
                 (reg.email && reg.email.toLowerCase().includes(searchTerm)) ||
                 (reg.cedula && reg.cedula.toLowerCase().includes(searchTerm));
 
-            const matchStatus = !statusFilter || 
+            const matchStatus = !statusFilter || statusFilter === 'todos' || statusFilter === '' ||
                 (statusFilter === 'confirmed' ? reg.confirmed : !reg.confirmed);
 
-            return matchSearch && matchStatus;
+            const matchRevision = !revisionFilter || revisionFilter === 'todos' || revisionFilter === '' ||
+                (revisionFilter === 'true' ? (reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta) : !(reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta));
+
+            return matchSearch && matchStatus && matchRevision;
         });
 
         this.currentPage = 1;
+        this.renderRegistrations();
     }
 }
