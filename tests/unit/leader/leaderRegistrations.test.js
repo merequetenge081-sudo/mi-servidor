@@ -82,7 +82,7 @@ describe('leaderRegistrations', () => {
             const result = await RegistrationsManager.loadRegistrations('leader-123');
 
             expect(AuthManager.apiCall).toHaveBeenCalledWith(
-                '/api/registrations?leaderId=leader-123&limit=1000'
+                '/api/registrations?leaderId=leader-123&limit=10000'
             );
             expect(result).toHaveLength(2); // Solo los del líder 123
             expect(result[0].firstName).toBe('Juan');

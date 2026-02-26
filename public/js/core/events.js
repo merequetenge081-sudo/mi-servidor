@@ -584,7 +584,7 @@ const Events = (() => {
             RegistrationsModule.applyFilters();
         };
 
-        if (searchInput) searchInput.addEventListener('change', applyRegistrationFilters);
+        if (searchInput) searchInput.addEventListener('input', applyRegistrationFilters);
         if (leaderFilter) leaderFilter.addEventListener('change', applyRegistrationFilters);
         if (statusFilter) statusFilter.addEventListener('change', applyRegistrationFilters);
         if (revisionFilter) revisionFilter.addEventListener('change', applyRegistrationFilters);

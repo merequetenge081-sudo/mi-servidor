@@ -220,7 +220,7 @@ export async function getRegistrations(req, res) {
     const { eventId, leaderId, confirmed, cedula, requiereRevisionPuesto } = req.query;
     const filter = buildOrgFilter(req); // Multi-tenant filtering
 
-    const maxLimit = parseInt(process.env.REGISTRATIONS_MAX_LIMIT, 10) || 2000;
+    const maxLimit = parseInt(process.env.REGISTRATIONS_MAX_LIMIT, 10) || 10000;
     const { page, limit, skip } = parsePagination(req.query, { defaultLimit: 50, maxLimit });
 
     logger.debug('[RegistrationsController] getRegistrations', {

@@ -79,11 +79,12 @@ const RegistrationsModule = (() => {
      */
     function renderTable(tab, data) {
         const itemsPerPage = AppState.constants.ITEMS_PER_PAGE || 5;
-        const currentPage = tab === 'bogota' ? AppState.ui.currentPageBogota : AppState.ui.currentPageResto;
+        let currentPage = tab === 'bogota' ? AppState.ui.currentPageBogota : AppState.ui.currentPageResto;
         const totalPages = Math.ceil(data.length / itemsPerPage) || 1;
 
         // Ajustar página si está fuera de rango
         if (currentPage > totalPages) {
+            currentPage = 1;
             if (tab === 'bogota') {
                 AppState.setUI({ currentPageBogota: 1 });
             } else {

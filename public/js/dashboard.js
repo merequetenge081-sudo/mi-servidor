@@ -346,7 +346,7 @@ async function loadDashboard() {
         const rawLeaders = Array.isArray(leadersData) ? leadersData : (leadersData.data || []);
         allLeaders = processLeaders(rawLeaders);
 
-        const regsRes = await apiCall(`/api/registrations${currentEventId ? '?eventId=' + currentEventId + '&' : '?'}limit=1000`);
+        const regsRes = await apiCall(`/api/registrations${currentEventId ? '?eventId=' + currentEventId + '&' : '?'}limit=10000`);
         const regsData = await regsRes.json();
         allRegistrations = Array.isArray(regsData) ? regsData : (regsData.data || []);
 

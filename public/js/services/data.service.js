@@ -124,7 +124,7 @@ const DataService = {
      */
     async getRegistrations() {
         const { eventId } = AppState.user;
-        const endpoint = `/api/registrations${eventId ? '?eventId=' + eventId + '&' : '?'}limit=2000`;
+        const endpoint = `/api/registrations${eventId ? '?eventId=' + eventId + '&' : '?'}limit=10000`;
         console.log('[DataService] Llamando getRegistrations:', endpoint);
         
         try {
