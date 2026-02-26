@@ -723,7 +723,7 @@
                 btn.disabled = true;
                 
                 const token = localStorage.getItem('token');
-                const eventId = localStorage.getItem('currentEventId');
+                const eventId = localStorage.getItem('eventId') || sessionStorage.getItem('eventId');
                 const url = eventId ? `/api/v2/analytics/verify-global?eventId=${eventId}` : '/api/v2/analytics/verify-global';
                 
                 const response = await fetch(url, {

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const eventId = localStorage.getItem('currentEventId');
+    const eventId = localStorage.getItem('eventId') || sessionStorage.getItem('eventId');
     const token = localStorage.getItem('token');
 
     if (!eventId || !token) {
