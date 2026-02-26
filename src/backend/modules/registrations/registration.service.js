@@ -362,8 +362,8 @@ export class RegistrationService {
         if (!reg.firstName || !reg.firstName.toString().trim()) missing.push("Nombre");
         if (!reg.lastName || !reg.lastName.toString().trim()) missing.push("Apellido");
         if (!reg.cedula || !reg.cedula.toString().trim()) missing.push("Cédula");
-        // Email es opcional
-        if (!reg.phone || !reg.phone.toString().trim()) missing.push("Celular");
+        // Email y Celular son opcionales
+        // if (!reg.phone || !reg.phone.toString().trim()) missing.push("Celular");
 
         if (missing.length > 0) {
           errors.push({
