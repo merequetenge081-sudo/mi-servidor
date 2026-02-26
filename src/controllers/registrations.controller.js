@@ -847,6 +847,27 @@ export async function verifyLeaderRegistrations(req, res) {
       let hasCorrections = false;
       let requiresReview = false;
 
+      // Separar nombre y apellido si están juntos en firstName y lastName está vacío
+      if (reg.firstName && (!reg.lastName || reg.lastName.trim() === '')) {
+        const parts = reg.firstName.trim().split(/\s+/);
+        if (parts.length >= 2) {
+          const mid = Math.ceil(parts.length / 2);
+          const newFirstName = parts.slice(0, mid).join(' ');
+          const newLastName = parts.slice(mid).join(' ');
+          
+          updates.firstName = newFirstName;
+          updates.lastName = newLastName;
+          
+          rowCorrections.push({
+            field: "name",
+            original: reg.firstName,
+            corrected: `${newFirstName} (Nombre) | ${newLastName} (Apellido)`,
+            similarity: "100.0%"
+          });
+          hasCorrections = true;
+        }
+      }
+
       if (reg.localidad) {
         const localidadMatch = matchLocalidad(reg.localidad, threshold);
         if (localidadMatch && localidadMatch.corrected) {
