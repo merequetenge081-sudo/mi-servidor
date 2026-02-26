@@ -52,6 +52,7 @@ const registrationSchema = new mongoose.Schema({
   verificadoAuto: { type: Boolean, default: false },
   necesitaRevision: { type: Boolean, default: false },
   inconsistenciaGrave: { type: Boolean, default: false },
+  importado: { type: Boolean, default: false },
   
   organizationId: { 
     type: String,

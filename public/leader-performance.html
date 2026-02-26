@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rendimiento de Líderes - Panel de Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Inter', sans-serif; }
+        .card { background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); padding: 1.5rem; }
+        .table-container { overflow-x: auto; }
+        .score-positive { color: #10b981; font-weight: bold; }
+        .score-negative { color: #ef4444; font-weight: bold; }
+        .score-neutral { color: #6b7280; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav class="bg-purple-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-users-cog text-2xl mr-3 text-purple-300"></i>
+                    <span class="font-bold text-xl tracking-wide">Rendimiento de Líderes</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/analytics.html" class="text-white hover:bg-purple-700 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-purple-700">
+                        <i class="fas fa-arrow-left mr-2"></i>Volver a Análisis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-purple-600 mb-4"></i>
+            <p class="text-gray-600 font-medium">Calculando métricas de rendimiento...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline" id="error-text"></span>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboard-content" class="hidden">
+            
+            <!-- Top Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Peor Desempeño -->
+                <div class="card border-l-4 border-red-500">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 text-red-500 mr-4">
+                            <i class="fas fa-thumbs-down text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-semibold uppercase">Peor Desempeño</p>
+                            <p class="text-lg font-bold text-gray-800" id="card-peor-nombre">---</p>
+                            <p class="text-xs text-red-600 font-medium" id="card-peor-score">Score: 0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Más Errores -->
+                <div class="card border-l-4 border-orange-500">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-orange-100 text-orange-500 mr-4">
+                            <i class="fas fa-exclamation-triangle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-semibold uppercase">Más Errores</p>
+                            <p class="text-lg font-bold text-gray-800" id="card-errores-nombre">---</p>
+                            <p class="text-xs text-orange-600 font-medium" id="card-errores-count">0 errores</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Más Importaciones -->
+                <div class="card border-l-4 border-blue-500">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
+                            <i class="fas fa-file-import text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-semibold uppercase">Más Importaciones</p>
+                            <p class="text-lg font-bold text-gray-800" id="card-import-nombre">---</p>
+                            <p class="text-xs text-blue-600 font-medium" id="card-import-count">0 registros</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Más Verificaciones -->
+                <div class="card border-l-4 border-green-500">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
+                            <i class="fas fa-check-double text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-semibold uppercase">Más Verificaciones</p>
+                            <p class="text-lg font-bold text-gray-800" id="card-verif-nombre">---</p>
+                            <p class="text-xs text-green-600 font-medium" id="card-verif-count">0 verificados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Ranking General -->
+                <div class="card">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-trophy text-yellow-500 mr-2"></i>Ranking General de Desempeño
+                    </h3>
+                    <div class="table-container">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Líder</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Total</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Errores</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="ranking-table-body">
+                                <!-- Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top por Localidad -->
+                <div class="card">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-map-marked-alt text-blue-500 mr-2"></i>Líderes Top por Localidad
+                    </h3>
+                    <div class="table-container">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Localidad</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Líder Top</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Registros</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="localidad-table-body">
+                                <!-- Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/leaderPerformance.js"></script>
+</body>
+</html>

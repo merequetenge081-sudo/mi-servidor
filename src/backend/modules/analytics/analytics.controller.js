@@ -284,6 +284,21 @@ export async function runGlobalVerification(req, res, next) {
   }
 }
 
+/**
+ * GET /api/v2/analytics/leader-performance
+ * Obtiene el rendimiento avanzado de líderes
+ */
+export async function getLeaderPerformance(req, res, next) {
+  try {
+    const { eventId } = req.query;
+    logger.info(`Leader performance request for event: ${eventId || 'all'}`);
+    const data = await advancedService.getLeaderPerformance(eventId);
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   getDashboard,
   getRegistrationStats,
@@ -296,5 +311,6 @@ export default {
   getSummary,
   getAdvanced,
   getSimulation,
-  runGlobalVerification
+  runGlobalVerification,
+  getLeaderPerformance
 };

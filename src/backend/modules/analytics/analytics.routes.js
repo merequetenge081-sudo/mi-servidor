@@ -33,6 +33,12 @@ router.get('/advanced', analyticsController.getAdvanced);
 router.get('/simulation', analyticsController.getSimulation);
 
 /**
+ * GET /api/v2/analytics/leader-performance
+ * Rendimiento avanzado de líderes (público)
+ */
+router.get('/leader-performance', analyticsController.getLeaderPerformance);
+
+/**
  * POST /api/v2/analytics/verify-global
  * Verificación global de matching (protegido)
  */

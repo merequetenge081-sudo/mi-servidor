@@ -389,9 +389,102 @@ export async function getSimulationData(eventId = null) {
   }
 }
 
+export async function getLeaderPerformance(eventId = null) {
+  try {
+    const matchQuery = eventId ? { eventId } : {};
+
+    // 1. Agrupación general por líder para calcular métricas
+    const leaderStats = await Registration.aggregate([
+      { $match: matchQuery },
+      {
+        $group: {
+          _id: '$leaderId',
+          leaderName: { $first: '$leaderName' },
+          totalRegistros: { $sum: 1 },
+          errores: {
+            $sum: {
+              $cond: [{ $or: ['$necesitaRevision', '$inconsistenciaGrave'] }, 1, 0]
+            }
+          },
+          inconsistenciasGraves: {
+            $sum: { $cond: ['$inconsistenciaGrave', 1, 0] }
+          },
+          importaciones: {
+            $sum: { $cond: ['$importado', 1, 0] }
+          },
+          verificaciones: {
+            $sum: { $cond: ['$verificadoAuto', 1, 0] }
+          }
+        }
+      },
+      {
+        $addFields: {
+          performanceScore: {
+            $add: [
+              { $multiply: ['$totalRegistros', 1] },
+              { $multiply: ['$errores', -2] },
+              { $multiply: ['$inconsistenciasGraves', -3] },
+              { $multiply: ['$verificaciones', 2] }
+            ]
+          }
+        }
+      }
+    ]);
+
+    // Ordenar y extraer top 10 para cada categoría
+    const topErrores = [...leaderStats].sort((a, b) => b.errores - a.errores).slice(0, 10);
+    const topImportaciones = [...leaderStats].sort((a, b) => b.importaciones - a.importaciones).slice(0, 10);
+    const topVerificaciones = [...leaderStats].sort((a, b) => b.verificaciones - a.verificaciones).slice(0, 10);
+    const peorDesempeno = [...leaderStats].sort((a, b) => a.performanceScore - b.performanceScore).slice(0, 10);
+    const rankingGeneral = [...leaderStats].sort((a, b) => b.performanceScore - a.performanceScore);
+
+    // 2. Agrupación por localidad y líder
+    const locLeaderStats = await Registration.aggregate([
+      { $match: { ...matchQuery, localidad: { $ne: null, $ne: '' } } },
+      {
+        $group: {
+          _id: { localidad: '$localidad', leaderId: '$leaderId' },
+          leaderName: { $first: '$leaderName' },
+          totalRegistros: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id.localidad': 1, totalRegistros: -1 } },
+      {
+        $group: {
+          _id: '$_id.localidad',
+          topLeader: { $first: '$leaderName' },
+          totalRegistros: { $first: '$totalRegistros' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          localidad: '$_id',
+          topLeader: 1,
+          totalRegistros: 1
+        }
+      },
+      { $sort: { totalRegistros: -1 } }
+    ]);
+
+    return {
+      topErrores,
+      topImportaciones,
+      topVerificaciones,
+      peorDesempeno,
+      rankingGeneral,
+      topPorLocalidad: locLeaderStats
+    };
+  } catch (error) {
+    logger.error('Error en getLeaderPerformance', error);
+    throw AppError.serverError('Error al obtener rendimiento de líderes');
+  }
+}
+
 export default {
   getAdvancedAnalytics,
   getSimulationData,
   runGlobalVerification,
-  validateAndFixLocation
+  validateAndFixLocation,
+  getLeaderPerformance
 };
