@@ -679,6 +679,37 @@
             });
         }
         
+        // --- Toast Notification ---
+        function showToast(message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed bottom-4 right-4 z-50 flex flex-col gap-2';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0`;
+            toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+
+            // Remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
         // --- Global Verification ---
         async function runGlobalVerification() {
             const btn = document.getElementById('btn-verify-global');
@@ -700,15 +731,17 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert(`Verificación completada.\n\nRegistros procesados: ${result.data.processed}\nActualizados: ${result.data.updated}\nErrores: ${result.data.errors}`);
+                    const d = result.data;
+                    const msg = `Verificación completada.<br>Asignados: ${d.assigned}<br>Autocorregidos: ${d.autoCorrected}<br>Para revisión: ${d.needsReview}<br>Inconsistencias: ${d.severeInconsistency}`;
+                    showToast(msg, 'success');
                     // Reload data to reflect changes
                     fetchAnalyticsData();
                 } else {
-                    alert('Error en la verificación: ' + result.message);
+                    showToast('Error en la verificación: ' + result.message, 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error de conexión al verificar datos.');
+                showToast('Error de conexión al verificar datos.', 'error');
             } finally {
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;

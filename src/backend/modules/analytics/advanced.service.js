@@ -22,14 +22,108 @@ const isBogota = (departamento, localidad) => {
   return false;
 };
 
+export async function validateAndFixLocation(registrationId) {
+  try {
+    const reg = await Registration.findById(registrationId);
+    if (!reg) throw new Error('Registro no encontrado');
+    
+    if (!reg.puestoId) {
+      return {
+        success: false,
+        score: 0,
+        autoCorrected: false,
+        needsReview: false,
+        message: 'No tiene puesto asignado'
+      };
+    }
+
+    const puesto = await Puestos.findById(reg.puestoId);
+    if (!puesto) throw new Error('Puesto no encontrado');
+
+    let score = 40; // Coincidencia de puestoId
+    
+    const normalize = (str) => str ? str.toString().trim().toLowerCase() : '';
+    
+    const regCiudad = normalize(reg.capital);
+    const regDepto = normalize(reg.departamento);
+    const regLoc = normalize(reg.localidad);
+    
+    const puestoCiudad = normalize(puesto.ciudad || 'bogotá');
+    const puestoDepto = normalize(puesto.departamento || 'bogotá d.c.');
+    const puestoLoc = normalize(puesto.localidad);
+
+    const isPuestoBogota = puestoCiudad.includes('bogot') || BOGOTA_LOCALIDADES.some(l => l.toLowerCase() === puestoLoc);
+    
+    // Coincidencia de ciudad -> 20%
+    if (regCiudad === puestoCiudad || (isPuestoBogota && regCiudad.includes('bogot'))) score += 20;
+    
+    // Coincidencia de departamento -> 20%
+    if (regDepto === puestoDepto || (isPuestoBogota && (regDepto.includes('bogot') || regDepto.includes('cundinamarca')))) score += 20;
+    
+    // Coincidencia de localidad -> 20%
+    if (regLoc === puestoLoc) score += 20;
+
+    let autoCorrected = false;
+    let needsReview = false;
+    let message = '';
+
+    reg.verificadoAuto = false;
+    reg.necesitaRevision = false;
+    reg.inconsistenciaGrave = false;
+
+    if (score >= 80) {
+      if (isPuestoBogota) {
+        reg.capital = 'Bogotá';
+        reg.departamento = 'Bogotá D.C.';
+      } else {
+        reg.capital = puesto.ciudad || reg.capital;
+        reg.departamento = puesto.departamento || reg.departamento;
+      }
+      reg.localidad = puesto.localidad;
+      reg.verificadoAuto = true;
+      autoCorrected = true;
+      message = 'Datos corregidos automáticamente';
+    } else if (score >= 60) {
+      reg.localidad = puesto.localidad;
+      reg.necesitaRevision = true;
+      needsReview = true;
+      message = 'Datos parcialmente corregidos. Requiere revisión manual.';
+    } else {
+      reg.inconsistenciaGrave = true;
+      message = 'Inconsistencia detectada. Revisión obligatoria.';
+    }
+
+    await reg.save();
+
+    return {
+      success: true,
+      score,
+      autoCorrected,
+      needsReview,
+      message
+    };
+
+  } catch (error) {
+    logger.error(`Error en validateAndFixLocation para ${registrationId}:`, error);
+    return {
+      success: false,
+      score: 0,
+      autoCorrected: false,
+      needsReview: false,
+      message: error.message
+    };
+  }
+}
+
 export async function runGlobalVerification() {
   try {
     logger.info('Iniciando verificación global de matching...');
-    const registrations = await Registration.find({ puestoId: null, votingPlace: { $ne: null, $ne: '' } });
     
+    // 1. Intentar asignar puestoId a los que no tienen
+    const unassignedRegistrations = await Registration.find({ puestoId: null, votingPlace: { $ne: null, $ne: '' } });
     let matchedCount = 0;
-    for (const reg of registrations) {
-      // Escape special regex characters to prevent SyntaxError
+    
+    for (const reg of unassignedRegistrations) {
       const safeString = reg.votingPlace.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const searchRegex = new RegExp(safeString, 'i');
       
@@ -51,8 +145,34 @@ export async function runGlobalVerification() {
       }
     }
     
-    logger.info(`Verificación global completada. ${matchedCount} registros actualizados.`);
-    return { success: true, data: { processed: registrations.length, updated: matchedCount, errors: 0 } };
+    // 2. Ejecutar validación inteligente para todos los que tienen puestoId
+    const assignedRegistrations = await Registration.find({ puestoId: { $ne: null } });
+    let autoCorrectedCount = 0;
+    let needsReviewCount = 0;
+    let severeInconsistencyCount = 0;
+
+    for (const reg of assignedRegistrations) {
+      const result = await validateAndFixLocation(reg._id);
+      if (result.success) {
+        if (result.autoCorrected) autoCorrectedCount++;
+        else if (result.needsReview) needsReviewCount++;
+        else severeInconsistencyCount++;
+      }
+    }
+    
+    logger.info(`Verificación global completada. ${matchedCount} puestos asignados. ${autoCorrectedCount} autocorregidos, ${needsReviewCount} para revisión, ${severeInconsistencyCount} inconsistencias graves.`);
+    
+    return { 
+      success: true, 
+      data: { 
+        processed: unassignedRegistrations.length + assignedRegistrations.length, 
+        assigned: matchedCount,
+        autoCorrected: autoCorrectedCount,
+        needsReview: needsReviewCount,
+        severeInconsistency: severeInconsistencyCount,
+        errors: 0 
+      } 
+    };
   } catch (error) {
     logger.error('Error en verificación global', error);
     throw AppError.serverError('Error al ejecutar verificación global');
@@ -255,5 +375,6 @@ export async function getSimulationData(eventId = null) {
 export default {
   getAdvancedAnalytics,
   getSimulationData,
-  runGlobalVerification
+  runGlobalVerification,
+  validateAndFixLocation
 };

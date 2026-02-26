@@ -14,6 +14,14 @@ const puestoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  ciudad: {
+    type: String,
+    default: 'Bogotá'
+  },
+  departamento: {
+    type: String,
+    default: 'Bogotá D.C.'
+  },
   direccion: String,
   mesas: [Number], // Array de números de mesa, ej: [1, 2, 3, 4, ...]
   aliases: [String], // Alias conocidos del lugar (sitio, nombres populares)

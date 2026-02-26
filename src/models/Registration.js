@@ -48,6 +48,11 @@ const registrationSchema = new mongoose.Schema({
   requiereRevisionPuesto: { type: Boolean, default: false },
   revisionPuestoResuelta: { type: Boolean, default: false },
   
+  // Nuevos campos para validación inteligente
+  verificadoAuto: { type: Boolean, default: false },
+  necesitaRevision: { type: Boolean, default: false },
+  inconsistenciaGrave: { type: Boolean, default: false },
+  
   organizationId: { 
     type: String,
     required: true,
