@@ -115,12 +115,15 @@ export async function validateAndFixLocation(registrationId) {
   }
 }
 
-export async function runGlobalVerification() {
+export async function runGlobalVerification(eventId = null) {
   try {
-    logger.info('Iniciando verificación global de matching...');
+    logger.info(`Iniciando verificación global de matching... Evento: ${eventId || 'Todos'}`);
+    
+    const baseQuery = eventId ? { eventId } : {};
     
     // 1. Intentar asignar puestoId a los que no tienen
-    const unassignedRegistrations = await Registration.find({ puestoId: null, votingPlace: { $ne: null, $ne: '' } });
+    const unassignedQuery = { ...baseQuery, puestoId: null, votingPlace: { $ne: null, $ne: '' } };
+    const unassignedRegistrations = await Registration.find(unassignedQuery);
     let matchedCount = 0;
     
     for (const reg of unassignedRegistrations) {
@@ -146,7 +149,8 @@ export async function runGlobalVerification() {
     }
     
     // 2. Ejecutar validación inteligente para todos los que tienen puestoId
-    const assignedRegistrations = await Registration.find({ puestoId: { $ne: null } });
+    const assignedQuery = { ...baseQuery, puestoId: { $ne: null } };
+    const assignedRegistrations = await Registration.find(assignedQuery);
     let autoCorrectedCount = 0;
     let needsReviewCount = 0;
     let severeInconsistencyCount = 0;

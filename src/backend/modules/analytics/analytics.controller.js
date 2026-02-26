@@ -275,8 +275,9 @@ export async function getSimulation(req, res, next) {
  */
 export async function runGlobalVerification(req, res, next) {
   try {
-    logger.info('Global verification request');
-    const result = await advancedService.runGlobalVerification();
+    const { eventId } = req.query;
+    logger.info(`Global verification request for event: ${eventId || 'all'}`);
+    const result = await advancedService.runGlobalVerification(eventId);
     res.json(result);
   } catch (error) {
     next(error);
