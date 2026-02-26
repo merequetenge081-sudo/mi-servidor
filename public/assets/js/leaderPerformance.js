@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const eventId = localStorage.getItem('eventId') || sessionStorage.getItem('eventId');
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
     if (!eventId || !token) {
         showError('No hay evento seleccionado o sesión inválida. Por favor, inicie sesión nuevamente.');
