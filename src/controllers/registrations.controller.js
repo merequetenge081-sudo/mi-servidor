@@ -430,7 +430,13 @@ export async function deleteRegistration(req, res) {
     await Registration.deleteOne({ _id: req.params.id });
 
     // Decrement leader registration count
-    await Leader.updateOne({ leaderId }, { $inc: { registrations: -1 } });
+    if (leaderId) {
+      const isValidObjectId = mongoose.Types.ObjectId.isValid(leaderId);
+      await Leader.updateOne(
+        { $or: [{ leaderId: leaderId }, ...(isValidObjectId ? [{ _id: leaderId }] : [])] },
+        { $inc: { registrations: -1 } }
+      );
+    }
 
     await AuditService.log("DELETE", "Registration", req.params.id, user, { cedula: registration.cedula }, `Registro eliminado`);
 
@@ -739,7 +745,7 @@ export async function bulkCreateRegistrations(req, res) {
 
       // Increment leader count
       await Leader.updateOne(
-        { leaderId: leader.leaderId }, 
+        { _id: leader._id }, 
         { $inc: { registrations: insertedCount } }
       );
     }
@@ -1240,8 +1246,10 @@ export async function reviewDeletionRequest(req, res) {
       });
 
       // Actualizar contador del líder
+      const leaderIdForUpdate = deletionRequest.leaderId;
+      const isValidObjectId = mongoose.Types.ObjectId.isValid(leaderIdForUpdate);
       await Leader.updateOne(
-        { leaderId: deletionRequest.leaderId },
+        { $or: [{ leaderId: leaderIdForUpdate }, ...(isValidObjectId ? [{ _id: leaderIdForUpdate }] : [])] },
         { $set: { registrations: 0 } }
       );
 

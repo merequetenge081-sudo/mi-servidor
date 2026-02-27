@@ -128,6 +128,9 @@ export class RegistrationService {
         userAgent: input.userAgent
       });
 
+      // 9. Incrementar contador del líder
+      await Leader.updateOne({ _id: leader._id }, { $inc: { registrations: 1 } });
+
       logger.success("Registration creada", { registrationId: registration._id });
       return registration;
     } catch (error) {
@@ -235,6 +238,17 @@ export class RegistrationService {
       }
 
       await repository.delete(registrationId);
+
+      // Decrementar contador del líder
+      const leaderId = registration.leaderId;
+      if (leaderId) {
+        const { default: mongoose } = await import('mongoose');
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(leaderId);
+        await Leader.updateOne(
+          { $or: [{ leaderId: leaderId }, ...(isValidObjectId ? [{ _id: leaderId }] : [])] },
+          { $inc: { registrations: -1 } }
+        );
+      }
 
       logger.success("Registration eliminada", { registrationId });
     } catch (error) {
@@ -462,6 +476,9 @@ export class RegistrationService {
         // Agregar a validRegistrations
         validRegistrations.push({
           organizationId,
+          leaderId: reg.leaderId || null,
+          leaderName: reg.leaderName || null,
+          eventId: reg.eventId || null,
           firstName: reg.firstName.toString().trim(),
           lastName: reg.lastName.toString().trim(),
           cedula: cedulaStr,
@@ -487,6 +504,23 @@ export class RegistrationService {
       if (validRegistrations.length > 0) {
         await repository.bulkCreate(validRegistrations);
         insertedCount = validRegistrations.length;
+
+        // Update leader counts if leaderId is present
+        const leaderCounts = {};
+        for (const reg of validRegistrations) {
+          if (reg.leaderId) {
+            leaderCounts[reg.leaderId] = (leaderCounts[reg.leaderId] || 0) + 1;
+          }
+        }
+
+        for (const [leaderId, count] of Object.entries(leaderCounts)) {
+          const { default: mongoose } = await import('mongoose');
+          const isValidObjectId = mongoose.Types.ObjectId.isValid(leaderId);
+          await Leader.updateOne(
+            { $or: [{ leaderId: leaderId }, ...(isValidObjectId ? [{ _id: leaderId }] : [])] },
+            { $inc: { registrations: count } }
+          );
+        }
       }
 
       // ========== STEP 6: Log audit ==========

@@ -11272,3 +11272,96 @@
 {"level":"info","message":"Iniciando conexión a MongoDB...","service":"mi-servidor","timestamp":"2026-02-25 03:42:37"}
 {"level":"info","message":"✓ Conectado exitosamente a MongoDB","service":"mi-servidor","timestamp":"2026-02-25 03:42:37"}
 {"level":"info","message":"✅ Puestos ya inicializados: 8 puestos en BD","service":"mi-servidor","timestamp":"2026-02-25 03:42:37"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-26 00:58:12"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-26 00:58:12"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-26 00:58:12"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 00:58:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 00:58:13"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 00:58:13"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 00:58:13"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 00:58:13"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 00:58:13"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 00:58:13"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 00:58:14"}
+{"level":"info","message":"✅ Puestos ya inicializados: 1677 puestos en BD","service":"mi-servidor","timestamp":"2026-02-26 00:58:15"}
+{"intervalMinutes":60,"level":"info","message":"Temp password cleanup scheduled","service":"mi-servidor","timestamp":"2026-02-26 00:58:15"}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/v2/analytics/simulation","requestId":"e79ba409-835f-47a9-a16c-ab261cbdfc0a","service":"mi-servidor","timestamp":"2026-02-26 00:59:50"}
+{"level":"info","message":"[AnalyticsController] Simulation data request","service":"mi-servidor","timestamp":"2026-02-26 00:59:50"}
+{"durationMs":427,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/analytics/simulation","requestId":"e79ba409-835f-47a9-a16c-ab261cbdfc0a","service":"mi-servidor","statusCode":200,"timestamp":"2026-02-26 00:59:51","userId":null,"userRole":null}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/v2/analytics/advanced","requestId":"6f4f4a31-2f9e-4f9f-b7a8-ddcdfd8bc255","service":"mi-servidor","timestamp":"2026-02-26 01:01:21"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-26 01:01:21"}
+{"durationMs":480,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/analytics/advanced","requestId":"6f4f4a31-2f9e-4f9f-b7a8-ddcdfd8bc255","service":"mi-servidor","statusCode":200,"timestamp":"2026-02-26 01:01:21","userId":null,"userRole":null}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-26 01:13:05"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-26 01:13:05"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-26 01:13:05"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 01:13:05"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 01:13:05"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 01:13:05"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 01:13:05"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 01:13:06"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 01:13:06"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 01:13:06"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 01:13:07"}
+{"level":"info","message":"✅ Puestos ya inicializados: 1677 puestos en BD","service":"mi-servidor","timestamp":"2026-02-26 01:13:08"}
+{"intervalMinutes":60,"level":"info","message":"Temp password cleanup scheduled","service":"mi-servidor","timestamp":"2026-02-26 01:13:08"}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/v2/analytics/advanced","requestId":"18981df4-438f-40b4-9401-3c51f37b7125","service":"mi-servidor","timestamp":"2026-02-26 01:14:07"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-26 01:14:07"}
+{"durationMs":489,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/analytics/advanced","requestId":"18981df4-438f-40b4-9401-3c51f37b7125","service":"mi-servidor","statusCode":200,"timestamp":"2026-02-26 01:14:07","userId":null,"userRole":null}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 01:34:04"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 01:34:06"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-26 01:34:44"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-26 01:34:44"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-26 01:34:44"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 01:34:45"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 01:34:45"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 01:34:45"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 01:34:45"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 01:34:45"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 01:34:45"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 01:34:45"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 01:34:46"}
+{"level":"info","message":"✅ Puestos ya inicializados: 1677 puestos en BD","service":"mi-servidor","timestamp":"2026-02-26 01:34:46"}
+{"intervalMinutes":60,"level":"info","message":"Temp password cleanup scheduled","service":"mi-servidor","timestamp":"2026-02-26 01:34:46"}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/v2/analytics/advanced","requestId":"bcb5147b-5839-459d-a96a-f4e17700b926","service":"mi-servidor","timestamp":"2026-02-26 01:37:00"}
+{"level":"info","message":"[AnalyticsController] Advanced analytics request","service":"mi-servidor","timestamp":"2026-02-26 01:37:00"}
+{"durationMs":645,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/analytics/advanced","requestId":"bcb5147b-5839-459d-a96a-f4e17700b926","service":"mi-servidor","statusCode":200,"timestamp":"2026-02-26 01:37:00","userId":null,"userRole":null}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 01:42:08"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 01:42:09"}
+{"level":"info","message":"[AdvancedAnalyticsService] Iniciando verificación global de matching...","service":"mi-servidor","timestamp":"2026-02-26 01:42:09"}
+{"level":"error","message":"[AdvancedAnalyticsService] ❌ Error en verificación global: Invalid regular expression: /C.DTAL.EL SILENCIO(ANT CEB 050/i: Unterminated group","service":"mi-servidor","stack":"SyntaxError: Invalid regular expression: /C.DTAL.EL SILENCIO(ANT CEB 050/i: Unterminated group\n    at new RegExp (<anonymous>)\n    at runGlobalVerification (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/analytics/advanced.service.js:32:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async [eval]:1:185","timestamp":"2026-02-26 01:42:14"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 11:38:11"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 11:38:12"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 12:41:05"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 12:41:06"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-26 13:37:34"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-26 13:37:34"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-26 13:37:34"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 13:37:35"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 13:37:35"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 13:37:35"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 13:37:35"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 13:37:35"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 13:37:35"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 13:37:35"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 13:37:36"}
+{"level":"info","message":"✅ Puestos ya inicializados: 1677 puestos en BD","service":"mi-servidor","timestamp":"2026-02-26 13:37:37"}
+{"intervalMinutes":60,"level":"info","message":"Temp password cleanup scheduled","service":"mi-servidor","timestamp":"2026-02-26 13:37:37"}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/v2/analytics/leader-performance","requestId":"6795f873-ca89-4a59-9e2f-ddd476a7914b","service":"mi-servidor","timestamp":"2026-02-26 13:38:07"}
+{"level":"info","message":"[AnalyticsController] Leader performance request for event: all","service":"mi-servidor","timestamp":"2026-02-26 13:38:07"}
+{"durationMs":158,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/analytics/leader-performance","requestId":"6795f873-ca89-4a59-9e2f-ddd476a7914b","service":"mi-servidor","statusCode":200,"timestamp":"2026-02-26 13:38:07","userId":null,"userRole":null}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-26 16:20:39"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-26 16:20:39"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-26 16:20:39"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 16:20:40"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 16:20:40"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 16:20:40"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-26 16:20:40"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-26 16:20:40"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-26 16:20:40"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-26 16:20:40"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-26 16:20:41"}
+{"level":"info","message":"✅ Puestos ya inicializados: 1677 puestos en BD","service":"mi-servidor","timestamp":"2026-02-26 16:20:42"}
+{"intervalMinutes":60,"level":"info","message":"Temp password cleanup scheduled","service":"mi-servidor","timestamp":"2026-02-26 16:20:42"}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/v2/leaders","requestId":"c1a41664-89e2-419d-b866-88813659d5a7","service":"mi-servidor","timestamp":"2026-02-26 16:21:21"}
+{"error":{"error":{"message":"Token no proporcionado","statusCode":401},"success":false},"level":"warn","message":"[ErrorHandler] ⚠️ GET /api/v2/leaders - 401","requestId":"c1a41664-89e2-419d-b866-88813659d5a7","service":"mi-servidor","timestamp":"2026-02-26 16:21:21"}
+{"durationMs":3,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/leaders","requestId":"c1a41664-89e2-419d-b866-88813659d5a7","service":"mi-servidor","statusCode":401,"timestamp":"2026-02-26 16:21:21","userId":null,"userRole":null}
