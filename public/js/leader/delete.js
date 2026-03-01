@@ -26,7 +26,11 @@ export class DeleteManager {
             if (data.error) {
                 alert('Error: ' + data.error);
             } else {
-                this.closeDeleteConfirmModal();\n\n                if (window.refreshRegistrations) {\n                    await window.refreshRegistrations();\n                }\n\n                return data;
+                this.closeDeleteConfirmModal();
+                if (window.refreshRegistrations) {
+                    await window.refreshRegistrations();
+                }
+                return data;
             }
         } catch (err) {
             console.error(err);

@@ -515,7 +515,11 @@ export class FormManager {
             if (responseData.error) {
                 alert(responseData.error);
             } else {
-                this.closeEditModal();\n\n                  if (window.refreshRegistrations) {\n                      await window.refreshRegistrations();\n                  }\n\n                  return responseData;
+                this.closeEditModal();
+                if (window.refreshRegistrations) {
+                    await window.refreshRegistrations();
+                }
+                return responseData;
             }
         } catch (err) {
             console.error(err);
