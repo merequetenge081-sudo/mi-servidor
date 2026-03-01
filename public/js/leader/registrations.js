@@ -172,7 +172,8 @@ export class RegistrationsManager {
             alert('Error al eliminar registros');
         }
     }
-\n    static renderRow(reg) {
+
+    static renderRow(reg) {
         const statusBadge = reg.confirmed 
             ? '<span class="badge badge-success">✓ Confirmado</span>'
             : '<span class="badge badge-warning">⏱ Pendiente</span>';
