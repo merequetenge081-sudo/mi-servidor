@@ -401,7 +401,7 @@ export async function impersonateLeader(adminUser, adminPassword, leaderId) {
     }
 
     // Verify admin password
-    const isPasswordValid = await authRepository.verifyPassword(adminPassword, adminRec.password);
+    const isPasswordValid = await authRepository.verifyPassword(adminPassword, adminRec.passwordHash);
     if (!isPasswordValid) {
         throw AppError.unauthorized('Contraseña de administrador incorrecta');
     }

@@ -220,7 +220,7 @@ const Helpers = {
      * Show Alert - Compatibility wrapper
      */
     showAlert(message, type = 'info') {
-        return ModalsModule.showAlert(message, type);
+        if (typeof ModalsModule !== "undefined" && ModalsModule.showAlert) { return ModalsModule.showAlert(message, type); } else { const prefix = type === "error" ? "Error: " : ""; alert(prefix + message); }
     },
 
     /**
