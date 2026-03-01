@@ -280,21 +280,62 @@ const Events = (() => {
                           const data = await response.json();
 
                           if (!response.ok) {
-                              throw new Error(data.message || 'Error de autenticación');
-                          }
+                                throw new Error(data.message || 'Error de autenticación');
+                            }
 
-                          closeModal();
-                          if (typeof Helpers !== 'undefined') Helpers.showAlert('Acceso concedido. Redirigiendo...', 'success');
-                          
-                          localStorage.setItem('admin_token', token);
-                          localStorage.setItem('token', data.data.token);
-                          localStorage.setItem('user', JSON.stringify(data.data.user));
+                            // Modificamos el modal para mostrar la redirección bonita
+                              if (modalBox) {
+                                  modalBox.innerHTML = `
+                                      <div class="modal-header" style="border-bottom: 0; padding-bottom: 0;">
+                                          <h3 class="modal-title" style="color: var(--success-color, #10b981); width: 100%; text-align: center;">
+                                              <i class="bi bi-check-circle-fill"></i> ¡Acceso Concedido!
+                                          </h3>
+                                      </div>
+                                      <div class="modal-body" style="text-align: center; padding: 2rem;">
+                                          <div class="spinner" style="border: 4px solid var(--border-color, rgba(0,0,0,0.1)); width: 50px; height: 50px; border-radius: 50%; border-left-color: var(--success-color, #10b981); animation: spin 1s linear infinite; margin: 0 auto 1.5rem;"></div>
+                                          <h4 style="color: var(--text-color, #333); font-weight: 500; margin-bottom: 0.5rem;">Cambiando contexto...</h4>
+                                          <p style="color: var(--text-muted, #666); font-size: 0.95rem;">Redirigiendo al panel del líder.</p>
+                                          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+                                      </div>
+                                  `;
+                              } else {
+                                  closeModal();
+                                  if (typeof Helpers !== 'undefined') Helpers.showAlert('Acceso concedido. Redirigiendo...', 'success');
+                              }
 
-                          setTimeout(() => {
-                              window.location.href = '/leader.html';
-                          }, 1000);
+                              // Limpiar cache anterior para evitar conflictos con sessionStorage
+                              sessionStorage.clear();
 
-                      } catch (err) {
+                              // Configurar variables de sesión
+                              localStorage.setItem('admin_token', token);
+                              sessionStorage.setItem('admin_token', token);
+                              
+                              localStorage.setItem('token', data.data.token);
+                              sessionStorage.setItem('token', data.data.token);
+
+                              localStorage.setItem('role', 'leader'); /* SUPER IMPORTANTE */
+                              sessionStorage.setItem('role', 'leader');
+
+                              const leaderInfo = data.data.leader || data.data.user;
+                              if (leaderInfo) {
+                                  const name = leaderInfo.name;
+                                  const id = leaderInfo.id || leaderInfo._id || leaderInfo.leaderId;
+                                  
+                                  localStorage.setItem('username', name);
+                                  sessionStorage.setItem('username', name);
+                                  
+                                  localStorage.setItem('user', JSON.stringify(leaderInfo));
+                                  sessionStorage.setItem('user', JSON.stringify(leaderInfo));
+                                  
+                                  localStorage.setItem('leaderId', id);
+                                  sessionStorage.setItem('leaderId', id);
+                              }
+
+                              setTimeout(() => {
+                                window.location.href = '/leader.html';
+                            }, 1500);
+
+                        } catch (err) {
                           console.error('Impersonation error:', err);
                           if (typeof Helpers !== 'undefined') Helpers.showAlert(err.message || 'Error al intentar acceder', 'error');
                           btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Acceder';
