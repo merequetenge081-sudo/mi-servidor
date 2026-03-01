@@ -289,10 +289,20 @@
                 </div>
 
                 <div class="table-container">
-                    <table class="modern-table">
+                    
+        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+            <button id="bulkSelectedConfirmBtn" class="btn btn-success" style="display: none; align-items: center; gap: 5px;" onclick="window.registrationsManager.bulkConfirmCurrent()">
+                <i class="bi bi-check-all"></i> Confirmar
+            </button>
+            <button id="bulkSelectedDeleteBtn" class="btn btn-danger" style="display: none; align-items: center; gap: 5px;" onclick="window.registrationsManager.bulkDeleteCurrent()">
+                <i class="bi bi-trash"></i> Eliminar
+            </button>
+        </div>
+        <table class="modern-table">
                         <thead>
                             <tr>
-                                <th>Nombre</th>
+                                <th style="width: 40px; text-align: center;"><input type="checkbox" onchange="window.registrationsManager.toggleSelectAll(this)" id="selectAllCheckbox"></th>
+                                  <th>Nombre</th>
                                 <th>Email</th>
                                 <th>Cédula</th>
                                 <th>Localidad</th>
@@ -305,7 +315,7 @@
                         </thead>
                         <tbody id="registrationsTableBody">
                             <tr>
-                                <td colspan="9" style="text-align: center; padding: 40px;">
+                                <td colspan="10" style="text-align: center; padding: 40px;">
                                     <div class="loading"></div>
                                     <p style="margin-top: 12px; color: var(--text-muted);">Cargando registros...</p>
                                 </td>

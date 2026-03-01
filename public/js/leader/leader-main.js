@@ -567,15 +567,24 @@ window.filtrarRegistrosRevision = () => {
     RegistrationsManager.applyFilters('', '', 'true');
     UIManager.goToView('registrations');
 };
-window.refreshRegistrations = async () => {
+window.refreshRegistrations = async (keepPage = false) => {
     const leaderId = StorageManager.getCurrentLeaderId();
     if (leaderId) {
-        await RegistrationsManager.loadRegistrations(leaderId);
+        await RegistrationsManager.loadRegistrations(leaderId, keepPage);
         RegistrationsManager.renderRegistrations();
         RegistrationsManager.checkRevisionPendiente();
         StatisticsManager.loadStatistics(RegistrationsManager.myRegistrations);
     }
 };
+
+// Auto-refresh every 30 seconds, preserving page
+if (!window.autoRefreshInterval) {
+    window.autoRefreshInterval = setInterval(() => {
+        if (window.refreshRegistrations) {
+            window.refreshRegistrations(true).catch(console.error);
+        }
+    }, 30000);
+}
 window.autoVerifyRegistrations = async () => {
     const leaderId = StorageManager.getCurrentLeaderId();
     if (!leaderId) return;

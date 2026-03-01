@@ -7,8 +7,9 @@ export class RegistrationsManager {
     static filteredRegistrations = [];
     static currentPage = 1;
     static itemsPerPage = 10;
+    static selectedIds = new Set();
 
-    static async loadRegistrations(leaderId) {
+    static async loadRegistrations(leaderId, keepPage = false) {
         try {
             const response = await AuthManager.apiCall(
                 `/api/registrations?leaderId=${leaderId}&limit=1000`
@@ -83,7 +84,95 @@ export class RegistrationsManager {
         this.updatePagination();
     }
 
-    static renderRow(reg) {
+    
+    static getSelectedIds() {
+        if (!this.selectedIds) this.selectedIds = new Set();
+        return Array.from(this.selectedIds);
+    }
+    
+    static toggleSelection(id) {
+        if (!this.selectedIds) this.selectedIds = new Set();
+        if (this.selectedIds.has(id)) {
+            this.selectedIds.delete(id);
+        } else {
+            this.selectedIds.add(id);
+        }
+        this.updateBulkButtons();
+    }
+    
+    static toggleSelectAll(checkbox) {
+        if (!this.selectedIds) this.selectedIds = new Set();
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        
+        if (checkbox.checked) {
+            this.filteredRegistrations.slice(start, end).forEach(reg => this.selectedIds.add(reg._id));
+        } else {
+            this.filteredRegistrations.slice(start, end).forEach(reg => this.selectedIds.delete(reg._id));
+        }
+        this.renderRegistrations();
+        this.updateBulkButtons();
+    }
+    
+    static updateBulkButtons() {
+        if (!this.selectedIds) this.selectedIds = new Set();
+        const hasSelection = this.selectedIds.size > 0;
+        const btnDelete = document.getElementById('bulkSelectedDeleteBtn');
+        const btnConfirm = document.getElementById('bulkSelectedConfirmBtn');
+        
+        if (btnDelete) btnDelete.style.display = hasSelection ? 'inline-block' : 'none';
+        if (btnConfirm) btnConfirm.style.display = hasSelection ? 'inline-block' : 'none';
+        
+        if (hasSelection) {
+            if (btnDelete) btnDelete.innerHTML = `<i class="bi bi-trash"></i> Eliminar (${this.selectedIds.size})`;
+            if (btnConfirm) btnConfirm.innerHTML = `<i class="bi bi-check-all"></i> Confirmar (${this.selectedIds.size})`;
+        }
+    }
+    
+    static async bulkConfirmCurrent() {
+        const ids = this.getSelectedIds();
+        if (ids.length === 0) return;
+        
+        if (!confirm(`¿Estás seguro de confirmar ${ids.length} registros?`)) return;
+        
+        try {
+            let successCount = 0;
+            for (const id of ids) {
+                const res = await window.AuthManager.apiCall(`/api/registrations/${id}/confirm`, { method: 'POST' });
+                if (res.ok) successCount++;
+            }
+            this.selectedIds.clear();
+            this.updateBulkButtons();
+            if (window.refreshRegistrations) await window.refreshRegistrations(true);
+            alert(`${successCount} registros confirmados exitosamente.`);
+        } catch (e) {
+            console.error(e);
+            alert('Error al confirmar registros');
+        }
+    }
+    
+    static async bulkDeleteCurrent() {
+        const ids = this.getSelectedIds();
+        if (ids.length === 0) return;
+        
+        if (!confirm(`¿Estás seguro de ELIMINAR ${ids.length} registros permanentemente?`)) return;
+        
+        try {
+            let successCount = 0;
+            for (const id of ids) {
+                const res = await window.AuthManager.apiCall(`/api/registrations/${id}`, { method: 'DELETE' });
+                if (res.ok) successCount++;
+            }
+            this.selectedIds.clear();
+            this.updateBulkButtons();
+            if (window.refreshRegistrations) await window.refreshRegistrations(true);
+            alert(`${successCount} registros eliminados exitosamente.`);
+        } catch (e) {
+            console.error(e);
+            alert('Error al eliminar registros');
+        }
+    }
+\n    static renderRow(reg) {
         const statusBadge = reg.confirmed 
             ? '<span class="badge badge-success">✓ Confirmado</span>'
             : '<span class="badge badge-warning">⏱ Pendiente</span>';
@@ -92,8 +181,12 @@ export class RegistrationsManager {
             ? '<span class="badge badge-revision">⚠ Revisar puesto</span>'
             : '';
 
+        const isChecked = this.selectedIds && this.selectedIds.has(reg._id) ? 'checked' : '';
         return `
             <tr>
+                <td style="width: 40px; text-align: center;">
+                    <input type="checkbox" onchange="RegistrationsManager.toggleSelection('${reg._id}')" ${isChecked} class="form-check-input">
+                </td>
                 <td>${reg.firstName} ${reg.lastName}</td>
                 <td>${reg.email || ''}</td>
                 <td>${reg.cedula || ''}</td>
