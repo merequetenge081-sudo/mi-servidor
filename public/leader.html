@@ -217,17 +217,13 @@
                         <input type="text" id="searchInput" placeholder="Buscar por nombre, email o cédula...">
                     </div>
 
-                    <select class="filter-select" id="filterStatus">
-                        <option value="">Todos los estados</option>
-                        <option value="confirmed">✓ Confirmados</option>
-                        <option value="pending">⏱ Pendientes</option>
-                    </select>
-
-                    <select class="filter-select" id="filterRevision">
-                        <option value="">Todos (Revisión)</option>
-                        <option value="true">⚠ Requiere revisión</option>
-                        <option value="false">✓ Sin revisión</option>
-                    </select>
+                                          <select class="filter-select" id="unifiedFilter">
+                          <option value="">Todos los registros</option>
+                          <option value="confirmed">✓ Confirmados</option>
+                          <option value="pending">⏱ Pendientes</option>
+                          <option value="needs_review">⚠ Requiere revisión</option>
+                          <option value="no_review">✓ Sin revisión</option>
+                      </select>
 
                     <div class="tooltip-container">
                         <button class="btn-secondary" onclick="refreshRegistrations()">

@@ -282,7 +282,7 @@ export class RegistrationsManager {
         }
     }
 
-    static applyFilters(searchTerm, statusFilter, revisionFilter) {
+    static applyFilters(searchTerm, unifiedFilter) {
         this.filteredRegistrations = this.myRegistrations.filter(reg => {
             const matchSearch = !searchTerm ||
                 (reg.firstName && reg.firstName.toLowerCase().includes(searchTerm)) ||
@@ -290,13 +290,13 @@ export class RegistrationsManager {
                 (reg.email && reg.email.toLowerCase().includes(searchTerm)) ||
                 (reg.cedula && reg.cedula.toLowerCase().includes(searchTerm));
 
-            const matchStatus = !statusFilter || statusFilter === 'todos' || statusFilter === '' ||
-                (statusFilter === 'confirmed' ? reg.confirmed : !reg.confirmed);
+            let matchUnified = true;
+            if (unifiedFilter === 'confirmed') matchUnified = reg.confirmed;
+            else if (unifiedFilter === 'pending') matchUnified = !reg.confirmed;
+            else if (unifiedFilter === 'needs_review') matchUnified = (reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta);
+            else if (unifiedFilter === 'no_review') matchUnified = !(reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta);
 
-            const matchRevision = !revisionFilter || revisionFilter === 'todos' || revisionFilter === '' ||
-                (revisionFilter === 'true' ? (reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta) : !(reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta));
-
-            return matchSearch && matchStatus && matchRevision;
+            return matchSearch && matchUnified;
         });
 
         this.currentPage = 1;

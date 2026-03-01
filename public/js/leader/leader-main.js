@@ -86,36 +86,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 function connectEventListeners(leaderId, leaderData) {
     // ========== SEARCH Y FILTROS ==========
     const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('filterStatus');
-    const filterRevision = document.getElementById('filterRevision');
+    const unifiedFilter = document.getElementById('unifiedFilter');
 
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value;
-            const statusValue = statusFilter ? statusFilter.value : 'todos';
-            const revisionValue = filterRevision ? filterRevision.value : 'todos';
-            RegistrationsManager.applyFilters(searchTerm, statusValue, revisionValue);
+            const filterValue = unifiedFilter ? unifiedFilter.value : '';
+            RegistrationsManager.applyFilters(searchTerm, filterValue);
         });
     }
 
-    if (statusFilter) {
-        statusFilter.addEventListener('change', (e) => {
-            const statusValue = e.target.value;
+    if (unifiedFilter) {
+        unifiedFilter.addEventListener('change', (e) => {
+            const filterValue = e.target.value;
             const searchTerm = searchInput ? searchInput.value : '';
-            const revisionValue = filterRevision ? filterRevision.value : 'todos';
-            RegistrationsManager.applyFilters(searchTerm, statusValue, revisionValue);
+            RegistrationsManager.applyFilters(searchTerm, filterValue);
         });
     }
-
-    if (filterRevision) {
-        filterRevision.addEventListener('change', (e) => {
-            const revisionValue = e.target.value;
-            const searchTerm = searchInput ? searchInput.value : '';
-            const statusValue = statusFilter ? statusFilter.value : 'todos';
-            RegistrationsManager.applyFilters(searchTerm, statusValue, revisionValue);
-        });
-    }
-
     // ========== BOTONES DE VISTA ==========
     const viewButtons = document.querySelectorAll('[data-view-button]');
     viewButtons.forEach(btn => {
@@ -557,14 +544,12 @@ window.closeLogoutModal = () => AuthManager.closeLogoutModal();
 // Registrations
 window.filtrarRegistrosRevision = () => {
     const searchInput = document.getElementById('searchInput');
-    const filterStatus = document.getElementById('filterStatus');
-    const filterRevision = document.getElementById('filterRevision');
-    
+    const unifiedFilter = document.getElementById('unifiedFilter');
+
     if (searchInput) searchInput.value = '';
-    if (filterStatus) filterStatus.value = '';
-    if (filterRevision) filterRevision.value = 'true';
-    
-    RegistrationsManager.applyFilters('', '', 'true');
+    if (unifiedFilter) unifiedFilter.value = 'needs_review';
+
+    RegistrationsManager.applyFilters('', 'needs_review');
     UIManager.goToView('registrations');
 };
 window.refreshRegistrations = async (keepPage = false) => {
