@@ -138,7 +138,7 @@ export class RegistrationsManager {
         try {
             let successCount = 0;
             for (const id of ids) {
-                const res = await window.AuthManager.apiCall(`/api/registrations/${id}/confirm`, { method: 'POST' });
+                const res = await AuthManager.apiCall(`/api/registrations/${id}/confirm`, { method: 'POST' });
                 if (res.ok) successCount++;
             }
             this.selectedIds.clear();
@@ -160,7 +160,7 @@ export class RegistrationsManager {
         try {
             let successCount = 0;
             for (const id of ids) {
-                const res = await window.AuthManager.apiCall(`/api/registrations/${id}`, { method: 'DELETE' });
+                const res = await AuthManager.apiCall(`/api/registrations/${id}`, { method: 'DELETE' });
                 if (res.ok) successCount++;
             }
             this.selectedIds.clear();
@@ -170,6 +170,20 @@ export class RegistrationsManager {
         } catch (e) {
             console.error(e);
             alert('Error al eliminar registros');
+        }
+    }
+
+    static toggleRowMenu(event, id) {
+        event.stopPropagation();
+        
+        // Close other open menus first
+        document.querySelectorAll('.row-action-menu').forEach(menu => {
+            if (menu.id !== `rowMenu-${id}`) menu.style.display = 'none';
+        });
+        
+        const menu = document.getElementById(`rowMenu-${id}`);
+        if (menu) {
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
         }
     }
 
@@ -186,7 +200,7 @@ export class RegistrationsManager {
         return `
             <tr>
                 <td style="width: 40px; text-align: center;">
-                    <input type="checkbox" onchange="RegistrationsManager.toggleSelection('${reg._id}')" ${isChecked} class="form-check-input">
+                    <input type="checkbox" onchange="window.registrationsManager.toggleSelection('${reg._id}')" ${isChecked} class="form-check-input">
                 </td>
                 <td>${reg.firstName} ${reg.lastName}</td>
                 <td>${reg.email || ''}</td>
@@ -196,18 +210,23 @@ export class RegistrationsManager {
                 <td>${reg.votingTable || ''}</td>
                 <td>${formatDate(reg.date)}</td>
                 <td>${statusBadge} ${revisionBadge}</td>
-                <td>
-                    <button class="action-btn action-btn-confirm" onclick="window.registrationsManager.toggleConfirm('${reg._id}', ${reg.confirmed}).then(() => window.refreshRegistrations())" title="${reg.confirmed ? 'Marcar como pendiente' : 'Confirmar'}">
-                        <i class="bi bi-check-circle"></i>
+                <td style="position: relative; text-align: center;">
+                    <button class="btn-icon" onclick="window.registrationsManager.toggleRowMenu(event, '${reg._id}')" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); padding: 5px;">
+                        <i class="bi bi-three-dots-vertical"></i>
                     </button>
-                    <button class="action-btn action-btn-edit" onclick="window.formManager.openEditModal(window.registrationsManager.myRegistrations, '${reg._id}')">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="action-btn action-btn-delete" onclick="window.deleteManager.confirmDelete('${reg._id}')">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div id="rowMenu-${reg._id}" class="row-action-menu" style="display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 160px; z-index: 100; text-align: left; overflow: hidden; padding: 0;">
+                        <button style="width: 100%; padding: 10px 16px; background: none; border: none; border-bottom: 1px solid var(--border); text-align: left; cursor: pointer; color: ${reg.confirmed ? 'var(--warning)' : 'var(--success)'}; font-weight: 500; display: flex; gap: 8px; align-items: center;" onclick="window.registrationsManager.toggleConfirm('${reg._id}', ${reg.confirmed}).then(() => window.refreshRegistrations()); document.getElementById('rowMenu-${reg._id}').style.display = 'none';">
+                            <i class="${reg.confirmed ? 'bi bi-clock-history' : 'bi bi-check-circle'}"></i> ${reg.confirmed ? 'Marcar Pendiente' : 'Confirmar'}
+                        </button>
+                        <button style="width: 100%; padding: 10px 16px; background: none; border: none; border-bottom: 1px solid var(--border); text-align: left; cursor: pointer; color: var(--primary); font-weight: 500; display: flex; gap: 8px; align-items: center;" onclick="window.formManager.openEditModal(window.registrationsManager.myRegistrations, '${reg._id}'); document.getElementById('rowMenu-${reg._id}').style.display = 'none';">
+                            <i class="bi bi-pencil"></i> Editar
+                        </button>
+                        <button style="width: 100%; padding: 10px 16px; background: none; border: none; text-align: left; cursor: pointer; color: var(--danger); font-weight: 500; display: flex; gap: 8px; align-items: center;" onclick="window.deleteManager.confirmDelete('${reg._id}'); document.getElementById('rowMenu-${reg._id}').style.display = 'none';">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </div>
                 </td>
-            </tr>
+              </tr>
         `;
     }
 
