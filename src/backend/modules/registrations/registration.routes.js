@@ -6,7 +6,7 @@
 import express from "express";
 import { RegistrationController } from "./registration.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
-import { roleMiddleware } from "../../middlewares/role.middleware.js";
+import { roleMiddleware, rolesMiddleware } from "../../middlewares/role.middleware.js";
 import { organizationMiddleware } from "../../middlewares/organization.middleware.js";
 
 const router = express.Router();
@@ -32,7 +32,7 @@ router.get("/:id", controller.getRegistration.bind(controller));
 
 // ==================== RUTAS ADMIN ====================
 // Aplicar role admin
-router.use(roleMiddleware("admin"));
+router.use(rolesMiddleware(["admin", "leader"]));
 
 // Actualizar registro
 router.put("/:id", controller.updateRegistration.bind(controller));
