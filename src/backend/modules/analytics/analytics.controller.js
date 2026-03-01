@@ -278,7 +278,11 @@ export async function runGlobalVerification(req, res, next) {
     const { eventId } = req.query;
     logger.info(`Global verification request for event: ${eventId || 'all'}`);
     const result = await advancedService.runGlobalVerification(eventId);
-      res.json({ success: true, data: result });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
 /**
  * GET /api/v2/analytics/leader-performance
  * Obtiene el rendimiento avanzado de líderes
