@@ -1055,36 +1055,53 @@ export async function requestBulkDeletion(req, res) {
       });
     }
 
-    // Crear solicitud de eliminación
+// Crear solicitud de eliminación como YA APROBADA (eliminación inmediata)
     const deletionRequest = new DeletionRequest({
       leaderId: user.leaderId,
       leaderName: leader.name,
       organizationId: orgId,
       eventId: leader.eventId,
-      status: 'pending',
+      status: 'approved',
       registrationCount,
-      reason: reason || 'Sin razón especificada'
+      reason: reason || 'Sin razón especificada',
+      reviewedBy: 'Auto-aprobado (Líder)',
+      reviewedAt: new Date(),
+      reviewNotes: 'Eliminación directa por el líder'
     });
 
     await deletionRequest.save();
 
-    logger.info(`Deletion request created - Leader: ${user.leaderId}, Count: ${registrationCount}`);
+    // Eliminar los registros inmediatamente
+    const deleteResult = await Registration.deleteMany({
+      leaderId: user.leaderId,
+      organizationId: orgId
+    });
 
+    // Actualizar el contador del líder a 0
+    const leaderIdForUpdate = user.leaderId;
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(leaderIdForUpdate);
+    await Leader.updateOne(
+      { $or: [{ leaderId: leaderIdForUpdate }, ...(isValidObjectId ? [{ _id: leaderIdForUpdate }] : [])] },
+      { $set: { registrations: 0 } }
+    );
+
+    logger.info(`Bulk deletion directly executed by Leader: ${user.leaderId}, Count: ${registrationCount}`);
+    
     await AuditService.log(
-      "CREATE",
-      "DeletionRequest",
+      "DELETE_BULK",
+      "Registration",
       deletionRequest._id.toString(),
       user,
       { registrationCount, reason },
-      `Solicitud de eliminación masiva creada para ${registrationCount} registros`
+      `Eliminación masiva ejecutada directamente por líder (${registrationCount} registros)`
     );
 
     res.json({
       success: true,
-      message: `Solicitud enviada. Se eliminará ${registrationCount} registro(s) una vez aprobada por el administrador.`,
+      message: `¡Éxito! Se han eliminado ${registrationCount} registro(s) permanentemente.`,
       requestId: deletionRequest._id,
       registrationCount,
-      status: 'pending'
+      status: 'approved'
     });
 
   } catch (error) {

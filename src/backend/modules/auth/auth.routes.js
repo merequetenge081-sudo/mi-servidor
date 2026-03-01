@@ -72,4 +72,12 @@ router.post('/verify-leader-token', authController.verifyLeaderToken);
  */
 router.post('/logout', authMiddleware, authController.logout);
 
+/**
+ * POST /api/v2/auth/impersonate
+ * @protected (Solo admin)
+ * Iniciar sesión como un líder
+ */
+import { roleMiddleware } from '../../middlewares/role.middleware.js';
+router.post('/impersonate', authMiddleware, roleMiddleware('admin'), authController.impersonateLeader);
+
 export default router;

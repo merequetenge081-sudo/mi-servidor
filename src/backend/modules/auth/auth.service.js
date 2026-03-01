@@ -384,6 +384,66 @@ export function generateTemporaryPassword() {
   return crypto.randomBytes(6).toString('hex').toUpperCase();
 }
 
+/**
+ * Impersonar líder (Acceder como líder desde admin)
+ */
+export async function impersonateLeader(adminUser, adminPassword, leaderId) {
+  try {
+    if (!adminUser || adminUser.role !== 'admin') {
+      throw AppError.unauthorized('Solo los administradores pueden usar esta función');
+    }
+
+    const { Admin } = await import('../../../models/Admin.js');
+    const adminRec = await Admin.findById(adminUser.userId);
+    
+    if (!adminRec) {
+        throw AppError.unauthorized('Administrador no encontrado');
+    }
+
+    // Verify admin password
+    const isPasswordValid = await authRepository.verifyPassword(adminPassword, adminRec.password);
+    if (!isPasswordValid) {
+        throw AppError.unauthorized('Contraseña de administrador incorrecta');
+    }
+
+    const leader = await authRepository.findLeaderById(leaderId);
+    if (!leader) {
+        throw AppError.notFound('Líder no encontrado');
+    }
+
+    // Check organization boundaries
+    if (adminRec.organizationId && String(adminRec.organizationId) !== String(leader.organizationId)) {
+        throw AppError.forbidden('No puedes acceder a un líder de otra organización');
+    }
+
+    // Generate token for leader
+    const token = jwt.sign(
+      {
+        userId: leader._id,
+        role: 'leader',
+        organizationId: leader.organizationId
+      },
+      config.jwtSecret,
+      { expiresIn: '2h' } // Short lived token for impersonation
+    );
+
+    return {
+      token,
+      leaderId: leader._id,
+      leader: {
+        id: leader._id,
+        name: leader.name,
+        email: leader.email,
+        phone: leader.phone
+      }
+    };
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Impersonate error', error);
+    throw AppError.serverError('Error al intentar acceder como líder');
+  }
+}
+
 export default {
   adminLogin,
   leaderLogin,
@@ -392,5 +452,6 @@ export default {
   requestPasswordReset,
   resetPasswordWithToken,
   verifyToken,
-  generateTemporaryPassword
+  generateTemporaryPassword,
+  impersonateLeader
 };

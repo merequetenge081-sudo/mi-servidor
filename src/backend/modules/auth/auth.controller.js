@@ -216,6 +216,34 @@ export async function logout(req, res, next) {
   }
 }
 
+/**
+ * POST /api/v2/auth/impersonate
+ * Login as leader using admin credentials
+ */
+export async function impersonateLeader(req, res, next) {
+  try {
+    const { adminPassword, leaderId } = req.body;
+    const adminUser = req.user;
+
+    logger.info('Intento de impersonate', { admin: adminUser?.username, leaderId });
+
+    if (!adminPassword || !leaderId) {
+        throw AppError.badRequest('Contraseña de administrador e ID del líder requeridos');
+    }
+
+    const result = await authService.impersonateLeader(adminUser, adminPassword, leaderId);
+
+    logger.success('Impersonate exitoso', { admin: adminUser.username, leaderId });
+    res.json({
+        success: true,
+        message: 'Sesión de líder iniciada correctamente',
+        data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   adminLogin,
   leaderLogin,
@@ -224,5 +252,6 @@ export default {
   resetPassword,
   verifyToken,
   verifyLeaderToken,
-  logout
+  logout,
+  impersonateLeader
 };

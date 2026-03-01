@@ -772,9 +772,12 @@ window.submitBulkDelete = async (event) => {
         // Éxito
         window.closeBulkDeleteModal();
         ModalsManager.showSuccess(
-            '¡Solicitud Enviada!',
-            data.message || 'Tu solicitud ha sido enviada y está pendiente de aprobación por un administrador.'
+            '¡Registros Eliminados!',
+            data.message || 'Tus registros han sido eliminados permanentemente.'
         );
+
+        // Recargar datos
+        setTimeout(() => window.location.reload(), 2000);
         
     } catch (error) {
         console.error('Error al solicitar eliminación masiva:', error);

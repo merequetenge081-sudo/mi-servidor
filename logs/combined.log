@@ -11365,3 +11365,36 @@
 {"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/v2/leaders","requestId":"c1a41664-89e2-419d-b866-88813659d5a7","service":"mi-servidor","timestamp":"2026-02-26 16:21:21"}
 {"error":{"error":{"message":"Token no proporcionado","statusCode":401},"success":false},"level":"warn","message":"[ErrorHandler] ⚠️ GET /api/v2/leaders - 401","requestId":"c1a41664-89e2-419d-b866-88813659d5a7","service":"mi-servidor","timestamp":"2026-02-26 16:21:21"}
 {"durationMs":3,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/leaders","requestId":"c1a41664-89e2-419d-b866-88813659d5a7","service":"mi-servidor","statusCode":401,"timestamp":"2026-02-26 16:21:21","userId":null,"userRole":null}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-28 20:00:05"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-28 20:00:05"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-28 20:00:05"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-28 20:00:05"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-28 20:00:05"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-28 20:00:05"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-28 20:00:05"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-28 20:00:06"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-28 20:00:06"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-28 20:00:06"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-28 20:00:07"}
+{"level":"info","message":"✅ Puestos ya inicializados: 1679 puestos en BD","service":"mi-servidor","timestamp":"2026-02-28 20:00:07"}
+{"intervalMinutes":60,"level":"info","message":"Temp password cleanup scheduled","service":"mi-servidor","timestamp":"2026-02-28 20:00:07"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-02-28 20:00:46"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-02-28 20:00:47"}
+{"level":"info","message":"✅ Puestos ya inicializados: 1679 puestos en BD","service":"mi-servidor","timestamp":"2026-02-28 20:00:48"}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/health","requestId":"7b741090-eb10-46f9-a2f0-129468a8753a","service":"mi-servidor","timestamp":"2026-02-28 20:00:56"}
+{"durationMs":4,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/health","requestId":"7b741090-eb10-46f9-a2f0-129468a8753a","service":"mi-servidor","statusCode":200,"timestamp":"2026-02-28 20:00:56","userId":null,"userRole":null}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/health","requestId":"926e1761-8105-424c-b463-bb351ddf2cfb","service":"mi-servidor","timestamp":"2026-02-28 20:01:29"}
+{"durationMs":1,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/health","requestId":"926e1761-8105-424c-b463-bb351ddf2cfb","service":"mi-servidor","statusCode":200,"timestamp":"2026-02-28 20:01:29","userId":null,"userRole":null}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/health","requestId":"0e199922-fa49-4286-98d1-4ff1c6bca678","service":"mi-servidor","timestamp":"2026-02-28 20:01:44"}
+{"durationMs":1,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/health","requestId":"0e199922-fa49-4286-98d1-4ff1c6bca678","service":"mi-servidor","statusCode":200,"timestamp":"2026-02-28 20:01:44","userId":null,"userRole":null}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 10:03:47"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 10:03:47"}

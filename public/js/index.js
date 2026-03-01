@@ -39,6 +39,7 @@
         'modules/registrations.module.js',
         'modules/notifications.module.js',
         'modules/export.module.js',
+        'modules/deletion-requests.module.js',
         
         // CORE EVENTS (delegacion centralizada)
         'core/events.js',

@@ -104,6 +104,9 @@ const LeadersModule = (() => {
                         <div class="action-menu-dropdown" data-leader-id="${leader._id}">
                             <button class="menu-item menu-scroll menu-scroll-up" data-scroll="up"><i class="bi bi-chevron-up"></i> Subir</button>
                             ${leader.email ? `<button class="menu-item send-email-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" data-leader-email="${leader.email}"><i class=\"bi bi-envelope\"></i> Enviar Correo</button>` : ''}
+                            <button class="menu-item impersonate-btn" data-leader-id="${leader._id}" style="color: #10b981; font-weight: 600;">
+                                <i class="bi bi-box-arrow-in-right"></i> Ingresar al perfil
+                            </button>
                             <button class="menu-item qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}"><i class=\"bi bi-qr-code\"></i> Ver QR</button>
                             <a href="/form.html?token=${leader.token || leader.leaderId || leader._id}" target="_blank" class="menu-item" style="text-decoration: none;"><i class=\"bi bi-box-arrow-up-right\"></i> Ver Formulario</a>
                             <button class="menu-item edit-leader-btn" data-leader-id="${leader._id}"><i class=\"bi bi-pencil\"></i> Editar</button>
@@ -144,39 +147,37 @@ const LeadersModule = (() => {
 
             return `
             <tr>
-                <td><strong>${leader.name}</strong></td>
-                <td>${leader.email || '<span style="color:#ccc;">Sin correo</span>'}</td>
-                <td>${leader.phone || '-'}</td>
+                <td><strong style="color: inherit;">${leader.name}</strong></td>
+                <td style="color: inherit;">${leader.email || '<span style="color: #666;">Sin correo</span>'}</td>
+                <td style="color: inherit;">${leader.phone || '-'}</td>
                 <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${leader.registrations || 0}</span></td>
                 <td>${passwordStatus}</td>
                 <td>
                     ${leader.username ?
-                    `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" title="Ver Credenciales (Usuario y Contraseña)">
+                    `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" title="Ver Credenciales (Usuario y Contraseña)" style="color: #1e40af; font-weight: 600;">
                             <i class="bi bi-eye"></i> Ver Credenciales
                         </button>`
-                    : '<span style="color: #999; font-size: 12px;">Sin usuario</span>'}
+                    : '<span style="color: #666; font-size: 12px;">Sin usuario</span>'}
                 </td>
                 <td>
-                    ${leader.email ?
-                    `<button class="btn btn-sm btn-outline-primary send-email-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" data-leader-email="${leader.email}" title="Enviar Correo de Acceso">
-                            <i class="bi bi-envelope"></i>
-                        </button>`
-                    : ''}
-                    <button class="btn btn-sm btn-outline-secondary qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" title="Ver QR">
-                        <i class="bi bi-qr-code"></i>
-                    </button>
-                    <a href="/form.html?token=${leader.token || leader.leaderId || leader._id}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Ver Formulario">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                    </a>
-                    <button class="btn btn-sm btn-outline-secondary edit-leader-btn" data-leader-id="${leader._id}" title="Editar">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger generate-pass-btn" data-leader-id="${leader._id}" data-can-generate="${leader.passwordResetRequested ? 'true' : 'false'}" ${leader.passwordResetRequested ? '' : 'disabled'} title="${leader.passwordResetRequested ? 'Generar Nueva Contraseña' : 'Solo disponible si el líder solicita'}" style="${leader.passwordResetRequested ? '' : 'opacity: 0.5; cursor: not-allowed;'}">
-                        <i class="bi bi-key"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary delete-leader-btn" data-leader-id="${leader._id}" title="Eliminar">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="action-menu-container">
+                        <button class="action-menu-btn" data-leader-id="${leader._id}">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <div class="action-menu-dropdown" data-leader-id="${leader._id}">
+                            <button class="menu-item menu-scroll menu-scroll-up" data-scroll="up"><i class="bi bi-chevron-up"></i> Subir</button>
+                            ${leader.email ? `<button class="menu-item send-email-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" data-leader-email="${leader.email}"><i class=\"bi bi-envelope\"></i> Enviar Correo</button>` : ''}
+                            <button class="menu-item impersonate-btn" data-leader-id="${leader._id}" style="color: #10b981; font-weight: 600;">
+                                <i class="bi bi-box-arrow-in-right"></i> Ingresar al perfil
+                            </button>
+                            <button class="menu-item qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}"><i class=\"bi bi-qr-code\"></i> Ver QR</button>
+                            <a href="/form.html?token=${leader.token || leader.leaderId || leader._id}" target="_blank" class="menu-item" style="text-decoration: none;"><i class=\"bi bi-box-arrow-up-right\"></i> Ver Formulario</a>
+                            <button class="menu-item edit-leader-btn" data-leader-id="${leader._id}"><i class=\"bi bi-pencil\"></i> Editar</button>
+                            <button class="menu-item gen-pass-btn" data-leader-id="${leader._id}" style="color: #dc2626; font-weight: 600;\"><i class=\"bi bi-key\"></i> Generar Contraseña</button>
+                            <button class="menu-item delete-leader-btn" data-leader-id="${leader._id}" style="color: #dc2626; font-weight: 600;\"><i class=\"bi bi-trash\"></i> Eliminar</button>
+                            <button class="menu-item menu-scroll menu-scroll-down" data-scroll="down"><i class="bi bi-chevron-down"></i> Bajar</button>
+                        </div>
+                    </div>
                 </td>
             </tr>
         `;

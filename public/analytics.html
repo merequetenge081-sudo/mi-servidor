@@ -736,14 +736,15 @@
                 
                 const result = await response.json();
                 
-                if (result.success) {
-                    const d = result.data;
-                    const msg = `Verificación completada.<br>Asignados: ${d.assigned}<br>Autocorregidos: ${d.autoCorrected}<br>Para revisión: ${d.needsReview}<br>Inconsistencias: ${d.severeInconsistency}`;
+                if (result.success || result.assigned !== undefined) {
+                    const d = result.data || result; // Fallback in case data is directly returned
+                    const msg = `Verificación completada.<br>Asignados: ${d.assigned || 0}<br>Autocorregidos: ${d.autoCorrected || 0}<br>Para revisión: ${d.needsReview || 0}<br>Inconsistencias: ${d.severeInconsistency || 0}`;
                     showToast(msg, 'success');
                     // Reload data to reflect changes
                     fetchAnalyticsData();
                 } else {
-                    showToast('Error en la verificación: ' + result.message, 'error');
+                    const errorMsg = result.error?.message || result.error || result.message || 'Error desconocido';
+                    showToast('Error en la verificación: ' + errorMsg, 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
