@@ -781,3 +781,44 @@ window.submitBulkDelete = async (event) => {
         submitBtn.innerHTML = originalBtnContent;
     }
 };
+
+// ========== ACCIONES EN LOTE (Dropdown) ==========
+window.toggleBulkDropdown = (e) => {
+    e.stopPropagation();
+    const menu = document.getElementById('bulkActionsMenu');
+    if (menu) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+};
+
+document.addEventListener('click', () => {
+    const menu = document.getElementById('bulkActionsMenu');
+    if (menu && menu.style.display === 'block') {
+        menu.style.display = 'none';
+    }
+});
+
+// ========== VOLVER A ADMIN ==========
+window.returnToAdmin = () => {
+    const adminToken = sessionStorage.getItem('admin_token') || localStorage.getItem('admin_token');
+    if (adminToken) {
+        localStorage.setItem('token', adminToken);
+        sessionStorage.setItem('token', adminToken);
+        localStorage.removeItem('role');
+        sessionStorage.removeItem('role');
+        sessionStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_token');
+        window.location.href = '/dashboard.html';
+    }
+};
+
+// Verificar si venimos de Admin mode
+document.addEventListener('DOMContentLoaded', () => {
+    const adminToken = sessionStorage.getItem('admin_token') || localStorage.getItem('admin_token');
+    if (adminToken) {
+        const btn = document.getElementById('returnAdminBtn');
+        if (btn) {
+            btn.style.display = 'inline-flex';
+        }
+    }
+});
