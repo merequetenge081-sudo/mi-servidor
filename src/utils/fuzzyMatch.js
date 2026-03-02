@@ -234,14 +234,39 @@ export function matchPuesto(input, puestos, threshold = 0.80, localidadFiltro = 
           candidateSimilarity = Math.max(candidateSimilarity, 0.9);
         }
         
-        // Nueva lógica: Si todas las palabras clave del candidato están en el input (o viceversa)
-        const inputWords = normalizedInput.split(' ').filter(w => w.length > 2);
-        const candidateWords = normalizedCandidate.split(' ').filter(w => w.length > 2);
+        // Logica mejorada de palabras clave pedida por el usuario
+        const stopWords = new Set([
+          'colegio', 'escuela', 'distrital', 'institucion', 'centro', 'educativo', 
+          'sede', 'local', 'salon', 'comunal', 'puesto', 'votacion', 'del', 'las', 
+          'los', 'san', 'santa', 'nacional', 'universidad', 'barrio'
+        ]);
+
+        const getSignificantWords = (str) => {
+          return str.split(' ').filter(w => w.length > 2 && !stopWords.has(w));
+        };
+
+        const inputWords = getSignificantWords(normalizedInput);
+        const candidateWords = getSignificantWords(normalizedCandidate);
         
         if (inputWords.length > 0 && candidateWords.length > 0) {
+          // Chequeo de todas las palabras candidadatos en el input
           const allCandidateWordsInInput = candidateWords.every(cw => normalizedInput.includes(cw));
           if (allCandidateWordsInInput) {
             candidateSimilarity = Math.max(candidateSimilarity, 0.85);
+          }
+
+          // Chequeo si coinciden al menos 2 palabras significativas (o 1 si el input tiene solo 1)
+          let matchingWords = 0;
+          for (const iw of inputWords) {
+            if (candidateWords.some(cw => cw.includes(iw) || iw.includes(cw))) {
+              matchingWords++;
+            }
+          }
+
+          if (matchingWords >= 2) {
+            candidateSimilarity = Math.max(candidateSimilarity, 0.95);
+          } else if (inputWords.length === 1 && matchingWords === 1) {
+            candidateSimilarity = Math.max(candidateSimilarity, 0.95);
           }
         }
       }
