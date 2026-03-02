@@ -22,7 +22,10 @@ export class RegistrationsManager {
 
             this.myRegistrations = registrations.filter(r => r.leaderId === leaderId);
             this.filteredRegistrations = [...this.myRegistrations];
-            this.currentPage = 1;
+            
+            if (!keepPage) {
+                this.currentPage = 1;
+            }
 
             return this.myRegistrations;
         } catch (error) {

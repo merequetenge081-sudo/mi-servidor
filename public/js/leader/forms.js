@@ -375,7 +375,7 @@ export class FormManager {
             }
 
             if (window.refreshRegistrations) {
-                await window.refreshRegistrations();
+                await window.refreshRegistrations(true); // keepPage = true
             }
         } catch (error) {
             console.error('Error al guardar registro:', error);
@@ -517,7 +517,7 @@ export class FormManager {
             } else {
                 this.closeEditModal();
                 if (window.refreshRegistrations) {
-                    await window.refreshRegistrations();
+                    await window.refreshRegistrations(true);
                 }
                 return responseData;
             }

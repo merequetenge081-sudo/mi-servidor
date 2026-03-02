@@ -28,7 +28,7 @@ export class DeleteManager {
             } else {
                 this.closeDeleteConfirmModal();
                 if (window.refreshRegistrations) {
-                    await window.refreshRegistrations();
+                    await window.refreshRegistrations(true);
                 }
                 return data;
             }
