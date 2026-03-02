@@ -141,6 +141,8 @@
         .expanded .fa-chevron-right { transform: rotate(90deg); }
         .chevron-icon { transition: transform 0.2s; display: inline-block; width: 20px; }
     </style>
+    <!-- Contenedor PDF Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <nav class="bg-indigo-900 text-white shadow-lg">
@@ -411,12 +413,88 @@
         <div class="sim-slide" id="slide-outro">
             <h2 class="text-5xl font-bold mb-6">¡Sigue así!</h2>
             <p class="text-2xl mb-8">Cada voto cuenta. El trabajo en equipo de tus líderes está dando frutos.</p>
-            <button class="sim-btn" onclick="closeSimulation()">Volver al Panel</button>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center mt-4">
+                <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 flex items-center justify-center text-xl z-50" onclick="downloadSimulationPDF()" id="btn-download-pdf">
+                    <i class="fas fa-file-pdf mr-2"></i> Descargar Reporte PDF
+                </button>
+                <button class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 flex items-center justify-center text-xl z-50" onclick="closeSimulation()">
+                    <i class="fas fa-times mr-2"></i> Volver al Panel
+                </button>
+            </div>
         </div>
         
         <!-- Navigation hints -->
         <div class="absolute bottom-8 left-0 w-full text-center opacity-50 text-sm tracking-widest uppercase" id="sim-hint">
             Toca para continuar
+        </div>
+    </div>
+
+    <!-- Contenedor oculto para la generación del PDF -->
+    <div id="pdf-report-container" style="position: absolute; top: -10000px; left: -10000px; width: 800px; background: white; color: black; padding: 40px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #4f46e5; padding-bottom: 20px;">
+            <h1 style="color: #312e81; font-size: 32px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Reporte de Simulación de Campaña</h1>
+            <p style="color: #6b7280; font-size: 16px; margin-top: 10px;">Metas y Proyecciones Electorales</p>
+            <p style="color: #9ca3af; font-size: 14px; margin-top: 5px;">Generado el: <strong id="pdf-date"></strong></p>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; gap: 20px; margin-bottom: 30px;">
+            <div style="flex: 1; background: #f3f4f6; padding: 25px; border-radius: 12px; border-left: 5px solid #10b981;">
+                <h3 style="margin-top: 0; color: #374151; font-size: 18px; text-transform: uppercase;">Estado Actual</h3>
+                <p style="font-size: 36px; font-weight: 800; color: #059669; margin: 15px 0 5px 0;"><span id="pdf-val-current">0</span></p>
+                <p style="font-size: 16px; font-weight: normal; color: #6b7280; margin: 0;">Votos Asegurados</p>
+                
+                <p style="font-size: 24px; font-weight: 700; color: #2563eb; margin: 20px 0 5px 0;"><span id="pdf-val-rate">0</span></p>
+                <p style="font-size: 14px; font-weight: normal; color: #6b7280; margin: 0;">Ritmo (Votos / Día)</p>
+            </div>
+            
+            <div style="flex: 1; background: #fffbeb; padding: 25px; border-radius: 12px; border-left: 5px solid #f59e0b;">
+                <h3 style="margin-top: 0; color: #374151; font-size: 18px; text-transform: uppercase;">Proyección a Meta</h3>
+                <p style="color: #6b7280; font-size: 14px; margin-top: -5px; margin-bottom: 15px;">Fecha límite: <strong id="pdf-target-date-display">...</strong></p>
+                <p style="font-size: 42px; font-weight: 900; color: #d97706; margin: 15px 0 5px 0;"><span id="pdf-val-target">0</span></p>
+                <p style="font-size: 16px; font-weight: normal; color: #6b7280; margin: 0;">Votos Estimados para Ganar</p>
+            </div>
+        </div>
+
+        <h2 style="color: #312e81; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-top: 40px; margin-bottom: 25px; font-size: 22px;">Métricas Destacadas</h2>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="background: #fafafa; padding: 15px 20px; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="color: #4b5563; margin: 0 0 5px 0; font-size: 14px; text-transform: uppercase;">📍 Top Puesto de Votación</h3>
+                    <p style="font-size: 20px; font-weight: bold; margin: 0; color: #111827;" id="pdf-val-top-puesto-name">Puesto</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="font-size: 24px; font-weight: bold; color: #8b5cf6; margin: 0;" id="pdf-val-top-puesto-votes">0</p>
+                    <p style="font-size: 12px; color: #6b7280; margin: 0;">votos</p>
+                </div>
+            </div>
+
+            <div style="background: #fafafa; padding: 15px 20px; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="color: #4b5563; margin: 0 0 5px 0; font-size: 14px; text-transform: uppercase;">🌆 Top Localidad / Municipio</h3>
+                    <p style="font-size: 20px; font-weight: bold; margin: 0; color: #111827;" id="pdf-val-top-localidad-name">Localidad</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="font-size: 24px; font-weight: bold; color: #ec4899; margin: 0;" id="pdf-val-top-localidad-votes">0</p>
+                    <p style="font-size: 12px; color: #6b7280; margin: 0;">votos</p>
+                </div>
+            </div>
+
+            <div style="background: #fafafa; padding: 15px 20px; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="color: #4b5563; margin: 0 0 5px 0; font-size: 14px; text-transform: uppercase;">⭐ Top Líder</h3>
+                    <p style="font-size: 20px; font-weight: bold; margin: 0; color: #111827;" id="pdf-val-top-leader-name">Líder</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="font-size: 24px; font-weight: bold; color: #ea580c; margin: 0;" id="pdf-val-top-leader-votes">0</p>
+                    <p style="font-size: 12px; color: #6b7280; margin: 0;">votos</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 50px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">Generado automáticamente por el Sistema de Panel de Control Electoral.</p>
+            <p style="color: #9ca3af; font-size: 12px; margin: 5px 0 0 0;">Este documento es una proyección analítica basada en tendencias del momento.</p>
         </div>
     </div>
 
@@ -876,6 +954,19 @@
                     
                     document.getElementById('sim-val-target-votes').textContent = simData.projectedTotal.toLocaleString();
                     
+                    // Populate PDF Report template data
+                    document.getElementById('pdf-date').textContent = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                    document.getElementById('pdf-target-date-display').textContent = targetDate;
+                    document.getElementById('pdf-val-current').textContent = simData.currentTotal.toLocaleString();
+                    document.getElementById('pdf-val-rate').textContent = simData.dailyGrowthRate.toLocaleString(undefined, { maximumFractionDigits: 1 });
+                    document.getElementById('pdf-val-target').textContent = simData.projectedTotal.toLocaleString();
+                    document.getElementById('pdf-val-top-puesto-name').textContent = simData.topPuesto || 'No Data';
+                    document.getElementById('pdf-val-top-puesto-votes').textContent = (simData.topPuestoVotes || 0).toLocaleString();
+                    document.getElementById('pdf-val-top-localidad-name').textContent = simData.topLocalidad || 'No Data';
+                    document.getElementById('pdf-val-top-localidad-votes').textContent = (simData.topLocalidadVotes || 0).toLocaleString();
+                    document.getElementById('pdf-val-top-leader-name').textContent = simData.topLeader || 'No Data';
+                    document.getElementById('pdf-val-top-leader-votes').textContent = (simData.topLeaderVotes || 0).toLocaleString();
+                    
                     // Setup UI
                     const overlay = document.getElementById('simulation-overlay');
                     overlay.style.display = 'flex';
@@ -970,6 +1061,39 @@
         function closeSimulation() {
             clearInterval(simInterval);
             document.getElementById('simulation-overlay').style.display = 'none';
+        }
+
+        async function downloadSimulationPDF() {
+            const btn = document.getElementById('btn-download-pdf');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generando...';
+            btn.disabled = true;
+
+            const element = document.getElementById('pdf-report-container');
+            const opt = {
+                margin:       0,
+                filename:     `Reporte_Simulacion_Campana_${new Date().toISOString().split('T')[0]}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            try {
+                element.style.top = '0';
+                element.style.left = '0';
+                element.style.display = 'block';
+                element.style.zIndex = '-1';
+                
+                await html2pdf().set(opt).from(element).save();
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Hubo un error al generar el PDF.');
+            } finally {
+                element.style.top = '-10000px';
+                element.style.left = '-10000px';
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
     </script>
 
