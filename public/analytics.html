@@ -430,7 +430,7 @@
     </div>
 
     <!-- Contenedor oculto para la generación del PDF -->
-    <div id="pdf-report-container" style="position: absolute; top: -10000px; left: -10000px; width: 800px; background: white; color: black; padding: 40px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box;">
+    <div id="pdf-report-container" style="position: absolute; left: -9999px; width: 800px; background: white; color: black; padding: 40px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; overflow: hidden; height: auto;">
         <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #4f46e5; padding-bottom: 20px;">
             <h1 style="color: #312e81; font-size: 32px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Reporte de Simulación de Campaña</h1>
             <p style="color: #6b7280; font-size: 16px; margin-top: 10px;">Metas y Proyecciones Electorales</p>
@@ -1079,21 +1079,22 @@
             };
 
             try {
-                // Hacer visible y reposicionar el elemento para el renderizado
-                element.style.position = 'fixed';
-                element.style.top = '0';
-                element.style.left = '0';
-                element.style.zIndex = '99999';
+                // Hacer el contenedor renderizable clonándolo o forzándolo al DOM visible un instante sin que afecte el viewport del usuario.
+                const clone = element.cloneNode(true);
+                clone.style.position = 'absolute';
+                clone.style.top = '0';
+                clone.style.left = '0';
+                clone.style.zIndex = '-999';
+                clone.id = 'pdf-clone';
+                document.body.appendChild(clone);
                 
-                await html2pdf().set(opt).from(element).save();
+                await html2pdf().set(opt).from(clone).save();
+                
+                document.body.removeChild(clone);
             } catch (error) {
                 console.error('Error generating PDF:', error);
                 alert('Hubo un error al generar el PDF.');
             } finally {
-                element.style.position = 'absolute';
-                element.style.top = '-10000px';
-                element.style.left = '-10000px';
-                element.style.zIndex = '-1';
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
