@@ -254,10 +254,10 @@ export async function getAdvanced(req, res, next) {
  */
 export async function getSimulation(req, res, next) {
   try {
-    const { eventId } = req.query;
-    logger.info('Simulation data request', { eventId });
+      const { eventId, targetDate } = req.query;
+      logger.info('Simulation data request', { eventId, targetDate });
 
-    const data = await advancedService.getSimulationData(eventId);
+      const data = await advancedService.getSimulationData(eventId, targetDate);
 
     res.json({
       success: true,

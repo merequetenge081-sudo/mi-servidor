@@ -347,59 +347,71 @@ const mesasArr = Object.entries(mesas).map(([mesa, mesaData]) => ({
   }
 }
 
-export async function getSimulationData(eventId = null) {
-  try {
-    const matchQuery = eventId ? { eventId } : {};
-    
-    const totalRegistrations = await Registration.countDocuments(matchQuery);
-    
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentRegistrations = await Registration.countDocuments({
-      ...matchQuery,
-      createdAt: { $gte: thirtyDaysAgo }
-    });
-    const dailyGrowthRate = recentRegistrations / 30;
+export async function getSimulationData(eventId = null, targetDateStr = null) {
+    try {
+      const matchQuery = eventId ? { eventId } : {};
 
-    const topLocAgg = await Registration.aggregate([
-      { $match: { ...matchQuery, localidad: { $ne: null, $ne: '' } } },
-      { $group: { _id: '$localidad', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 1 }
-    ]);
+      const totalRegistrations = await Registration.countDocuments(matchQuery); 
 
-    const topMesaAgg = await Registration.aggregate([
-      { $match: { ...matchQuery, puestoId: { $ne: null }, mesa: { $ne: null } } },
-      { $group: { _id: { puestoId: '$puestoId', mesa: '$mesa' }, count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 1 },
-      { $lookup: { from: 'puestos', localField: '_id.puestoId', foreignField: '_id', as: 'puesto' } },
-      { $unwind: '$puesto' }
-    ]);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const recentRegistrations = await Registration.countDocuments({
+        ...matchQuery,
+        createdAt: { $gte: thirtyDaysAgo }
+      });
+      const dailyGrowthRate = recentRegistrations / 30;
 
-    const top5Locs = await Registration.aggregate([
-      { $match: { ...matchQuery, localidad: { $ne: null, $ne: '' } } },
-      { $group: { _id: '$localidad', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 5 }
-    ]);
-    const top5LocNames = top5Locs.map(l => l._id);
+      // Calculate days remaining to target date
+      const currentDate = new Date();
+      // Default to March 5, 2026
+      const targetDate = targetDateStr ? new Date(`${targetDateStr}T00:00:00`) : new Date('2026-03-05T00:00:00');
+      
+      let daysRemaining = Math.ceil((targetDate - currentDate) / (1000 * 60 * 60 * 24));
+      if (daysRemaining < 0) daysRemaining = 0;
 
-    const topLeaderAgg = await Registration.aggregate([
-      { $match: { ...matchQuery, localidad: { $in: top5LocNames }, leaderName: { $ne: null } } },
-      { $group: { _id: '$leaderName', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 1 }
-    ]);
+      const topLocAgg = await Registration.aggregate([
+        { $match: { ...matchQuery, localidad: { $ne: null, $ne: '' } } },       
+        { $group: { _id: '$localidad', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 1 }
+      ]);
 
-    return {
-      currentTotal: totalRegistrations,
-      dailyGrowthRate: Math.round(dailyGrowthRate),
-      projection30Days: Math.round(totalRegistrations + (dailyGrowthRate * 30)),
-      projection60Days: Math.round(totalRegistrations + (dailyGrowthRate * 60)),
-      projectedTotal: Math.round(totalRegistrations + (dailyGrowthRate * 60)),
-      topLocalidad: topLocAgg[0]?._id || 'Desconocida',
-      topPuesto: topMesaAgg[0]?.puesto?.nombre || 'Desconocido',
+      const topPuestoAgg = await Registration.aggregate([
+        { $match: { ...matchQuery, puestoId: { $ne: null } } },
+        { $group: { _id: '$puestoId', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 1 },
+        { $lookup: { from: 'puestos', localField: '_id', foreignField: '_id', as: 'puesto' } },
+        { $unwind: '$puesto' }
+      ]);
+
+      const topMesaAgg = await Registration.aggregate([
+        { $match: { ...matchQuery, puestoId: { $ne: null }, mesa: { $ne: null } } },
+        { $group: { _id: { puestoId: '$puestoId', mesa: '$mesa' }, count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 1 },
+        { $lookup: { from: 'puestos', localField: '_id.puestoId', foreignField: '_id', as: 'puesto' } },
+        { $unwind: '$puesto' }
+      ]);
+
+      const topLeaderAgg = await Registration.aggregate([
+        { $match: { ...matchQuery, leaderName: { $ne: null, $ne: '' } } },
+        { $group: { _id: '$leaderName', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 1 }
+      ]);
+
+      return {
+        currentTotal: totalRegistrations,
+        dailyGrowthRate: dailyGrowthRate > 0 ? dailyGrowthRate : 0,
+        daysRemaining,
+        projection30Days: Math.round(totalRegistrations + (dailyGrowthRate * 30)),
+        projection60Days: Math.round(totalRegistrations + (dailyGrowthRate * 60)),
+        projectedTotal: Math.round(totalRegistrations + (dailyGrowthRate * daysRemaining)),
+        topLocalidad: topLocAgg[0]?._id || 'Desconocida',
+        topLocalidadVotes: topLocAgg[0]?.count || 0,
+        topPuesto: topPuestoAgg[0]?.puesto?.nombre || 'Desconocido',
+        topPuestoVotes: topPuestoAgg[0]?.count || 0,
       topMesa: topMesaAgg[0]?._id?.mesa || 'N/A',
       topLeader: topLeaderAgg[0]?._id || 'Desconocido',
       topLeaderVotes: topLeaderAgg[0]?.count || 0

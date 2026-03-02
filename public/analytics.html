@@ -201,10 +201,16 @@
             </div>
             
             <!-- Simulation Trigger -->
-            <button id="btn-start-simulation" class="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 flex items-center mt-4 md:mt-0">
-                <i class="fas fa-play-circle text-2xl mr-2"></i>
-                <span>Iniciar Simulación de Campaña</span>
-            </button>
+            <div class="flex flex-col items-end space-y-2 mt-4 md:mt-0">
+                <div class="flex items-center space-x-2">
+                    <label for="simulation-target-date" class="text-sm font-medium text-gray-700">Elecciones:</label>
+                    <input type="date" id="simulation-target-date" value="2026-03-05" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
+                </div>
+                <button id="btn-start-simulation" class="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 flex items-center">
+                    <i class="fas fa-play-circle text-2xl mr-2"></i>
+                    <span>Iniciar Simulación de Campaña</span>
+                </button>
+            </div>
         </div>
 
         <!-- Loading Indicator -->
@@ -360,20 +366,45 @@
             </div>
         </div>
         
-        <!-- Slide 5: Projection 30 Days -->
-        <div class="sim-slide" id="slide-proj30">
-            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">En 30 días alcanzarás</p>
-            <div class="big-number text-purple-400" id="sim-val-30">0</div>
-            <p class="text-3xl font-bold">Votos Proyectados</p>
-            <p class="mt-6 text-xl opacity-80">Manteniendo el ritmo actual</p>
+        <!-- Slide 5: Top Puesto -->
+        <div class="sim-slide" id="slide-top-puesto">
+            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">El Puesto de Votación Más Fuerte</p>
+            <div class="big-number text-purple-400 text-5xl mt-6 mb-4" id="sim-val-top-puesto-name">Puesto X</div>
+            <div class="text-3xl font-bold flex flex-col items-center mt-4">
+                <span class="text-gray-300 text-xl font-normal mb-1">Total de votos asegurados</span>
+                <span class="text-4xl text-white font-black" id="sim-val-top-puesto-votes">0</span>
+            </div>
+            <i class="fas fa-map-marker-alt text-6xl text-purple-500 mt-8" style="animation: pulse 2s infinite;"></i>
         </div>
-        
-        <!-- Slide 6: Projection 60 Days -->
-        <div class="sim-slide" id="slide-proj60">
-            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">Y para el día de las elecciones (60 días)</p>
-            <div class="big-number text-yellow-400" id="sim-val-60">0</div>
-            <p class="text-3xl font-bold">Votos Totales Estimados</p>
-            <i class="fas fa-trophy text-6xl text-yellow-400 mt-8" style="animation: pulse 2s infinite;"></i>
+
+        <!-- Slide 6: Top Localidad -->
+        <div class="sim-slide" id="slide-top-localidad">
+            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">La Localidad Destacada</p>
+            <div class="big-number text-pink-400 text-5xl mt-6 mb-4" id="sim-val-top-localidad-name">Localidad Y</div>
+            <div class="text-3xl font-bold flex flex-col items-center mt-4">
+                <span class="text-gray-300 text-xl font-normal mb-1">Impacto total en la zona</span>
+                <span class="text-4xl text-white font-black" id="sim-val-top-localidad-votes">0</span>
+            </div>
+            <i class="fas fa-city text-6xl text-pink-500 mt-8" style="animation: pulse 2s infinite;"></i>
+        </div>
+
+        <!-- Slide 7: Top Lider -->
+        <div class="sim-slide" id="slide-top-leader">
+            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">El Líder del momento</p>
+            <div class="big-number text-orange-400 text-5xl mt-6 mb-4" id="sim-val-top-leader-name">Líder Z</div>
+            <div class="text-3xl font-bold flex flex-col items-center mt-4">
+                <span class="text-gray-300 text-xl font-normal mb-1">Votos aportados</span>
+                <span class="text-4xl text-white font-black" id="sim-val-top-leader-votes">0</span>
+            </div>
+            <i class="fas fa-star text-6xl text-orange-500 mt-8" style="animation: pulse 2s infinite;"></i>
+        </div>
+
+        <!-- Slide 8: Projection Target Data -->
+        <div class="sim-slide" id="slide-proj-target">
+            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">Proyección al Final de las Elecciones</p>
+            <div class="big-number text-yellow-400" id="sim-val-target-votes">0</div>
+            <p class="text-3xl font-bold">Votos Estimados para Ganar</p>
+            <i class="fas fa-trophy text-6xl text-yellow-500 mt-8" style="animation: pulse 2s infinite;"></i>
         </div>
         
         <!-- Slide 7: Outro -->
@@ -821,7 +852,8 @@
             try {
                 // Fetch simulation data
                 const token = localStorage.getItem('token');
-                const response = await fetch('/api/v2/analytics/simulation', {
+                const targetDate = document.getElementById('simulation-target-date').value || '2026-03-05';
+                const response = await fetch(`/api/v2/analytics/simulation?targetDate=${targetDate}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
@@ -831,9 +863,18 @@
                     
                     // Populate data in slides
                     document.getElementById('sim-val-current').textContent = simData.currentTotal.toLocaleString();
-                    document.getElementById('sim-val-rate').textContent = simData.dailyGrowthRate.toLocaleString();
-                    document.getElementById('sim-val-30').textContent = simData.projection30Days.toLocaleString();
-                    document.getElementById('sim-val-60').textContent = simData.projection60Days.toLocaleString();
+                    document.getElementById('sim-val-rate').textContent = simData.dailyGrowthRate.toLocaleString(undefined, { maximumFractionDigits: 1 });
+                    
+                    document.getElementById('sim-val-top-puesto-name').textContent = simData.topPuesto || 'No Data';
+                    document.getElementById('sim-val-top-puesto-votes').textContent = (simData.topPuestoVotes || 0).toLocaleString();
+                    
+                    document.getElementById('sim-val-top-localidad-name').textContent = simData.topLocalidad || 'No Data';
+                    document.getElementById('sim-val-top-localidad-votes').textContent = (simData.topLocalidadVotes || 0).toLocaleString();
+                    
+                    document.getElementById('sim-val-top-leader-name').textContent = simData.topLeader || 'No Data';
+                    document.getElementById('sim-val-top-leader-votes').textContent = (simData.topLeaderVotes || 0).toLocaleString();
+                    
+                    document.getElementById('sim-val-target-votes').textContent = simData.projectedTotal.toLocaleString();
                     
                     // Setup UI
                     const overlay = document.getElementById('simulation-overlay');
@@ -906,8 +947,10 @@
                 'linear-gradient(135deg, #8A2387, #E94057, #F27121)', // Intro
                 'linear-gradient(135deg, #11998e, #38ef7d)', // Current
                 'linear-gradient(135deg, #2193b0, #6dd5ed)', // Rate
-                'linear-gradient(135deg, #8E2DE2, #4A00E0)', // 30 days
-                'linear-gradient(135deg, #f12711, #f5af19)', // 60 days
+                'linear-gradient(135deg, #4A00E0, #8E2DE2)', // Top Puesto
+                'linear-gradient(135deg, #ff0844, #ffb199)', // Top Localidad
+                'linear-gradient(135deg, #f12711, #f5af19)', // Top Leader
+                'linear-gradient(135deg, #000000, #e74c3c)', // Projection Target
                 'linear-gradient(135deg, #1DB954, #191414)'  // Outro
             ];
             
