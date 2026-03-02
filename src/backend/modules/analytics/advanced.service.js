@@ -122,8 +122,13 @@ export async function runGlobalVerification(eventId = null) {
     const baseQuery = eventId ? { eventId } : {};
     
     // 1. Intentar asignar puestoId a los que no tienen
-    const unassignedQuery = { ...baseQuery, puestoId: null, votingPlace: { $ne: null, $ne: '' } };
-    const unassignedRegistrations = await Registration.find(unassignedQuery);
+    const unassignedQuery = { 
+      ...baseQuery, 
+      puestoId: null, 
+      votingPlace: { $nin: [null, ''] }
+    };
+    // Fetch limited registrations to prevent crashing on millions row DBs
+    const unassignedRegistrations = await Registration.find(unassignedQuery).limit(5000);
     let matchedCount = 0;
     
     // Procesar en lotes
@@ -131,7 +136,10 @@ export async function runGlobalVerification(eventId = null) {
     for (let i = 0; i < unassignedRegistrations.length; i += unassignedBatchSize) {
       const batch = unassignedRegistrations.slice(i, i + unassignedBatchSize);
       await Promise.all(batch.map(async (reg) => {
-        const safeString = reg.votingPlace.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const votingStr = (reg.votingPlace || '').toString().trim();
+        if(!votingStr) return; // safeguard
+
+        const safeString = votingStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const searchRegex = new RegExp(safeString, 'i');
         
         const puesto = await Puestos.findOne({
@@ -155,7 +163,7 @@ export async function runGlobalVerification(eventId = null) {
     
     // 2. Ejecutar validación inteligente para todos los que tienen puestoId
     const assignedQuery = { ...baseQuery, puestoId: { $ne: null } };
-    const assignedRegistrations = await Registration.find(assignedQuery).populate('puestoId');
+    const assignedRegistrations = await Registration.find(assignedQuery).populate('puestoId').limit(5000);
     let autoCorrectedCount = 0;
     let needsReviewCount = 0;
     let severeInconsistencyCount = 0;
@@ -191,8 +199,8 @@ export async function runGlobalVerification(eventId = null) {
       } 
     };
   } catch (error) {
-    logger.error('Error en verificación global', error);
-    throw AppError.serverError('Error al ejecutar verificación global');
+    logger.error('Error en verificación global:', error);
+    throw AppError.serverError('Error al ejecutar verificación global: ' + (error.message || 'Desconocido'));
   }
 }
 
