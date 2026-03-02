@@ -196,9 +196,13 @@ export async function runGlobalVerification(eventId = null) {
   }
 }
 
-export async function getAdvancedAnalytics(eventId = null, status = 'all') {
-  try {
-    const matchQuery = eventId ? { eventId } : {};
+export async function getAdvancedAnalytics(eventId = null, status = 'all', leaderId = null) {
+    try {
+      const matchQuery = eventId ? { eventId } : {};
+
+      if (leaderId) {
+          matchQuery.leaderId = leaderId;
+      }
     
     if (status === 'confirmed') {
       matchQuery.puestoId = { $ne: null };

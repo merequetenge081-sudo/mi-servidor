@@ -190,6 +190,14 @@
                         <option value="unconfirmed">Solo datos sin confirmar</option>
                     </select>
                 </div>
+                
+                <!-- Global Leader Filter -->
+                <div class="flex items-center">
+                    <label for="global-leader-filter" class="mr-2 text-sm font-medium text-gray-700">Líder:</label>
+                    <select id="global-leader-filter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2" style="max-width: 200px;">
+                        <option value="">Todos los líderes</option>
+                    </select>
+                </div>
             </div>
             
             <!-- Simulation Trigger -->
@@ -399,8 +407,33 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             fetchAnalyticsData();
-            
-            // Toggle Event Listener
+
+              // Load all leaders into the new filter
+              const globalLeaderFilter = document.getElementById('global-leader-filter');
+              if (globalLeaderFilter) {
+                  fetch('/api/v2/leaders?limit=1000', { 
+                      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+                  })
+                  .then(r => r.json())
+                  .then(data => {
+                      if (data && data.success && data.data) {
+                          data.data.forEach(l => {
+                              const opt = document.createElement('option');
+                              opt.value = l.id || l._id;
+                              opt.textContent = l.name;
+                              globalLeaderFilter.appendChild(opt);
+                          });
+                      }
+                  })
+                  .catch(err => console.error('Error fetching leaders', err));
+
+                  // Listen for global leader changes
+                  globalLeaderFilter.addEventListener('change', () => {
+                      fetchAnalyticsData();
+                  });
+              }
+
+              // Toggle Event Listener
             toggleCheckbox.addEventListener('change', (e) => {
                 currentRegion = e.target.checked ? 'bogota' : 'nacional';
                 updateToggleLabels();
@@ -445,7 +478,9 @@
 
                 const token = localStorage.getItem('token');
                 const status = dataStatusFilter.value;
-                const response = await fetch(`/api/v2/analytics/advanced?status=${status}`, {
+                  const globalLeaderFilter = document.getElementById('global-leader-filter');
+                  const leaderId = globalLeaderFilter ? globalLeaderFilter.value : '';
+                  const response = await fetch(`/api/v2/analytics/advanced?status=${status}&leaderId=${leaderId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

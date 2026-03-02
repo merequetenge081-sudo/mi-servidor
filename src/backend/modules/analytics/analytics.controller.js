@@ -233,10 +233,10 @@ export async function getSummary(req, res, next) {
  */
 export async function getAdvanced(req, res, next) {
   try {
-    const { eventId, status } = req.query;
-    logger.info('Advanced analytics request', { eventId, status });
+    const { eventId, status, leaderId } = req.query;
+    logger.info('Advanced analytics request', { eventId, status, leaderId });
 
-    const data = await advancedService.getAdvancedAnalytics(eventId, status);
+    const data = await advancedService.getAdvancedAnalytics(eventId, status, leaderId);
 
     res.json({
       success: true,

@@ -92,21 +92,23 @@ function renderDashboard(data) {
         data.rankingGeneral.forEach((lider, index) => {
             const scoreClass = lider.performanceScore > 0 ? 'score-positive' : (lider.performanceScore < 0 ? 'score-negative' : 'score-neutral');
             const row = `
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-4 py-3 whitespace-nowrap">
+                <tr class="hover:bg-indigo-50 transition-colors group cursor-default">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <span class="text-gray-500 font-bold mr-3">#${index + 1}</span>
-                            <span class="font-medium text-gray-900">${lider.leaderName || 'Desconocido'}</span>
+                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full ${index < 3 ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-500'} font-bold mr-4 shadow-sm border ${index < 3 ? 'border-yellow-200' : 'border-gray-200'}">${index + 1}</span>
+                            <span class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">${lider.leaderName || 'Desconocido'}</span>
                         </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-500">
-                        ${lider.totalRegistros}
+                    <td class="px-4 py-4 whitespace-nowrap text-center">
+                        <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium shadow-inner">${lider.totalRegistros}</span>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center text-sm text-red-500 font-medium">
-                        ${lider.errores}
+                    <td class="px-4 py-4 whitespace-nowrap text-center">
+                        <span class="text-sm ${lider.errores > 0 ? 'text-red-500 font-bold bg-red-50' : 'text-gray-400'} px-2 py-1 rounded">${lider.errores > 0 ? '<i class="fas fa-times-circle mr-1"></i>' : ''}${lider.errores}</span>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center text-sm ${scoreClass}">
-                        ${lider.performanceScore}
+                    <td class="px-4 py-4 whitespace-nowrap text-center">
+                        <span class="text-base ${scoreClass} ${lider.performanceScore > 0 ? 'bg-green-50 px-3 py-1 rounded-full border border-green-200' : (lider.performanceScore < 0 ? 'bg-red-50 px-3 py-1 rounded-full border border-red-200' : 'bg-gray-50 px-3 py-1 rounded-full')} shadow-sm inline-flex items-center">
+                           ${lider.performanceScore > 0 ? '<i class="fas fa-caret-up mr-1 opacity-70"></i>' : (lider.performanceScore < 0 ? '<i class="fas fa-caret-down mr-1 opacity-70"></i>' : '')} ${lider.performanceScore}
+                        </span>
                     </td>
                 </tr>
             `;
@@ -123,16 +125,23 @@ function renderDashboard(data) {
     if (data.topPorLocalidad && data.topPorLocalidad.length > 0) {
         data.topPorLocalidad.forEach(loc => {
             const row = `
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                        ${loc.localidad || 'Sin Localidad'}
+                <tr class="hover:bg-indigo-50 transition-colors group cursor-default">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full ${index < 3 ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-500'} font-bold mr-4 shadow-sm border ${index < 3 ? 'border-yellow-200' : 'border-gray-200'}">${index + 1}</span>
+                            <span class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">${lider.leaderName || 'Desconocido'}</span>
+                        </div>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                        <i class="fas fa-star text-yellow-400 mr-1 text-xs"></i>
-                        ${loc.topLeader || 'Desconocido'}
+                    <td class="px-4 py-4 whitespace-nowrap text-center">
+                        <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium shadow-inner">${lider.totalRegistros}</span>
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm text-gray-500 font-medium">
-                        ${loc.totalRegistros}
+                    <td class="px-4 py-4 whitespace-nowrap text-center">
+                        <span class="text-sm ${lider.errores > 0 ? 'text-red-500 font-bold bg-red-50' : 'text-gray-400'} px-2 py-1 rounded">${lider.errores > 0 ? '<i class="fas fa-times-circle mr-1"></i>' : ''}${lider.errores}</span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-center">
+                        <span class="text-base ${scoreClass} ${lider.performanceScore > 0 ? 'bg-green-50 px-3 py-1 rounded-full border border-green-200' : (lider.performanceScore < 0 ? 'bg-red-50 px-3 py-1 rounded-full border border-red-200' : 'bg-gray-50 px-3 py-1 rounded-full')} shadow-sm inline-flex items-center">
+                           ${lider.performanceScore > 0 ? '<i class="fas fa-caret-up mr-1 opacity-70"></i>' : (lider.performanceScore < 0 ? '<i class="fas fa-caret-down mr-1 opacity-70"></i>' : '')} ${lider.performanceScore}
+                        </span>
                     </td>
                 </tr>
             `;
