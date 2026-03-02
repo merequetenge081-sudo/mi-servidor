@@ -253,8 +253,16 @@ export async function getAdvancedAnalytics(eventId = null, status = 'all', leade
 
       if (!data[region].topMesas[loc]) data[region].topMesas[loc] = {};
       if (!data[region].topMesas[loc][puestoName]) data[region].topMesas[loc][puestoName] = {};
-      if (!data[region].topMesas[loc][puestoName][mesa]) data[region].topMesas[loc][puestoName][mesa] = 0;
-      data[region].topMesas[loc][puestoName][mesa]++;
+if (!data[region].topMesas[loc][puestoName][mesa]) data[region].topMesas[loc][puestoName][mesa] = { count: 0, voters: [] };
+        data[region].topMesas[loc][puestoName][mesa].count++;
+        // Limit to 100 to avoid giant JSONs
+        if (data[region].topMesas[loc][puestoName][mesa].voters.length < 100) {
+            data[region].topMesas[loc][puestoName][mesa].voters.push({
+                nombre: `${reg.firstName || ''} ${reg.lastName || ''}`.trim(),
+                cedula: reg.cedula,
+                lider: leader
+            });
+        }
 
       if (!data[region].leadersByLocalidad[loc]) data[region].leadersByLocalidad[loc] = {};
       if (!data[region].leadersByLocalidad[loc][leader]) data[region].leadersByLocalidad[loc][leader] = 0;
@@ -293,9 +301,10 @@ export async function getAdvancedAnalytics(eventId = null, status = 'all', leade
 
       const jerarquia = Object.entries(regionData.topMesas).map(([localidad, puestos]) => {
         const puestosArr = Object.entries(puestos).map(([puesto, mesas]) => {
-          const mesasArr = Object.entries(mesas).map(([mesa, count]) => ({
-            mesa,
-            totalVotos: count
+const mesasArr = Object.entries(mesas).map(([mesa, mesaData]) => ({
+              mesa,
+              totalVotos: mesaData.count,
+              voters: mesaData.voters
           })).sort((a, b) => b.totalVotos - a.totalVotos);
           
           const totalPuesto = mesasArr.reduce((sum, m) => sum + m.totalVotos, 0);
