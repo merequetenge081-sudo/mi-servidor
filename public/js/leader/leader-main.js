@@ -87,21 +87,26 @@ function connectEventListeners(leaderId, leaderData) {
     // ========== SEARCH Y FILTROS ==========
     const searchInput = document.getElementById('searchInput');
     const unifiedFilter = document.getElementById('unifiedFilter');
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+
+    const triggerFilter = () => {
+        const searchTerm = searchInput ? searchInput.value : '';
+        const filterValue = unifiedFilter ? unifiedFilter.value : '';
+        RegistrationsManager.applyFilters(searchTerm, filterValue);
+    };
+
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', triggerFilter);
+    }
 
     if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value;
-            const filterValue = unifiedFilter ? unifiedFilter.value : '';
-            RegistrationsManager.applyFilters(searchTerm, filterValue);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') triggerFilter();
         });
     }
 
     if (unifiedFilter) {
-        unifiedFilter.addEventListener('change', (e) => {
-            const filterValue = e.target.value;
-            const searchTerm = searchInput ? searchInput.value : '';
-            RegistrationsManager.applyFilters(searchTerm, filterValue);
-        });
+        unifiedFilter.addEventListener('change', triggerFilter);
     }
     // ========== BOTONES DE VISTA ==========
     const viewButtons = document.querySelectorAll('[data-view-button]');

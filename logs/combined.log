@@ -11407,3 +11407,118 @@
 {"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-01 11:45:04"}
 {"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-01 11:45:04"}
 {"level":"error","message":"[AuthService] ❌ Impersonate error: Cast to ObjectId failed for value \"123\" (type string) at path \"_id\" for model \"Admin\"","service":"mi-servidor","stack":"CastError: Cast to ObjectId failed for value \"123\" (type string) at path \"_id\" for model \"Admin\"\n    at ObjectId.cast (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\schema\\objectid.js:250:11)\n    at SchemaType.applySetters (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\schematype.js:1219:12)\n    at SchemaType.castForQuery (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\schematype.js:1633:15)\n    at cast (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\cast.js:389:32)\n    at Query.cast (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\query.js:4927:12)\n    at Query._castConditions (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\query.js:2237:10)\n    at model.Query._findOne (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\query.js:2533:8)\n    at model.Query.exec (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\query.js:4447:28)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Module.impersonateLeader (file:///C:/Users/Janus/Projects/mi-servidor/src/backend/modules/auth/auth.service.js:397:22)","timestamp":"2026-03-01 11:45:04"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-01 15:26:11"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:11"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-01 15:26:11"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:11"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - Tu enlace personalizado","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"📧 sendAccessEmail() para: undefined","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 👋 ¡Bienvenido al Sistema!","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔐 Tu Nueva Contraseña Temporal","service":"mi-servidor","timestamp":"2026-03-01 15:26:12"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-01 15:26:19"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:19"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-01 15:26:19"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:19"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - Tu enlace personalizado","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"📧 sendAccessEmail() para: undefined","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 👋 ¡Bienvenido al Sistema!","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔐 Tu Nueva Contraseña Temporal","service":"mi-servidor","timestamp":"2026-03-01 15:26:20"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-01 15:49:13"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-01 15:49:14"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-01 15:49:14"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:49:14"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - Tu enlace personalizado","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"📧 sendAccessEmail() para: undefined","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 👋 ¡Bienvenido al Sistema!","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔐 Tu Nueva Contraseña Temporal","service":"mi-servidor","timestamp":"2026-03-01 15:49:16"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-01 16:50:20"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-01 16:50:20"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-01 16:50:20"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 16:50:20"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - Tu enlace personalizado","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"📧 sendAccessEmail() para: undefined","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 👋 ¡Bienvenido al Sistema!","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔐 Tu Nueva Contraseña Temporal","service":"mi-servidor","timestamp":"2026-03-01 16:50:22"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-01 18:43:03"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-01 18:43:03"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-01 18:43:03"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 18:43:03"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - Tu enlace personalizado","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"📧 sendAccessEmail() para: undefined","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"0":"L","1":"e","10":"i","11":"l","12":" ","13":"n","14":"o","15":" ","16":"p","17":"r","18":"o","19":"p","2":"a","20":"o","21":"r","22":"c","23":"i","24":"o","25":"n","26":"a","27":"d","28":"o","3":"d","4":"e","5":"r","6":" ","7":"e","8":"m","9":"a","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"📧 sendAccessEmail() para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"0":"L","1":"e","10":"e","11":"n","12":" ","13":"n","14":"o","15":" ","16":"d","17":"i","18":"s","19":"p","2":"a","20":"o","21":"n","22":"i","23":"b","24":"l","25":"e","3":"d","4":"e","5":"r","6":" ","7":"t","8":"o","9":"k","level":"error","message":"❌ Error en sendAccessEmail:","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 👋 ¡Bienvenido al Sistema!","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"🔑 sendCredentialsEmail para: test@example.com","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"warn","message":"🔑 El líder no tiene tempPasswordPlaintext","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔑 Tus Credenciales de Acceso","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"📧 [MOCK] Email a test@example.com - 🔐 Tu Nueva Contraseña Temporal","service":"mi-servidor","timestamp":"2026-03-01 18:43:04"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-01 18:59:20"}
+{"level":"info","message":"[AdvancedAnalyticsService] Iniciando verificación global de matching... Evento: Todos","service":"mi-servidor","timestamp":"2026-03-01 19:54:09"}
+{"level":"error","message":"[AdvancedAnalyticsService] ❌ Error en validateAndFixLocation para 6984ec1c999b0033b4707956:: Registration validation failed: lastName: Path `lastName` is required.","service":"mi-servidor","stack":"ValidationError: Registration validation failed: lastName: Path `lastName` is required.\n    at Document.invalidate (C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3221:32)\n    at C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\document.js:3014:17\n    at C:\\Users\\Janus\\Projects\\mi-servidor\\node_modules\\mongoose\\lib\\schematype.js:1368:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2026-03-01 19:54:15"}
+{"level":"info","message":"[AdvancedAnalyticsService] Iniciando verificación global de matching... Evento: Todos","service":"mi-servidor","timestamp":"2026-03-01 20:32:59"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-01 21:14:17"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-01 21:14:17"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-01 21:14:17"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-03-01 21:14:17"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-03-01 21:14:17"}
+{"level":"warn","message":"⚠️ Usando JWT_SECRET por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-03-01 21:14:17"}
+{"level":"warn","message":"⚠️ Usando ENCRYPTION_KEY por defecto (solo para desarrollo)","service":"mi-servidor","timestamp":"2026-03-01 21:14:17"}
+{"level":"info","message":"✅ Autenticación en memoria inicializada","service":"mi-servidor","timestamp":"2026-03-01 21:14:18"}
+{"level":"info","message":"📋 Credenciales de prueba: admin/admin123, lider@example.com/leader123","service":"mi-servidor","timestamp":"2026-03-01 21:14:18"}
+{"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-03-01 21:14:18"}
+{"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-03-01 21:14:19"}
+{"level":"info","message":"✅ Puestos ya inicializados: 1681 puestos en BD","service":"mi-servidor","timestamp":"2026-03-01 21:14:20"}
+{"intervalMinutes":60,"level":"info","message":"Temp password cleanup scheduled","service":"mi-servidor","timestamp":"2026-03-01 21:14:20"}
+{"env":"development","ip":"127.0.0.1","level":"info","message":"http_request","method":"GET","path":"/api/v2/analytics/simulation","requestId":"76a1cc73-9a07-4bb4-b067-8d1bb5726c9b","service":"mi-servidor","timestamp":"2026-03-01 21:14:56"}
+{"level":"info","message":"[AnalyticsController] Simulation data request","service":"mi-servidor","timestamp":"2026-03-01 21:14:56"}
+{"durationMs":483,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/analytics/simulation","requestId":"76a1cc73-9a07-4bb4-b067-8d1bb5726c9b","service":"mi-servidor","statusCode":200,"timestamp":"2026-03-01 21:14:56","userId":null,"userRole":null}

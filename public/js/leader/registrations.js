@@ -21,7 +21,32 @@ export class RegistrationsManager {
             const registrations = this.parseRegistrationsResponse(allRegistrations);
 
             this.myRegistrations = registrations.filter(r => r.leaderId === leaderId);
-            this.filteredRegistrations = [...this.myRegistrations];
+            
+            // Reapply existing filters if present
+            const searchInput = document.getElementById('searchInput');
+            const unifiedFilter = document.getElementById('unifiedFilter');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const filterValue = unifiedFilter ? unifiedFilter.value : '';
+            
+            if (searchTerm || filterValue) {
+                this.filteredRegistrations = this.myRegistrations.filter(reg => {
+                    const matchSearch = !searchTerm ||
+                        (reg.firstName && reg.firstName.toLowerCase().includes(searchTerm)) ||
+                        (reg.lastName && reg.lastName.toLowerCase().includes(searchTerm)) ||
+                        (reg.email && reg.email.toLowerCase().includes(searchTerm)) ||
+                        (reg.cedula && reg.cedula.toLowerCase().includes(searchTerm));
+
+                    let matchUnified = true;
+                    if (filterValue === 'confirmed') matchUnified = reg.confirmed;
+                    else if (filterValue === 'pending') matchUnified = !reg.confirmed;
+                    else if (filterValue === 'needs_review') matchUnified = (reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta);
+                    else if (filterValue === 'no_review') matchUnified = !(reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta);
+
+                    return matchSearch && matchUnified;
+                });
+            } else {
+                this.filteredRegistrations = [...this.myRegistrations];
+            }
             
             if (!keepPage) {
                 this.currentPage = 1;
@@ -306,12 +331,13 @@ export class RegistrationsManager {
     }
 
     static applyFilters(searchTerm, unifiedFilter) {
+        const lowerSearch = searchTerm ? searchTerm.toLowerCase() : '';
         this.filteredRegistrations = this.myRegistrations.filter(reg => {
-            const matchSearch = !searchTerm ||
-                (reg.firstName && reg.firstName.toLowerCase().includes(searchTerm)) ||
-                (reg.lastName && reg.lastName.toLowerCase().includes(searchTerm)) ||
-                (reg.email && reg.email.toLowerCase().includes(searchTerm)) ||
-                (reg.cedula && reg.cedula.toLowerCase().includes(searchTerm));
+            const matchSearch = !lowerSearch ||
+                (reg.firstName && reg.firstName.toLowerCase().includes(lowerSearch)) ||
+                (reg.lastName && reg.lastName.toLowerCase().includes(lowerSearch)) ||
+                (reg.email && reg.email.toLowerCase().includes(lowerSearch)) ||
+                (reg.cedula && reg.cedula.toLowerCase().includes(lowerSearch));
 
             let matchUnified = true;
             if (unifiedFilter === 'confirmed') matchUnified = reg.confirmed;
