@@ -1,14 +1,14 @@
 // leader-main.js - Módulo principal de inicialización
-import { AuthManager } from './auth.js';
-import { UIManager } from './ui.js';
-import { RegistrationsManager } from './registrations.js';
-import { FormManager } from './forms.js?v=2.7.3';
-import { DeleteManager } from './delete.js';
-import { StatisticsManager } from './statistics.js';
-import { ImportExportManager } from './import-export.js';
-import { ModalsManager } from './modals.js';
-import { LeaderManager } from './leader.js';
-import { StorageManager } from './utils.js';
+import { AuthManager } from './auth.js?v=2.7.4';
+import { UIManager } from './ui.js?v=2.7.4';
+import { RegistrationsManager } from './registrations.js?v=2.7.4';
+import { FormManager } from './forms.js?v=2.7.4';
+import { DeleteManager } from './delete.js?v=2.7.4';
+import { StatisticsManager } from './statistics.js?v=2.7.4';
+import { ImportExportManager } from './import-export.js?v=2.7.4';
+import { ModalsManager } from './modals.js?v=2.7.4';
+import { LeaderManager } from './leader.js?v=2.7.4';
+import { StorageManager } from './utils.js?v=2.7.4';
 
 // Exportar managers globales para que puedan ser accedidos desde onclick handlers en HTML
 window.registrationsManager = RegistrationsManager;
