@@ -436,17 +436,27 @@ export async function getLeaderPerformance(eventId = null) {
           totalRegistros: { $sum: 1 },
           errores: {
             $sum: {
-              $cond: [{ $or: ['$necesitaRevision', '$inconsistenciaGrave'] }, 1, 0]
+              $cond: [
+                {
+                  $or: [
+                    { $eq: ['$requiereRevisionPuesto', true] },
+                    { $eq: ['$necesitaRevision', true] },
+                    { $eq: ['$inconsistenciaGrave', true] }
+                  ]
+                },
+                1,
+                0
+              ]
             }
           },
           inconsistenciasGraves: {
-            $sum: { $cond: ['$inconsistenciaGrave', 1, 0] }
+            $sum: { $cond: [{ $eq: ['$inconsistenciaGrave', true] }, 1, 0] }
           },
           importaciones: {
-            $sum: { $cond: ['$importado', 1, 0] }
+            $sum: { $cond: [{ $eq: ['$importado', true] }, 1, 0] }
           },
           verificaciones: {
-            $sum: { $cond: ['$verificadoAuto', 1, 0] }
+            $sum: { $cond: [{ $eq: ['$verificadoAuto', true] }, 1, 0] }
           }
         }
       },
