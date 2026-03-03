@@ -13,6 +13,7 @@ import { createLogger } from "../../core/Logger.js";
 import { AppError } from "../../core/AppError.js";
 import config from "../../config/config.js";
 import { parsePagination } from "../../../utils/pagination.js";
+import Leader from "../../../models/Leader.js";
 
 const logger = createLogger("RegistrationController");
 const service = new RegistrationService();
@@ -259,14 +260,45 @@ export class RegistrationController {
     try {
       logger.info("POST bulkCreateRegistrations", { count: req.body.registrations?.length });
 
-      const { registrations } = req.body;
+      const { registrations, leaderId } = req.body;
 
       if (!Array.isArray(registrations)) {
         throw AppError.badRequest("registrations debe ser un array");
       }
 
+      // 1. Identify target leader for the bulk import
+      const targetLeaderId = leaderId || req.user?._id;
+      if (!targetLeaderId) {
+        throw AppError.badRequest("No se especificó un líder para la importación.");
+      }
+
+      // 2. Fetch leader details to inject into registrations
+      const leader = await Leader.findOne({ 
+        $or: [
+          { _id: targetLeaderId.toString().match(/^[0-9a-fA-F]{24}$/) ? targetLeaderId : null },
+          { leaderId: targetLeaderId }
+        ]
+      }).lean();
+
+      if (!leader) {
+        throw AppError.notFound("Líder no encontrado para asignar los registros.");
+      }
+
+      const assignedEventId = leader.eventId || leader.assignedEventId;
+      if (!assignedEventId) {
+        throw AppError.badRequest("El líder no tiene un evento asignado.");
+      }
+
+      // 3. Inject leader and event details into each item so the Service schema validation passes
+      const enrichedRegistrations = registrations.map(reg => ({
+        ...reg,
+        leaderId: leader.leaderId,
+        leaderName: leader.name,
+        eventId: assignedEventId
+      }));
+
       const result = await service.bulkCreateRegistrations(
-        registrations,
+        enrichedRegistrations,
         req.orgId,
         req.user?._id
       );
