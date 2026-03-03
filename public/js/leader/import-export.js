@@ -47,7 +47,7 @@ export class ImportExportManager {
 
                 const registrations = this.mapImportRows(jsonData);
 
-                const response = await fetch(`${API_URL}/api/registrations/bulk`, {
+                const response = await fetch(`${API_URL}/api/v2/registrations/bulk/create`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
