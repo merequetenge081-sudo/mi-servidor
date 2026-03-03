@@ -284,7 +284,6 @@ export async function generateReportPDF(options = {}) {
         doc.on('end', () => resolve(Buffer.concat(buffers)));
 
         const nowStr = new Date().toLocaleDateString('es-CO');
-        const sessionId = Math.random().toString(36).substring(2, 8).toUpperCase();
         const renderFilterValue = (value, fallback = 'Todos') => (value === null || value === undefined || value === '' ? fallback : String(value));
 
         const drawHeader = (title) => {
@@ -295,8 +294,8 @@ export async function generateReportPDF(options = {}) {
         };
 
         const drawFooter = (pageNum) => {
-          doc.fillColor('#94a3b8').fontSize(9).font('Helvetica').text('Confidencial - Informe Analitico de Campana', 40, 560);
-          doc.text(`Pagina ${pageNum} | Sesion ${sessionId}`, 700, 560);
+          doc.fillColor('#94a3b8').fontSize(9).font('Helvetica').text(`Informe analitico | Evento: ${eventName}`, 40, 560, { width: 520 });
+          doc.text(`Pagina ${pageNum} de 4`, 740, 560);
         };
 
         const drawKPIBox = (x, y, title, value, subtitle, color) => {
@@ -320,11 +319,13 @@ export async function generateReportPDF(options = {}) {
           `EventId: ${renderFilterValue(activeEventId, 'Activo')}\nRegion: ${regionKey.toUpperCase()}\nEstado: ${renderFilterValue(status, 'all')}\nLider: ${renderFilterValue(leaderId, 'Todos')}`,
           40, 336, { width: 420, lineGap: 4 }
         );
-        doc.fillColor('#334155').fontSize(13).font('Helvetica-Bold').text('SINTESIS', 40, 426);
+        doc.fillColor('#334155').fontSize(13).font('Helvetica-Bold').text('RESUMEN CUANTITATIVO', 40, 426);
         doc.fillColor('#1e293b').fontSize(10).font('Helvetica').text(
+          `- Registros del evento: ${totalRegistrations.toLocaleString('es-CO')}\n` +
+          `- Lideres con actividad: ${totalLeaders.toLocaleString('es-CO')}\n` +
           `- Tendencia 30 dias: ${trendDirection} (${trendPct.toFixed(2)}%)\n` +
-          `- Proyeccion objetivo: ${(simulationData?.projectedTotal || 0).toLocaleString('es-CO')}\n` +
-          `- Top lider: ${simulationData?.topLeader || 'N/D'} (${simulationData?.topLeaderVotes || 0})`,
+          `- Proyeccion al objetivo: ${(simulationData?.projectedTotal || 0).toLocaleString('es-CO')}\n` +
+          `- Lider con mayor aporte: ${simulationData?.topLeader || 'N/D'} (${simulationData?.topLeaderVotes || 0})`,
           50, 448, { width: 400, lineGap: 5 }
         );
 
@@ -366,9 +367,11 @@ export async function generateReportPDF(options = {}) {
         const locImg = await getQuickChartImage(locCfg, 390, 260);
         if (locImg) doc.image(locImg, 435, 140, { width: 370 });
 
-        doc.fillColor('#334155').fontSize(11).font('Helvetica').text(
-          `Total votos (${regionKey}): ${(regionData.totalVotos || 0).toLocaleString('es-CO')}. Datos exclusivos del evento y filtros vigentes.`,
-          40, 430, { width: 760, lineGap: 4 }
+        doc.fillColor('#334155').fontSize(11).font('Helvetica').text(`Total votos region ${regionKey.toUpperCase()}: ${(regionData.totalVotos || 0).toLocaleString('es-CO')}`, 40, 430);
+        doc.fillColor('#334155').fontSize(10).font('Helvetica').text(
+          `Top puesto: ${(topPuestos[0]?._id || 'N/D')} (${(topPuestos[0]?.totalVotos || 0).toLocaleString('es-CO')}) | ` +
+          `Top localidad: ${(topLocalidades[0]?._id || 'N/D')} (${(topLocalidades[0]?.totalVotos || 0).toLocaleString('es-CO')})`,
+          40, 448, { width: 760, lineGap: 4 }
         );
         drawFooter(2);
 
@@ -395,7 +398,7 @@ export async function generateReportPDF(options = {}) {
         if (qualityImg) doc.image(qualityImg, 435, 140, { width: 370 });
 
         doc.rect(40, 430, 762, 95).fill('#ffffff');
-        doc.fillColor('#0f172a').fontSize(12).font('Helvetica-Bold').text('Top 5 lideres', 55, 446);
+        doc.fillColor('#0f172a').fontSize(12).font('Helvetica-Bold').text('TOP 5 LIDERES DEL EVENTO', 55, 446);
         topRanking.slice(0, 5).forEach((leader, idx) => {
           doc.fillColor('#334155').fontSize(10).font('Helvetica').text(
             `${idx + 1}. ${leader.leaderName || 'Sin nombre'} | Score ${leader.performanceScore || 0} | Registros ${leader.totalRegistros || 0}`,
@@ -437,9 +440,12 @@ export async function generateReportPDF(options = {}) {
         );
 
         doc.rect(40, 430, 762, 95).fill('#ecfeff');
-        doc.fillColor('#475569').fontSize(11).font('Helvetica').text(
-          'Informe consolidado desde modulos analytics + advanced. Solo incluye datos del evento seleccionado y filtros activos del panel.',
-          50, 462, { width: 740, lineGap: 4 }
+        doc.fillColor('#475569').fontSize(11).font('Helvetica-Bold').text('CONCLUSION OPERATIVA', 50, 446);
+        doc.fillColor('#475569').fontSize(10).font('Helvetica').text(
+          `Con ${totalRegistrations.toLocaleString('es-CO')} registros y tendencia ${trendDirection} (${trendPct.toFixed(2)}%), ` +
+          `la proyeccion estimada es ${(simulationData?.projectedTotal || 0).toLocaleString('es-CO')} al corte objetivo. ` +
+          `La mayor concentracion actual esta en ${simulationData?.topPuesto || 'N/D'} y ${simulationData?.topLocalidad || 'N/D'}.`,
+          50, 466, { width: 740, lineGap: 4 }
         );
         drawFooter(4);
 
