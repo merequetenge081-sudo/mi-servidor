@@ -1,0 +1,1 @@
+import mongoose from 'mongoose'; import 'dotenv/config'; import { Leader } from './src/models/Leader.js'; async function run() { await mongoose.connect(process.env.MONGODB_URI); const leader = await Leader.findOne({ leaderId: 'leader1770062619833' }).lean(); console.log(leader); process.exit(0); } run();

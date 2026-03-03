@@ -2328,6 +2328,41 @@ addListener('exportByLeaderBtn', 'click', () => {
     exportToExcel(data, `registros_${leader.name.replace(/ /g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`, `Reporte de Registros - ${leader.name}`);
 });
 
+addListener('exportByLocalidadBtn', 'click', () => {
+    const localidad = document.getElementById('exportLocalidadSelect').value;
+    if (!localidad) return showAlert('Por favor seleccione una localidad', 'warning');
+
+    const filtered = allRegistrations.filter(r => r.localidad === localidad);
+    if (filtered.length === 0) return showAlert('Esta localidad no tiene registros', 'info');
+
+    const data = filtered.map(r => {
+        let nombre = (r.firstName || '').trim();
+        let apellido = (r.lastName || '').trim();
+        let nombreCompleto = nombre;
+        if (apellido && !nombre.toLowerCase().includes(apellido.toLowerCase())) {
+            nombreCompleto = `${nombre} ${apellido}`.trim();
+        } else if (!nombre && apellido) {
+            nombreCompleto = apellido;
+        }
+
+        return {
+            'Nombres y Apellidos': nombreCompleto,
+            Email: r.email || '',
+            Cédula: r.cedula || '',
+            Teléfono: r.phone || '',
+            Departamento: r.departamento || r.department || '',
+            Municipio: r.capital || r.municipality || '',
+            Localidad: r.localidad || '',
+            Líder: r.leaderName || '',
+            Puesto: r.votingPlace || '',
+            Mesa: r.votingTable || '',
+            Fecha: new Date(r.date).toLocaleDateString('es-CO'),
+            Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
+        };
+    });
+    exportToExcel(data, `registros_${localidad.replace(/ /g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`, `Reporte de Registros - ${localidad}`);
+});
+
 addListener('exportLeaderStatsBtn', 'click', () => {
     if (!leaderAnalyticsData || leaderAnalyticsData.length === 0) return showAlert('No hay datos para exportar', 'warning');
     const data = leaderAnalyticsData.map(l => ({
@@ -2517,13 +2552,20 @@ addListener('exportLeaderStatsBtn', 'click', () => {
 // Populate Export Leader Select
 function populateExportLeader() {
     const select = document.getElementById('exportLeaderSelect');
-    if (!select) return;
+    if (select) {
+        // Sort leaders by name
+        const sorted = [...allLeaders].sort((a, b) => a.name.localeCompare(b.name));
 
-    // Sort leaders by name
-    const sorted = [...allLeaders].sort((a, b) => a.name.localeCompare(b.name));
+        select.innerHTML = '<option value="">Seleccione un líder...</option>' +     
+            sorted.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+    }
 
-    select.innerHTML = '<option value="">Seleccione un líder...</option>' +     
-        sorted.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+    const locSelect = document.getElementById('exportLocalidadSelect');
+    if (locSelect) {
+        const uniqueLocalidades = [...new Set(allRegistrations.map(r => r.localidad).filter(l => l && l.trim() !== ''))].sort();
+        locSelect.innerHTML = '<option value="">Seleccione una localidad...</option>' +
+            uniqueLocalidades.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+    }
 }
 
 // Export Specific Leader Registrations
