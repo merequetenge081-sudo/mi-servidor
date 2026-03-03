@@ -2603,44 +2603,6 @@ function populateExportLeader() {
     }
 }
 
-// Export Specific Leader Registrations
-addListener('exportByLeaderBtn', 'click', () => {
-    const select = document.getElementById('exportLeaderSelect');
-    const leaderId = select.value;
-
-    if (!leaderId) return showAlert('Por favor seleccione un líder', 'warning');
-
-    const leaderFn = allLeaders.find(l => l._id === leaderId);
-    const leaderName = leaderFn ? leaderFn.name.replace(/ /g, '_') : 'lider';   
-
-    const regs = allRegistrations.filter(r => r.leaderId === leaderId);
-    if (regs.length === 0) return showAlert('Este líder no tiene registros', 'info');
-    
-    const data = regs.map(r => ({
-        Nombre: `${r.firstName} ${r.lastName}`,
-        Email: r.email || '',
-        Cédula: r.cedula || '',
-        Teléfono: r.phone || '',
-        Ubicación: r.localidad || r.departamento || '',
-        Municipio: r.capital || r.municipality || '',
-        Fecha: new Date(r.date).toLocaleDateString('es-CO'),
-        Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
-    }));
-
-    exportToExcel(data, `registros_${leaderName}_${new Date().toISOString().slice(0, 10)}.xlsx`, `Registros - ${leaderFn ? leaderFn.name : 'Líder'}`);
-                loadDashboard();
-                showSuccessModal('¡Actualizado!', 'La información del líder ha sido actualizada.');
-            } else {
-                const data = await res.json();
-                showAlert('Error: ' + (data.error || 'No se pudo actualizar'), 'error');
-            }
-        } catch (err) {
-            console.error(err);
-            showAlert('Error de conexión', 'error');
-        }
-    });
-}
-
 // ============== DELETION REQUESTS ==============
 
 let deletionRequests = [];
