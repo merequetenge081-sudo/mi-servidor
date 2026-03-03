@@ -1,14 +1,14 @@
 // leader-main.js - Módulo principal de inicialización
-import { AuthManager } from './auth.js?v=2.7.4';
-import { UIManager } from './ui.js?v=2.7.4';
-import { RegistrationsManager } from './registrations.js?v=2.7.4';
-import { FormManager } from './forms.js?v=2.7.4';
-import { DeleteManager } from './delete.js?v=2.7.4';
-import { StatisticsManager } from './statistics.js?v=2.7.4';
-import { ImportExportManager } from './import-export.js?v=2.7.4';
-import { ModalsManager } from './modals.js?v=2.7.4';
-import { LeaderManager } from './leader.js?v=2.7.4';
-import { StorageManager } from './utils.js?v=2.7.4';
+import { AuthManager } from './auth.js?v=2.7.5';
+import { UIManager } from './ui.js?v=2.7.5';
+import { RegistrationsManager } from './registrations.js?v=2.7.5';
+import { FormManager } from './forms.js?v=2.7.5';
+import { DeleteManager } from './delete.js?v=2.7.5';
+import { StatisticsManager } from './statistics.js?v=2.7.5';
+import { ImportExportManager } from './import-export.js?v=2.7.5';
+import { ModalsManager } from './modals.js?v=2.7.5';
+import { LeaderManager } from './leader.js?v=2.7.5';
+import { StorageManager } from './utils.js?v=2.7.5';
 
 // Exportar managers globales para que puedan ser accedidos desde onclick handlers en HTML
 window.registrationsManager = RegistrationsManager;
@@ -302,7 +302,7 @@ function connectEventListeners(leaderId, leaderData) {
             const response = await DeleteManager.performDelete();
             if (response.ok) {
                 DeleteManager.closeDeleteConfirmModal();
-                await RegistrationsManager.loadRegistrations(leaderId);
+                await RegistrationsManager.loadRegistrations(leaderId, true);
                 RegistrationsManager.renderRegistrations();
                 RegistrationsManager.checkRevisionPendiente();
                 StatisticsManager.loadStatistics(RegistrationsManager.myRegistrations);
@@ -598,7 +598,7 @@ window.autoVerifyRegistrations = async () => {
             `Sin cambios: ${result.unchanged}`;
 
         ModalsManager.showSuccessModal('Verificacion automatica', message);
-        await window.refreshRegistrations();
+        await window.refreshRegistrations(true);
     } catch (error) {
         alert(error.message || 'Error al verificar registros');
     } finally {

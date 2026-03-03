@@ -92,6 +92,13 @@ export class RegistrationsManager {
 
     static renderRegistrations() {
         const tbody = document.getElementById('registrationsTableBody');
+        
+        // Ensure currentPage is valid if array size decreased
+        const totalPages = Math.ceil(this.filteredRegistrations.length / this.itemsPerPage) || 1;
+        if (this.currentPage > totalPages) {
+            this.currentPage = totalPages;
+        }
+
         const start = (this.currentPage - 1) * this.itemsPerPage;
         const end = start + this.itemsPerPage;
         const pageData = this.filteredRegistrations.slice(start, end);
