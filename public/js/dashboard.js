@@ -2279,6 +2279,41 @@ function exportAllRegistrations() {
 addListener('exportRegsBtn', 'click', exportAllRegistrations);
 addListener('exportRegsMainBtn', 'click', exportAllRegistrations);
 
+addListener('fixNamesBtn', 'click', async () => {
+    if (!confirm('¿Estás seguro de que deseas estandarizar y corregir los nombres de todos los registros del evento actual? Esta acción no se puede deshacer.')) return;
+    
+    try {
+        const btn = document.getElementById('fixNamesBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+        btn.disabled = true;
+        
+        const res = await apiCall('/api/registrations/fix-names', {
+            method: 'POST',
+            body: JSON.stringify({ eventId: currentEventId })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+            showAlert(data.message || `Se corrigieron ${data.updated} registros con éxito.`, 'success');
+            loadDashboard(); // Recargar datos
+        } else {
+            showAlert(data.error || 'Error al corregir nombres', 'error');
+        }
+        
+        // Timeout para visual fluid behavior
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 1000);
+    } catch (e) {
+        console.error(e);
+        showAlert('Error de red al intentar corregir nombres', 'error');
+        document.getElementById('fixNamesBtn').innerHTML = '<i class="bi bi-magic"></i> Corregir Nombres';
+        document.getElementById('fixNamesBtn').disabled = false;
+    }
+});
+
 addListener('exportLeadersMainBtn', 'click', () => {
     try {
         console.log('Export Leaders Clicked');

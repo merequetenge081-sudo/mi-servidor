@@ -247,7 +247,8 @@ router.put("/registrations/:id", authMiddleware, registrationController.updateRe
 router.delete("/registrations/:id", authMiddleware, registrationController.deleteRegistration);
 router.post("/registrations/:id/confirm", authMiddleware, registrationController.confirmRegistration);
 router.post("/registrations/:id/unconfirm", authMiddleware, roleMiddleware("admin"), registrationController.unconfirmRegistration);
-
+  // ==================== BATCH FIXES ====================
+  router.post("/registrations/fix-names", authMiddleware, roleMiddleware("admin"), registrationController.fixNames);
 // ==================== DELETION REQUESTS ====================
 router.post("/registrations/deletion-request", authMiddleware, registrationController.requestBulkDeletion);
 router.get("/registrations/deletion-request/status", authMiddleware, registrationController.getDeletionRequestStatus);
