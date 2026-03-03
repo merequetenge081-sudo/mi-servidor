@@ -184,13 +184,13 @@ export async function generateReportPDF(eventId = null) {
   try {
     logger.info('Preparando PDF report avanzado', { eventId });
 
-    const [analytics, leaderPerf, roleDist] = await Promise.all([
-      analyticsService.getSummary(),
-      advancedService.getLeaderPerformance({}),
-      advancedService.getRoleDistribution({})
-    ]);
+    // Call real existing methods
+    const dashboard = await analyticsService.getDashboardSummary(eventId);
+    const leaderPerf = await advancedService.getLeaderPerformance(eventId);
 
-    const { totalLeaders, totalRegistrations } = analytics;
+    const summary = dashboard?.summary || {};
+    const totalLeaders = summary.uniqueLeaders || 0;
+    const totalRegistrations = summary.totalRegistrations || 0;
 
     return new Promise((resolve, reject) => {
       try {
@@ -199,45 +199,30 @@ export async function generateReportPDF(eventId = null) {
 
         doc.on('data', buffers.push.bind(buffers));
         doc.on('end', () => {
-          const pdfData = Buffer.concat(buffers);
-          resolve(pdfData);
+          resolve(Buffer.concat(buffers));
         });
 
         doc.font('Helvetica');
 
+        // Document Header
         doc.fontSize(22).fillColor('#2c3e50').text('Informe Analítico Avanzado', { align: 'center' });
         doc.moveDown();
         
         doc.fontSize(10).fillColor('#7f8c8d').text(`Generado: ${new Date().toLocaleString()}`, { align: 'right' });
         doc.moveDown(1.5);
 
+        // --- SECTION 1: GLOBAL SUMMARY ---
         doc.fontSize(16).fillColor('#e74c3c').text('1. Resumen General Constitucional');
         doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#e74c3c').stroke();
         doc.moveDown(0.5);
         
         doc.fontSize(12).fillColor('#34495e');
-        doc.text(`Total Líderes Activos: ${totalLeaders || 0}`);
-        doc.text(`Total Registros Captados: ${totalRegistrations || 0}`);
+        doc.text(`Total Líderes Activos: ${totalLeaders}`);
+        doc.text(`Total Registros Captados: ${totalRegistrations}`);
         doc.moveDown(2);
 
-        doc.fontSize(16).fillColor('#3498db').text('2. Distribución Organizacional por Roles');
-        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#3498db').stroke();
-        doc.moveDown(0.5);
-        
-        doc.fontSize(11).fillColor('#2c3e50');
-        if (roleDist && roleDist.length > 0) {
-          roleDist.forEach(role => {
-            const roleName = role._id || 'Voluntario/Sin Asignar';
-            const count = role.count || 0;
-            const regCount = role.registrationsCount || 0;
-            doc.text(`> ${roleName}: ${count} gestores -> (${regCount} adheridos)`);
-          });
-        } else {
-          doc.text('No existen roles configurados en el sistema.', { font: 'Helvetica-Oblique' });
-        }
-        doc.moveDown(2);
-
-        doc.fontSize(16).fillColor('#27ae60').text('3. Cuadro de Honor y Rendimiento de Líderes');
+        // --- SECTION 2: TOP LEADER PERFORMANCE ---
+        doc.fontSize(16).fillColor('#27ae60').text('2. Cuadro de Honor y Rendimiento de Líderes');
         doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#27ae60').stroke();
         doc.moveDown(0.5);
         
@@ -261,7 +246,6 @@ export async function generateReportPDF(eventId = null) {
         }
         
         doc.moveDown(3);
-        
         doc.fontSize(10).fillColor('#bdc3c7').text('--- Fin del Reporte ---', { align: 'center' });
 
         doc.end();
