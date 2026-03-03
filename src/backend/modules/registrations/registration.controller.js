@@ -13,7 +13,7 @@ import { createLogger } from "../../core/Logger.js";
 import { AppError } from "../../core/AppError.js";
 import config from "../../config/config.js";
 import { parsePagination } from "../../../utils/pagination.js";
-import Leader from "../../../models/Leader.js";
+import { Leader } from "../../../models/Leader.js";
 
 const logger = createLogger("RegistrationController");
 const service = new RegistrationService();
