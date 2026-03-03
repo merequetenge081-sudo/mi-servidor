@@ -14,6 +14,7 @@ import { AppError } from "../../core/AppError.js";
 import config from "../../config/config.js";
 import { parsePagination } from "../../../utils/pagination.js";
 import { Leader } from "../../../models/Leader.js";
+import mongoose from "mongoose";
 
 const logger = createLogger("RegistrationController");
 const service = new RegistrationService();
@@ -273,18 +274,18 @@ export class RegistrationController {
       }
 
       // 2. Fetch leader details to inject into registrations
-      const leader = await Leader.findOne({ 
-        $or: [
-          { _id: targetLeaderId.toString().match(/^[0-9a-fA-F]{24}$/) ? targetLeaderId : null },
-          { leaderId: targetLeaderId }
-        ]
-      }).lean();
+      const isObjectId = mongoose.Types.ObjectId.isValid(targetLeaderId);
+      const leaderQuery = isObjectId
+        ? { $or: [{ _id: targetLeaderId }, { leaderId: targetLeaderId }] }
+        : { leaderId: targetLeaderId };
+        
+      const leaderRecord = await Leader.findOne(leaderQuery).lean();
 
-      if (!leader) {
+      if (!leaderRecord) {
         throw AppError.notFound("Líder no encontrado para asignar los registros.");
       }
 
-      const assignedEventId = leader.eventId || leader.assignedEventId;
+      const assignedEventId = leaderRecord.eventId || leaderRecord.assignedEventId;
       if (!assignedEventId) {
         throw AppError.badRequest("El líder no tiene un evento asignado.");
       }
@@ -292,8 +293,8 @@ export class RegistrationController {
       // 3. Inject leader and event details into each item so the Service schema validation passes
       const enrichedRegistrations = registrations.map(reg => ({
         ...reg,
-        leaderId: leader.leaderId,
-        leaderName: leader.name,
+        leaderId: targetLeaderId, // Usar el targetLeaderId explícito
+        leaderName: leaderRecord.name || leaderRecord.firstName || `${leaderRecord.firstName} ${leaderRecord.lastName}`,
         eventId: assignedEventId
       }));
 

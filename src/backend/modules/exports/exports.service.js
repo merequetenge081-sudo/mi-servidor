@@ -178,23 +178,47 @@ export async function generatePuestoQR(puestoId) {
 }
 
 /**
+ * Helper to fetch chart image from QuickChart
+ */
+async function getQuickChartImage(chartConfig) {
+  try {
+    const url = `https://quickchart.io/chart?width=500&height=300&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (error) {
+    logger.warn('Error fetching QuickChart image:', error.message);
+    return null;
+  }
+}
+
+/**
  * Genera reporte PDF (structure para futuro)
  */
 export async function generateReportPDF(eventId = null) {
   try {
     logger.info('Preparando PDF report avanzado', { eventId });
 
-    // Call real existing methods
+    // 1. Gather comprehensive data
     const dashboard = await analyticsService.getDashboardSummary(eventId);
     const leaderPerf = await advancedService.getLeaderPerformance(eventId);
+    let registrationAnalytics = null;
+    
+    try {
+      registrationAnalytics = await analyticsService.getRegistrationAnalytics(eventId);
+    } catch(e) {
+      logger.warn('Could not fetch registration analytics for PDF', e);
+    }
 
     const summary = dashboard?.summary || {};
     const totalLeaders = summary.uniqueLeaders || 0;
     const totalRegistrations = summary.totalRegistrations || 0;
+    const completionPercent = dashboard?.summary?.completionPercentage || '0.00';
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
-        const doc = new PDFDocument({ margin: 50 });
+        const doc = new PDFDocument({ margin: 50, size: 'A4' });
         const buffers = [];
 
         doc.on('data', buffers.push.bind(buffers));
@@ -205,40 +229,87 @@ export async function generateReportPDF(eventId = null) {
         doc.font('Helvetica');
 
         // Document Header
-        doc.fontSize(22).fillColor('#2c3e50').text('Informe Analítico Avanzado', { align: 'center' });
-        doc.moveDown();
-        
-        doc.fontSize(10).fillColor('#7f8c8d').text(`Generado: ${new Date().toLocaleString()}`, { align: 'right' });
-        doc.moveDown(1.5);
-
-        // --- SECTION 1: GLOBAL SUMMARY ---
-        doc.fontSize(16).fillColor('#e74c3c').text('1. Resumen General Constitucional');
-        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#e74c3c').stroke();
+        doc.fontSize(24).fillColor('#1e3a8a').text('Informe Analítico Ejecutivo', { align: 'center', underline: true });
         doc.moveDown(0.5);
         
-        doc.fontSize(12).fillColor('#34495e');
-        doc.text(`Total Líderes Activos: ${totalLeaders}`);
-        doc.text(`Total Registros Captados: ${totalRegistrations}`);
+        doc.fontSize(10).fillColor('#64748b').text(`Generado el: ${new Date().toLocaleString()}`, { align: 'right' });
         doc.moveDown(2);
 
-        // --- SECTION 2: TOP LEADER PERFORMANCE ---
-        doc.fontSize(16).fillColor('#27ae60').text('2. Cuadro de Honor y Rendimiento de Líderes');
-        doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor('#27ae60').stroke();
-        doc.moveDown(0.5);
+        // --- SECTION 1: GLOBAL SUMMARY ---
+        doc.fontSize(16).fillColor('#0f172a').text('1. Resumen General Constitucional');
+        doc.moveTo(50, doc.y).lineTo(545, doc.y).strokeColor('#3b82f6').stroke();
+        doc.moveDown(1);
+        
+        doc.fontSize(14).fillColor('#334155');
+        doc.text(`• Total Líderes Activos: `, { continued: true }).fillColor('#2563eb').text(totalLeaders.toString());
+        doc.fillColor('#334155').text(`• Total Registros Captados: `, { continued: true }).fillColor('#16a34a').text(totalRegistrations.toString());
+        doc.fillColor('#334155').text(`• Porcentaje de Avance (Est.): `, { continued: true }).fillColor('#ea580c').text(`${completionPercent}%`);
+        doc.moveDown(2);
+
+        // --- FETCH CHARTS ---
+        let leadLabels = [];
+        let leadData = [];
+        if (leaderPerf && leaderPerf.length > 0) {
+          const top5 = leaderPerf.slice(0, 5);
+          leadLabels = top5.map(l => {
+             const n = (l.leaderData && l.leaderData.name) ? l.leaderData.name : (l.leaderName || 'No ID');
+             return n.split(' ')[0]; // Just first name to fit chart
+          });
+          leadData = top5.map(l => l.totalRegistrations || 0);
+        }
+
+        // Generate Bar Chart if we have data
+        if (leadLabels.length > 0) {
+          doc.fontSize(16).fillColor('#0f172a').text('2. Gráfico de Rendimiento (Top 5 Líderes)');
+          doc.moveTo(50, doc.y).lineTo(545, doc.y).strokeColor('#3b82f6').stroke();
+          doc.moveDown(1);
+
+          const barChartConfig = {
+            type: 'bar',
+            data: {
+              labels: leadLabels,
+              datasets: [{
+                label: 'Registros',
+                data: leadData,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgb(54, 162, 235)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              plugins: { datalabels: { display: true, color: '#fff', font: { weight: 'bold' } } }
+            }
+          };
+
+          const chartBuffer = await getQuickChartImage(barChartConfig);
+          if (chartBuffer) {
+            doc.image(chartBuffer, { width: 450, align: 'center' });
+            doc.moveDown();
+          } else {
+            doc.fontSize(12).fillColor('#e48257').text('[Gráfico no disponible temporalmente]');
+            doc.moveDown();
+          }
+        }
+
+        // --- SECTION 3: TOP LEADER PERFORMANCE TABLE ---
+        doc.addPage();
+        doc.fontSize(16).fillColor('#0f172a').text('3. Cuadro de Honor y Efectividad');
+        doc.moveTo(50, doc.y).lineTo(545, doc.y).strokeColor('#3b82f6').stroke();
+        doc.moveDown(1);
         
         if (leaderPerf && leaderPerf.length > 0) {
-          const topLeaders = leaderPerf.slice(0, 10);
+          const topLeaders = leaderPerf.slice(0, 15); // Show top 15
           
           topLeaders.forEach((leader, index) => {
             const leaderName = (leader.leaderData && leader.leaderData.name) ? leader.leaderData.name : (leader.leaderName || 'No Identificado');
             const totalReg = leader.totalRegistrations || 0;
             const netEffectiveness = leader.efectividadNeta ? leader.efectividadNeta.toFixed(2) : '0.00';
             const penalty = leader.penaltyScore || 0;
+            const validos = totalReg - penalty;
             
-            doc.fontSize(12).fillColor('#34495e').text(`${index + 1}. ${leaderName}`, { continued: false });
-            doc.fontSize(10).fillColor('#7f8c8d')
-               .text(`   Registros Exitosos: ${totalReg} | Efectividad Ponderada: ${netEffectiveness}%`);
-            doc.text(`   Inconsistencias y Errores (Penalizaciones): ${penalty}`);
+            doc.fontSize(12).fillColor('#1e293b').text(`${index + 1}. ${leaderName}`, { continued: false });
+            doc.fontSize(10).fillColor('#475569')
+               .text(`   Registros Exitosos: ${totalReg} | Válidos: ${validos > 0 ? validos : 0} | Efectividad: ${netEffectiveness}%`);
             doc.moveDown(0.5);
           });
         } else {
@@ -246,7 +317,7 @@ export async function generateReportPDF(eventId = null) {
         }
         
         doc.moveDown(3);
-        doc.fontSize(10).fillColor('#bdc3c7').text('--- Fin del Reporte ---', { align: 'center' });
+        doc.fontSize(10).fillColor('#94a3b8').text('--- Fin del Reporte Analítico ---', { align: 'center' });
 
         doc.end();
       } catch (err) {
