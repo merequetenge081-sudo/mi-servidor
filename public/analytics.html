@@ -1172,26 +1172,36 @@
         async function exportToPDF() {
             const btn = document.getElementById('btn-export-pdf');
             const originalHtml = btn.innerHTML;
-            
+
             try {
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generando...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generando Informe...';
                 btn.disabled = true;
 
-                const element = document.getElementById('pdf-content');
-                if (!element) {
-                    throw new Error("No se encontró el contenedor del reporte");
+                const token = localStorage.getItem('token');
+                
+                const response = await fetch('/api/v2/exports/pdf/report', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al generar el PDF en el servidor');
                 }
 
-                const opt = {
-                    margin:       [10, 10, 10, 10],
-                    filename:     'Rendimiento_y_Analisis_Avanzado.pdf',
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
-                };
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Informe_Analitico_${new Date().toISOString().split('T')[0]}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
 
-                await html2pdf().set(opt).from(element).save();
-
+                showToast('Informe analítico descargado exitosamente', 'success');
             } catch (error) {
                 console.error("Error generando PDF:", error);
                 alert("Ocurrió un error al generar el PDF: " + error.message);
