@@ -150,11 +150,21 @@ export async function getPuestoQRBase64(req, res, next) {
  */
 export async function generateReport(req, res, next) {
   try {
-    const { eventId } = req.query;
+    const eventId = req.query.eventId || req.body?.eventId || null;
+    const status = req.query.status || req.body?.status || 'all';
+    const leaderId = req.query.leaderId || req.body?.leaderId || null;
+    const targetDate = req.query.targetDate || req.body?.targetDate || null;
+    const region = req.query.region || req.body?.region || 'nacional';
 
-    logger.info('Solicitando PDF report', { eventId });
+    logger.info('Solicitando PDF report', { eventId, status, leaderId, targetDate, region });
 
-    const pdf = await exportsService.generateReportPDF(eventId);
+    const pdf = await exportsService.generateReportPDF({
+      eventId,
+      status,
+      leaderId,
+      targetDate,
+      region
+    });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="report-${new Date().toISOString().split('T')[0]}.pdf"`);

@@ -587,6 +587,10 @@
             }
         }
         
+        function getSelectedEventId() {
+            return localStorage.getItem('eventId') || sessionStorage.getItem('eventId') || '';
+        }
+
         async function fetchAnalyticsData() {
             try {
                 loadingIndicator.classList.remove('hidden');
@@ -594,9 +598,14 @@
 
                 const token = localStorage.getItem('token');
                 const status = dataStatusFilter.value;
-                  const globalLeaderFilter = document.getElementById('global-leader-filter');
-                  const leaderId = globalLeaderFilter ? globalLeaderFilter.value : '';
-                  const response = await fetch(`/api/v2/analytics/advanced?status=${status}&leaderId=${leaderId}`, {
+                const globalLeaderFilter = document.getElementById('global-leader-filter');
+                const leaderId = globalLeaderFilter ? globalLeaderFilter.value : '';
+                const eventId = getSelectedEventId();
+                const params = new URLSearchParams({ status });
+                if (leaderId) params.set('leaderId', leaderId);
+                if (eventId) params.set('eventId', eventId);
+
+                const response = await fetch(`/api/v2/analytics/advanced?${params.toString()}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -938,7 +947,10 @@
                 // Fetch simulation data
                 const token = localStorage.getItem('token');
                 const targetDate = document.getElementById('simulation-target-date').value || '2026-03-05';
-                const response = await fetch(`/api/v2/analytics/simulation?targetDate=${targetDate}`, {
+                const eventId = getSelectedEventId();
+                const params = new URLSearchParams({ targetDate });
+                if (eventId) params.set('eventId', eventId);
+                const response = await fetch(`/api/v2/analytics/simulation?${params.toString()}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
@@ -1178,8 +1190,19 @@
                 btn.disabled = true;
 
                 const token = localStorage.getItem('token');
-                
-                const response = await fetch('/api/v2/exports/pdf/report', {
+                const status = document.getElementById('data-status-filter')?.value || 'all';
+                const leaderId = document.getElementById('global-leader-filter')?.value || '';
+                const eventId = getSelectedEventId();
+                const targetDate = document.getElementById('simulation-target-date')?.value || '';
+
+                const params = new URLSearchParams();
+                if (eventId) params.set('eventId', eventId);
+                if (status) params.set('status', status);
+                if (leaderId) params.set('leaderId', leaderId);
+                if (targetDate) params.set('targetDate', targetDate);
+                params.set('region', currentRegion || 'nacional');
+
+                const response = await fetch(`/api/v2/exports/pdf/report?${params.toString()}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
