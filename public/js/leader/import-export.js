@@ -295,38 +295,60 @@ export class ImportExportManager {
             }
 
             const data = registrations.map(r => ({
-                'Nombre': r.firstName || '',
-                'Apellido': r.lastName || '',
+                'Nombre': `${r.firstName || ''} ${r.lastName || ''}`.trim(),
                 'Email': r.email || '',
                 'Cédula': r.cedula || '',
+                'Teléfono': r.phone || '',
+                'Departamento': r.departamento || r.department || '',
+                'Municipio': r.capital || r.municipality || '',
                 'Localidad': r.localidad || '',
                 'Puesto Votación': r.votingPlace || '',
                 'Mesa': r.votingTable || '',
-                'Teléfono': r.phone || '',
                 'Fecha': new Date(r.date).toLocaleDateString('es-CO'),
                 'Estado': r.confirmed ? 'Confirmado' : 'Pendiente'
             }));
 
-            const ws = XLSX.utils.json_to_sheet(data);
+            const leaderName = leaderData && leaderData.name ? leaderData.name : 'Líder';
+            const title = `Reporte de Registros - ${leaderName}`;
+            const headers = Object.keys(data[0]);
+
+            const wsData = [
+                [title],
+                [],
+                headers
+            ];
+
+            data.forEach(item => {
+                const rowData = headers.map(key => {
+                    const val = item[key];
+                    return val !== null && val !== undefined ? String(val) : '';
+                });
+                wsData.push(rowData);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+            if (!ws['!merges']) ws['!merges'] = [];
+            ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: Math.max(0, headers.length - 1) } });
+
+            if (!ws['A1'].s) ws['A1'].s = {};
+            ws['A1'].s = { font: { bold: true, sz: 14 }, alignment: { horizontal: "center" } };
+
+            const colWidths = headers.map(h => ({ wch: Math.max(h.length + 2, 12) }));
+            data.forEach(row => {
+                headers.forEach((header, i) => {
+                    const val = String(row[header] || '');
+                    if (val.length > colWidths[i].wch) {
+                        colWidths[i].wch = Math.min(val.length + 2, 50);
+                    }
+                });
+            });
+            ws['!cols'] = colWidths;
+
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Mis Registros');
 
-            const safeName = leaderData && leaderData.name 
-                ? leaderData.name.replace(/[^a-zA-Z0-9]/g, '_') 
-                : 'leader';
-            XLSX.writeFile(wb, `mis_registros_${safeName}.xlsx`);
-        } catch (err) {
-            console.error('Export Error:', err);
-            alert('Ocurrió un error al exportar: ' + err.message);
-        }
-    }
-
-    static downloadTemplate() {
-        const headers = [
-            ['Nombre', 'Apellido', 'Cédula', 'Email', 'Celular', 'Mesa', 'Localidad', 'Puesto Votación']
-        ];
-
-        const ws = XLSX.utils.aoa_to_sheet(headers);
+            const safeName = leaderName.replace(/[^a-zA-Z0-9]/g, '_');
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
         XLSX.writeFile(wb, "Plantilla_Registros.xlsx");

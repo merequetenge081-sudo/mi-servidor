@@ -1555,13 +1555,56 @@ document.getElementById('nextLeaderPageBtn').addEventListener('click', () => {
     }
 });
 
-function exportToExcel(data, filename) {
+function exportToExcel(data, filename, title = 'Reporte') {
     if (typeof XLSX === 'undefined') {
         showAlert('Error: Librería Excel (XLSX) no cargada. Recarga la página.', 'error');
         return;
     }
     try {
-        const ws = XLSX.utils.json_to_sheet(data);
+        if (!data || data.length === 0) {
+            showAlert('No hay datos para exportar.', 'warning');
+            return;
+        }
+
+        const headers = Object.keys(data[0] || {});
+        
+        // Crear matriz con título, espacio en blanco encabezados y datos
+        const wsData = [
+            [title],
+            [],
+            headers
+        ];
+
+        data.forEach(item => {
+            const rowData = headers.map(key => {
+                const val = item[key];
+                return val !== null && val !== undefined ? String(val) : '';
+            });
+            wsData.push(rowData);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // Combinar celdas para el título y centrar
+        if(!ws['!merges']) ws['!merges'] = [];
+        ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: Math.max(0, headers.length - 1) } });
+
+        // Dar formato simple (negrita) asumiendo compatibilidad (Style options in basic js-xlsx might be ignored but won't crash)
+        if(!ws['A1'].s) ws['A1'].s = {};
+        ws['A1'].s = { font: { bold: true, sz: 14 }, alignment: { horizontal: "center" } };
+
+        // Ajustar ancho de las columnas
+        const colWidths = headers.map(h => ({ wch: Math.max(h.length + 2, 12) }));
+        data.forEach(row => {
+            headers.forEach((header, i) => {
+                const val = String(row[header] || '');
+                if (val.length > colWidths[i].wch) {
+                    colWidths[i].wch = Math.min(val.length + 2, 50); // Límite de 50 caracteres
+                }
+            });
+        });
+        ws['!cols'] = colWidths;
+
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Datos');
         XLSX.writeFile(wb, filename);
@@ -2220,6 +2263,9 @@ function exportAllRegistrations() {
         Nombre: `${r.firstName} ${r.lastName}`,
         Email: r.email || '',
         Cédula: r.cedula || '',
+        Teléfono: r.phone || '',
+        Departamento: r.departamento || r.department || '',
+        Municipio: r.capital || r.municipality || '',
         Localidad: r.localidad || '',
         Líder: r.leaderName || '',
         Puesto: r.votingPlace || '',
@@ -2227,7 +2273,7 @@ function exportAllRegistrations() {
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
     }));
-    exportToExcel(data, `registros_completo_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    exportToExcel(data, `registros_completo_${new Date().toISOString().slice(0, 10)}.xlsx`, 'Reporte General de Registros');
 }
 
 addListener('exportRegsBtn', 'click', exportAllRegistrations);
@@ -2253,7 +2299,7 @@ addListener('exportLeadersMainBtn', 'click', () => {
         });
 
         console.log('Export Data Prepared:', data);
-        exportToExcel(data, `lideres_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        exportToExcel(data, `lideres_${new Date().toISOString().slice(0, 10)}.xlsx`, 'Reporte de Líderes');
     } catch (e) {
         console.error('Error in exportLeadersMainBtn:', e);
         showAlert('Error al exportar: ' + e.message, 'error');
@@ -2263,19 +2309,23 @@ addListener('exportLeadersMainBtn', 'click', () => {
 addListener('exportByLeaderBtn', 'click', () => {
     const leaderId = document.getElementById('exportLeaderSelect').value;
     const leader = allLeaders.find(l => l._id === leaderId);
+    if (!leader) return showAlert('Por favor seleccione un líder', 'warning');
+
     const filtered = allRegistrations.filter(r => r.leaderId === leaderId);
     const data = filtered.map(r => ({
         Nombre: `${r.firstName} ${r.lastName}`,
         Email: r.email || '',
         Cédula: r.cedula || '',
+        Teléfono: r.phone || '',
+        Departamento: r.departamento || r.department || '',
+        Municipio: r.capital || r.municipality || '',
         Localidad: r.localidad || '',
         Puesto: r.votingPlace || '',
         Mesa: r.votingTable || '',
-        Teléfono: r.phone || '',
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
     }));
-    exportToExcel(data, `registros_${leader.name}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    exportToExcel(data, `registros_${leader.name.replace(/ /g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`, `Reporte de Registros - ${leader.name}`);
 });
 
 addListener('exportLeaderStatsBtn', 'click', () => {
@@ -2287,7 +2337,7 @@ addListener('exportLeaderStatsBtn', 'click', () => {
         Pendientes: l.pending,
         'Tasa de Confirmación': l.rate + '%'
     }));
-    exportToExcel(data, `detalles_lideres_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    exportToExcel(data, `detalles_lideres_${new Date().toISOString().slice(0, 10)}.xlsx`, 'Estadísticas por Líder');
 });
 
 // Update Event
@@ -2400,6 +2450,7 @@ addListener('exportBogotaBtn', 'click', () => {
         Nombre: `${r.firstName} ${r.lastName}`,
         Email: r.email || '',
         Cédula: r.cedula || '',
+        Teléfono: r.phone || '',
         Localidad: r.localidad || '',
         Líder: r.leaderName || '',
         Puesto: r.votingPlace || '',
@@ -2407,7 +2458,7 @@ addListener('exportBogotaBtn', 'click', () => {
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
     }));
-    exportToExcel(data, `registros_bogota_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    exportToExcel(data, `registros_bogota_${new Date().toISOString().slice(0, 10)}.xlsx`, 'Reporte de Registros - Bogotá');
 });
 
 addListener('exportRestoBtn', 'click', () => {
@@ -2416,14 +2467,16 @@ addListener('exportRestoBtn', 'click', () => {
         Nombre: `${r.firstName} ${r.lastName}`,
         Email: r.email || '',
         Cédula: r.cedula || '',
-        Departamento: r.departamento || '',
+        Teléfono: r.phone || '',
+        Departamento: r.departamento || r.department || '',
+        Municipio: r.capital || r.municipality || '',
         Líder: r.leaderName || '',
         Puesto: r.votingPlace || '',
         Mesa: r.votingTable || '',
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
     }));
-    exportToExcel(data, `registros_resto_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    exportToExcel(data, `registros_resto_${new Date().toISOString().slice(0, 10)}.xlsx`, 'Reporte de Registros - Resto del País');
 });
 
 
@@ -2458,7 +2511,7 @@ addListener('exportLeaderStatsBtn', 'click', () => {
         'Tasa Confirmación (%)': l.rate + '%'
     }));
 
-    exportToExcel(data, `estadisticas_lideres_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    exportToExcel(data, `estadisticas_lideres_${new Date().toISOString().slice(0, 10)}.xlsx`, 'Estadísticas de Líderes Detallada');
 });
 
 // Populate Export Leader Select
@@ -2469,7 +2522,7 @@ function populateExportLeader() {
     // Sort leaders by name
     const sorted = [...allLeaders].sort((a, b) => a.name.localeCompare(b.name));
 
-    select.innerHTML = '<option value="">Seleccione un líder...</option>' +
+    select.innerHTML = '<option value="">Seleccione un líder...</option>' +     
         sorted.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
 }
 
@@ -2481,51 +2534,23 @@ addListener('exportByLeaderBtn', 'click', () => {
     if (!leaderId) return showAlert('Por favor seleccione un líder', 'warning');
 
     const leaderFn = allLeaders.find(l => l._id === leaderId);
-    const leaderName = leaderFn ? leaderFn.name.replace(/ /g, '_') : 'lider';
+    const leaderName = leaderFn ? leaderFn.name.replace(/ /g, '_') : 'lider';   
 
     const regs = allRegistrations.filter(r => r.leaderId === leaderId);
     if (regs.length === 0) return showAlert('Este líder no tiene registros', 'info');
-
+    
     const data = regs.map(r => ({
         Nombre: `${r.firstName} ${r.lastName}`,
         Email: r.email || '',
         Cédula: r.cedula || '',
+        Teléfono: r.phone || '',
         Ubicación: r.localidad || r.departamento || '',
+        Municipio: r.capital || r.municipality || '',
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
     }));
 
-    exportToExcel(data, `registros_${leaderName}_${new Date().toISOString().slice(0, 10)}.xlsx`);
-});
-
-// ============== LEADER ACTIONS ==============
-
-
-let leaderToDeleteId = null;
-
-function deleteLeader(leaderId) {
-    leaderToDeleteId = leaderId;
-    openDeleteLeaderModal();
-}
-
-// Bind Edit Leader Save Button
-if (document.getElementById('saveEditLeaderBtn')) {
-    document.getElementById('saveEditLeaderBtn').addEventListener('click', async () => {
-        const id = document.getElementById('editLeaderId').value;
-        const name = document.getElementById('editLeaderName').value;
-        const email = document.getElementById('editLeaderEmail').value;
-        const phone = document.getElementById('editLeaderPhone').value;
-
-        if (!name) return showAlert('El nombre es obligatorio', 'warning');
-
-        try {
-            const res = await apiCall(`/api/leaders/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify({ name, email, phone })
-            });
-
-            if (res.ok) {
-                document.getElementById('editLeaderModal').classList.remove('active');
+    exportToExcel(data, `registros_${leaderName}_${new Date().toISOString().slice(0, 10)}.xlsx`, `Registros - ${leaderFn ? leaderFn.name : 'Líder'}`);
                 loadDashboard();
                 showSuccessModal('¡Actualizado!', 'La información del líder ha sido actualizada.');
             } else {
