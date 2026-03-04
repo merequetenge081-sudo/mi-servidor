@@ -227,16 +227,18 @@
 
                                           <select class="filter-select" id="unifiedFilter">
                           <option value="">Todos los registros</option>
-                          <option value="confirmed">✓ Confirmados</option>
-                          <option value="pending">⏱ Pendientes</option>
-                          <option value="needs_review">⚠ Requiere revisión</option>
-                          <option value="no_review">✓ Sin revisión</option>
-                      </select>
-
-                      <select class="filter-select" id="phoneFilterLeader">
-                          <option value="">Con y sin teléfono</option>
-                          <option value="with_phone">Con Teléfono</option>
-                          <option value="without_phone">Sin Teléfono</option>
+                          <optgroup label="Estado">
+                              <option value="confirmed">✓ Confirmados</option>
+                              <option value="pending">⏱ Pendientes</option>
+                          </optgroup>
+                          <optgroup label="Revisión">
+                              <option value="needs_review">⚠ Requiere revisión</option>
+                              <option value="no_review">✓ Sin revisión</option>
+                          </optgroup>
+                          <optgroup label="Teléfono">
+                              <option value="with_phone">📱 Con Teléfono</option>
+                              <option value="without_phone">📵 Sin Teléfono</option>
+                          </optgroup>
                       </select>
 
                     <div class="tooltip-container">

@@ -757,9 +757,7 @@ const Events = (() => {
         // Registration filters
         const searchInput = document.getElementById('searchInput');
         const leaderFilter = document.getElementById('leaderFilter');
-        const statusFilter = document.getElementById('statusFilter');
-        const revisionFilter = document.getElementById('revisionFilter');
-        const phoneFilter = document.getElementById('phoneFilter');
+        const unifiedFilter = document.getElementById('unifiedFilter');
 
         const applyRegistrationFilters = () => {
             if (AppState) {
@@ -770,9 +768,7 @@ const Events = (() => {
 
         if (searchInput) searchInput.addEventListener('input', applyRegistrationFilters);
         if (leaderFilter) leaderFilter.addEventListener('change', applyRegistrationFilters);
-        if (statusFilter) statusFilter.addEventListener('change', applyRegistrationFilters);
-        if (revisionFilter) revisionFilter.addEventListener('change', applyRegistrationFilters);
-        if (phoneFilter) phoneFilter.addEventListener('change', applyRegistrationFilters);
+        if (unifiedFilter) unifiedFilter.addEventListener('change', applyRegistrationFilters);
     }
 
     function bindTabs() {

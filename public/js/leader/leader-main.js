@@ -87,14 +87,12 @@ function connectEventListeners(leaderId, leaderData) {
     // ========== SEARCH Y FILTROS ==========
     const searchInput = document.getElementById('searchInput');
     const unifiedFilter = document.getElementById('unifiedFilter');
-    const phoneFilter = document.getElementById('phoneFilterLeader');
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
     const triggerFilter = () => {
         const searchTerm = searchInput ? searchInput.value : '';
         const filterValue = unifiedFilter ? unifiedFilter.value : '';
-        const phoneValue = phoneFilter ? phoneFilter.value : '';
-        RegistrationsManager.applyFilters(searchTerm, filterValue, phoneValue);
+        RegistrationsManager.applyFilters(searchTerm, filterValue);
     };
 
     if (applyFiltersBtn) {

@@ -50,27 +50,27 @@ const RegistrationsModule = (() => {
     function applyAllFilters() {
         const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
         const leaderId = document.getElementById('leaderFilter')?.value || '';
-        const status = document.getElementById('statusFilter')?.value || '';
-        const revision = document.getElementById('revisionFilter')?.value || '';
-        const phone = document.getElementById('phoneFilter')?.value || '';
+        const unified = document.getElementById('unifiedFilter')?.value || '';
 
         const registrations = AppState.data.registrations || [];
 
-        // Filtrar por búsqueda, líder, estado, revisión y teléfono
+        // Filtrar por búsqueda, líder y el filtro unificado
         const filtered = registrations.filter(r => {
             const matchSearch = !search ||
                 `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
                 (r.email && r.email.toLowerCase().includes(search)) ||
                 (r.cedula && r.cedula.includes(search));
             const matchLeader = !leaderId || r.leaderId === leaderId;
-            const matchStatus = !status || (status === 'confirmed' ? r.confirmed : !r.confirmed);
-            const matchRevision = !revision || (revision === 'true' ? (r.requiereRevisionPuesto && !r.revisionPuestoResuelta) : !(r.requiereRevisionPuesto && !r.revisionPuestoResuelta));
             
-            let matchPhone = true;
-            if (phone === 'with_phone') matchPhone = !!(r.phone && r.phone.trim() !== '');
-            else if (phone === 'without_phone') matchPhone = !(r.phone && r.phone.trim() !== '');
+            let matchUnified = true;
+            if (unified === 'confirmed') matchUnified = r.confirmed;
+            else if (unified === 'pending') matchUnified = !r.confirmed;
+            else if (unified === 'needs_review') matchUnified = (r.requiereRevisionPuesto && !r.revisionPuestoResuelta);
+            else if (unified === 'no_review') matchUnified = !(r.requiereRevisionPuesto && !r.revisionPuestoResuelta);
+            else if (unified === 'with_phone') matchUnified = !!(r.phone && r.phone.trim() !== '');
+            else if (unified === 'without_phone') matchUnified = !(r.phone && r.phone.trim() !== '');
 
-            return matchSearch && matchLeader && matchStatus && matchRevision && matchPhone;
+            return matchSearch && matchLeader && matchUnified;
         });
 
         // Separar por región

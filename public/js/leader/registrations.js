@@ -25,12 +25,10 @@ export class RegistrationsManager {
             // Reapply existing filters if present
             const searchInput = document.getElementById('searchInput');
             const unifiedFilter = document.getElementById('unifiedFilter');
-            const phoneFilter = document.getElementById('phoneFilterLeader');
             const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
             const filterValue = unifiedFilter ? unifiedFilter.value : '';
-            const phoneValue = phoneFilter ? phoneFilter.value : '';
             
-            if (searchTerm || filterValue || phoneValue) {
+            if (searchTerm || filterValue) {
                 this.filteredRegistrations = this.myRegistrations.filter(reg => {
                     const matchSearch = !searchTerm ||
                         (reg.firstName && reg.firstName.toLowerCase().includes(searchTerm)) ||
@@ -43,12 +41,10 @@ export class RegistrationsManager {
                     else if (filterValue === 'pending') matchUnified = !reg.confirmed;
                     else if (filterValue === 'needs_review') matchUnified = (reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta);
                     else if (filterValue === 'no_review') matchUnified = !(reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta);
+                    else if (filterValue === 'with_phone') matchUnified = !!(reg.phone && reg.phone.trim() !== '');
+                    else if (filterValue === 'without_phone') matchUnified = !(reg.phone && reg.phone.trim() !== '');
 
-                    let matchPhone = true;
-                    if (phoneValue === 'with_phone') matchPhone = !!(reg.phone && reg.phone.trim() !== '');
-                    else if (phoneValue === 'without_phone') matchPhone = !(reg.phone && reg.phone.trim() !== '');
-
-                    return matchSearch && matchUnified && matchPhone;
+                    return matchSearch && matchUnified;
                 });
             } else {
                 this.filteredRegistrations = [...this.myRegistrations];
@@ -344,7 +340,7 @@ export class RegistrationsManager {
         }
     }
 
-    static applyFilters(searchTerm, unifiedFilter, phoneFilterValue = '') {
+    static applyFilters(searchTerm, unifiedFilter) {
         const lowerSearch = searchTerm ? searchTerm.toLowerCase() : '';
         this.filteredRegistrations = this.myRegistrations.filter(reg => {
             const matchSearch = !lowerSearch ||
@@ -358,12 +354,10 @@ export class RegistrationsManager {
             else if (unifiedFilter === 'pending') matchUnified = !reg.confirmed;
             else if (unifiedFilter === 'needs_review') matchUnified = (reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta);
             else if (unifiedFilter === 'no_review') matchUnified = !(reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta);
+            else if (unifiedFilter === 'with_phone') matchUnified = !!(reg.phone && reg.phone.trim() !== '');
+            else if (unifiedFilter === 'without_phone') matchUnified = !(reg.phone && reg.phone.trim() !== '');
 
-            let matchPhone = true;
-            if (phoneFilterValue === 'with_phone') matchPhone = !!(reg.phone && reg.phone.trim() !== '');
-            else if (phoneFilterValue === 'without_phone') matchPhone = !(reg.phone && reg.phone.trim() !== '');
-
-            return matchSearch && matchUnified && matchPhone;
+            return matchSearch && matchUnified;
         });
 
         this.currentPage = 1;
