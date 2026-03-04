@@ -46,9 +46,7 @@ describe("metrics.service", () => {
       .mockResolvedValueOnce([]) // leader aggregation
       .mockResolvedValueOnce([]); // locality aggregation
     leaderCountMock.mockResolvedValue(0);
-    leaderFindMock.mockReturnValue({
-      lean: () => Promise.resolve([])
-    });
+    leaderFindMock.mockResolvedValue([]);
 
     await metricsService.getDashboardMetrics({ organizationId: "org1" });
 
