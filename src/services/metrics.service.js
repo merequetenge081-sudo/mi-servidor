@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
@@ -27,6 +28,87 @@ const BOGOTA_LOCALIDADES = [
 ];
 
 const BOGOTA_LOCALIDADES_UPPER = BOGOTA_LOCALIDADES.map((l) => l.toUpperCase());
+const BOGOTA_LOCALIDADES_NORMALIZED_UPPER = BOGOTA_LOCALIDADES.map((l) =>
+  l
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+);
+
+let bogotaLocalidadesCache = {
+  list: [...BOGOTA_LOCALIDADES_NORMALIZED_UPPER],
+  updatedAt: 0
+};
+
+function normalizeLocalidadString(value) {
+  return (value || "")
+    .toString()
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/Ñ/g, "N")
+    .toUpperCase();
+}
+
+async function loadBogotaLocalidadesFromDb() {
+  const cacheTtlMs = 10 * 60 * 1000;
+  if (Date.now() - bogotaLocalidadesCache.updatedAt < cacheTtlMs) {
+    return bogotaLocalidadesCache.list;
+  }
+
+  const puestos = await Puestos.find(
+    {
+      localidad: { $nin: [null, ""] },
+      $or: [
+        { ciudad: /bogot/i },
+        { departamento: /bogot/i },
+        { departamento: /cundinamarca/i }
+      ]
+    },
+    { localidad: 1 }
+  ).lean();
+
+  const merged = new Set(BOGOTA_LOCALIDADES_NORMALIZED_UPPER);
+  puestos.forEach((puesto) => {
+    const normalized = normalizeLocalidadString(puesto.localidad);
+    if (normalized) merged.add(normalized);
+  });
+
+  bogotaLocalidadesCache = {
+    list: Array.from(merged),
+    updatedAt: Date.now()
+  };
+
+  return bogotaLocalidadesCache.list;
+}
+
+function normalizeLocalidadExpr(fieldExpr) {
+  let expr = { 
+    $trim: { input: { $toUpper: { $ifNull: [fieldExpr, ""] } } }
+  };
+  const replacements = [
+    { find: "Á", replacement: "A" },
+    { find: "É", replacement: "E" },
+    { find: "Í", replacement: "I" },
+    { find: "Ó", replacement: "O" },
+    { find: "Ú", replacement: "U" },
+    { find: "Ü", replacement: "U" },
+    { find: "Ñ", replacement: "N" },
+    { find: "á", replacement: "A" },
+    { find: "é", replacement: "E" },
+    { find: "í", replacement: "I" },
+    { find: "ó", replacement: "O" },
+    { find: "ú", replacement: "U" },
+    { find: "ü", replacement: "U" },
+    { find: "ñ", replacement: "N" }
+  ];
+
+  replacements.forEach((rule) => {
+    expr = { $replaceAll: { input: expr, find: rule.find, replacement: rule.replacement } };
+  });
+
+  return expr;
+}
 
 function buildBaseMatch({ organizationId, eventId, leaderId, includeInvalid }) {
   const match = {};
@@ -37,15 +119,15 @@ function buildBaseMatch({ organizationId, eventId, leaderId, includeInvalid }) {
   return match;
 }
 
-function buildRegionMatch(region) {
+function buildRegionMatch(region, bogotaLocalidadesUpper = BOGOTA_LOCALIDADES_NORMALIZED_UPPER) {
   if (!region || region === "all") return null;
 
   const isBogotaExpr = {
     $or: [
       {
         $in: [
-          { $toUpper: { $ifNull: ["$localidad", ""] } },
-          BOGOTA_LOCALIDADES_UPPER
+          normalizeLocalidadExpr("$localidadResolved"),
+          bogotaLocalidadesUpper
         ]
       },
       {
@@ -57,6 +139,18 @@ function buildRegionMatch(region) {
       {
         $regexMatch: {
           input: { $ifNull: ["$capital", ""] },
+          regex: /bogot/i
+        }
+      },
+      {
+        $regexMatch: {
+          input: { $ifNull: ["$puesto.departamento", ""] },
+          regex: /bogot|cundinamarca/i
+        }
+      },
+      {
+        $regexMatch: {
+          input: { $ifNull: ["$puesto.ciudad", ""] },
           regex: /bogot/i
         }
       }
@@ -363,22 +457,37 @@ export async function getDashboardSummary(eventId = null, options = {}) {
 }
 
 export async function getDashboardMetrics(options = {}) {
-  const regionMatch = buildRegionMatch(options.region);
-  const match = {
-    ...buildBaseMatch(options),
-    ...(regionMatch ? regionMatch : {})
-  };
+  const bogotaLocalidadesUpper = await loadBogotaLocalidadesFromDb();
+  
+  // Base match (includes leaderId, eventId, etc)
+  const baseMatch = buildBaseMatch(options);
 
-  const agg = await Registration.aggregate([
-    { $match: match },
+  const initialAggPipeline = [
+    { $match: baseMatch },
+    {
+      $lookup: {
+        from: "puestos",
+        localField: "puestoId",
+        foreignField: "_id",
+        as: "puesto"
+      }
+    },
+    { $addFields: { puesto: { $arrayElemAt: ["$puesto", 0] } } },
+    {
+      $addFields: {
+        localidadResolved: {
+          $ifNull: ["$puesto.localidad", "$localidad"]
+        }
+      }
+    },
     {
       $addFields: {
         isBogota: {
           $or: [
             {
               $in: [
-                { $toUpper: { $ifNull: ["$localidad", ""] } },
-                BOGOTA_LOCALIDADES_UPPER
+                normalizeLocalidadExpr("$localidadResolved"),
+                bogotaLocalidadesUpper
               ]
             },
             {
@@ -392,11 +501,35 @@ export async function getDashboardMetrics(options = {}) {
                 input: { $ifNull: ["$capital", ""] },
                 regex: /bogot/i
               }
+            },
+            {
+              $regexMatch: {
+                input: { $ifNull: ["$puesto.departamento", ""] },
+                regex: /bogot|cundinamarca/i
+              }
+            },
+            {
+              $regexMatch: {
+                input: { $ifNull: ["$puesto.ciudad", ""] },
+                regex: /bogot/i
+              }
             }
           ]
         }
       }
-    },
+    }
+  ];
+
+  if (options.region && options.region !== "all") {
+    initialAggPipeline.push({
+      $match: {
+        isBogota: options.region === "bogota"
+      }
+    });
+  }
+
+  const agg = await Registration.aggregate([
+    ...initialAggPipeline,
     {
       $group: {
         _id: "$leaderId",
@@ -409,11 +542,14 @@ export async function getDashboardMetrics(options = {}) {
   ]);
 
   const leaderIds = agg.map((l) => l._id).filter(Boolean);
+  const objectLeaderIds = leaderIds
+    .filter((id) => mongoose.Types.ObjectId.isValid(id))
+    .map((id) => new mongoose.Types.ObjectId(id));
   const leaderDocs = await Leader.find(
     {
       $or: [
         { leaderId: { $in: leaderIds } },
-        { _id: { $in: leaderIds.filter((id) => typeof id === "string") } }
+        ...(objectLeaderIds.length ? [{ _id: { $in: objectLeaderIds } }] : [])
       ]
     },
     { name: 1, leaderId: 1 }
@@ -453,10 +589,10 @@ export async function getDashboardMetrics(options = {}) {
   );
 
   const localityAgg = await Registration.aggregate([
-    { $match: match },
+    ...initialAggPipeline,
     {
       $group: {
-        _id: { $ifNull: ["$localidad", "$departamento"] },
+        _id: { $ifNull: ["$localidadResolved", { $ifNull: ["$puesto.departamento", "$departamento"] }] },
         count: { $sum: 1 }
       }
     },
