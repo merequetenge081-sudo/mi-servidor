@@ -18,6 +18,18 @@
         .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #4b5563; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 10; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s; font-size: 0.75rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); line-height: 1.4; pointer-events: none; }
         .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #4b5563 transparent transparent transparent; }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        
+        @media print {
+            body { background-color: white; }
+            .card { box-shadow: none !important; border: 1px solid #ddd; margin-bottom: 20px; page-break-inside: avoid; }
+            .table-container { overflow: visible !important; }
+            nav, .tooltiptext { display: none !important; }
+            * { text-shadow: none !important; color: #000 !important; background: transparent !important; }
+            table { page-break-inside: auto; width: 100%; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+        }
     </style>
 </head>
 <body>
@@ -155,16 +167,24 @@
                         <h3 class="text-lg font-bold text-gray-800">
                             <i class="fas fa-list-ol text-indigo-500 mr-2"></i>Ranking Detallado de Líderes
                         </h3>
-                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"><i class="fas fa-sort-amount-down mr-1"></i>Ordenado por Score</span>
+                        <div class="flex items-center space-x-2">
+                            <label for="ranking-filter" class="text-sm font-medium text-gray-700">Filtrar/Ordenar:</label>
+                            <select id="ranking-filter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-1.5 cursor-pointer">
+                                <option value="score">Por Defecto (Score)</option>
+                                <option value="revisionPuesto">Más con Revisar Puesto</option>
+                                <option value="sinTelefono">Menos Teléfonos Registrados</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="table-container bg-white rounded-lg overflow-hidden border border-gray-200">
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200" id="ranking-table">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-4 text-left text-xs font-black text-gray-600 uppercase tracking-wider tooltip">Líder <span class="tooltiptext">Nombre registrado del líder</span></th>
                                     <th class="px-4 py-4 text-center text-xs font-black text-gray-600 uppercase tracking-wider tooltip">Aportes <span class="tooltiptext">Volumen total aportado sin contar calidad</span></th>
                                     <th class="px-4 py-4 text-center text-xs font-black text-gray-600 uppercase tracking-wider tooltip text-orange-500">Fallos <span class="tooltiptext">Cantidad de registros erróneos o devueltos</span></th>
-                                    <th class="px-4 py-4 text-center text-xs font-black text-gray-900 uppercase tracking-wider tooltip bg-indigo-50">Score <span class="tooltiptext">Calificación final (Puntaje = Aportes válidos - Penalidad por fallos)</span></th>
+                                    <th class="px-4 py-4 text-center text-xs font-black text-gray-600 uppercase tracking-wider tooltip text-purple-600 hidden" id="dynamic-col">Revisar Puesto</th>
+                                    <th class="px-4 py-4 text-center text-xs font-black text-gray-900 uppercase tracking-wider tooltip bg-indigo-50">Score <span class="tooltiptext">Calificación final</span></th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200" id="ranking-table-body">

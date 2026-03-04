@@ -457,6 +457,24 @@ export async function getLeaderPerformance(eventId = null) {
           },
           verificaciones: {
             $sum: { $cond: [{ $eq: ['$verificadoAuto', true] }, 1, 0] }
+          },
+          revisionPuesto: {
+            $sum: { $cond: [{ $eq: ['$requiereRevisionPuesto', true] }, 1, 0] }
+          },
+          sinTelefono: {
+            $sum: {
+              $cond: [
+                {
+                  $or: [
+                    { $eq: ['$phone', null] },
+                    { $eq: ['$phone', ''] },
+                    { $not: ['$phone'] }
+                  ]
+                },
+                1,
+                0
+              ]
+            }
           }
         }
       },
