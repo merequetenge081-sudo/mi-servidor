@@ -1094,6 +1094,7 @@
                   image:        { type: 'jpeg', quality: 0.98 },
                   html2canvas:  { scale: 2, useCORS: true, windowWidth: 1056 },
                   jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+            };
             try {
                 // Hacer el contenedor renderizable clonándolo o forzándolo al DOM visible un instante sin que afecte el viewport del usuario.
                 const clone = element.cloneNode(true);
