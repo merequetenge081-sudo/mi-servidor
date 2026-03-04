@@ -104,6 +104,7 @@ const RegistrationsModule = (() => {
         <tr>
             <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
             <td>${reg.email || '-'}</td>
+            <td>${reg.phone || '-'}</td>
             <td>${reg.cedula || '-'}</td>
             <td>${tab === 'bogota' ? (reg.localidad || '-') : (reg.departamento || '-')}</td>
             <td>${puestoDisplay}${requiereRevision ? ' <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.75rem; padding: 2px 8px;">⚠ Revisar</span>' : ''}</td>
@@ -120,8 +121,8 @@ const RegistrationsModule = (() => {
         }).join('');
 
         const emptyMessage = tab === 'bogota'
-            ? '<tr><td colspan="9" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogotá</td></tr>'
-            : '<tr><td colspan="9" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td></tr>';
+            ? '<tr><td colspan="10" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogotá</td></tr>'
+            : '<tr><td colspan="10" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td></tr>';
 
         const tableEl = document.getElementById(tableId);
         if (tableEl) {

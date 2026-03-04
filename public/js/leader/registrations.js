@@ -106,7 +106,7 @@ export class RegistrationsManager {
         if (pageData.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="9" style="text-align: center; padding: 40px;">
+                    <td colspan="11" style="text-align: center; padding: 40px;">
                         <i class="bi bi-inbox" style="font-size: 48px; color: var(--text-muted);"></i>
                         <p style="margin-top: 12px; color: var(--text-muted);">No hay registros para mostrar</p>
                     </td>
@@ -239,6 +239,7 @@ export class RegistrationsManager {
                 </td>
                 <td>${reg.firstName} ${reg.lastName}</td>
                 <td>${reg.email || ''}</td>
+                <td>${reg.phone || ''}</td>
                 <td>${reg.cedula || ''}</td>
                 <td>${reg.localidad || ''}</td>
                 <td>${reg.votingPlace || ''}</td>

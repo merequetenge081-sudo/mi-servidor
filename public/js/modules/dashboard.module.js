@@ -58,7 +58,7 @@ const DashboardModule = (() => {
             .slice(0, 10); // Últimos 10
 
         if (recent.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay registros recientes</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay registros recientes</td></tr>';
             return;
         }
 
@@ -77,6 +77,7 @@ const DashboardModule = (() => {
                 <tr>
                     <td>${fullName}</td>
                     <td>${reg.email || 'N/A'}</td>
+                    <td>${reg.phone || 'N/A'}</td>
                     <td>${reg.cedula || 'N/A'}</td>
                     <td>${leaderName}</td>
                     <td>${dateLabel}</td>
