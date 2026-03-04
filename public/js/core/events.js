@@ -759,18 +759,20 @@ const Events = (() => {
         const leaderFilter = document.getElementById('leaderFilter');
         const statusFilter = document.getElementById('statusFilter');
         const revisionFilter = document.getElementById('revisionFilter');
+        const phoneFilter = document.getElementById('phoneFilter');
 
         const applyRegistrationFilters = () => {
             if (AppState) {
                 AppState.setUI({ currentPageBogota: 1, currentPageResto: 1 });
             }
-            RegistrationsModule.applyFilters();
+            if (window.RegistrationsModule) window.RegistrationsModule.applyFilters();
         };
 
         if (searchInput) searchInput.addEventListener('input', applyRegistrationFilters);
         if (leaderFilter) leaderFilter.addEventListener('change', applyRegistrationFilters);
         if (statusFilter) statusFilter.addEventListener('change', applyRegistrationFilters);
         if (revisionFilter) revisionFilter.addEventListener('change', applyRegistrationFilters);
+        if (phoneFilter) phoneFilter.addEventListener('change', applyRegistrationFilters);
     }
 
     function bindTabs() {

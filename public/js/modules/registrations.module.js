@@ -52,19 +52,25 @@ const RegistrationsModule = (() => {
         const leaderId = document.getElementById('leaderFilter')?.value || '';
         const status = document.getElementById('statusFilter')?.value || '';
         const revision = document.getElementById('revisionFilter')?.value || '';
+        const phone = document.getElementById('phoneFilter')?.value || '';
 
         const registrations = AppState.data.registrations || [];
 
-        // Filtrar por búsqueda, líder, estado y revisión
+        // Filtrar por búsqueda, líder, estado, revisión y teléfono
         const filtered = registrations.filter(r => {
             const matchSearch = !search ||
                 `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
                 (r.email && r.email.toLowerCase().includes(search)) ||
-                r.cedula.includes(search);
+                (r.cedula && r.cedula.includes(search));
             const matchLeader = !leaderId || r.leaderId === leaderId;
             const matchStatus = !status || (status === 'confirmed' ? r.confirmed : !r.confirmed);
             const matchRevision = !revision || (revision === 'true' ? (r.requiereRevisionPuesto && !r.revisionPuestoResuelta) : !(r.requiereRevisionPuesto && !r.revisionPuestoResuelta));
-            return matchSearch && matchLeader && matchStatus && matchRevision;
+            
+            let matchPhone = true;
+            if (phone === 'with_phone') matchPhone = !!(r.phone && r.phone.trim() !== '');
+            else if (phone === 'without_phone') matchPhone = !(r.phone && r.phone.trim() !== '');
+
+            return matchSearch && matchLeader && matchStatus && matchRevision && matchPhone;
         });
 
         // Separar por región

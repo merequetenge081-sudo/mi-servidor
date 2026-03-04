@@ -46,8 +46,8 @@ const AppState = {
     constants: {
         API_URL: window.location.origin,
         SESSION_TIMEOUT_MS: 30 * 60 * 1000,
-        ITEMS_PER_PAGE: 5,
-        ANALYTICS_ITEMS_PER_PAGE: 5,
+        ITEMS_PER_PAGE: 25,
+        ANALYTICS_ITEMS_PER_PAGE: 25,
         BOGOTA_LOCALIDADES: [
             'Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito',
             'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos',
