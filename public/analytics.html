@@ -523,19 +523,19 @@
               // Load all leaders into the new filter
               const globalLeaderFilter = document.getElementById('global-leader-filter');
               if (globalLeaderFilter) {
-                  fetch('/api/v2/leaders?limit=1000', { 
-                      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+                  const token = localStorage.getItem('token');
+                  fetch('/api/v2/leaders?limit=1000', {
+                      headers: { 'Authorization': `Bearer ${token}` }
                   })
                   .then(r => r.json())
-                  .then(data => {
-                      if (data && data.success && data.data) {
-                          data.data.forEach(l => {
-                              const opt = document.createElement('option');
-                              opt.value = l.id || l._id;
-                              opt.textContent = l.name;
-                              globalLeaderFilter.appendChild(opt);
-                          });
-                      }
+                  .then(result => {
+                      const leaders = (result && result.success && result.data) ? result.data : (Array.isArray(result) ? result : []);
+                      leaders.forEach(l => {
+                          const opt = document.createElement('option');
+                          opt.value = l.leaderId || l._id || l.id || '';
+                          opt.textContent = l.name || l.leaderName || 'Líder';
+                          globalLeaderFilter.appendChild(opt);
+                      });
                   })
                   .catch(err => console.error('Error fetching leaders', err));
 
@@ -629,7 +629,7 @@
         function renderDashboard() {
             if (!analyticsData) return;
             
-            const data = analyticsData[currentRegion];
+            const data = analyticsData[currentRegion] || { topPuestos: [], topLocalidades: [], topLideres: [], jerarquia: [], totalVotos: 0 };
             
             // Update Top Stats
             document.getElementById('stat-total-votos').textContent = data.totalVotos.toLocaleString();
@@ -811,12 +811,14 @@
         function renderLeadersTable(filterText = '') {
             if (!analyticsData) return;
             
-            const data = analyticsData[currentRegion].topLideres;
+            const regionData = analyticsData[currentRegion] || {};
+            const data = Array.isArray(regionData.topLideres) ? regionData.topLideres : [];
             const tbody = document.getElementById('leaders-table-body');
             tbody.innerHTML = '';
             
             const filteredData = data.filter(l => {
-                const name = l.liderNombre ? l.liderNombre.toLowerCase() : 'desconocido';
+                const nameValue = l.liderNombre || l.name || l.nombre || 'desconocido';
+                const name = String(nameValue).toLowerCase();
                 return name.includes(filterText.toLowerCase());
             });
             
@@ -825,20 +827,24 @@
                 return;
             }
             
-            const maxVotos = filteredData.length > 0 ? Math.max(...filteredData.map(l => l.totalVotos)) : 1;
+            const maxVotos = filteredData.length > 0
+                ? Math.max(...filteredData.map(l => Number(l.totalVotos ?? l.totalRegistros ?? l.total ?? 0)))
+                : 1;
             
             filteredData.slice(0, 20).forEach(lider => {
-                const percentage = Math.round((lider.totalVotos / maxVotos) * 100);
+                const totalVotos = Number(lider.totalVotos ?? lider.totalRegistros ?? lider.total ?? 0);
+                const percentage = Math.round((totalVotos / maxVotos) * 100);
+                const leaderName = lider.liderNombre || lider.name || lider.nombre || 'Desconocido';
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-indigo-50 transition-colors group cursor-default';
                 tr.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold text-lg shadow-sm group-hover:shadow-md transition-shadow">
-                                ${lider.liderNombre ? lider.liderNombre.charAt(0).toUpperCase() : '?'}
+                                ${leaderName ? String(leaderName).charAt(0).toUpperCase() : '?'}
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">${lider.liderNombre || 'Desconocido'}</div>
+                                <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">${leaderName}</div>
                                 <div class="text-xs text-gray-500">Rendimiento Destacado</div>
                             </div>
                         </div>
@@ -847,7 +853,7 @@
                         <div class="flex flex-col items-end justify-center">
                             <div class="text-sm font-bold text-gray-900 flex items-center mb-1">
                                 <i class="fas fa-users text-indigo-400 mr-2"></i>
-                                ${lider.totalVotos} <span class="text-xs font-normal text-gray-500 ml-1">aportes</span>
+                                ${totalVotos} <span class="text-xs font-normal text-gray-500 ml-1">aportes</span>
                             </div>
                             <div class="w-full max-w-[12rem] flex items-center justify-end space-x-2">
                                 <div class="flex-grow bg-gray-200 rounded-full h-2 shadow-inner">
@@ -1088,22 +1094,36 @@
             btn.disabled = true;
 
             const element = document.getElementById('pdf-report-container');
-            const opt = {
-                  margin:       0.5,
-                  filename:     `Presentacion_Simulacion_${new Date().toISOString().split('T')[0]}.pdf`,
-                  image:        { type: 'jpeg', quality: 0.98 },
-                  html2canvas:  { scale: 2, useCORS: true, windowWidth: 1056 },
-                  jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
-            };
             try {
-                // Hacer el contenedor renderizable clonándolo o forzándolo al DOM visible un instante sin que afecte el viewport del usuario.
+                await (document.fonts ? document.fonts.ready : Promise.resolve());
+                // Hacer el contenedor renderizable clonándolo o forzándolo al DOM visible sin afectar el viewport del usuario.
                 const clone = element.cloneNode(true);
-                clone.style.position = 'absolute';
+                clone.style.position = 'fixed';
                 clone.style.top = '0';
                 clone.style.left = '0';
-                clone.style.zIndex = '-999';
+                clone.style.opacity = '0';
+                clone.style.pointerEvents = 'none';
+                clone.style.overflow = 'visible';
+                clone.style.width = `${element.scrollWidth || 1056}px`;
                 clone.id = 'pdf-clone';
                 document.body.appendChild(clone);
+
+                const opt = {
+                    margin: 0.3,
+                    filename: `Presentacion_Simulacion_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        windowWidth: clone.scrollWidth,
+                        windowHeight: clone.scrollHeight,
+                        scrollX: 0,
+                        scrollY: 0
+                    },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
                 
                 await html2pdf().set(opt).from(clone).save();
                 
@@ -1186,42 +1206,38 @@
             try {
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generando Informe...';
                 btn.disabled = true;
+                await (document.fonts ? document.fonts.ready : Promise.resolve());
 
-                const token = localStorage.getItem('token');
-                const status = document.getElementById('data-status-filter')?.value || 'all';
-                const leaderId = document.getElementById('global-leader-filter')?.value || '';
-                const eventId = getSelectedEventId();
-                const targetDate = document.getElementById('simulation-target-date')?.value || '';
+                const element = document.getElementById('pdf-content');
+                const clone = element.cloneNode(true);
+                clone.style.position = 'fixed';
+                clone.style.top = '0';
+                clone.style.left = '0';
+                clone.style.opacity = '0';
+                clone.style.pointerEvents = 'none';
+                clone.style.overflow = 'visible';
+                clone.style.width = `${element.scrollWidth}px`;
+                document.body.appendChild(clone);
 
-                const params = new URLSearchParams();
-                if (eventId) params.set('eventId', eventId);
-                if (status) params.set('status', status);
-                if (leaderId) params.set('leaderId', leaderId);
-                if (targetDate) params.set('targetDate', targetDate);
-                params.set('region', currentRegion || 'nacional');
+                const opt = {
+                    margin: 0.3,
+                    filename: `Informe_Analitico_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        windowWidth: clone.scrollWidth,
+                        windowHeight: clone.scrollHeight,
+                        scrollX: 0,
+                        scrollY: 0
+                    },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
 
-                const response = await fetch(`/api/v2/exports/pdf/report?${params.toString()}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error al generar el PDF en el servidor');
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Informe_Analitico_${new Date().toISOString().split('T')[0]}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-
+                await html2pdf().set(opt).from(clone).save();
+                document.body.removeChild(clone);
                 showToast('Informe analítico descargado exitosamente', 'success');
             } catch (error) {
                 console.error("Error generando PDF:", error);
