@@ -254,6 +254,56 @@ const ExportsModule = (() => {
         }
     }
 
+    /**
+     * Export Specific Localidad Registrations
+     */
+    function exportByLocalidad() {
+        try {
+            const locSelect = document.getElementById('exportLocalidadSelect');
+            if (!locSelect) return showAlert('Selector de localidad no encontrado', 'error');
+
+            const localidad = locSelect.value;
+            if (!localidad) return showAlert('Por favor seleccione una localidad', 'warning');
+
+            const allRegistrations = AppState.data.registrations || [];
+            const filtered = allRegistrations.filter(r => r.localidad === localidad);
+            
+            if (filtered.length === 0) return showAlert('Esta localidad no tiene registros', 'info');
+
+            const data = filtered.map(r => {
+                let nombre = (r.firstName || '').trim();
+                let apellido = (r.lastName || '').trim();
+                let nombreCompleto = nombre;
+                if (apellido && !nombre.toLowerCase().includes(apellido.toLowerCase())) {
+                    nombreCompleto = `${nombre} ${apellido}`.trim();
+                } else if (!nombre && apellido) {
+                    nombreCompleto = apellido;
+                }
+
+                return {
+                    'Nombres y Apellidos': nombreCompleto,
+                    'Email': r.email || '',
+                    'Cédula': r.cedula || '',
+                    'Teléfono': r.phone || '',
+                    'Departamento': r.departamento || r.department || '',
+                    'Municipio': r.capital || r.municipality || '',
+                    'Localidad': r.localidad || '',
+                    'Líder': r.leaderName || '',
+                    'Puesto': r.votingPlace || '',
+                    'Mesa': r.votingTable || '',
+                    'Fecha': new Date(r.date).toLocaleDateString('es-CO'),
+                    'Estado': r.confirmed ? 'Confirmado' : 'Pendiente'
+                };
+            });
+
+            const dateStr = new Date().toISOString().slice(0, 10);
+            ExportService.downloadExcel(data, `registros_${localidad.replace(/ /g, '_')}_${dateStr}`, `Registros - ${localidad}`);
+        } catch (e) {
+            console.error('Error in exportByLocalidad:', e);
+            showAlert('Error al exportar: ' + e.message, 'error');
+        }
+    }
+
     // ====== EXPOSED API ======
 
     return {
@@ -263,7 +313,8 @@ const ExportsModule = (() => {
         exportResto,
         exportAllLeaders,
         exportByLeader,
-        exportLeaderStats
+        exportLeaderStats,
+        exportByLocalidad
     };
 })();
 

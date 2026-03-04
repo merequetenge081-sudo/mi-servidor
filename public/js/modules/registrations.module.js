@@ -307,6 +307,55 @@ const RegistrationsModule = (() => {
         const { resto } = applyAllFilters();
         renderTable('resto', resto);
     }
+    
+    /**
+     * Ejecuta corrección y estandarización masiva de nombres
+     */
+    async function fixNames() {
+        if (!confirm('¿Estás seguro de que deseas estandarizar y corregir los nombres de todos los registros del evento actual? Esta acción no se puede deshacer.')) return;
+        
+        try {
+            const btn = document.getElementById('fixNamesBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+            btn.disabled = true;
+            
+            const res = await fetch(`${AppState.constants.API_URL}/api/registrations/fix-names`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AppState.user.token}`
+                },
+                body: JSON.stringify({ eventId: AppState.data.currentEventId })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                Helpers.showAlert(data.message || `Se corrigieron mútiples registros con éxito.`, 'success');
+                // Reload dashboard data
+                if (typeof DashboardModule !== 'undefined' && DashboardModule.load) {
+                    DashboardModule.load();
+                } else {
+                    location.reload();
+                }
+            } else {
+                Helpers.showAlert(data.error || 'Error al corregir nombres', 'error');
+            }
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1000);
+        } catch (e) {
+            console.error('[RegistrationsModule] fixNames err:', e);
+            Helpers.showAlert('Error de red al intentar corregir nombres', 'error');
+            const btn = document.getElementById('fixNamesBtn');
+            if (btn) {
+                btn.innerHTML = '<i class="bi bi-magic"></i> Corregir Nombres';
+                btn.disabled = false;
+            }
+        }
+    }
 
     // ====== EXPOSED API ======
 
@@ -318,7 +367,8 @@ const RegistrationsModule = (() => {
         renderResto,
         changePage,
         toggleConfirm,
-        showTab
+        showTab,
+        fixNames
     };
 })();
 

@@ -349,6 +349,20 @@ export class ImportExportManager {
             XLSX.utils.book_append_sheet(wb, ws, 'Mis Registros');
 
             const safeName = leaderName.replace(/[^a-zA-Z0-9]/g, '_');
+            const dateStr = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `mis_registros_${safeName}_${dateStr}.xlsx`);
+        } catch (err) {
+            console.error('Export Error:', err);
+            alert('Ocurrió un error al exportar: ' + err.message);
+        }
+    }
+
+    static downloadTemplate() {
+        const headers = [
+            ['Nombres', 'Apellidos', 'Cédula', 'Email', 'Celular', 'Mesa', 'Localidad', 'Puesto Votación']
+        ];
+        
+        const ws = XLSX.utils.aoa_to_sheet(headers);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Plantilla");
         XLSX.writeFile(wb, "Plantilla_Registros.xlsx");

@@ -503,9 +503,22 @@ const LeadersModule = (() => {
     }
 
     function populateExportLeader() {
-        const allLeaders = window.AppState.data.leaders;
+        const allLeaders = window.AppState.data.leaders || [];
+        const sorted = [...allLeaders].sort((a, b) => a.name.localeCompare(b.name));
         const select = document.getElementById('exportLeaderSelect');
-        select.innerHTML = allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+        if (select) {
+            select.innerHTML = '<option value="">Seleccione un líder...</option>' + 
+                sorted.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
+        }
+        
+        // También popular exportLocalidadSelect
+        const locSelect = document.getElementById('exportLocalidadSelect');
+        if (locSelect) {
+            const allRegistrations = window.AppState.data.registrations || [];
+            const uniqueLocalidades = [...new Set(allRegistrations.map(r => r.localidad).filter(l => l && l.trim() !== ''))].sort();
+            locSelect.innerHTML = '<option value="">Seleccione una localidad...</option>' + 
+                uniqueLocalidades.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+        }
     }
 
     function populateAnalyticsLeaderFilter() {

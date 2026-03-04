@@ -517,6 +517,16 @@ const Events = (() => {
                 return;
             }
 
+            if (target.id === 'fixNamesBtn') {
+                RegistrationsModule.fixNames();
+                return;
+            }
+            
+            if (target.id === 'exportByLocalidadBtn') {
+                ExportsModule.exportByLocalidad();
+                return;
+            }
+
             if (target.id === 'exportLeadersMainBtn') {
                 ExportsModule.exportAllLeaders();
                 return;

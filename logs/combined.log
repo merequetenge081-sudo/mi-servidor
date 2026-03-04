@@ -11524,3 +11524,9 @@
 {"durationMs":483,"env":"development","level":"info","message":"http_response","method":"GET","path":"/api/v2/analytics/simulation","requestId":"76a1cc73-9a07-4bb4-b067-8d1bb5726c9b","service":"mi-servidor","statusCode":200,"timestamp":"2026-03-01 21:14:56","userId":null,"userRole":null}
 {"level":"info","message":"[BOOT] Conectando a MongoDB Atlas: seguimiento-datos","service":"mi-servidor","timestamp":"2026-03-03 09:59:12"}
 {"level":"info","message":"✓ Conectado exitosamente a MongoDB Atlas","service":"mi-servidor","timestamp":"2026-03-03 09:59:13"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-03 17:31:09"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-03 17:31:09"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-03 17:31:09"}
+{"level":"info","message":"📧 EmailService Init - RESEND_API_KEY: NO configurado","service":"mi-servidor","timestamp":"2026-03-03 17:31:18"}
+{"level":"info","message":"📧 EMAIL_FROM: redsp@fulars.com","service":"mi-servidor","timestamp":"2026-03-03 17:31:18"}
+{"level":"warn","message":"⚠️  Usando modo mock para emails (RESEND_API_KEY no configurada o modo forzado).","service":"mi-servidor","timestamp":"2026-03-03 17:31:18"}

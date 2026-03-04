@@ -307,7 +307,7 @@ const ModalsModule = {
         } finally {
             setTimeout(clearFlag, 100);
         }
-    }
+    },
 
     /**
      * Toggle notifications dropdown
@@ -372,7 +372,7 @@ const ModalsModule = {
             console.error('[ModalsModule] Error toggling help drawer:', e);
             alert('Error abriendo ayuda: ' + e.message);
         }
-    }
+    },
 
     /**
      * Close help drawer
