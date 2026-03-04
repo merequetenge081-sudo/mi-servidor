@@ -61,7 +61,6 @@ export async function exportData(req, res) {
           { header: "Cédula", key: "cedula", width: 15 },
           { header: "Nombre", key: "firstName", width: 20 },
           { header: "Apellido", key: "lastName", width: 20 },
-          { header: "Email", key: "email", width: 30 },
           { header: "Teléfono", key: "phone", width: 15 },
           { header: "Localidad", key: "localidad", width: 20 },
           { header: "Registrado a Votar", key: "registeredToVote", width: 20 },
@@ -77,7 +76,6 @@ export async function exportData(req, res) {
             cedula: reg.cedula,
             firstName: reg.firstName,
             lastName: reg.lastName,
-            email: reg.email,
             phone: reg.phone,
             localidad: reg.localidad,
             registeredToVote: reg.registeredToVote ? "Sí" : "No",
@@ -97,7 +95,6 @@ export async function exportData(req, res) {
       worksheet.columns = [
         { header: "ID Líder", key: "leaderId", width: 15 },
         { header: "Nombre", key: "name", width: 25 },
-        { header: "Email", key: "email", width: 30 },
         { header: "Teléfono", key: "phone", width: 15 },
         { header: "Área", key: "area", width: 20 },
         { header: "Registros", key: "registrations", width: 12 },
@@ -108,7 +105,6 @@ export async function exportData(req, res) {
         worksheet.addRow({
           leaderId: leader.leaderId,
           name: leader.name,
-          email: leader.email,
           phone: leader.phone,
           area: leader.area,
           registrations: leader.registrations,

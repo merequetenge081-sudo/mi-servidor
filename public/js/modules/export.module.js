@@ -89,8 +89,8 @@ const ExportsModule = (() => {
         const registrations = AppState.data.registrations || [];
         const data = registrations.map(r => ({
             Nombre: `${r.firstName} ${r.lastName}`,
-            Email: r.email || '',
             Cédula: r.cedula || '',
+            Teléfono: r.phone || '',
             Localidad: r.localidad || '',
             Departamento: r.departamento || '',
             Líder: r.leaderName || '',
@@ -111,8 +111,8 @@ const ExportsModule = (() => {
         const bogota = registrations.filter(r => bogotaLocalidades.includes(r.localidad));
         const data = bogota.map(r => ({
             Nombre: `${r.firstName} ${r.lastName}`,
-            Email: r.email || '',
             Cédula: r.cedula || '',
+            Teléfono: r.phone || '',
             Localidad: r.localidad || '',
             Líder: r.leaderName || '',
             Puesto: r.votingPlace || '',
@@ -132,8 +132,8 @@ const ExportsModule = (() => {
         const resto = registrations.filter(r => !bogotaLocalidades.includes(r.localidad) && r.departamento);
         const data = resto.map(r => ({
             Nombre: `${r.firstName} ${r.lastName}`,
-            Email: r.email || '',
             Cédula: r.cedula || '',
+            Teléfono: r.phone || '',
             Departamento: r.departamento || '',
             Líder: r.leaderName || '',
             Puesto: r.votingPlace || '',
@@ -161,7 +161,6 @@ const ExportsModule = (() => {
                 const count = registrations.filter(r => r.leaderId === l._id).length;
                 return {
                     Nombre: l.name,
-                    Email: l.email || '',
                     Teléfono: l.phone || '',
                     Registros: count,
                     Activo: (l.active !== false) ? 'Sí' : 'No'
@@ -205,8 +204,8 @@ const ExportsModule = (() => {
 
             const data = regs.map(r => ({
                 Nombre: `${r.firstName} ${r.lastName}`,
-                Email: r.email || '',
                 Cédula: r.cedula || '',
+                Teléfono: r.phone || '',
                 Localidad: r.localidad || '',
                 Departamento: r.departamento || '',
                 Puesto: r.votingPlace || '',

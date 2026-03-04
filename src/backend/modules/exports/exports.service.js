@@ -46,17 +46,17 @@ export async function exportRegistrationsCSV(eventId = null) {
     const registrations = await exportsRepository.getRegistrationsForExport(eventId);
 
     // Convertir a CSV
-    let csv = 'Cédula,Nombre,Apellido,Puesto,Localidad,Líder,Email,Fecha\n';
+    let csv = 'Cédula,Nombre,Apellido,Teléfono,Puesto,Localidad,Líder,Fecha\n';
     
     for (const reg of registrations) {
       const row = [
         reg.cedula,
         reg.nombre,
         reg.apellido,
+        reg.phone || '',
         reg.puestoId?.numero || '',
         reg.puestoId?.localidad || '',
         reg.leaderId?.name || '',
-        reg.leaderId?.email || '',
         new Date(reg.createdAt).toLocaleDateString()
       ];
       csv += row.map(cell => `"${cell}"`).join(',') + '\n';
@@ -89,10 +89,10 @@ export async function exportRegistrationsExcel(eventId = null) {
       { header: 'Cédula', key: 'cedula', width: 15 },
       { header: 'Nombre', key: 'nombre', width: 20 },
       { header: 'Apellido', key: 'apellido', width: 20 },
+      { header: 'Teléfono', key: 'telefono', width: 15 },
       { header: 'Puesto', key: 'puesto', width: 10 },
       { header: 'Localidad', key: 'localidad', width: 20 },
       { header: 'Líder', key: 'lider', width: 20 },
-      { header: 'Email Líder', key: 'email', width: 25 },
       { header: 'Fecha Registro', key: 'fecha', width: 15 }
     ];
 
@@ -102,10 +102,10 @@ export async function exportRegistrationsExcel(eventId = null) {
         cedula: reg.cedula,
         nombre: reg.nombre,
         apellido: reg.apellido,
+        telefono: reg.phone || '',
         puesto: reg.puestoId?.numero || '',
         localidad: reg.puestoId?.localidad || '',
         lider: reg.leaderId?.name || '',
-        email: reg.leaderId?.email || '',
         fecha: new Date(reg.createdAt).toLocaleDateString()
       });
     }
@@ -138,7 +138,7 @@ export async function exportLeadersExcel() {
 
     worksheet.columns = [
       { header: 'Nombre', key: 'name', width: 20 },
-      { header: 'Email', key: 'email', width: 25 },
+      { header: 'Teléfono', key: 'phone', width: 15 },
       { header: 'Cédula', key: 'cedula', width: 15 },
       { header: 'Especialidad', key: 'specialty', width: 20 },
       { header: 'Evento Asignado', key: 'eventId', width: 25 },
@@ -148,7 +148,7 @@ export async function exportLeadersExcel() {
     for (const leader of leaders) {
       worksheet.addRow({
         name: leader.name,
-        email: leader.email,
+        phone: leader.phone || '',
         cedula: leader.cedula,
         specialty: leader.specialty || '',
         eventId: leader.assignedEventId || 'No asignado',
