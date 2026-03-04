@@ -9,6 +9,21 @@ const WINDOW_SIZE = 15 * 60 * 1000; // 15 minutes in milliseconds
 const MAX_REQUESTS = 200; // Maximum 200 requests per window
 const LOGIN_WINDOW_SIZE = 10 * 60 * 1000; // 10 minutes in milliseconds
 const LOGIN_MAX_REQUESTS = 10; // Maximum 10 login attempts per window
+const ALLOWLIST_ENV = process.env.IP_ALLOWLIST || process.env.DEV_IP_ALLOWLIST || '';
+function normalizeIp(value) {
+  return (value || '').replace(/^::ffff:/, '');
+}
+
+const ALLOWLIST_IPS = new Set(
+  ALLOWLIST_ENV
+    .split(',')
+    .map(value => normalizeIp(value.trim()))
+    .filter(Boolean)
+);
+
+function isAllowlisted(ip) {
+  return ALLOWLIST_IPS.has(normalizeIp(ip));
+}
 
 function getClientIp(req) {
   return (
@@ -30,6 +45,10 @@ function getLoginKey(req) {
 export function rateLimitMiddleware(req, res, next) {
   const clientIp = getClientIp(req);
   const now = Date.now();
+
+  if (isAllowlisted(clientIp)) {
+    return next();
+  }
 
   if (!requestCounts[clientIp]) {
     requestCounts[clientIp] = [];
@@ -60,6 +79,10 @@ export function rateLimitMiddleware(req, res, next) {
 export function loginRateLimitMiddleware(req, res, next) {
   const clientIp = getClientIp(req);
   const now = Date.now();
+
+  if (isAllowlisted(clientIp)) {
+    return next();
+  }
 
   if (!loginRequestCounts[clientIp]) {
     loginRequestCounts[clientIp] = [];

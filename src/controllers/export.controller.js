@@ -9,7 +9,13 @@ import logger from "../config/logger.js";
 export async function exportData(req, res) {
   try {
     const user = req.user;
-    const { type, eventId } = req.query;
+    const type = req.params.type || req.query.type;
+    const { eventId } = req.query;
+    const page = Number.parseInt(req.query.page, 10);
+    const pageSizeRaw = Number.parseInt(req.query.pageSize || req.query.limit, 10);
+    const pageSize = Number.isFinite(pageSizeRaw) && pageSizeRaw > 0
+      ? Math.min(pageSizeRaw, 50000)
+      : 5000;
 
     if (!["registrations", "leaders", "events"].includes(type)) {
       return res.status(400).json({ error: "Tipo de export inválido" });
@@ -18,45 +24,70 @@ export async function exportData(req, res) {
     const workbook = new ExcelJS.Workbook();
 
     if (type === "registrations" || type === "all") {
-      const worksheet = workbook.addWorksheet("Registros");
       const filter = eventId ? { eventId } : {};
-      const registrations = await Registration.find(filter).lean();
-      const puestoIds = [...new Set(registrations.map(reg => reg.puestoId).filter(Boolean).map(id => id.toString()))];
-      const puestos = puestoIds.length > 0
-        ? await Puestos.find({ _id: { $in: puestoIds } }).lean()
-        : [];
-      const puestoById = new Map(puestos.map(puesto => [puesto._id.toString(), puesto]));
+      const total = await Registration.countDocuments(filter);
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      const requestedPage = Number.isFinite(page) && page > 0 ? Math.min(page, totalPages) : null;
+      const pages = requestedPage ? [requestedPage] : Array.from({ length: totalPages }, (_, i) => i + 1);
 
-      worksheet.columns = [
-        { header: "Cédula", key: "cedula", width: 15 },
-        { header: "Nombre", key: "firstName", width: 20 },
-        { header: "Apellido", key: "lastName", width: 20 },
-        { header: "Email", key: "email", width: 30 },
-        { header: "Teléfono", key: "phone", width: 15 },
-        { header: "Localidad", key: "localidad", width: 20 },
-        { header: "Registrado a Votar", key: "registeredToVote", width: 20 },
-        { header: "Puesto de Votación", key: "puestoNombre", width: 30 },
-        { header: "Mesa", key: "mesa", width: 10 },
-        { header: "Confirmado", key: "confirmed", width: 15 },
-        { header: "Fecha de Registro", key: "date", width: 15 }
-      ];
+      res.setHeader("X-Export-Total", total);
+      res.setHeader("X-Export-Page-Size", pageSize);
+      res.setHeader("X-Export-Total-Pages", totalPages);
+      if (requestedPage) {
+        res.setHeader("X-Export-Page", requestedPage);
+      }
 
-      registrations.forEach(reg => {
-        const puesto = reg.puestoId ? puestoById.get(reg.puestoId.toString()) : null;
-        worksheet.addRow({
-          cedula: reg.cedula,
-          firstName: reg.firstName,
-          lastName: reg.lastName,
-          email: reg.email,
-          phone: reg.phone,
-          localidad: reg.localidad,
-          registeredToVote: reg.registeredToVote ? "Sí" : "No",
-          puestoNombre: puesto?.nombre || "-",
-          mesa: reg.mesa ?? "-",
-          confirmed: reg.confirmed ? "Confirmado" : "Pendiente",
-          date: reg.date
+      for (const currentPage of pages) {
+        const worksheetName = requestedPage ? "Registros" : `Registros_${currentPage}`;
+        const worksheet = workbook.addWorksheet(worksheetName);
+        const registrations = await Registration.find(filter)
+          .skip((currentPage - 1) * pageSize)
+          .limit(pageSize)
+          .lean();
+
+        const puestoIds = [...new Set(
+          registrations
+            .map(reg => reg.puestoId)
+            .filter(Boolean)
+            .map(id => id.toString())
+        )];
+
+        const puestos = puestoIds.length > 0
+          ? await Puestos.find({ _id: { $in: puestoIds } }).lean()
+          : [];
+        const puestoById = new Map(puestos.map(puesto => [puesto._id.toString(), puesto]));
+
+        worksheet.columns = [
+          { header: "Cédula", key: "cedula", width: 15 },
+          { header: "Nombre", key: "firstName", width: 20 },
+          { header: "Apellido", key: "lastName", width: 20 },
+          { header: "Email", key: "email", width: 30 },
+          { header: "Teléfono", key: "phone", width: 15 },
+          { header: "Localidad", key: "localidad", width: 20 },
+          { header: "Registrado a Votar", key: "registeredToVote", width: 20 },
+          { header: "Puesto de Votación", key: "puestoNombre", width: 30 },
+          { header: "Mesa", key: "mesa", width: 10 },
+          { header: "Confirmado", key: "confirmed", width: 15 },
+          { header: "Fecha de Registro", key: "date", width: 15 }
+        ];
+
+        registrations.forEach(reg => {
+          const puesto = reg.puestoId ? puestoById.get(reg.puestoId.toString()) : null;
+          worksheet.addRow({
+            cedula: reg.cedula,
+            firstName: reg.firstName,
+            lastName: reg.lastName,
+            email: reg.email,
+            phone: reg.phone,
+            localidad: reg.localidad,
+            registeredToVote: reg.registeredToVote ? "Sí" : "No",
+            puestoNombre: puesto?.nombre || "-",
+            mesa: reg.mesa ?? "-",
+            confirmed: reg.confirmed ? "Confirmado" : "Pendiente",
+            date: reg.date
+          });
         });
-      });
+      }
     }
 
     if (type === "leaders" || type === "all") {
