@@ -1030,7 +1030,10 @@
 
             try {
                 await (document.fonts ? document.fonts.ready : Promise.resolve());
-                const overlay = document.getElementById('simulation-overlay');
+                if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
+                    throw new Error('html2canvas o jsPDF no estan disponibles');
+                }
+
                 const slideIds = [
                     'slide-intro',
                     'slide-current',
@@ -1056,47 +1059,53 @@
                 container.id = 'simulation-pdf-container';
                 container.style.position = 'fixed';
                 container.style.top = '0';
-                container.style.left = '0';
-                container.style.opacity = '0';
-                container.style.pointerEvents = 'none';
+                container.style.left = '-2000px';
                 container.style.width = '1056px';
+                container.style.pointerEvents = 'none';
                 container.style.background = '#ffffff';
+                document.body.appendChild(container);
 
-                slideIds.forEach((slideId, index) => {
-                    const slide = document.getElementById(slideId);
-                    if (!slide) return;
+                const { jsPDF } = window.jspdf;
+                const pageWidth = 1056;
+                const pageHeight = 816;
+                const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [pageWidth, pageHeight] });
+
+                let firstPage = true;
+                for (let i = 0; i < slideIds.length; i += 1) {
+                    const slide = document.getElementById(slideIds[i]);
+                    if (!slide) continue;
+
                     const clone = slide.cloneNode(true);
                     clone.classList.add('active');
                     clone.style.display = 'flex';
-                    clone.style.minHeight = '816px';
-                    clone.style.width = '1056px';
+                    clone.style.minHeight = `${pageHeight}px`;
+                    clone.style.width = `${pageWidth}px`;
                     clone.style.padding = '48px';
                     clone.style.boxSizing = 'border-box';
-                    clone.style.pageBreakAfter = index === slideIds.length - 1 ? 'auto' : 'always';
-                    clone.style.background = colors[index] || '#111827';
+                    clone.style.background = colors[i] || '#111827';
+
+                    container.innerHTML = '';
                     container.appendChild(clone);
-                });
 
-                document.body.appendChild(container);
-
-                const opt = {
-                    margin: 0.3,
-                    filename: `Presentacion_Simulacion_${new Date().toISOString().split('T')[0]}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
+                    const canvas = await window.html2canvas(container, {
                         scale: 2,
                         useCORS: true,
                         backgroundColor: '#ffffff',
-                        windowWidth: container.scrollWidth,
-                        windowHeight: container.scrollHeight,
+                        width: pageWidth,
+                        height: pageHeight,
+                        windowWidth: pageWidth,
+                        windowHeight: pageHeight,
                         scrollX: 0,
                         scrollY: 0
-                    },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                };
+                    });
 
-                await html2pdf().set(opt).from(container).save();
+                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                    if (!firstPage) pdf.addPage([pageWidth, pageHeight], 'landscape');
+                    firstPage = false;
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+                }
+
+                pdf.save(`Presentacion_Simulacion_${new Date().toISOString().split('T')[0]}.pdf`);
                 document.body.removeChild(container);
             } catch (error) {
                 console.error('Error generating PDF:', error);

@@ -277,9 +277,8 @@ export async function generateReportPDF(options = {}) {
     const startDateStr = startDate.toISOString().slice(0, 10);
     const endDateStr = endDate.toISOString().slice(0, 10);
 
-    const [dashboard, leaderPerf, advancedData, simulationData, trendData] = await Promise.all([
+    const [dashboard, advancedData, simulationData, trendData] = await Promise.all([
       analyticsService.getDashboardSummary(activeEventId),
-      advancedService.getLeaderPerformance(activeEventId),
       advancedService.getAdvancedAnalytics(activeEventId, status, leaderId),
       advancedService.getSimulationData(activeEventId, targetDate),
       analyticsService.getTrendAnalysis(startDateStr, endDateStr, activeEventId)
@@ -287,9 +286,6 @@ export async function generateReportPDF(options = {}) {
 
     const summary = dashboard?.summary || {};
     const regionData = advancedData?.[regionKey] || { topPuestos: [], topLocalidades: [], topLideres: [], totalVotos: 0 };
-    const rankingGeneral = leaderPerf?.rankingGeneral || [];
-    const topErrores = leaderPerf?.topErrores || [];
-    const topVerificaciones = leaderPerf?.topVerificaciones || [];
     const totalLeaders = summary.uniqueLeaders || 0;
     const totalRegistrations = summary.totalRegistrations || 0;
     const completionPercentNum = Math.max(0, Number(summary.completionPercentage || 0));
@@ -300,21 +296,16 @@ export async function generateReportPDF(options = {}) {
 
     const topPuestos = (regionData.topPuestos || []).slice(0, 8);
     const topLocalidades = (regionData.topLocalidades || []).slice(0, 8);
-    const topRanking = rankingGeneral.slice(0, 10);
     const trendSeries = (trendData?.timeSeries || []).slice(-15);
 
-    const totalErrors = topErrores.reduce((acc, x) => acc + (x.errores || 0), 0);
-    const totalAutoVerified = topVerificaciones.reduce((acc, x) => acc + (x.verificaciones || 0), 0);
-
-    const topLeaderName = simulationData?.topLeader || (topRanking[0]?.leaderName || 'N/D');
-    const topLeaderVotes = simulationData?.topLeaderVotes || (topRanking[0]?.totalRegistros || 0);
+    const topLeaderName = simulationData?.topLeader || 'N/D';
+    const topLeaderVotes = simulationData?.topLeaderVotes || 0;
 
     return new Promise(async (resolve, reject) => {
       try {
-        const PAGE = { w: 842, h: 595, m: 28, headerH: 84, footerH: 24 };
+        const doc = new PDFDocument({ margin: 0, size: [1000, 720] });
+        const PAGE = { w: doc.page.width, h: doc.page.height, m: 28, headerH: 84, footerH: 24 };
         const contentTop = PAGE.m + PAGE.headerH;
-
-        const doc = new PDFDocument({ margin: 0, size: [PAGE.w, PAGE.h] });
         const buffers = [];
         doc.on('data', buffers.push.bind(buffers));
         doc.on('end', () => resolve(Buffer.concat(buffers)));
@@ -464,57 +455,15 @@ export async function generateReportPDF(options = {}) {
         drawTopList('Top 5 localidades', topLocalidades, PAGE.m + 418, contentTop + 312);
         drawFooter(2);
 
-        // Page 3 - Leaders
+        // Page 3 - Leader performance placeholder
         doc.addPage({ margin: 0, size: [PAGE.w, PAGE.h], layout: 'landscape' });
         doc.rect(0, 0, PAGE.w, PAGE.h).fill(BRAND.colors.pageBg);
-        drawHeader('Rendimiento de lideres', `Evento: ${eventName} | Lideres evaluados: ${totalLeaders.toLocaleString('es-CO')}`);
-
-        drawCard(PAGE.m, contentTop + 12, 390, 270);
-        doc.fillColor(BRAND.colors.textPrimary).font('Helvetica-Bold').fontSize(11).text('Ranking por score', PAGE.m + 14, contentTop + 26);
-        const rankingCfg = {
-          type: 'bar',
-          data: {
-            labels: topRanking.slice(0, 8).map((l) => String(l.leaderName || 'N/D').slice(0, 14)),
-            datasets: [{ label: 'Score', data: topRanking.slice(0, 8).map((l) => l.performanceScore || 0), backgroundColor: '#0ea5e9' }]
-          },
-          options: {
-            layout: { padding: 10 },
-            plugins: { legend: { display: false }, title: { display: true, text: 'Top 8 lideres por score', fontSize: 11 } },
-            scales: { y: { beginAtZero: true }, x: { ticks: { fontSize: 9 } } }
-          }
-        };
-        const rankingImg = await getQuickChartImage(rankingCfg, 360, 220);
-        if (rankingImg) doc.image(rankingImg, PAGE.m + 14, contentTop + 50, { width: 360, height: 214 });
-
-        drawCard(PAGE.m + 404, contentTop + 12, 410, 270);
-        doc.fillColor(BRAND.colors.textPrimary).font('Helvetica-Bold').fontSize(11).text('Calidad operativa', PAGE.m + 418, contentTop + 26);
-        const qualityCfg = {
-          type: 'bar',
-          data: {
-            labels: ['Errores (Top 10)', 'Verificaciones auto (Top 10)'],
-            datasets: [{ data: [totalErrors, totalAutoVerified], backgroundColor: ['#ef4444', BRAND.colors.success] }]
-          },
-          options: {
-            layout: { padding: 8 },
-            plugins: { legend: { display: false }, title: { display: true, text: 'Comparativo calidad', fontSize: 11 } },
-            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-          }
-        };
-        const qualityImg = await getQuickChartImage(qualityCfg, 380, 220);
-        if (qualityImg) doc.image(qualityImg, PAGE.m + 418, contentTop + 50, { width: 380, height: 214 });
-
-        drawCard(PAGE.m, contentTop + 294, 814, 147);
-        doc.fillColor(BRAND.colors.textPrimary).font('Helvetica-Bold').fontSize(11).text('Top 10 lideres (score y volumen)', PAGE.m + 14, contentTop + 308);
-        topRanking.slice(0, 10).forEach((leader, idx) => {
-          const col = idx < 5 ? PAGE.m + 14 : PAGE.m + 414;
-          const row = idx < 5 ? idx : idx - 5;
-          doc.fillColor(BRAND.colors.textSecondary).font('Helvetica').fontSize(9).text(
-            `${idx + 1}. ${String(leader.leaderName || 'N/D').slice(0, 22)} | Score ${leader.performanceScore || 0} | Registros ${leader.totalRegistros || 0}`,
-            col,
-            contentTop + 328 + (row * 19),
-            { width: 380 }
-          );
-        });
+        drawHeader('Rendimiento de lideres', `Evento: ${eventName}`);
+        drawCard(PAGE.m, contentTop + 24, PAGE.w - (PAGE.m * 2), 260);
+        doc.fillColor(BRAND.colors.textPrimary).font('Helvetica-Bold').fontSize(18)
+          .text('Seccion en desarrollo', PAGE.m + 20, contentTop + 52);
+        doc.fillColor(BRAND.colors.textSecondary).font('Helvetica').fontSize(11)
+          .text('Estamos redisenando el rendimiento de lideres para una nueva version.', PAGE.m + 20, contentTop + 86, { width: PAGE.w - (PAGE.m * 2) - 40 });
         drawFooter(3);
 
         // Page 4 - Trend and projection
