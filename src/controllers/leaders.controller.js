@@ -177,11 +177,37 @@ export async function getLeaders(req, res) {
 
     const leaders = await Leader.find(filter)
       .select('-passwordHash -tempPasswordPlaintext')
-      .sort({ name: 1 });
+      .sort({ name: 1 })
+      .lean();
 
-    logger.debug('[LeadersController] leaders encontrados', { count: leaders.length });
+    const registrationFilter = { ...buildOrgFilter(req) };
+    if (eventId) registrationFilter.eventId = eventId;
 
-    res.json(leaders);
+    const registrationCounts = await Registration.aggregate([
+      { $match: registrationFilter },
+      { $group: { _id: '$leaderId', count: { $sum: 1 } } }
+    ]);
+
+    const countsByLeaderId = new Map(
+      registrationCounts.map(item => [String(item._id), item.count])
+    );
+
+    const leadersWithCounts = leaders.map(leader => {
+      const idKey = leader._id?.toString();
+      const leaderIdKey = leader.leaderId;
+      const count =
+        (leaderIdKey ? (countsByLeaderId.get(String(leaderIdKey)) || 0) : 0) +
+        (idKey ? (countsByLeaderId.get(idKey) || 0) : 0);
+
+      return {
+        ...leader,
+        registrations: count
+      };
+    });
+
+    logger.debug('[LeadersController] leaders encontrados', { count: leadersWithCounts.length });
+
+    res.json(leadersWithCounts);
   } catch (error) {
     logger.error("Get leaders error:", { error: error.message, stack: error.stack });
     res.status(500).json({ error: "Error al obtener líderes" });
