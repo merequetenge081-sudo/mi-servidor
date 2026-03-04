@@ -16,6 +16,12 @@ const router = express.Router();
 router.get('/dashboard', analyticsController.getDashboard);
 
 /**
+ * GET /api/v2/analytics/metrics
+ * Métricas del dashboard (público)
+ */
+router.get('/metrics', analyticsController.getDashboardMetrics);
+
+/**
  * GET /api/v2/analytics/summary
  * Resumen ejecutivo (público)
  */

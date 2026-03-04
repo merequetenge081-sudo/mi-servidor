@@ -36,6 +36,14 @@ const puestoSchema = new mongoose.Schema({
   // Metadata
   activo: { type: Boolean, default: true },
   fuente: { type: String, default: "IDECA" }, // De dónde se importó
+
+  // Estado de integridad
+  integrityStatus: {
+    type: String,
+    enum: ["valid", "needs_review", "invalid"],
+    default: "valid",
+    index: true
+  },
   
   // Auditoría
   createdAt: { type: Date, default: Date.now },

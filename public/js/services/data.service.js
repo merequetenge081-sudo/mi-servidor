@@ -195,17 +195,22 @@ const DataService = {
      * Obtiene estadísticas
      */
     async getStats() {
-        const leaders = AppState.getData('leaders');
-        const registrations = AppState.getData('registrations');
+        const { eventId } = AppState.user;
+        const params = new URLSearchParams();
+        if (eventId) params.set('eventId', eventId);
+        const endpoint = params.toString()
+            ? `/api/v2/analytics/metrics?${params.toString()}`
+            : '/api/v2/analytics/metrics';
 
-        const confirmed = registrations.filter(r => r.confirmed).length;
-        const rate = registrations.length > 0 ? ((confirmed / registrations.length) * 100).toFixed(1) : 0;
+        const response = await this.apiCall(endpoint);
+        const data = await response.json();
+        const totals = data?.data?.totals || {};
 
         return {
-            totalLeaders: leaders.length,
-            totalRegistrations: registrations.length,
-            confirmedCount: confirmed,
-            confirmRate: rate
+            totalLeaders: totals.totalLeaders || 0,
+            totalRegistrations: totals.totalRegistrations || 0,
+            confirmedCount: totals.confirmedCount || 0,
+            confirmRate: totals.confirmRate || 0
         };
     },
 

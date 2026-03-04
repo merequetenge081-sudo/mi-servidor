@@ -6,8 +6,7 @@
 import { Registration } from '../../../models/Registration.js';
 import { Leader } from '../../../models/Leader.js';
 import { Event } from '../../../models/Event.js';
-import { Puestos } from '../../../models/Puestos.js';
-import { Admin } from '../../../models/Admin.js';
+import metricsService from '../../../services/metrics.service.js';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 
@@ -18,31 +17,16 @@ const logger = createLogger('AnalyticsRepository');
  */
 export async function getRegistrationStats(eventId = null, filters = {}) {
   try {
-    const query = eventId ? { eventId } : {};
-    
-    const stats = await Registration.aggregate([
-      { $match: query },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: 1 },
-          byLeader: { $push: '$leaderId' },
-          byPuesto: { $push: '$puestoId' },
-          createdDates: { $push: '$createdAt' }
-        }
-      },
-      {
-        $project: {
-          _id: 0,
-          total: 1,
-          byLeader: { $size: { $setUnion: ['$byLeader'] } },
-          byPuesto: { $size: { $setUnion: ['$byPuesto'] } }
-        }
-      }
-    ]);
+    const stats = await metricsService.getRegistrationStats({ eventId });
 
     logger.debug('Estadísticas de registraciones', { eventId, stats });
-    return stats[0] || { total: 0, byLeader: 0, byPuesto: 0 };
+    return {
+      total: stats.total,
+      byLeader: stats.byLeader,
+      byPuesto: stats.byPuesto,
+      confirmed: stats.confirmed,
+      registeredToVote: stats.registeredToVote
+    };
   } catch (error) {
     logger.error('Error obteniendo stats registraciones', error);
     throw AppError.serverError('Error al obtener estadísticas de registraciones');
@@ -55,12 +39,17 @@ export async function getRegistrationStats(eventId = null, filters = {}) {
 export async function getLeaderStats(eventId = null) {
   try {
     const leadersCount = await Leader.countDocuments({ 
-      status: { $ne: 'inactive' },
+      active: true,
       ...(eventId && { assignedEventId: eventId })
     });
 
     const registrationsPerLeader = await Registration.aggregate([
-      ...(eventId ? [{ $match: { eventId } }] : []),
+      {
+        $match: {
+          ...(eventId && { eventId }),
+          dataIntegrityStatus: { $ne: 'invalid' }
+        }
+      },
       {
         $group: {
           _id: '$leaderId',
@@ -97,7 +86,10 @@ export async function getEventStats(eventId = null) {
 
     const eventStats = [];
     for (const event of events) {
-      const registrations = await Registration.countDocuments({ eventId: event._id });
+      const registrations = await Registration.countDocuments({
+        eventId: event._id,
+        dataIntegrityStatus: { $ne: 'invalid' }
+      });
       eventStats.push({
         eventId: event._id,
         eventName: event.name,
@@ -121,38 +113,11 @@ export async function getEventStats(eventId = null) {
  */
 export async function getPuestoStats() {
   try {
-    const totalPuestos = await Puestos.countDocuments();
-    
-    const puestosWithRegistrations = await Registration.aggregate([
-      {
-        $group: {
-          _id: '$puestoId',
-          registrations: { $sum: 1 }
-        }
-      },
-      { $match: { registrations: { $gt: 0 } } }
-    ]);
+    const stats = await metricsService.getPuestoStats();
 
-    const localidades = await Puestos.aggregate([
-      {
-        $group: {
-          _id: '$localidad',
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { count: -1 } }
-    ]);
+    logger.debug('Estadísticas de puestos', { totalPuestos: stats.totalPuestos });
 
-    logger.debug('Estadísticas de puestos', { totalPuestos });
-
-    return {
-      totalPuestos,
-      puestosWithActivity: puestosWithRegistrations.length,
-      byLocalidad: localidades.map(l => ({
-        localidad: l._id,
-        puestos: l.count
-      }))
-    };
+    return stats;
   } catch (error) {
     logger.error('Error obteniendo stats puestos', error);
     throw AppError.serverError('Error al obtener estadísticas de puestos');
@@ -164,26 +129,7 @@ export async function getPuestoStats() {
  */
 export async function getTimeSeriesStats(startDate, endDate, eventId = null) {
   try {
-    const query = {
-      createdAt: {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      },
-      ...(eventId && { eventId })
-    };
-
-    const timeSeries = await Registration.aggregate([
-      { $match: query },
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
-          },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]);
+    const timeSeries = await metricsService.getTimeSeriesStats(startDate, endDate, { eventId });
 
     logger.debug('Series temporal', { startDate, endDate, count: timeSeries.length });
     return timeSeries;
@@ -198,26 +144,7 @@ export async function getTimeSeriesStats(startDate, endDate, eventId = null) {
  */
 export async function getExecutiveSummary(eventId = null) {
   try {
-    const [registrations, leaders, events, puestos] = await Promise.all([
-      getRegistrationStats(eventId),
-      getLeaderStats(eventId),
-      getEventStats(eventId),
-      getPuestoStats()
-    ]);
-
-    return {
-      summary: {
-        totalRegistrations: registrations.total,
-        uniqueLeaders: leaders.total,
-        activeEvents: events.length,
-        totalPuestos: puestos.totalPuestos
-      },
-      registrations,
-      leaders,
-      events,
-      puestos,
-      timestamp: new Date()
-    };
+    return await metricsService.getDashboardSummary(eventId);
   } catch (error) {
     logger.error('Error obteniendo resumen ejecutivo', error);
     throw AppError.serverError('Error al obtener resumen');

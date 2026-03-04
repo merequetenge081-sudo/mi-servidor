@@ -53,6 +53,14 @@ const registrationSchema = new mongoose.Schema({
   necesitaRevision: { type: Boolean, default: false },
   inconsistenciaGrave: { type: Boolean, default: false },
   importado: { type: Boolean, default: false },
+
+  // Estado de integridad de datos para métricas
+  dataIntegrityStatus: {
+    type: String,
+    enum: ["valid", "needs_review", "invalid"],
+    default: "valid",
+    index: true
+  },
   
   organizationId: { 
     type: String,
@@ -93,6 +101,7 @@ registrationSchema.index({ organizationId: 1, eventId: 1 });
 registrationSchema.index({ organizationId: 1, leaderId: 1 });
 registrationSchema.index({ requiereRevisionPuesto: 1, organizationId: 1 });
 registrationSchema.index({ requiereRevisionPuesto: 1, leaderId: 1 });
+registrationSchema.index({ dataIntegrityStatus: 1, organizationId: 1 });
 
 export const Registration = mongoose.model("Registration", registrationSchema);
 

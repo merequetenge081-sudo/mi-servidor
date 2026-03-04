@@ -3,9 +3,7 @@
  * Provides advanced analytics with organization support
  */
 
-import { Registration } from "../models/Registration.js";
-import { Leader } from "../models/Leader.js";
-import { Event } from "../models/Event.js";
+import metricsService from "./metrics.service.js";
 import logger from "../config/logger.js";
 
 export class StatsService {
@@ -14,60 +12,19 @@ export class StatsService {
    */
   static async getStats(organizationId = null, eventId = null) {
     try {
-      const match = {};
-      if (organizationId) match.organizationId = organizationId;
-      if (eventId) match.eventId = eventId;
+      const summary = await metricsService.getStatsSummary({
+        organizationId,
+        eventId
+      });
 
-      // Use aggregation for better performance
-      const statsResult = await Registration.aggregate([
-        { $match: match },
-        {
-          $facet: {
-            totalRegistrations: [{ $count: "count" }],
-            totalConfirmed: [
-              { $match: { confirmed: true } },
-              { $count: "count" }
-            ],
-            registeredToVote: [
-              { $match: { registeredToVote: true } },
-              { $count: "count" }
-            ],
-            byLeader: [
-              {
-                $group: {
-                  _id: "$leaderId",
-                  count: { $sum: 1 },
-                  confirmed: { $sum: { $cond: ["$confirmed", 1, 0] } }
-                }
-              },
-              { $sort: { count: -1 } }
-            ]
-          }
-        }
-      ]);
-
-      const stats = statsResult[0];
-      const totalRegistrations = stats.totalRegistrations[0]?.count || 0;
-      const totalConfirmed = stats.totalConfirmed[0]?.count || 0;
-      const registeredToVote = stats.registeredToVote[0]?.count || 0;
+      const byLeader = await metricsService.getLeaderStats({
+        organizationId,
+        eventId
+      });
 
       return {
-        totalRegistrations,
-        totalConfirmed,
-        confirmationRate: totalRegistrations > 0 
-          ? ((totalConfirmed / totalRegistrations) * 100).toFixed(2) 
-          : 0,
-        registeredToVote,
-        notRegisteredToVote: totalRegistrations - registeredToVote,
-        totalLeaders: await Leader.countDocuments({ 
-          ...(organizationId && { organizationId }),
-          active: true 
-        }),
-        totalEvents: await Event.countDocuments({ 
-          ...(organizationId && { organizationId }),
-          active: true 
-        }),
-        byLeader: stats.byLeader
+        ...summary,
+        byLeader
       };
     } catch (error) {
       logger.error("Get stats error:", { error: error.message, stack: error.stack });
@@ -80,35 +37,10 @@ export class StatsService {
    */
   static async getDailyStats(organizationId = null, eventId = null, days = 30) {
     try {
-      const match = {};
-      if (organizationId) match.organizationId = organizationId;
-      if (eventId) match.eventId = eventId;
-
-      // Calculate date from X days ago
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-
-      const dailyStats = await Registration.aggregate([
-        {
-          $match: {
-            ...match,
-            createdAt: { $gte: startDate }
-          }
-        },
-        {
-          $group: {
-            _id: {
-              $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
-            },
-            totalRegistrations: { $sum: 1 },
-            confirmedCount: { $sum: { $cond: ["$confirmed", 1, 0] } },
-            registeredToVote: { $sum: { $cond: ["$registeredToVote", 1, 0] } }
-          }
-        },
-        { $sort: { _id: 1 } }
-      ]);
-
-      return dailyStats;
+      return await metricsService.getDailyStats(
+        { organizationId, eventId },
+        parseInt(days, 10)
+      );
     } catch (error) {
       logger.error("Get daily stats error:", { error: error.message, stack: error.stack });
       throw error;
@@ -120,37 +52,10 @@ export class StatsService {
    */
   static async getLeaderStats(organizationId = null, leaderId = null) {
     try {
-      const match = { active: true };
-      if (organizationId) match.organizationId = organizationId;
-      if (leaderId) match.leaderId = leaderId;
-
-      const leaderStats = await Registration.aggregate([
-        { $match: match },
-        {
-          $group: {
-            _id: "$leaderId",
-            totalRegistrations: { $sum: 1 },
-            confirmedCount: { $sum: { $cond: ["$confirmed", 1, 0] } },
-            registeredToVote: { $sum: { $cond: ["$registeredToVote", 1, 0] } },
-            lastRegistration: { $max: "$createdAt" },
-            firstRegistration: { $min: "$createdAt" }
-          }
-        },
-        {
-          $addFields: {
-            confirmationRate: {
-              $cond: [
-                { $gt: ["$totalRegistrations", 0] },
-                { $multiply: [{ $divide: ["$confirmedCount", "$totalRegistrations"] }, 100] },
-                0
-              ]
-            }
-          }
-        },
-        { $sort: { totalRegistrations: -1 } }
-      ]);
-
-      return leaderStats;
+      return await metricsService.getLeaderStats({
+        organizationId,
+        leaderId
+      });
     } catch (error) {
       logger.error("Get leader stats error:", { error: error.message, stack: error.stack });
       throw error;
@@ -162,38 +67,7 @@ export class StatsService {
    */
   static async getEventStats(organizationId = null) {
     try {
-      const match = {};
-      if (organizationId) match.organizationId = organizationId;
-
-      const eventStats = await Registration.aggregate([
-        { $match: match },
-        {
-          $group: {
-            _id: "$eventId",
-            totalRegistrations: { $sum: 1 },
-            confirmedCount: { $sum: { $cond: ["$confirmed", 1, 0] } },
-            registeredToVote: { $sum: { $cond: ["$registeredToVote", 1, 0] } },
-            uniqueLeaders: { $addToSet: "$leaderId" },
-            uniqueCedulas: { $addToSet: "$cedula" }
-          }
-        },
-        {
-          $addFields: {
-            confirmationRate: {
-              $cond: [
-                { $gt: ["$totalRegistrations", 0] },
-                { $multiply: [{ $divide: ["$confirmedCount", "$totalRegistrations"] }, 100] },
-                0
-              ]
-            },
-            uniqueLeaders: { $size: "$uniqueLeaders" },
-            uniquePersons: { $size: "$uniqueCedulas" }
-          }
-        },
-        { $sort: { totalRegistrations: -1 } }
-      ]);
-
-      return eventStats;
+      return await metricsService.getEventStats({ organizationId });
     } catch (error) {
       logger.error("Get event stats error:", { error: error.message, stack: error.stack });
       throw error;
@@ -205,34 +79,10 @@ export class StatsService {
    */
   static async getGeographicStats(organizationId = null, eventId = null) {
     try {
-      const match = {};
-      if (organizationId) match.organizationId = organizationId;
-      if (eventId) match.eventId = eventId;
-
-      const geoStats = await Registration.aggregate([
-        { $match: match },
-        {
-          $group: {
-            _id: "$localidad",
-            count: { $sum: 1 },
-            confirmed: { $sum: { $cond: ["$confirmed", 1, 0] } }
-          }
-        },
-        {
-          $addFields: {
-            confirmationRate: {
-              $cond: [
-                { $gt: ["$count", 0] },
-                { $multiply: [{ $divide: ["$confirmed", "$count"] }, 100] },
-                0
-              ]
-            }
-          }
-        },
-        { $sort: { count: -1 } }
-      ]);
-
-      return geoStats;
+      return await metricsService.getGeographicStats({
+        organizationId,
+        eventId
+      });
     } catch (error) {
       logger.error("Get geographic stats error:", { error: error.message, stack: error.stack });
       throw error;

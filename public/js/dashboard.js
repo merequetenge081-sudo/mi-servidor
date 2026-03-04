@@ -5,6 +5,7 @@ let currentEventId = sessionStorage.getItem('eventId') || localStorage.getItem('
 let allLeaders = [];
 let allRegistrations = [];
 let charts = {};
+let dashboardMetrics = null;
 
 // Paginación separada para cada pestaña
 let currentPageBogota = 1;
@@ -321,6 +322,27 @@ async function apiCall(endpoint, options = {}) {
     return response;
 }
 
+async function fetchDashboardMetrics(region = 'all', leaderId = null) {
+    const params = new URLSearchParams();
+    if (currentEventId) params.set('eventId', currentEventId);
+    if (region && region !== 'all') params.set('region', region);
+    if (leaderId && leaderId !== 'all') params.set('leaderId', leaderId);
+
+    const query = params.toString();
+    const endpoint = query ? `/api/v2/analytics/metrics?${query}` : '/api/v2/analytics/metrics';
+    const response = await apiCall(endpoint);
+    if (!response.ok) {
+        throw new Error(`Error obteniendo metrics: ${response.status}`);
+    }
+    const payload = await response.json();
+    if (!payload || !payload.success) {
+        throw new Error('Respuesta inválida de metrics');
+    }
+
+    dashboardMetrics = payload.data;
+    return dashboardMetrics;
+}
+
 async function loadDashboard() {
 
     // Fix for ID mismatch: sidebarUsername instead of adminUsername
@@ -345,6 +367,7 @@ async function loadDashboard() {
         const regsData = await regsRes.json();
         allRegistrations = Array.isArray(regsData) ? regsData : (regsData.data || []);
 
+        await fetchDashboardMetrics();
         updateStats();
         loadLeadersTable();
         loadRecentRegistrations();
@@ -537,12 +560,13 @@ async function loadNotifications() {
 }
 
 function updateStats() {
-    const confirmed = allRegistrations.filter(r => r.confirmed).length;
-    const rate = allRegistrations.length > 0 ? ((confirmed / allRegistrations.length) * 100).toFixed(1) : 0;
-    document.getElementById('totalLeaders').textContent = allLeaders.length;
-    document.getElementById('totalRegistrations').textContent = allRegistrations.length;
-    document.getElementById('confirmedCount').textContent = confirmed;
-    document.getElementById('confirmRate').textContent = rate + '%';
+    const totals = dashboardMetrics?.totals;
+    if (!totals) return;
+
+    document.getElementById('totalLeaders').textContent = totals.totalLeaders || 0;
+    document.getElementById('totalRegistrations').textContent = totals.totalRegistrations || 0;
+    document.getElementById('confirmedCount').textContent = totals.confirmedCount || 0;
+    document.getElementById('confirmRate').textContent = `${totals.confirmRate || 0}%`;
 }
 
 // processLeaders removed - strict event filtering handles duplicates now
@@ -1367,144 +1391,100 @@ function getAnalyticsFilteredData() {
     const leaderSelect = document.getElementById('analyticsLeaderFilter');
     const region = regionSelect ? regionSelect.value : 'all';
     const leaderId = leaderSelect ? leaderSelect.value : 'all';
-    // Use the existing helper or fallback to array check if needed, but isBogotaRegistration is used elsewhere
-    const bogotaLocalidades = getBogotaLocalidades();
-
-    let regs = allRegistrations;
-
-    // 1. Filter by Leader first (if selected)
-    if (leaderId !== 'all') {
-        regs = regs.filter(r => r.leaderId === leaderId);
-    }
-
-    // 2. Filter by Region
-    // Using isBogotaRegistration ensures consistency with the rest of the app
-    if (region === 'bogota') {
-        regs = regs.filter(r => isBogotaRegistration(r));
-    } else if (region === 'resto') {
-        regs = regs.filter(r => !isBogotaRegistration(r)); // Include empty local/dept as resto? Or strict? Code used !includes
-    }
-
-    let leaders = allLeaders;
-    if (leaderId !== 'all') {
-        leaders = leaders.filter(l => l._id === leaderId);
-    } else {
-        // Optimization: If filtering by region, only show leaders relevant to that region (who have at least 1 reg there)
-        // OR show all? User complained "it looks wrong". Usually this means too many 0s.
-        if (region !== 'all') {
-            const activeLeaderIds = new Set(regs.map(r => r.leaderId));
-            // We filter leaders to only those who have activity in this filtered view
-            // This makes the "Average" meaningful for the region
-            leaders = leaders.filter(l => activeLeaderIds.has(l._id));
-        }
-    }
-
-    return { regs, leaders, bogotaLocalidades };
+    return { region, leaderId };
 }
 
-function loadAnalytics() {
-    const { regs, leaders } = getAnalyticsFilteredData(); // bogotaLocalidades not strictly needed here if we use helper
+async function loadAnalytics() {
+    try {
+        const { region, leaderId } = getAnalyticsFilteredData();
+        const metrics = await fetchDashboardMetrics(region, leaderId);
+        const totals = metrics?.totals;
+        if (!totals) return;
 
-    // Split for totals
-    // We should use isBogotaRegistration for consistency
-    const bogotaRegs = regs.filter(r => isBogotaRegistration(r));
-    const restoRegs = regs.filter(r => !isBogotaRegistration(r));
+        document.getElementById('avgConfirmRate').textContent = `${totals.confirmRate || 0}%`;
+        document.getElementById('avgRegsPerLeader').textContent = totals.avgRegsPerLeader || 0;
+        document.getElementById('bogotaCount').textContent = totals.bogotaCount || 0;
+        document.getElementById('restoCount').textContent = totals.restoCount || 0;
 
-    const total = regs.length;
-    const confirmed = regs.filter(r => r.confirmed).length;
-    const rate = total > 0 ? ((confirmed / total) * 100).toFixed(1) : 0;
-    const leadersCount = leaders.length;
-    const avgRegs = leadersCount > 0 ? (total / leadersCount).toFixed(1) : 0;
+        // Leader Registrations Chart
+        const leaderStats = (metrics.leaders || [])
+            .map(l => ({
+                name: (l.name || 'Sin lider').split(' ')[0],
+                registros: l.total,
+                bogota: l.bogota,
+                resto: l.resto
+            }))
+            .sort((a, b) => b.registros - a.registros)
+            .slice(0, 10);
 
-    document.getElementById('avgConfirmRate').textContent = rate + '%';
-    document.getElementById('avgRegsPerLeader').textContent = avgRegs;
-    document.getElementById('bogotaCount').textContent = bogotaRegs.length;
-    document.getElementById('restoCount').textContent = restoRegs.length;
+        if (charts.leaderRegs) charts.leaderRegs.destroy();
+        const ctxLeaderRegs = document.getElementById('leaderRegistrationsChart').getContext('2d');
+        charts.leaderRegs = new Chart(ctxLeaderRegs, {
+            type: 'bar',
+            data: {
+                labels: leaderStats.map(l => l.name),
+                datasets: [{
+                    label: 'Bogotá',
+                    data: leaderStats.map(l => l.bogota),
+                    backgroundColor: '#667eea',
+                    borderRadius: 8
+                }, {
+                    label: 'Resto del País',
+                    data: leaderStats.map(l => l.resto),
+                    backgroundColor: '#764ba2',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: true } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
 
-    // Leader Registrations Chart
-    const leaderStats = leaders.map(l => ({
-        name: l.name.split(' ')[0],
-        registros: regs.filter(r => r.leaderId === l._id).length,
-        bogota: bogotaRegs.filter(r => r.leaderId === l._id).length,
-        resto: restoRegs.filter(r => r.leaderId === l._id).length
-    })).sort((a, b) => b.registros - a.registros);
+        // Locality Chart
+        const topLocalities = (metrics.locality || []).slice(0, 10);
 
-    if (charts.leaderRegs) charts.leaderRegs.destroy();
-    const ctxLeaderRegs = document.getElementById('leaderRegistrationsChart').getContext('2d');
-    charts.leaderRegs = new Chart(ctxLeaderRegs, {
-        type: 'bar',
-        data: {
-            labels: leaderStats.map(l => l.name),
-            datasets: [{
-                label: 'Bogotá',
-                data: leaderStats.map(l => l.bogota),
-                backgroundColor: '#667eea',
-                borderRadius: 8
-            }, {
-                label: 'Resto del País',
-                data: leaderStats.map(l => l.resto),
-                backgroundColor: '#764ba2',
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+        if (charts.locality) charts.locality.destroy();
+        const ctxLocality = document.getElementById('localityChart').getContext('2d');
+        charts.locality = new Chart(ctxLocality, {
+            type: 'doughnut',
+            data: {
+                labels: topLocalities.map(l => l.name),
+                datasets: [{
+                    data: topLocalities.map(l => l.count),
+                    backgroundColor: [
+                        '#667eea', '#764ba2', '#FF6B6B', '#4ECDC4', '#45B7D1',
+                        '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'
+                    ],
+                    borderWidth: 2,
+                    borderColor: 'white'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
 
-    // Locality Chart
-    const localityData = {};
-    regs.forEach(r => {
-        const key = r.localidad || r.departamento || 'Sin dato';
-        localityData[key] = (localityData[key] || 0) + 1;
-    });
-
-    const topLocalities = Object.entries(localityData)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
-
-    if (charts.locality) charts.locality.destroy();
-    const ctxLocality = document.getElementById('localityChart').getContext('2d');
-    charts.locality = new Chart(ctxLocality, {
-        type: 'doughnut',
-        data: {
-            labels: topLocalities.map(l => l[0]),
-            datasets: [{
-                data: topLocalities.map(l => l[1]),
-                backgroundColor: [
-                    '#667eea', '#764ba2', '#FF6B6B', '#4ECDC4', '#45B7D1',
-                    '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'
-                ],
-                borderWidth: 2,
-                borderColor: 'white'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'right' } }
-        }
-    });
-
-    // Leader Details Table - Prepare Data
-    leaderAnalyticsData = leaders.map(l => {
-        const leaderRegs = regs.filter(r => r.leaderId === l._id);
-        const leaderConfirmed = leaderRegs.filter(r => r.confirmed).length;
-        return {
+        // Leader Details Table - Prepare Data
+        leaderAnalyticsData = (metrics.leaders || []).map(l => ({
             name: l.name,
-            total: leaderRegs.length,
-            confirmed: leaderConfirmed,
-            pending: leaderRegs.length - leaderConfirmed,
-            rate: leaderRegs.length > 0 ? ((leaderConfirmed / leaderRegs.length) * 100).toFixed(1) : 0
-        };
-    }).sort((a, b) => b.total - a.total);
+            total: l.total,
+            confirmed: l.confirmed,
+            pending: l.pending,
+            rate: l.rate
+        }));
 
-    // Render first page
-    currentAnalyticsPage = 1;
-    renderLeaderAnalyticsTable();
+        // Render first page
+        currentAnalyticsPage = 1;
+        renderLeaderAnalyticsTable();
+    } catch (err) {
+        console.error('Error cargando analytics:', err);
+        showAlert('Error cargando analíticas. Intenta de nuevo.', 'error');
+    }
 }
 
 let leaderAnalyticsData = [];
@@ -2552,25 +2532,12 @@ addListener('exportRestoBtn', 'click', () => {
 
 
 // Export Leader Stats
-addListener('exportLeaderStatsBtn', 'click', () => {
+addListener('exportLeaderStatsBtn', 'click', async () => {
     if (!leaderAnalyticsData || leaderAnalyticsData.length === 0) {
-        // Try to generate on the fly if empty (e.g. analytics tab not visited yet)
-        if (allLeaders.length > 0) {
-            const { leaders, regs } = getAnalyticsFilteredData();
-            leaderAnalyticsData = leaders.map(l => {
-                const leaderRegs = regs.filter(r => r.leaderId === l._id);
-                const leaderConfirmed = leaderRegs.filter(r => r.confirmed).length;
-                return {
-                    name: l.name,
-                    total: leaderRegs.length,
-                    confirmed: leaderConfirmed,
-                    pending: leaderRegs.length - leaderConfirmed,
-                    rate: leaderRegs.length > 0 ? ((leaderConfirmed / leaderRegs.length) * 100).toFixed(1) : 0
-                };
-            }).sort((a, b) => b.total - a.total);
-        } else {
-            return showAlert('No hay datos para exportar', 'warning');
-        }
+        await loadAnalytics();
+    }
+    if (!leaderAnalyticsData || leaderAnalyticsData.length === 0) {
+        return showAlert('No hay datos para exportar', 'warning');
     }
 
     const data = leaderAnalyticsData.map(l => ({

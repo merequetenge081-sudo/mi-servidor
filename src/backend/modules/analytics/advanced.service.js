@@ -208,6 +208,8 @@ export async function getAdvancedAnalytics(eventId = null, status = 'all', leade
     try {
       const matchQuery = eventId ? { eventId } : {};
 
+  matchQuery.dataIntegrityStatus = { $ne: 'invalid' };
+
       if (leaderId) {
           matchQuery.leaderId = leaderId;
       }
@@ -349,7 +351,8 @@ const mesasArr = Object.entries(mesas).map(([mesa, mesaData]) => ({
 
 export async function getSimulationData(eventId = null, targetDateStr = null) {
     try {
-      const matchQuery = eventId ? { eventId } : {};
+  const matchQuery = eventId ? { eventId } : {};
+  matchQuery.dataIntegrityStatus = { $ne: 'invalid' };
 
       const totalRegistrations = await Registration.countDocuments(matchQuery); 
 
@@ -425,6 +428,7 @@ export async function getSimulationData(eventId = null, targetDateStr = null) {
 export async function getLeaderPerformance(eventId = null) {
   try {
     const matchQuery = eventId ? { eventId } : {};
+    matchQuery.dataIntegrityStatus = { $ne: 'invalid' };
 
     // 1. Agrupación general por líder para calcular métricas
     const leaderStats = await Registration.aggregate([

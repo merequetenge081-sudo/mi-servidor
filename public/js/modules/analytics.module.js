@@ -17,171 +17,112 @@ const AnalyticsModule = (() => {
     // ===================================
     // CONSTANTES - Localidades de Bogotá
     // ===================================
-    const BOGOTA_LOCALIDADES = new Set([
-        'Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme',
-        'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá',
-        'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño',
-        'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'
-    ]);
-
-    // ===================================
-    // ESTADO INTERNO
-    // ===================================
-    let currentFilter = {
-        region: 'all',      // 'all', 'bogota', 'resto'
-        leaderId: null      // null = todos
-    };
-    let currentAnalyticsPage = 1;
-    const ITEMS_PER_PAGE = 10;
-
-    // ===================================
-    // UTILIDADES - Identificar región
-    // ===================================
-    function isBogotaRegistration(registration) {
-        // Solo clasificar como Bogotá si tiene una de las 20 localidades
-        // Buscar coincidencias en el campo localidad (case insensitive)
-        if (!registration.localidad) return false;
-        
-        const localidad = registration.localidad.trim().toLowerCase();
-        
-        // Búsqueda case-insensitive
-        for (const loc of BOGOTA_LOCALIDADES) {
-            const locLower = loc.toLowerCase();
-            // Coincidencia exacta o parcial (contiene la localidad)
-            if (localidad === locLower || localidad.includes(locLower) || locLower.includes(localidad)) {
-                return true;
+    function renderLeaderPerformanceChart(leaderStats) {
+        try {
+            const data = Array.isArray(leaderStats) ? leaderStats : [];
+            if (data.length === 0) {
+                const canvas = document.getElementById('leaderRegistrationsChart');
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.font = '14px Inter';
+                    ctx.fillStyle = '#9ca3af';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No hay datos disponibles', canvas.width / 2, canvas.height / 2);
+                }
+                return;
             }
-        }
-        
-        return false;
-    }
 
-    function normalizeText(text) {
-        if (!text) return '';
-        return text.trim().charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-    }
+            const topLeaders = data
+                .map((l) => ({
+                    name: (l.name || 'Sin lider').split(' ')[0],
+                    bogota: l.bogota || 0,
+                    resto: l.resto || 0,
+                    total: l.total || 0
+                }))
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 10);
 
-    /**
-     * Normaliza y estandariza nombres de ubicaciones
-     * - Quita tildes/acentos
-     * - Convierte a Title Case
-     * - Unifica variaciones (ATLANTICO, atlántico, Atlántico -> Atlántico)
-     */
-    function normalizeLocation(text) {
-        if (!text || text.trim() === '') return '';
-        
-        // Limpiar y convertir a minúsculas
-        let normalized = text.trim().toLowerCase();
-        
-        // Mapa de reemplazos para estandarizar nombres comunes
-        const locationMap = {
-            'atlantico': 'Atlántico',
-            'bogota': 'Bogotá',
-            'bolivar': 'Bolívar',
-            'boyaca': 'Boyacá',
-            'cordoba': 'Córdoba',
-            'narino': 'Nariño',
-            'quindio': 'Quindío',
-            'valle del cauca': 'Valle del Cauca',
-            'valle': 'Valle del Cauca',
-            'medellin': 'Medellín',
-            'barranquilla': 'Barranquilla',
-            'cartagena': 'Cartagena',
-            'cucuta': 'Cúcuta',
-            'bucaramanga': 'Bucaramanga',
-            'pereira': 'Pereira',
-            'santa marta': 'Santa Marta',
-            'ibague': 'Ibagué',
-            'pasto': 'Pasto',
-            'manizales': 'Manizales',
-            'neiva': 'Neiva',
-            'villavicencio': 'Villavicencio',
-            'armenia': 'Armenia',
-            'valledupar': 'Valledupar',
-            'monteria': 'Montería',
-            'sincelejo': 'Sincelejo',
-            'popayan': 'Popayán',
-            'tunja': 'Tunja',
-            'florencia': 'Florencia',
-            'riohacha': 'Riohacha',
-            'yopal': 'Yopal',
-            'quibdo': 'Quibdó',
-            'arauca': 'Arauca',
-            'mocoa': 'Mocoa',
-            'san andres': 'San Andrés',
-            'leticia': 'Leticia',
-            'puerto carreno': 'Puerto Carreño',
-            'inirida': 'Inírida',
-            'mitu': 'Mitú'
-        };
-        
-        // Buscar coincidencia exacta o parcial
-        for (const [key, value] of Object.entries(locationMap)) {
-            if (normalized === key || normalized.includes(key)) {
-                return value;
-            }
-        }
-        
-        // Si no hay coincidencia, aplicar Title Case
-        return normalized
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-    }
+            const labels = topLeaders.map((l) => l.name);
+            const bogotaData = topLeaders.map((l) => l.bogota);
+            const restoData = topLeaders.map((l) => l.resto);
 
-    function getLocationDisplay(registration) {
-        // Retorna: localidad para Bogotá, departamento/capital para Resto
-        if (isBogotaRegistration(registration)) {
-            return normalizeLocation(registration.localidad) || 'Bogotá (Otra)';
-        } else {
-            // Prioridad: capital > departamento > localidad > Sin especificar
-            // Normalizar para unificar variaciones (ATLANTICO, atlántico, Atlántico)
-            if (registration.capital && registration.capital.trim() !== '') {
-                return normalizeLocation(registration.capital);
-            }
-            if (registration.departamento && registration.departamento.trim() !== '') {
-                return normalizeLocation(registration.departamento);
-            }
-            if (registration.localidad && registration.localidad.trim() !== '') {
-                return normalizeLocation(registration.localidad);
-            }
-            return 'Sin especificar';
+            ChartService.createChart('leaderRegistrationsChart', {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Bogotá',
+                            data: bogotaData,
+                            backgroundColor: '#667eea',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Resto del País',
+                            data: restoData,
+                            backgroundColor: '#f093fb',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#9ca3af', maxRotation: 0 },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#9ca3af',
+                                padding: 20,
+                                boxWidth: 12,
+                                boxHeight: 12
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                            titleColor: '#f3f4f6',
+                            bodyColor: '#d1d5db',
+                            padding: 12,
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            displayColors: true,
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label || '';
+                                },
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.parsed.y || 0;
+                                    return `${label}: ${value} registros`;
+                                },
+                                afterBody: function(context) {
+                                    const index = context[0].dataIndex;
+                                    const bogota = bogotaData[index];
+                                    const resto = restoData[index];
+                                    const total = bogota + resto;
+                                    return ['', `Total: ${total} registros`];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (err) {
+            console.error('[Analytics] Error en renderLeaderPerformanceChart:', err);
         }
     }
-
-    // ===================================
-    // FILTRAR REGISTROS POR REGIÓN
-    // ===================================
-    function filterRegistrations(registrations, region, leaderId) {
-        let filtered = [...registrations];
-
-        // Filtro por región
-        if (region === 'bogota') {
-            filtered = filtered.filter(r => isBogotaRegistration(r));
-        } else if (region === 'resto') {
-            filtered = filtered.filter(r => !isBogotaRegistration(r));
-        }
-
-        // Filtro por líder
-        if (leaderId) {
-            filtered = filtered.filter(r => r.leaderId === leaderId);
-        }
-
-        return filtered;
-    }
-
-    // ===================================
-    // CALCULAR ESTADÍSTICAS
-    // ===================================
-    function calculateStats(registrations) {
-        const bogota = registrations.filter(r => isBogotaRegistration(r)).length;
-        const resto = registrations.filter(r => !isBogotaRegistration(r)).length;
-        const confirmed = registrations.filter(r => r.confirmed === true || r.confirmed === 'true').length;
-        const pending = registrations.filter(r => r.confirmed !== true && r.confirmed !== 'true').length;
-        const confirmRate = registrations.length > 0 ? ((confirmed / registrations.length) * 100).toFixed(1) : '0.0';
-
-        console.log('[Analytics Debug] Stats:', {
-            totalRegs: registrations.length,
             bogota,
             resto,
             confirmed,
@@ -195,52 +136,53 @@ const AnalyticsModule = (() => {
     // ===================================
     // ACTUALIZAR ESTADÍSTICAS
     // ===================================
+    async function refreshMetrics() {
+        const params = new URLSearchParams();
+        const eventId = AppState.user?.eventId || null;
+        if (eventId) params.set('eventId', eventId);
+        if (currentFilter.region && currentFilter.region !== 'all') {
+            params.set('region', currentFilter.region);
+        }
+        if (currentFilter.leaderId) params.set('leaderId', currentFilter.leaderId);
+
+        const query = params.toString();
+        const endpoint = query ? `/api/v2/analytics/metrics?${query}` : '/api/v2/analytics/metrics';
+        const response = await fetch(endpoint, {
+            headers: {
+                'Authorization': `Bearer ${AppState.user.token}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Error obteniendo metrics');
+        const payload = await response.json();
+        if (!payload || !payload.success) throw new Error('Respuesta inválida de metrics');
+
+        cachedMetrics = payload.data;
+        return cachedMetrics;
+    }
+
     function updateStats() {
-        const registrations = AppState.data.registrations || [];
-        const filtered = filterRegistrations(registrations, currentFilter.region, currentFilter.leaderId);
-        const stats = calculateStats(filtered);
+        const totals = cachedMetrics?.totals;
+        if (!totals) return;
 
-        console.log('[Analytics] Actualizando stats - Filtrados:', filtered.length);
-
-        DOMUtils.tryUpdate('avgConfirmRate', `${stats.confirmRate}%`);
-        DOMUtils.tryUpdate('avgRegsPerLeader', stats.total);
-        DOMUtils.tryUpdate('bogotaCount', stats.bogota);
-        DOMUtils.tryUpdate('restoCount', stats.resto);
+        DOMUtils.tryUpdate('avgConfirmRate', `${totals.confirmRate || 0}%`);
+        DOMUtils.tryUpdate('avgRegsPerLeader', totals.avgRegsPerLeader || 0);
+        DOMUtils.tryUpdate('bogotaCount', totals.bogotaCount || 0);
+        DOMUtils.tryUpdate('restoCount', totals.restoCount || 0);
     }
 
     // ===================================
     // CARGAR DETALLE POR LÍDER EN TABLA
     // ===================================
     function populateLeaderDetailTable() {
-        const registrations = AppState.data.registrations || [];
-        const leaders = AppState.data.leaders || [];
-        const filtered = filterRegistrations(registrations, currentFilter.region, currentFilter.leaderId);
+        const leaderStats = cachedMetrics?.leaders || [];
         const tbody = DOMUtils.byId('leaderDetailTable');
 
         if (!tbody) return;
-
-        console.log('[Analytics] Populate table - Total registrations:', registrations.length, 'Filtered:', filtered.length);
-
-        // Calcular stats por cada líder EN LA REGIÓN FILTRADA
-        const leaderStats = leaders.map(leader => {
-            const leaderRegs = filtered.filter(r => r.leaderId === leader._id);
-            const confirmed = leaderRegs.filter(r =>
-                r.confirmed === true || r.confirmed === 'true'
-            ).length;
-            const pending = leaderRegs.length - confirmed;
-            const rate = leaderRegs.length > 0 ? ((confirmed / leaderRegs.length) * 100).toFixed(1) : '0.0';
-
-            return {
-                _id: leader._id,
-                name: leader.name,
-                total: leaderRegs.length,
-                confirmed,
-                pending,
-                rate
-            };
-        }).filter(s => s.total > 0).sort((a, b) => b.total - a.total);
-
-        console.log('[Analytics] Leader stats count:', leaderStats.length);
+        if (leaderStats.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Sin datos</td></tr>';
+            return;
+        }
 
         // Paginación
         const totalPages = Math.ceil(leaderStats.length / ITEMS_PER_PAGE);
@@ -251,7 +193,7 @@ const AnalyticsModule = (() => {
         // Renderizar tabla
         let html = pageItems.map(stat => `
             <tr>
-                <td><strong>${stat.name}</strong></td>
+                <td><strong>${stat.name || 'Sin lider'}</strong></td>
                 <td><strong style="color: #667eea;">${stat.total}</strong></td>
                 <td><span class="badge bg-success">${stat.confirmed}</span></td>
                 <td><span class="badge bg-warning text-dark">${stat.pending}</span></td>
@@ -482,44 +424,18 @@ const AnalyticsModule = (() => {
     // CARGAR GRÁFICOS CON DATOS REALES
     // ===================================
     function loadCharts() {
-        const registrations = AppState.data.registrations || [];
-        const leaders = AppState.data.leaders || [];
-        const filtered = filterRegistrations(registrations, currentFilter.region, currentFilter.leaderId);
+        if (!cachedMetrics) return;
 
-        console.log('[Analytics] Charts - Filtered registrations:', filtered.length);
+        renderLeaderPerformanceChart(cachedMetrics.leaders || []);
 
-        // ===== GRÁFICO 1: DESEMPEÑO POR LÍDER - BOGOTÁ VS RESTO DEL PAÍS =====
-        // Si hay filtro de región, mostrar solo esa región (pero ambos datasets se calculan desde filtered)
-        // Si no hay filtro de región, mostrar comparación completa
-        renderLeaderPerformanceChart(filtered, leaders);
-
-        // ===== GRÁFICO 2: TOP 10 LOCALIDADES/DEPARTAMENTOS =====
         try {
-            const locationMap = {};
-            
-            console.log('[Analytics] Construyendo gráfico de ubicaciones...');
-            
-            filtered.forEach(reg => {
-                const location = getLocationDisplay(reg);
-                locationMap[location] = (locationMap[location] || 0) + 1;
-            });
-
-            const topLocations = Object.entries(locationMap)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
-
-            console.log('[Analytics] Top ubicaciones:', topLocations.map(l => `${l[0]}: ${l[1]}`).join(', '));
-
-            if (topLocations.length === 0) {
-                console.warn('[AnalyticsModule] Sin datos para gráfico de ubicaciones');
-            }
-
+            const topLocations = cachedMetrics.locality || [];
             ChartService.createChart('localityChart', {
                 type: 'doughnut',
                 data: {
-                    labels: topLocations.map(l => l[0]),
+                    labels: topLocations.map(l => l.name),
                     datasets: [{
-                        data: topLocations.map(l => l[1]),
+                        data: topLocations.map(l => l.count),
                         backgroundColor: [
                             '#667eea', '#764ba2', '#f093fb', '#4facfe',
                             '#43e97b', '#fa709a', '#feca57', '#ff6b6b',
@@ -552,7 +468,7 @@ const AnalyticsModule = (() => {
     // ===================================
     // APLICAR FILTROS
     // ===================================
-    function applyFilters() {
+    async function applyFilters() {
         const regionSelect = DOMUtils.byId('analyticsRegionFilter');
         const leaderSelect = DOMUtils.byId('analyticsLeaderFilter');
 
@@ -560,6 +476,7 @@ const AnalyticsModule = (() => {
         currentFilter.leaderId = leaderSelect ? leaderSelect.value : null;
         currentAnalyticsPage = 1;
 
+        await refreshMetrics();
         updateStats();
         populateLeaderDetailTable();
         loadCharts();
@@ -572,7 +489,7 @@ const AnalyticsModule = (() => {
         ModalsModule.showAlert(`Filtros aplicados: ${regionText}${leaderText ? ' - ' + leaderText : ''}`, 'success');
     }
 
-    function clearFilters() {
+    async function clearFilters() {
         const regionSelect = DOMUtils.byId('analyticsRegionFilter');
         const leaderSelect = DOMUtils.byId('analyticsLeaderFilter');
 
@@ -582,6 +499,7 @@ const AnalyticsModule = (() => {
         currentFilter = { region: 'all', leaderId: null };
         currentAnalyticsPage = 1;
 
+        await refreshMetrics();
         updateStats();
         populateLeaderDetailTable();
         loadCharts();
@@ -592,15 +510,11 @@ const AnalyticsModule = (() => {
     // ===================================
     // CARGAR ANALYTICS (ENTRY POINT)
     // ===================================
-    function loadAnalytics() {
+    async function loadAnalytics() {
         console.log('[AnalyticsModule] 🔍 Cargando analytics desde base de datos...');
         
-        const allRegs = AppState.data.registrations || [];
-        const allLeaders = AppState.data.leaders || [];
-        
         console.log('[AnalyticsModule] Datos disponibles:', {
-            registrations: allRegs.length,
-            leaders: allLeaders.length
+            leaders: (AppState.data.leaders || []).length
         });
         
         // Resetear filtros al cargar
@@ -621,7 +535,7 @@ const AnalyticsModule = (() => {
                 leaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
         }
 
-        // Cargar análisis completamente desde AppState (MongoDB)
+        await refreshMetrics();
         updateStats();
         populateLeaderDetailTable();
         loadCharts();
@@ -652,14 +566,8 @@ const AnalyticsModule = (() => {
 
         if (nextBtn) {
             nextBtn.addEventListener('click', () => {
-                const registrations = AppState.data.registrations || [];
-                const filtered = filterRegistrations(registrations, currentFilter.region, currentFilter.leaderId);
-                const leaders = AppState.data.leaders || [];
-                const leaderStats = leaders.map(leader => ({
-                    total: filtered.filter(r => r.leaderId === leader._id).length
-                })).filter(s => s.total > 0);
-
-                const totalPages = Math.ceil(leaderStats.length / ITEMS_PER_PAGE);
+                const totalLeaders = cachedMetrics?.leaders?.length || 0;
+                const totalPages = Math.ceil(totalLeaders / ITEMS_PER_PAGE) || 1;
                 if (currentAnalyticsPage < totalPages) {
                     currentAnalyticsPage++;
                     populateLeaderDetailTable();

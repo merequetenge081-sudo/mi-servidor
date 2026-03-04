@@ -33,6 +33,32 @@ export async function getDashboard(req, res, next) {
 }
 
 /**
+ * GET /api/v2/analytics/metrics
+ * Obtiene métricas del dashboard con filtros opcionales
+ */
+export async function getDashboardMetrics(req, res, next) {
+  try {
+    const { eventId, region = 'all', leaderId = null } = req.query;
+
+    logger.info('Dashboard metrics request', { eventId, region, leaderId });
+
+    const metrics = await analyticsService.getDashboardMetrics({
+      eventId,
+      region,
+      leaderId
+    });
+
+    res.json({
+      success: true,
+      message: 'Dashboard Metrics',
+      data: metrics
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * GET /api/v2/analytics/registrations
  * Obtiene estadísticas de registraciones
  */
@@ -300,6 +326,7 @@ export async function getLeaderPerformance(req, res, next) {
 
 export default {
   getDashboard,
+  getDashboardMetrics,
   getRegistrationStats,
   getLeaderStats,
   getEventStats,

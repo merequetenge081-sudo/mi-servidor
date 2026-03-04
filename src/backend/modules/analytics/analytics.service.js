@@ -6,6 +6,7 @@
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import analyticsRepository from './analytics.repository.js';
+import metricsService from '../../../services/metrics.service.js';
 
 const logger = createLogger('AnalyticsService');
 
@@ -30,6 +31,25 @@ export async function getDashboardSummary(eventId = null) {
     if (error.isOperational) throw error;
     logger.error('Error en dashboard summary', error);
     throw AppError.serverError('Error al obtener dashboard');
+  }
+}
+
+/**
+ * Obtiene métricas del dashboard (stats + charts base)
+ */
+export async function getDashboardMetrics({ eventId = null, region = 'all', leaderId = null } = {}) {
+  try {
+    logger.info('Obteniendo dashboard metrics', { eventId, region, leaderId });
+
+    return await metricsService.getDashboardMetrics({
+      eventId,
+      region,
+      leaderId
+    });
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error en dashboard metrics', error);
+    throw AppError.serverError('Error al obtener métricas del dashboard');
   }
 }
 
@@ -265,6 +285,7 @@ export async function getEventDetail(eventId) {
 
 export default {
   getDashboardSummary,
+  getDashboardMetrics,
   getRegistrationAnalytics,
   getLeaderAnalytics,
   getEventAnalytics,
