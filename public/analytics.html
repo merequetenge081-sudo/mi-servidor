@@ -302,30 +302,24 @@
                     </div>
                 </div>
 
-                <!-- Top Leaders Table -->
-                <div class="card lg:col-span-2">
+                <!-- Leader Performance -->
+                <div class="card lg:col-span-2" id="leader-performance">
                     <div class="flex justify-between items-center mb-4 border-b pb-2">
                         <h3 class="text-lg font-semibold text-gray-800">
-                            <i class="fas fa-star text-yellow-500 mr-2"></i>Top Líderes
+                            <i class="fas fa-trophy text-amber-500 mr-2"></i>Rendimiento de Líderes
                         </h3>
                         <div class="relative">
                             <input type="text" id="leader-filter" placeholder="Filtrar líder..." class="pl-8 pr-4 py-1 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <i class="fas fa-search absolute left-3 top-2 text-gray-400 text-xs"></i>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-black text-gray-600 uppercase tracking-wider">Líder</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-black text-gray-600 uppercase tracking-wider">Volumen y Progreso</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200" id="leaders-table-body">
-                                <!-- Rows will be generated here -->
-                            </tbody>
-                        </table>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider grid grid-cols-12 gap-3 px-2 pb-2">
+                        <div class="col-span-1">#</div>
+                        <div class="col-span-6">Líder</div>
+                        <div class="col-span-2 text-right">Aportes</div>
+                        <div class="col-span-3 text-right">Progreso</div>
                     </div>
+                    <div id="leader-performance-list" class="space-y-2"></div>
                 </div>
 
             </div>
@@ -813,58 +807,47 @@
             
             const regionData = analyticsData[currentRegion] || {};
             const data = Array.isArray(regionData.topLideres) ? regionData.topLideres : [];
-            const tbody = document.getElementById('leaders-table-body');
-            tbody.innerHTML = '';
-            
+            const list = document.getElementById('leader-performance-list');
+            if (!list) return;
+            list.innerHTML = '';
+
             const filteredData = data.filter(l => {
                 const nameValue = l.liderNombre || l.name || l.nombre || 'desconocido';
                 const name = String(nameValue).toLowerCase();
                 return name.includes(filterText.toLowerCase());
             });
-            
+
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">No se encontraron líderes</td></tr>';
+                list.innerHTML = '<div class="text-center text-gray-500 py-6">No hay líderes con datos para mostrar.</div>';
                 return;
             }
-            
-            const maxVotos = filteredData.length > 0
-                ? Math.max(...filteredData.map(l => Number(l.totalVotos ?? l.totalRegistros ?? l.total ?? 0)))
-                : 1;
-            
-            filteredData.slice(0, 20).forEach(lider => {
+
+            const maxVotos = Math.max(...filteredData.map(l => Number(l.totalVotos ?? l.totalRegistros ?? l.total ?? 0)), 1);
+
+            filteredData.slice(0, 25).forEach((lider, index) => {
                 const totalVotos = Number(lider.totalVotos ?? lider.totalRegistros ?? lider.total ?? 0);
                 const percentage = Math.round((totalVotos / maxVotos) * 100);
                 const leaderName = lider.liderNombre || lider.name || lider.nombre || 'Desconocido';
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-indigo-50 transition-colors group cursor-default';
-                tr.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-700 font-bold text-lg shadow-sm group-hover:shadow-md transition-shadow">
-                                ${leaderName ? String(leaderName).charAt(0).toUpperCase() : '?'}
+
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-12 gap-3 items-center bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm';
+                row.innerHTML = `
+                    <div class="col-span-1 text-sm font-bold text-gray-500">${index + 1}</div>
+                    <div class="col-span-6">
+                        <div class="text-sm font-semibold text-gray-900">${leaderName}</div>
+                        <div class="text-xs text-gray-500">Votos captados</div>
+                    </div>
+                    <div class="col-span-2 text-right text-sm font-bold text-gray-900">${totalVotos}</div>
+                    <div class="col-span-3">
+                        <div class="flex items-center justify-end space-x-2">
+                            <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" style="width: ${percentage}%"></div>
                             </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">${leaderName}</div>
-                                <div class="text-xs text-gray-500">Rendimiento Destacado</div>
-                            </div>
+                            <span class="text-xs font-bold text-indigo-600">${percentage}%</span>
                         </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                        <div class="flex flex-col items-end justify-center">
-                            <div class="text-sm font-bold text-gray-900 flex items-center mb-1">
-                                <i class="fas fa-users text-indigo-400 mr-2"></i>
-                                ${totalVotos} <span class="text-xs font-normal text-gray-500 ml-1">aportes</span>
-                            </div>
-                            <div class="w-full max-w-[12rem] flex items-center justify-end space-x-2">
-                                <div class="flex-grow bg-gray-200 rounded-full h-2 shadow-inner">
-                                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" style="width: ${percentage}%"></div>
-                                </div>
-                                <span class="text-xs font-bold text-indigo-600 w-8 text-right">${percentage}%</span>
-                            </div>
-                        </div>
-                    </td>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                list.appendChild(row);
             });
         }
         
@@ -1096,17 +1079,12 @@
             const element = document.getElementById('pdf-report-container');
             try {
                 await (document.fonts ? document.fonts.ready : Promise.resolve());
-                // Hacer el contenedor renderizable clonándolo o forzándolo al DOM visible sin afectar el viewport del usuario.
-                const clone = element.cloneNode(true);
-                clone.style.position = 'fixed';
-                clone.style.top = '0';
-                clone.style.left = '0';
-                clone.style.opacity = '0';
-                clone.style.pointerEvents = 'none';
-                clone.style.overflow = 'visible';
-                clone.style.width = `${element.scrollWidth || 1056}px`;
-                clone.id = 'pdf-clone';
-                document.body.appendChild(clone);
+                element.style.left = '0';
+                element.style.top = '0';
+                element.style.position = 'fixed';
+                element.style.opacity = '1';
+                element.style.pointerEvents = 'none';
+                element.style.zIndex = '-1';
 
                 const opt = {
                     margin: 0.3,
@@ -1116,22 +1094,25 @@
                         scale: 2,
                         useCORS: true,
                         backgroundColor: '#ffffff',
-                        windowWidth: clone.scrollWidth,
-                        windowHeight: clone.scrollHeight,
+                        windowWidth: element.scrollWidth || 1056,
+                        windowHeight: element.scrollHeight || element.offsetHeight,
                         scrollX: 0,
                         scrollY: 0
                     },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
-                
-                await html2pdf().set(opt).from(clone).save();
-                
-                document.body.removeChild(clone);
+
+                await html2pdf().set(opt).from(element).save();
             } catch (error) {
                 console.error('Error generating PDF:', error);
                 alert('Hubo un error al generar el PDF.');
             } finally {
+                element.style.left = '-9999px';
+                element.style.position = 'absolute';
+                element.style.opacity = '0';
+                element.style.pointerEvents = 'none';
+                element.style.zIndex = '';
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
@@ -1206,38 +1187,41 @@
             try {
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generando Informe...';
                 btn.disabled = true;
-                await (document.fonts ? document.fonts.ready : Promise.resolve());
+                const token = localStorage.getItem('token');
+                const status = document.getElementById('data-status-filter')?.value || 'all';
+                const leaderId = document.getElementById('global-leader-filter')?.value || '';
+                const eventId = getSelectedEventId();
+                const targetDate = document.getElementById('simulation-target-date')?.value || '';
 
-                const element = document.getElementById('pdf-content');
-                const clone = element.cloneNode(true);
-                clone.style.position = 'fixed';
-                clone.style.top = '0';
-                clone.style.left = '0';
-                clone.style.opacity = '0';
-                clone.style.pointerEvents = 'none';
-                clone.style.overflow = 'visible';
-                clone.style.width = `${element.scrollWidth}px`;
-                document.body.appendChild(clone);
+                const params = new URLSearchParams();
+                if (eventId) params.set('eventId', eventId);
+                if (status) params.set('status', status);
+                if (leaderId) params.set('leaderId', leaderId);
+                if (targetDate) params.set('targetDate', targetDate);
+                params.set('region', currentRegion || 'nacional');
 
-                const opt = {
-                    margin: 0.3,
-                    filename: `Informe_Analitico_${new Date().toISOString().split('T')[0]}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        backgroundColor: '#ffffff',
-                        windowWidth: clone.scrollWidth,
-                        windowHeight: clone.scrollHeight,
-                        scrollX: 0,
-                        scrollY: 0
-                    },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                };
+                const response = await fetch(`/api/v2/exports/pdf/report?${params.toString()}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
-                await html2pdf().set(opt).from(clone).save();
-                document.body.removeChild(clone);
+                if (!response.ok) {
+                    throw new Error('Error al generar el PDF en el servidor');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Informe_Analitico_${new Date().toISOString().split('T')[0]}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
                 showToast('Informe analítico descargado exitosamente', 'success');
             } catch (error) {
                 console.error("Error generando PDF:", error);
