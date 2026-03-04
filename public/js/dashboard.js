@@ -2,6 +2,9 @@ const API_URL = window.location.origin;
 // Intentar leer token de sessionStorage primero (más seguro), luego localStorage
 let currentToken = sessionStorage.getItem('token') || localStorage.getItem('token');
 let currentEventId = sessionStorage.getItem('eventId') || localStorage.getItem('eventId');
+if (currentEventId === 'undefined' || currentEventId === 'null' || currentEventId === '') {
+    currentEventId = null;
+}
 let allLeaders = [];
 let allRegistrations = [];
 let charts = {};
