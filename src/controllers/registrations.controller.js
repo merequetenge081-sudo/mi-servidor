@@ -1398,27 +1398,24 @@ export async function fixNames(req, res) {
     let updatedCount = 0;
 
     for (let reg of registrations) {
-      let changed = false;
       const deduct = (s) => {
-        let p = (s||'').trim().split(' ').filter(Boolean);
+        let str = String(s || '').trim();
+        let p = str.split(' ').filter(Boolean);
         if (p.length === 2 && p[0].toLowerCase() === p[1].toLowerCase()) return p[0];
-        return (s||'').trim();
+        return str;
       };
-      const titleCase = (s) => s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-
+      const titleCase = (s) => String(s || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+      
       let f = deduct(reg.firstName); let l = deduct(reg.lastName);
       f = titleCase(f); l = titleCase(l);
-      
+
       if (reg.firstName !== f || reg.lastName !== l) {
-        reg.firstName = f; reg.lastName = l;
-        await reg.save();
+        await Registration.updateOne({ _id: reg._id }, { $set: { firstName: f, lastName: l } });
         updatedCount++;
       }
     }
-    
-    res.status(200).json({ success: true, message: updatedCount + ' nombres corregidos.' });
-  } catch (error) {
-    console.error('Error in fixNames:', error);
-    res.status(500).json({ success: false, message: 'Error interno del servidor.' });
-  }
+
+    res.status(200).json({ success: true, message: updatedCount + ' nombres corregidos.', updated: updatedCount });
+  } catch (error) { console.error(error); res.status(500).json({ success: false, message: String(error) });
+}
 }
