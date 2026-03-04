@@ -302,24 +302,19 @@
                     </div>
                 </div>
 
-                <!-- Leader Performance -->
+                <!-- Leader Performance (En Desarrollo) -->
                 <div class="card lg:col-span-2" id="leader-performance">
                     <div class="flex justify-between items-center mb-4 border-b pb-2">
                         <h3 class="text-lg font-semibold text-gray-800">
-                            <i class="fas fa-trophy text-amber-500 mr-2"></i>Rendimiento de Líderes
+                            <i class="fas fa-tools text-amber-500 mr-2"></i>Rendimiento de Líderes
                         </h3>
-                        <div class="relative">
-                            <input type="text" id="leader-filter" placeholder="Filtrar líder..." class="pl-8 pr-4 py-1 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <i class="fas fa-search absolute left-3 top-2 text-gray-400 text-xs"></i>
+                    </div>
+                    <div class="flex items-center justify-center py-8 text-gray-500">
+                        <div class="text-center">
+                            <div class="text-lg font-semibold">En desarrollo</div>
+                            <div class="text-sm">Estamos rediseñando este modulo.</div>
                         </div>
                     </div>
-                    <div class="text-xs text-gray-500 uppercase tracking-wider grid grid-cols-12 gap-3 px-2 pb-2">
-                        <div class="col-span-1">#</div>
-                        <div class="col-span-6">Líder</div>
-                        <div class="col-span-2 text-right">Aportes</div>
-                        <div class="col-span-3 text-right">Progreso</div>
-                    </div>
-                    <div id="leader-performance-list" class="space-y-2"></div>
                 </div>
 
             </div>
@@ -428,7 +423,7 @@
     </div>
 
     <!-- Contenedor oculto para la generación del PDF -->
-      <div id="pdf-report-container" style="position: absolute; left: -9999px; width: 1056px; background: white; color: black; padding: 50px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; overflow: hidden; height: auto;">
+    <div id="pdf-report-container" style="position: absolute; left: -9999px; width: 1056px; background: white; color: black; padding: 50px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; overflow: visible; height: auto;">
           <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #4f46e5; padding-bottom: 20px;">
               <h1 style="color: #312e81; font-size: 38px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Reporte de Simulación de Campaña</h1>
               <p style="color: #6b7280; font-size: 18px; margin-top: 10px;">Metas y Proyecciones Electorales (Formato Presentación)</p>
@@ -552,9 +547,11 @@
             });
             
             // Leader Filter Event Listener
-            leaderFilter.addEventListener('input', (e) => {
-                renderLeadersTable(e.target.value);
-            });
+            if (leaderFilter) {
+                leaderFilter.addEventListener('input', (e) => {
+                    renderLeadersTable(e.target.value);
+                });
+            }
             
             // Verify Global Button
             document.getElementById('btn-verify-global').addEventListener('click', runGlobalVerification);
@@ -802,53 +799,8 @@
             });
         }
         
-        function renderLeadersTable(filterText = '') {
-            if (!analyticsData) return;
-            
-            const regionData = analyticsData[currentRegion] || {};
-            const data = Array.isArray(regionData.topLideres) ? regionData.topLideres : [];
-            const list = document.getElementById('leader-performance-list');
-            if (!list) return;
-            list.innerHTML = '';
-
-            const filteredData = data.filter(l => {
-                const nameValue = l.liderNombre || l.name || l.nombre || 'desconocido';
-                const name = String(nameValue).toLowerCase();
-                return name.includes(filterText.toLowerCase());
-            });
-
-            if (filteredData.length === 0) {
-                list.innerHTML = '<div class="text-center text-gray-500 py-6">No hay líderes con datos para mostrar.</div>';
-                return;
-            }
-
-            const maxVotos = Math.max(...filteredData.map(l => Number(l.totalVotos ?? l.totalRegistros ?? l.total ?? 0)), 1);
-
-            filteredData.slice(0, 25).forEach((lider, index) => {
-                const totalVotos = Number(lider.totalVotos ?? lider.totalRegistros ?? lider.total ?? 0);
-                const percentage = Math.round((totalVotos / maxVotos) * 100);
-                const leaderName = lider.liderNombre || lider.name || lider.nombre || 'Desconocido';
-
-                const row = document.createElement('div');
-                row.className = 'grid grid-cols-12 gap-3 items-center bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm';
-                row.innerHTML = `
-                    <div class="col-span-1 text-sm font-bold text-gray-500">${index + 1}</div>
-                    <div class="col-span-6">
-                        <div class="text-sm font-semibold text-gray-900">${leaderName}</div>
-                        <div class="text-xs text-gray-500">Votos captados</div>
-                    </div>
-                    <div class="col-span-2 text-right text-sm font-bold text-gray-900">${totalVotos}</div>
-                    <div class="col-span-3">
-                        <div class="flex items-center justify-end space-x-2">
-                            <div class="flex-1 bg-gray-200 rounded-full h-2">
-                                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" style="width: ${percentage}%"></div>
-                            </div>
-                            <span class="text-xs font-bold text-indigo-600">${percentage}%</span>
-                        </div>
-                    </div>
-                `;
-                list.appendChild(row);
-            });
+        function renderLeadersTable() {
+            return;
         }
         
         // --- Toast Notification ---
@@ -1076,15 +1028,56 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generando...';
             btn.disabled = true;
 
-            const element = document.getElementById('pdf-report-container');
             try {
                 await (document.fonts ? document.fonts.ready : Promise.resolve());
-                element.style.left = '0';
-                element.style.top = '0';
-                element.style.position = 'fixed';
-                element.style.opacity = '1';
-                element.style.pointerEvents = 'none';
-                element.style.zIndex = '-1';
+                const overlay = document.getElementById('simulation-overlay');
+                const slideIds = [
+                    'slide-intro',
+                    'slide-current',
+                    'slide-rate',
+                    'slide-top-puesto',
+                    'slide-top-localidad',
+                    'slide-top-leader',
+                    'slide-proj-target',
+                    'slide-outro'
+                ];
+                const colors = [
+                    'linear-gradient(135deg, #8A2387, #E94057, #F27121)',
+                    'linear-gradient(135deg, #11998e, #38ef7d)',
+                    'linear-gradient(135deg, #2193b0, #6dd5ed)',
+                    'linear-gradient(135deg, #4A00E0, #8E2DE2)',
+                    'linear-gradient(135deg, #ff0844, #ffb199)',
+                    'linear-gradient(135deg, #f12711, #f5af19)',
+                    'linear-gradient(135deg, #000000, #e74c3c)',
+                    'linear-gradient(135deg, #1DB954, #191414)'
+                ];
+
+                const container = document.createElement('div');
+                container.id = 'simulation-pdf-container';
+                container.style.position = 'fixed';
+                container.style.top = '0';
+                container.style.left = '0';
+                container.style.opacity = '0';
+                container.style.pointerEvents = 'none';
+                container.style.width = '1056px';
+                container.style.background = '#ffffff';
+
+                slideIds.forEach((slideId, index) => {
+                    const slide = document.getElementById(slideId);
+                    if (!slide) return;
+                    const clone = slide.cloneNode(true);
+                    clone.classList.add('active');
+                    clone.style.display = 'flex';
+                    clone.style.minHeight = '816px';
+                    clone.style.width = '1056px';
+                    clone.style.padding = '48px';
+                    clone.style.boxSizing = 'border-box';
+                    clone.style.pageBreakAfter = index === slideIds.length - 1 ? 'auto' : 'always';
+                    clone.style.background = colors[index] || '#111827';
+                    container.appendChild(clone);
+                });
+
+                document.body.appendChild(container);
 
                 const opt = {
                     margin: 0.3,
@@ -1094,8 +1087,8 @@
                         scale: 2,
                         useCORS: true,
                         backgroundColor: '#ffffff',
-                        windowWidth: element.scrollWidth || 1056,
-                        windowHeight: element.scrollHeight || element.offsetHeight,
+                        windowWidth: container.scrollWidth,
+                        windowHeight: container.scrollHeight,
                         scrollX: 0,
                         scrollY: 0
                     },
@@ -1103,16 +1096,12 @@
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
 
-                await html2pdf().set(opt).from(element).save();
+                await html2pdf().set(opt).from(container).save();
+                document.body.removeChild(container);
             } catch (error) {
                 console.error('Error generating PDF:', error);
                 alert('Hubo un error al generar el PDF.');
             } finally {
-                element.style.left = '-9999px';
-                element.style.position = 'absolute';
-                element.style.opacity = '0';
-                element.style.pointerEvents = 'none';
-                element.style.zIndex = '';
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
