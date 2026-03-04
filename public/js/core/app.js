@@ -65,7 +65,41 @@
         }
         console.log('[App] ✅ Session activity vinculada');
 
-        console.log('[App] ✅ Aplicación inicializada correctamente');
+        // 5. Configurar auto-refresco (tiempo real aproximado, cada 10s)
+        console.log('[App] Configurando actualización en tiempo real...');
+        setInterval(async () => {
+            try {
+                if (typeof BootstrapService !== 'undefined' && BootstrapService.loadLeaders && BootstrapService.loadRegistrations) {
+                    
+                    // No actualizar forzosamente si el usuario está interactuando con un modal abierto
+                    const activeModals = document.querySelectorAll('.modal-overlay.active');
+                    if (activeModals.length > 0) return;
+
+                    // Refrescar en silencio en segundo plano
+                    await BootstrapService.loadLeaders();
+                    await BootstrapService.loadRegistrations();
+                    
+                    const currentSection = AppState.getUI('currentSection');
+                    if (currentSection === 'dashboard' && window.DashboardModule) {
+                        window.DashboardModule.refresh();
+                    } else if (currentSection === 'registrations' && window.RegistrationsModule) {
+                        window.RegistrationsModule.applyFilters();
+                    } else if (currentSection === 'leaders' && window.LeadersModule) {
+                        const searchInput = document.getElementById('leaderSearchInput');
+                        if (searchInput && searchInput.value) {
+                            window.LeadersModule.filterByName(searchInput.value);
+                        } else {
+                            window.LeadersModule.loadTable();
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('[App] Auto-refresh error:', err);
+            }
+        }, 10000);
+        console.log('[App] ✅ Auto-refresco en background activado');
+
+        console.log('[App] ✅ Aplicarión inicializada correctamente');
 
     } catch (err) {
         console.error('[App] Error inicializando:', err);

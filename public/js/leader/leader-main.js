@@ -567,13 +567,17 @@ window.refreshRegistrations = async (keepPage = false) => {
     }
 };
 
-// Auto-refresh every 30 seconds, preserving page
+// Auto-refresh every 10 seconds, preserving page to act as real-time sync
 if (!window.autoRefreshInterval) {
     window.autoRefreshInterval = setInterval(() => {
+        // Pausar auto-refresco si hay algún modal abierto para evitar interrumpir al usuario
+        const activeModals = document.querySelectorAll('.modal-overlay.active');
+        if (activeModals.length > 0) return;
+
         if (window.refreshRegistrations) {
             window.refreshRegistrations(true).catch(console.error);
         }
-    }, 30000);
+    }, 10000);
 }
 window.autoVerifyRegistrations = async () => {
     const leaderId = StorageManager.getCurrentLeaderId();
