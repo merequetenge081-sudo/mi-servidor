@@ -1,0 +1,8367 @@
+[
+  {
+    "codigo": "001283",
+    "nombre": "Centro Comercial Centro Mayor",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500018",
+    "nombre": "Cinco De Noviembre",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500002",
+    "nombre": "Ciudad Berna",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500005",
+    "nombre": "Ciudad Jardin",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500016",
+    "nombre": "Colegio Adventista Emmanuel",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001285",
+    "nombre": "Colegio Cooperativo del Magisterio de Cundinamarca",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001286",
+    "nombre": "Colegio Distrital Atanasio Girardot - Sede A",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001287",
+    "nombre": "Colegio Distrital Francisco Jose de Paula - Sede A",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001288",
+    "nombre": "Colegio Distrital Francisco Jose de Paula - Sede B",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001289",
+    "nombre": "Colegio Distrital Guillermo León Valencia - Sede A",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001290",
+    "nombre": "Colegio Distrital Guillermo León Valencia - Sede C",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001291",
+    "nombre": "Colegio Distrital Jaime Pardo Leal",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001292",
+    "nombre": "Colegio Parroquial La Valvanera",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001293",
+    "nombre": "Colegio Privado Comunidad Hermanas de Nuestra Señora de La Paz",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001294",
+    "nombre": "Escuela Normal Superior Distrital María Montesory - Sede A",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001295",
+    "nombre": "Escuela Superior Distrital María Montesory - Sede B",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001296",
+    "nombre": "Gimnasio Monseñor Manuel María Camargo",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001297",
+    "nombre": "Instituto Técnico Comercial del Restrepo",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500009",
+    "nombre": "La Fragua",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500008",
+    "nombre": "La Fraguita",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500014",
+    "nombre": "La Valvanera",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500004",
+    "nombre": "Luna Park",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500001",
+    "nombre": "Policarpa",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500006",
+    "nombre": "Restrepo A",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500007",
+    "nombre": "Restrepo B",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001299",
+    "nombre": "Salón Comunal Cinco de Noviembre",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001300",
+    "nombre": "Salón Comunal Ciudad Berna",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001301",
+    "nombre": "Salón Comunal Ciudad Villa Mayor",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001302",
+    "nombre": "Salón Comunal Eduardo Frei",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001303",
+    "nombre": "Salón Comunal San Antonio",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001304",
+    "nombre": "Salón Comunal Sevilla Sur",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500017",
+    "nombre": "Salon Comunal Villa Mayor",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500015",
+    "nombre": "Sal�n Comunal San Antonio",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500003",
+    "nombre": "San Antonio",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500010",
+    "nombre": "Santander",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500011",
+    "nombre": "Santander Sur",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500013",
+    "nombre": "Sena",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "001298",
+    "nombre": "SENA Centro Distrital (San Jorge Central)",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1500012",
+    "nombre": "Villa Mayor",
+    "localidad": "Antonio Nariño"
+  },
+  {
+    "codigo": "1100011",
+    "nombre": "12 De Octubre",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001231",
+    "nombre": "Alianza Cristiana y Misionera Colombiana",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100020",
+    "nombre": "Benjamin Herrera",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100025",
+    "nombre": "Cafam Av. 68",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001232",
+    "nombre": "Cancha detrás de Olimpica",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001233",
+    "nombre": "Centro Comercial CAFAM Floresta",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001234",
+    "nombre": "Centro Comercial ISERRA 100",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001235",
+    "nombre": "Centro Comercial Metrópolis",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001236",
+    "nombre": "Colegio Distrital  Francisco Primero Sede C",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001237",
+    "nombre": "Colegio Distrital Domingo Faustino Sarmiento Sede B",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001238",
+    "nombre": "Colegio Distrital Faustino Sarmiento - Sede A",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001239",
+    "nombre": "Colegio Distrital Francisco Primero Sede Alemania",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001240",
+    "nombre": "Colegio Distrital Francisco primero Sede Manuela Ayala",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001241",
+    "nombre": "Colegio Distrital Heladia Mejía - Sede B",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001242",
+    "nombre": "Colegio Distrital Heladía Mejía Sede A",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001243",
+    "nombre": "Colegio Distrital Jorge Eliecer Gaitán - Sede A",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001244",
+    "nombre": "Colegio Distrital Jorge Eliecer Gaitán - Sede B",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001245",
+    "nombre": "Colegio Distrital Juan Francisco Berbeo - Sede A",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001246",
+    "nombre": "Colegio Distrital Juan Francisco Berbeo - Sede B",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001247",
+    "nombre": "Colegio Distrital Lorencita Villegas de Santos",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001249",
+    "nombre": "Colegio Distrital Rafaél Bernal Jiménez - Sede B",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001248",
+    "nombre": "Colegio Distrital Rafael Bernal Jimenez Sede A",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001250",
+    "nombre": "Colegio Distrital República de Panamá - Sede C",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001251",
+    "nombre": "Colegio Distrital República de Panamá Sede A",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001252",
+    "nombre": "Colegio Distrital Tomás Carrasquilla - sede A",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001253",
+    "nombre": "Colegio Mercedario San Pedro",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001254",
+    "nombre": "Colegio San Felipe Neri",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100017",
+    "nombre": "Colombia",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100005",
+    "nombre": "Entre Rios",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001255",
+    "nombre": "Fundación Educativa Santa María",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001256",
+    "nombre": "Fundación Universitaria Monserrate - UNIMONSERRATE",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100004",
+    "nombre": "Gaitan",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100022",
+    "nombre": "Iserra 100",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001257",
+    "nombre": "Jardín Infantil Santa Sofía",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100008",
+    "nombre": "Jose Joaquin Vargas",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100001",
+    "nombre": "La Castellana",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100018",
+    "nombre": "La Muequeta",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100016",
+    "nombre": "La Paz",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001258",
+    "nombre": "Localidad Barrios Unidos",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100015",
+    "nombre": "Los Alcazares",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100006",
+    "nombre": "Metropolis",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001259",
+    "nombre": "Parqueadero Conjunto Residencial Entre Ríos",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100003",
+    "nombre": "Patria",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100024",
+    "nombre": "Plaza de Los Artesanos",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100021",
+    "nombre": "Polideportivo Polo",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100013",
+    "nombre": "Polo Club",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100010",
+    "nombre": "Popular Modelo",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100002",
+    "nombre": "Rionegro",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100014",
+    "nombre": "San Felipe",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100009",
+    "nombre": "San Fernando",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100023",
+    "nombre": "San Miguel",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100012",
+    "nombre": "Santa Sofia",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100019",
+    "nombre": "Siete De Agosto",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "1100007",
+    "nombre": "Simon Bolivar",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "001262",
+    "nombre": "Universidad del Rosario",
+    "localidad": "Barrios Unidos"
+  },
+  {
+    "codigo": "07100084",
+    "nombre": "Almacén Metro Autopista Sur",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100271",
+    "nombre": "Atalayas",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100253",
+    "nombre": "Bosa",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100261",
+    "nombre": "Bosa Brasilia",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100260",
+    "nombre": "Bosa Paulo VI",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100073",
+    "nombre": "Bosa San Jose",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100275",
+    "nombre": "Bosanova",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100280",
+    "nombre": "Campo Verde - Potreritos",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100277",
+    "nombre": "Carbonell",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100070",
+    "nombre": "Carlos Alban",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100077",
+    "nombre": "Carlos Pizarro Leon Gomez",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100085",
+    "nombre": "Cc. Gran Plaza Bosa",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100284",
+    "nombre": "Cedid San Pablo",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001792",
+    "nombre": "Centro Comercial Gran Plaza Bosa",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100272",
+    "nombre": "Ciudadela El Porvenir",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100281",
+    "nombre": "Claretiano",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100288",
+    "nombre": "Claretiano El Libertador",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100291",
+    "nombre": "Colegio Ciudadanos Del Futuro",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001794",
+    "nombre": "Colegio Claretiano de Bosa",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001793",
+    "nombre": "Colegio Claretiano El Libertador",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001795",
+    "nombre": "Colegio Colombo Japonés",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001796",
+    "nombre": "Colegio Colsubsidio Chicalá",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001797",
+    "nombre": "Colegio Distrital  Albán Holguín - Sede C",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001798",
+    "nombre": "Colegio Distrital Alfonso López Michelsen",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "Bosa",
+    "nombre": "Punto de votación 8",
+    "localidad": ""
+  },
+  {
+    "codigo": "001800",
+    "nombre": "Colegio Distrital Argelia",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001801",
+    "nombre": "Colegio Distrital Bicentenario de La Independencia",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001802",
+    "nombre": "Colegio Distrital Bosa Nova",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001803",
+    "nombre": "Colegio Distrital Brasilia",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001804",
+    "nombre": "Colegio Distrital Brasilia Bosa Sede B",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001807",
+    "nombre": "Colegio Distrital Carlos Albán Holguín - Sede A",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001808",
+    "nombre": "Colegio Distrital Carlos Albán Holguín Sede B",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001809",
+    "nombre": "Colegio Distrital Carlos Pizarro León Gómez - Sede A",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001805",
+    "nombre": "Colegio Distrital CEDID San Pablo Sede A",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001806",
+    "nombre": "Colegio Distrital CEDID San Pablo Sede C",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001810",
+    "nombre": "Colegio Distrital Ciudadela Educativa de Bosa",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001811",
+    "nombre": "Colegio Distrital El Porvenir - Sede B",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001812",
+    "nombre": "Colegio Distrital El Porvenir Sede A",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001813",
+    "nombre": "Colegio Distrital Fe y Alegría San Ignacio",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001814",
+    "nombre": "Colegio Distrital Fernando Mazuera Villegas",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001815",
+    "nombre": "Colegio Distrital Fernando Mazuera Villegas - Sede B",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001816",
+    "nombre": "Colegio Distrital Francisco de Paula Santander",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001817",
+    "nombre": "Colegio Distrital German Arciniegas Sede A",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001818",
+    "nombre": "Colegio Distrital Gran Colombiano - Sede B",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001819",
+    "nombre": "Colegio Distrital Gran Colombiano Sede A",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001820",
+    "nombre": "Colegio Distrital Gran Colombiano Sede D",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001821",
+    "nombre": "Colegio Distrital Jorge Isaacs",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001822",
+    "nombre": "Colegio Distrital José Antonio Galán",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001823",
+    "nombre": "Colegio Distrital José Francisco Socarrás",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001824",
+    "nombre": "Colegio Distrital Kimy Pernia",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001825",
+    "nombre": "Colegio Distrital La Bici",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001826",
+    "nombre": "Colegio Distrital La Concepción Sede C",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001827",
+    "nombre": "Colegio Distrital La Esperanza",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001828",
+    "nombre": "Colegio Distrital Leonardo Posada Pedraza",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001829",
+    "nombre": "Colegio Distrital Llano Oriental",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001830",
+    "nombre": "Colegio Distrital Los Naranjos",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001831",
+    "nombre": "Colegio Distrital Luis Lopez de Mesa Sede Nueva",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001832",
+    "nombre": "Colegio Distrital Luis López de Meza",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001833",
+    "nombre": "Colegio Distrital Nuevo Chile",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001834",
+    "nombre": "Colegio Distrital Orlando Higuita Rojas",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001835",
+    "nombre": "Colegio Distrital Orlando Higuita Rojas Sede B - Juan Maximiliano Ambrosio",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001836",
+    "nombre": "Colegio Distrital Pablo de Tarso - Sede A",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001837",
+    "nombre": "Colegio Distrital Parques De Bogotá",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001838",
+    "nombre": "Colegio Distrital Paulo de Tarso - Sede B",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001839",
+    "nombre": "Colegio Distrital Porfilio Barba Jacob",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001840",
+    "nombre": "Colegio Distrital San Bernardino",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001841",
+    "nombre": "Colegio Distrital Santiago de las Atalayas",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001842",
+    "nombre": "Colegio Distrital Soledad Acosta de Samper",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001843",
+    "nombre": "Colegio Distrital Villas del Progreso",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001844",
+    "nombre": "Colegio Miguel Ángel Asturias",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001845",
+    "nombre": "Colegio Mixto Ciudadanos del Futuro",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001846",
+    "nombre": "Colegio Mixto Villa Carolina",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001847",
+    "nombre": "Colegio Privado Garabatos de Colores",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001848",
+    "nombre": "Colegio Privado Liceo Alfredo Nóbel",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001849",
+    "nombre": "Colegio Privado Liceo Cultural López Osorio",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001850",
+    "nombre": "Coliseo la Palestina",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100266",
+    "nombre": "El Porvenir",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100267",
+    "nombre": "El Recreo",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100075",
+    "nombre": "El Recuerdo Santafe",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100076",
+    "nombre": "Fe Y Alegria San Ignacio",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100269",
+    "nombre": "Francisco De Paula Santander",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001851",
+    "nombre": "Gimnasio Los Sauces",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100289",
+    "nombre": "Gimnasio Real Americano",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001852",
+    "nombre": "Gimnasio Real Americano Sede B",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001853",
+    "nombre": "Gimnasio Santa Rocio",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100282",
+    "nombre": "Holanda",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001854",
+    "nombre": "Institución Educativa Distrital La Concepción - Sede B",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001855",
+    "nombre": "Instituto GUIMARC",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100262",
+    "nombre": "Islandia",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100287",
+    "nombre": "Jardín Infantil Olarte",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001856",
+    "nombre": "Jardín Infantil Olarte – SDIS",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100072",
+    "nombre": "Jimenez De Quesada",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100069",
+    "nombre": "Jose Antonio Galan",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100290",
+    "nombre": "Juan Maximiliano Ambrosio",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100285",
+    "nombre": "La Acuarela",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100254",
+    "nombre": "La Amistad",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100268",
+    "nombre": "La Esperanza",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100071",
+    "nombre": "La Estacion",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100274",
+    "nombre": "La Independencia",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100255",
+    "nombre": "La Libertad",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100257",
+    "nombre": "Laureles",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100273",
+    "nombre": "Laureles II",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001857",
+    "nombre": "Liceo Ciudad Capital",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001858",
+    "nombre": "Liceo Manuel Elkin Patarroyo",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100276",
+    "nombre": "Llano Oriental",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100083",
+    "nombre": "Manuel Elkin Patarroyo",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100286",
+    "nombre": "Miguel Ángel Asturias",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100279",
+    "nombre": "Naranjos",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100082",
+    "nombre": "Nuestra Sra De Nazareth",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100079",
+    "nombre": "Nueva Estacion",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100278",
+    "nombre": "Nueva Granada",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100078",
+    "nombre": "Nuevo Carlos Alban",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100265",
+    "nombre": "Nuevo Chile",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100259",
+    "nombre": "Orlando Higuita",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100270",
+    "nombre": "Pablo De Tarso",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100258",
+    "nombre": "Palestina",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001859",
+    "nombre": "Parque IDRD",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100256",
+    "nombre": "Piamonte",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100283",
+    "nombre": "Portal De Brasil",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100081",
+    "nombre": "Recreo Michelsen",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001860",
+    "nombre": "Salón Comunal Villa del Río",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100263",
+    "nombre": "San Bernardino",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100074",
+    "nombre": "Santa Fe De Bosa",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "001861",
+    "nombre": "SuperCADE de Bosa",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100264",
+    "nombre": "Surbana",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100068",
+    "nombre": "Villa Del Rio",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "07100080",
+    "nombre": "Villa Del Rio II",
+    "localidad": "Bosa"
+  },
+  {
+    "codigo": "02100027",
+    "nombre": "Antiguo Country Plazoleta Caru",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100032",
+    "nombre": "Bethlemitas-Calle 65",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001606",
+    "nombre": "Carulla - Plazoleta",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001607",
+    "nombre": "Centro Comercial de la 93",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100026",
+    "nombre": "Chico Liceo Frances Louis Past",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100024",
+    "nombre": "Chico Norte",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100025",
+    "nombre": "Chico Reservado",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001608",
+    "nombre": "Colegio Bethlemitas",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100030",
+    "nombre": "Colegio Campestre Monteverde S",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001615",
+    "nombre": "Colegio del Rosario de Santo Domingo",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001609",
+    "nombre": "Colegio Distrital  Simón Rodríguez Sede A",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001610",
+    "nombre": "Colegio Distrital Campestre Monteverde",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001611",
+    "nombre": "Colegio Distrital San Martín de Porres Sede B",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001612",
+    "nombre": "Colegio Distrital Simón Rodríguez - Sede B",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001613",
+    "nombre": "Colegio Liceo de Cervantes El Retiro",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001614",
+    "nombre": "Colegio Nuevo Gimnasio",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100031",
+    "nombre": "Colegio San Martin de Porres Sede A",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100297",
+    "nombre": "Colegio Simón Rodríguez Sede A",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100034",
+    "nombre": "El Aquinate U. Santo Tomás",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001616",
+    "nombre": "Fundación Universitaria Konrad Lorenz",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100029",
+    "nombre": "Granada Colegio Simon Rodriguez Sede B",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001617",
+    "nombre": "Liceo Francés Louis Pasteur",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100298",
+    "nombre": "Mariscal Sucre Sede B",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001618",
+    "nombre": "Museo del Chico",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001619",
+    "nombre": "Parqueadero",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001620",
+    "nombre": "Parqueadero Chicó Calle 90",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001621",
+    "nombre": "Parqueadero Chicó Calle 97",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001622",
+    "nombre": "Parqueadero Olímpica",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001623",
+    "nombre": "Parqueadero SENA",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001624",
+    "nombre": "SENA",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100295",
+    "nombre": "Sena Calle 52",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100293",
+    "nombre": "Sena Calle 65",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100033",
+    "nombre": "U. Santo Tomás Claustro",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001634",
+    "nombre": "Universidad Área Andina",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100035",
+    "nombre": "Universidad Catolica",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001625",
+    "nombre": "Universidad Católica de Colombia",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001633",
+    "nombre": "Universidad de La Salle",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001626",
+    "nombre": "Universidad Distrital",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "Chapinero",
+    "nombre": "Calle 79 No 11-45",
+    "localidad": ""
+  },
+  {
+    "codigo": "001628",
+    "nombre": "Universidad Javeriana",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100294",
+    "nombre": "Universidad Konrad Lorenz",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001629",
+    "nombre": "Universidad Pedagógica Nacional",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "02100296",
+    "nombre": "Universidad Piloto",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001630",
+    "nombre": "Universidad Piloto de Colombia",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001631",
+    "nombre": "Universidad Santo Tomás",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001632",
+    "nombre": "Universidad Sergio Arboleda",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "001635",
+    "nombre": "Vía Pública Salón Comunal Paraíso El Tropihueco",
+    "localidad": "Chapinero"
+  },
+  {
+    "codigo": "20100245",
+    "nombre": "Candelaria La Nueva Dos",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100243",
+    "nombre": "Caracoli",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001425",
+    "nombre": "Casa de la Cultura Ciudad Bolívar",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001426",
+    "nombre": "Centro Comercial Gran Plaza El Ensueño",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001427",
+    "nombre": "Centro de Desarrollo Comunitario Arborizadora Alta",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001428",
+    "nombre": "Centro de Desarrollo Educativo IDIPRON",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001429",
+    "nombre": "Colegio Cerro del Sur",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001430",
+    "nombre": "Colegio Compartir San Isidro",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001431",
+    "nombre": "Colegio Distrital Antonio García",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001432",
+    "nombre": "Colegio Distrital Arborizadora Baja",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001433",
+    "nombre": "Colegio Distrital Bicentenario",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001435",
+    "nombre": "Colegio Distrital Calasanz (Buenavista)",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001434",
+    "nombre": "Colegio Distrital CEDIT Ciudad Bolívar",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001436",
+    "nombre": "Colegio Distrital Ciudad Bolívar Argentina",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001437",
+    "nombre": "Colegio Distrital Ciudad Bolívar Argentina - Sede B",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001438",
+    "nombre": "Colegio Distrital Ciudad de Montreal",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001439",
+    "nombre": "Colegio Distrital Cundinamarca",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001440",
+    "nombre": "Colegio Distrital Don Bosco La Joya",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001441",
+    "nombre": "Colegio Distrital El Ensueño",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001442",
+    "nombre": "Colegio Distrital El Recuerdo - Sede A",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001443",
+    "nombre": "Colegio Distrital Estrella del Sur - Sede C",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001444",
+    "nombre": "Colegio Distrital Estrella del Sur Sede B",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001445",
+    "nombre": "Colegio Distrital Fanny Mikey",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001446",
+    "nombre": "Colegio Distrital Gimnasio Sabio Caldas",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001447",
+    "nombre": "Colegio Distrital Guillermo Cano Isaza",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001448",
+    "nombre": "Colegio Distrital Ismael Perdomo",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001449",
+    "nombre": "Colegio Distrital José Celestino Mutis",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001450",
+    "nombre": "Colegio Distrital José Jaime Rojas",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001451",
+    "nombre": "Colegio Distrital José María Vargas Vila (Bella Flor)",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001452",
+    "nombre": "Colegio Distrital La Acacia II - Sede A",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001453",
+    "nombre": "Colegio Distrital La Estancia San Isidro",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001454",
+    "nombre": "Colegio Distrital León de Greiff",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001455",
+    "nombre": "Colegio Distrital María Mercedes Carranza",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001456",
+    "nombre": "Colegio Distrital Nicolas Gómez Dávila",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001457",
+    "nombre": "Colegio Distrital Paraíso Manuela Beltrán - Sede A",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001458",
+    "nombre": "Colegio Distrital Paraíso Mirador",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001459",
+    "nombre": "Colegio Distrital Paraíso Mirador - Sede B",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001460",
+    "nombre": "Colegio Distrital Quiba Alta San Martín - Sede B",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001461",
+    "nombre": "Colegio Distrital Rafaél Uribe Uribe",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001462",
+    "nombre": "Colegio Distrital República de Canadá",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001463",
+    "nombre": "Colegio Distrital República de México - Sede Principal",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001464",
+    "nombre": "Colegio Distrital Rodrigo Lara Bonilla",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001465",
+    "nombre": "Colegio Distrital Rogelio Salmona",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001466",
+    "nombre": "Colegio Distrital Rural Mochuelo Alto",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001467",
+    "nombre": "Colegio Distrital Rural Pasquilla",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001468",
+    "nombre": "Colegio Distrital San Francisco Sede A",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001469",
+    "nombre": "Colegio Distrital San Francisco Sede B",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001471",
+    "nombre": "Colegio Distrital Santa Bárbara",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001470",
+    "nombre": "Colegio Distrital Santa Barbara Sur",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001472",
+    "nombre": "Colegio Distrital Sierra Morena -  Sede B",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001473",
+    "nombre": "Colegio Distrital Sierra Morena -  Sede C (Divino Niño)",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001474",
+    "nombre": "Colegio Distrital Sierra Morena Sede A",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001475",
+    "nombre": "Colegio Distrital Tanque Laguna - Sede B",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001476",
+    "nombre": "Colegio Distrital Unión Europea Sede A",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001477",
+    "nombre": "Colegio Distrital Villa Mar - Sede A",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001478",
+    "nombre": "Comedor Comunitario",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001479",
+    "nombre": "Conjunto Residencial Casa Linda Del Tunal Unidad 2",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100240",
+    "nombre": "El Paraiso",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001480",
+    "nombre": "Facultad Tecnológica Universidad Distrital",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001481",
+    "nombre": "Jardín Infantil Lara Bonilla",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001482",
+    "nombre": "Jardín Infantil San Francisco",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100238",
+    "nombre": "Jerusalen (El Tanque)",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001483",
+    "nombre": "Liceo Contadora",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100241",
+    "nombre": "Manuela Beltran",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100246",
+    "nombre": "Marandu",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100239",
+    "nombre": "Mochuelo Bajo El Clavel",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001484",
+    "nombre": "Parque Caracolí",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001485",
+    "nombre": "Parque Casa Grande",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001486",
+    "nombre": "Polideportivo La Estancia",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100242",
+    "nombre": "Potosi (La Laguna)",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001487",
+    "nombre": "Salón Comunal",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001488",
+    "nombre": "Salón Comunal Arborizadora Baja",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001489",
+    "nombre": "Salón Comunal Barrio Casavianca",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001490",
+    "nombre": "Salón Comunal San Francisco I Sector",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001491",
+    "nombre": "Salón Comunal Sierra Morena I",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100237",
+    "nombre": "San Joaquin Del Vaticano",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100247",
+    "nombre": "Tanque-Sierra Morena",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "20100244",
+    "nombre": "Union Europea",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001492",
+    "nombre": "Vereda Santa Rosa",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "001493",
+    "nombre": "Vía pública al costado del Colegio Distrital Rodrigo Lara Bonilla Sede B (José Celestino Mutis)",
+    "localidad": "Ciudad Bolívar"
+  },
+  {
+    "codigo": "0900066",
+    "nombre": "Alcala Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900058",
+    "nombre": "Almazan Engativa",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900030",
+    "nombre": "Bachue",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900032",
+    "nombre": "Bachue II - Bochica I",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900012",
+    "nombre": "Bochica",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900054",
+    "nombre": "Bolivia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900021",
+    "nombre": "Bonanza",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900004",
+    "nombre": "Bosque Popular",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900001",
+    "nombre": "Boyaca",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001043",
+    "nombre": "Centro Comercial Diverplaza",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001044",
+    "nombre": "Centro Comercial Nuestro Bogotá",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001045",
+    "nombre": "Centro Comercial Portal 80",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001046",
+    "nombre": "Centro Comercial Punto 72",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001047",
+    "nombre": "Centro Comercial Unicentro de Occidente",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900063",
+    "nombre": "Centro Educativo Scalas",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900047",
+    "nombre": "Ciudad De Honda",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900040",
+    "nombre": "Ciudadela Colsubsidio",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001049",
+    "nombre": "Colegio Adventista del Norte",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001050",
+    "nombre": "Colegio Cafam Básica Primaria",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001051",
+    "nombre": "Colegio Centro Educativo Integral Colsubsidio",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001052",
+    "nombre": "Colegio Colsubsidio Las Mercedes",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001053",
+    "nombre": "Colegio Colsubsidio Torquigua",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001054",
+    "nombre": "Colegio Cooperativo Los Álamos - \"COALAMOS\"",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900069",
+    "nombre": "Colegio Copes",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001055",
+    "nombre": "Colegio Distrital Antonio Nariño - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001056",
+    "nombre": "Colegio Distrital Antonio Villavicencio - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001057",
+    "nombre": "Colegio Distrital Charry",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001058",
+    "nombre": "Colegio Distrital Fe y Alegría",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001059",
+    "nombre": "Colegio Distrital Florida Blanca - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001060",
+    "nombre": "Colegio Distrital Garces Navas Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001061",
+    "nombre": "Colegio Distrital General Santander",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001062",
+    "nombre": "Colegio Distrital General Santander Sede C",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001063",
+    "nombre": "Colegio Distrital Guillermo León Valencia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001064",
+    "nombre": "Colegio Distrital Instituto Técnico Industrial Francisco Jose de Caldas - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001065",
+    "nombre": "Colegio Distrital Instituto Técnico industrial Francisco José de Caldas - Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001066",
+    "nombre": "Colegio Distrital Jorge Gaitán Cortés - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001067",
+    "nombre": "Colegio Distrital Jorge Gaitán Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001068",
+    "nombre": "Colegio Distrital Jorge Gaitán Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001069",
+    "nombre": "Colegio Distrital José Asunción Silva - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001070",
+    "nombre": "Colegio Distrital Juán del Corral - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001071",
+    "nombre": "Colegio Distrital La Palestina Sede A - Centro de Estudios del Niño",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001072",
+    "nombre": "Colegio Distrital Los Cerezos",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001073",
+    "nombre": "Colegio Distrital Manuela Ayala de Gaitán - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001074",
+    "nombre": "Colegio Distrital Manuela Ayala de Gaitán - Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001075",
+    "nombre": "Colegio Distrital Marco Tulio Fernández - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001076",
+    "nombre": "Colegio Distrital Marco Tulio Fernández - Sede D",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001077",
+    "nombre": "Colegio Distrital Morisco",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001078",
+    "nombre": "Colegio Distrital Naciones Unidas - Sede C",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001079",
+    "nombre": "Colegio Distrital Naciones Unidas Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001084",
+    "nombre": "Colegio Distrital Néstor Forero Alcalá - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001080",
+    "nombre": "Colegio Distrital Nestor Forero Alcala Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001081",
+    "nombre": "Colegio Distrital Nidia Quintero de Turbay - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001082",
+    "nombre": "Colegio Distrital Nidia Quintero de Turbay - Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001083",
+    "nombre": "Colegio Distrital Nueva Constitución",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001085",
+    "nombre": "Colegio Distrital República de China",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001086",
+    "nombre": "Colegio Distrital República de Colombia - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001087",
+    "nombre": "Colegio Distrital República de Colombia - Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001088",
+    "nombre": "Colegio Distrital República de Colombia Sede C",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001089",
+    "nombre": "Colegio Distrital Robert Kennedy - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001090",
+    "nombre": "Colegio Distrital Robert Kennedy Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001091",
+    "nombre": "Colegio Distrital Rodolfo Llinas",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001092",
+    "nombre": "Colegio Distrital San José Norte - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001093",
+    "nombre": "Colegio Distrital San José Norte Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001094",
+    "nombre": "Colegio Distrital Simón Bolívar - Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001095",
+    "nombre": "Colegio Distrital Simón Bolívar Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001096",
+    "nombre": "Colegio Distrital Tabora - Sede A",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001097",
+    "nombre": "Colegio Distrital Tabora - Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001099",
+    "nombre": "Colegio Distrital Técnico República de Guatemala",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001098",
+    "nombre": "Colegio Distrital Tomás Cipriano de Mosquera",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001100",
+    "nombre": "Colegio Distrital Villa Amalia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001101",
+    "nombre": "Colegio Gimnasio El Lago",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001102",
+    "nombre": "Colegio Manyanet",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001103",
+    "nombre": "Colegio Margarita Bosco",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001104",
+    "nombre": "Colegio Minuto de Dios",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900065",
+    "nombre": "Colegio Norte Adventista",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001105",
+    "nombre": "Colegio Pedagógico del Espíritu Santo",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001106",
+    "nombre": "Colegio Privado Centro Lestonac Compañía de María",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001107",
+    "nombre": "Colegio Privado Instituto Técnico Industrial Centro Don Bosco",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001108",
+    "nombre": "Colegio Privado RR Oblatas Al Divino Amor",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001109",
+    "nombre": "Colegio Técnico Distrital Laureano Gómez - Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001110",
+    "nombre": "Coliseo Parque San Andrés",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900034",
+    "nombre": "Cortijo",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001111",
+    "nombre": "Costado Almacén Éxito de Occidente",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900067",
+    "nombre": "Diverplaza",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900056",
+    "nombre": "El Cedro",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900005",
+    "nombre": "El Guali",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900006",
+    "nombre": "El Lujan",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900038",
+    "nombre": "El Morisco",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900042",
+    "nombre": "El Muelle",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900002",
+    "nombre": "Engativa",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900041",
+    "nombre": "Ferias II",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900024",
+    "nombre": "Florencia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900011",
+    "nombre": "Garces Navas",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001112",
+    "nombre": "Gimnasio Los Alerces",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001113",
+    "nombre": "Gimnasio Santa Maria del Alcazar",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900055",
+    "nombre": "Gran Granada",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900043",
+    "nombre": "La Caba�a",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900062",
+    "nombre": "La Clarita",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900027",
+    "nombre": "La Espa�ola",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900018",
+    "nombre": "La Estrada",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900019",
+    "nombre": "La Estradita",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900017",
+    "nombre": "La Europa",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900015",
+    "nombre": "La Florida",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900023",
+    "nombre": "La Granja",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900014",
+    "nombre": "La Salina",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900029",
+    "nombre": "La Serena",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900020",
+    "nombre": "Las Ferias",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900061",
+    "nombre": "Le�n Valencia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900008",
+    "nombre": "Los Alamos",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900013",
+    "nombre": "Los Alamos Norte",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900039",
+    "nombre": "Los Cerezos",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900068",
+    "nombre": "Margarita Bosco",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900028",
+    "nombre": "Minuto De Dios",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900050",
+    "nombre": "Morti�o",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900064",
+    "nombre": "Naciones Unidas Sede B",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900003",
+    "nombre": "Normandia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900051",
+    "nombre": "Palo Blanco",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001114",
+    "nombre": "Parqueadero Supermanzana D - Portería 1",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900046",
+    "nombre": "Plazuelas Del Virrey",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001115",
+    "nombre": "Polideportivo",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900053",
+    "nombre": "Primavera",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900026",
+    "nombre": "Quirigua",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900031",
+    "nombre": "Quirigua Plaza de Mercado",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001116",
+    "nombre": "Salón Comunal",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001123",
+    "nombre": "Salón Comunal Álamos",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001117",
+    "nombre": "Salón Comunal Barrio La Clarita",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001118",
+    "nombre": "Salón Comunal Bosques de Mariana",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001122",
+    "nombre": "Salón Comunal de Villaluz",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001119",
+    "nombre": "Salón Comunal El Verdum",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001120",
+    "nombre": "Salón Comunal Protecho Villa Amalia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001121",
+    "nombre": "Salón Comunal Urbanización Plazuelas del Virrey",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900060",
+    "nombre": "Sal�n Comunal �lamos",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900036",
+    "nombre": "San Ignacio",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900052",
+    "nombre": "San Joaquin",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900035",
+    "nombre": "San Marcos",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900045",
+    "nombre": "Santa Cecilia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900016",
+    "nombre": "Santa Helenita",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900025",
+    "nombre": "Santa Rosita",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001124",
+    "nombre": "Sede Social Conjunto Zarzamora CAFAM",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001125",
+    "nombre": "Sede Social Edificio Comunal Bochica 1",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900022",
+    "nombre": "Sta. Maria Del Lago",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900037",
+    "nombre": "Tabora",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900044",
+    "nombre": "Tisquesusa",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900057",
+    "nombre": "Torquigua",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900059",
+    "nombre": "Unicentro De Occidente",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001126",
+    "nombre": "Uniminuto Escuela de Convenciones",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "001127",
+    "nombre": "Universidad De Ciencias Aplicadas Y Ambientales - U.D.C.A.",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900009",
+    "nombre": "Villa Amalia",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900049",
+    "nombre": "Villa Constanza",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900033",
+    "nombre": "Villa Gladys",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900007",
+    "nombre": "Villa Luz",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900010",
+    "nombre": "Villas De Granada",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "0900048",
+    "nombre": "Zarzamora",
+    "localidad": "Engativá"
+  },
+  {
+    "codigo": "9900029",
+    "nombre": "Acunar",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100312",
+    "nombre": "Agustiniano Salitre",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900026",
+    "nombre": "Atahualpa",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100309",
+    "nombre": "Batavia",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100125",
+    "nombre": "Belen",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900037",
+    "nombre": "Cacique Hyntiba",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001001",
+    "nombre": "Casa de La Cultura de Fontibón Cacique Hyntiba",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001002",
+    "nombre": "Casa de Pensamiento Intercultural",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900030",
+    "nombre": "Casa Pensamiento Intercultural",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100307",
+    "nombre": "Centro A",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001003",
+    "nombre": "Centro Comercial Hayuelos",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001004",
+    "nombre": "Centro Comercial Multiplaza",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001005",
+    "nombre": "Centro Comercial Salitre Plaza",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001006",
+    "nombre": "Centro Comercial Trebolis",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001007",
+    "nombre": "Colegio Agustiniano Salitre",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001009",
+    "nombre": "Colegio Distrital Antonio Van Üden",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001010",
+    "nombre": "Colegio Distrital Antonio Van Üden Sede B",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001008",
+    "nombre": "Colegio Distrital Antonio Van Uden Sede C",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001011",
+    "nombre": "Colegio Distrital Atahualpa",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001012",
+    "nombre": "Colegio Distrital Carlo Federici",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001013",
+    "nombre": "Colegio Distrital Costa Rica - Sede C",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001014",
+    "nombre": "Colegio Distrital Integrado - Sede B",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001015",
+    "nombre": "Colegio Distrital Internacional",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001016",
+    "nombre": "Colegio Distrital La Felicidad",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001017",
+    "nombre": "Colegio Distrital Luis Ángel Arango",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001018",
+    "nombre": "Colegio Distrital Pablo Neruda",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001019",
+    "nombre": "Colegio Distrital Pablo Neruda Sede B",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001020",
+    "nombre": "Colegio Distrital República de Costa Rica - Sede C",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001021",
+    "nombre": "Colegio Distrital Rodrigo Arenas Betancourt",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001022",
+    "nombre": "Colegio Distrital Santa Cecilia",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001023",
+    "nombre": "Colegio Distrital Villemar El Carmen",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001024",
+    "nombre": "Colegio Gimnasio Modelia Real",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001025",
+    "nombre": "Colegio Integrado de Fontibón",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900031",
+    "nombre": "Colegio Luis Angel Arango",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001026",
+    "nombre": "Colegio Parroquial San Pedro Claver",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001027",
+    "nombre": "Colegio Privado Parroquial San José",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001028",
+    "nombre": "Colegio Santa Teresa Centro",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001029",
+    "nombre": "Concentración Escolar Batavia",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900033",
+    "nombre": "El Charco",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900032",
+    "nombre": "Ferrocaja",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100299",
+    "nombre": "Fontibón",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100301",
+    "nombre": "Hayuelos Centro Comercial",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900027",
+    "nombre": "Hayuelos Jumbo",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900028",
+    "nombre": "Integrado Sede B",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001030",
+    "nombre": "Jardín Infantil ACUNAR Sabana Grande",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001031",
+    "nombre": "Jardín Infantil Villa Andrea",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900024",
+    "nombre": "La Aldea",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900021",
+    "nombre": "La Felicidad",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100310",
+    "nombre": "La Giralda",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100308",
+    "nombre": "La Laguna",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001032",
+    "nombre": "Liceo Juvenil Moravia",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001033",
+    "nombre": "Liceo Navarra",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900023",
+    "nombre": "Modelia Real",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100305",
+    "nombre": "Modelia Sur",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900034",
+    "nombre": "Multiplaza",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900022",
+    "nombre": "Navarra Modelia",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900036",
+    "nombre": "Pablo Neruda",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001034",
+    "nombre": "Parqueadero Almacén Los Tres Elefantes",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001035",
+    "nombre": "Parqueadero Supermercado JUMBO",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100314",
+    "nombre": "Puente Grande",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100311",
+    "nombre": "Puerta De Teja",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900019",
+    "nombre": "Recodo",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900035",
+    "nombre": "Salitre Plaza",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001038",
+    "nombre": "Salón Comunal la Aldea",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001036",
+    "nombre": "Salón Comunal San José - El Jardín",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001037",
+    "nombre": "Salón Comunal Tres Estancias",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001039",
+    "nombre": "Salón Social Conjunto Residencial Fontibón Reservado",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100302",
+    "nombre": "San Pablo La Perla",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100306",
+    "nombre": "Santa Cecilia - Modelia",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900020",
+    "nombre": "Santa Teresa Centro",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001040",
+    "nombre": "Subdirección de Integración Social",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100313",
+    "nombre": "Tres Elefantes - La Esperanza",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900038",
+    "nombre": "Tres Estancias",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900025",
+    "nombre": "Van Uden",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100304",
+    "nombre": "Veracruz",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100303",
+    "nombre": "Versalles",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001041",
+    "nombre": "Vía Pública Colegio Distrital Villemar El Carmen Sede C",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001042",
+    "nombre": "Vía Pública Salón Múltiple Comunitario",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "09100300",
+    "nombre": "Villemar",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "9900018",
+    "nombre": "Zona Franca",
+    "localidad": "Fontibón"
+  },
+  {
+    "codigo": "001494",
+    "nombre": "Almacén Metro",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001495",
+    "nombre": "Almacén Metro Alquería",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700039",
+    "nombre": "Almenar",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700032",
+    "nombre": "Aloha",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700040",
+    "nombre": "Alqueria De La Fragua",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700009",
+    "nombre": "Avenida Boyaca Sur",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700021",
+    "nombre": "Banderas",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700060",
+    "nombre": "Bazaar Alsacia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700041",
+    "nombre": "Boita",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700006",
+    "nombre": "Britalia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700067",
+    "nombre": "C. Comercial Ciudad Tintal",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700057",
+    "nombre": "Campo Bello",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700011",
+    "nombre": "Carimagua",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700088",
+    "nombre": "Carlos Arango Vélez",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700027",
+    "nombre": "Carvajal II",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700005",
+    "nombre": "Casablanca 32",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700035",
+    "nombre": "Castilla",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700004",
+    "nombre": "Catalina",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001496",
+    "nombre": "Centro Comercial Ciudad Tintal",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001497",
+    "nombre": "Centro Comercial El Edén",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001498",
+    "nombre": "Centro Comercial Milenio Plaza",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001499",
+    "nombre": "Centro Comercial Plaza de Las Américas",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700080",
+    "nombre": "Centro Comercial Tintal Plaza",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001501",
+    "nombre": "Centro de Desarrollo Comunitario Kennedy",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700063",
+    "nombre": "Centro Desarrollo Comunitario Kennedy",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700001",
+    "nombre": "Class",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700082",
+    "nombre": "Codema",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700042",
+    "nombre": "Col de Timiza",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700048",
+    "nombre": "Col. Gabriel Betancourt Mejia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700052",
+    "nombre": "Colegio Class I.e.d Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700065",
+    "nombre": "Colegio Dario Echandia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700056",
+    "nombre": "Colegio Debora Arango",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001503",
+    "nombre": "Colegio Disitrital Nelson Mandela",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001504",
+    "nombre": "Colegio Distrital Alfonso López",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001505",
+    "nombre": "Colegio Distrital Alfonso López Pumarejo - Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001506",
+    "nombre": "Colegio Distrital Alquería",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001507",
+    "nombre": "Colegio Distrital Antonia Santos",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001509",
+    "nombre": "Colegio Distrital Cafam Bellavista",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001510",
+    "nombre": "Colegio Distrital Carlos Arango Vélez Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001511",
+    "nombre": "Colegio Distrital Ciudad de Techo",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001512",
+    "nombre": "Colegio Distrital Class",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001513",
+    "nombre": "Colegio Distrital Class - Sede B Roma",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001508",
+    "nombre": "Colegio Distrital CODEMA",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001514",
+    "nombre": "Colegio Distrital Darío Echandía",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001515",
+    "nombre": "Colegio Distrital Debora Arango Pérez",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001516",
+    "nombre": "Colegio Distrital Eduardo Umaña Luna",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001517",
+    "nombre": "Colegio Distrital El Japón",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001518",
+    "nombre": "Colegio Distrital Francisco Miranda",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001519",
+    "nombre": "Colegio Distrital Gabriel Betancourt Mejía",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001520",
+    "nombre": "Colegio Distrital Gran Britalia - Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001521",
+    "nombre": "Colegio Distrital Gustavo Rojas Pinilla",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001522",
+    "nombre": "Colegio Distrital Hernando Durán Dussan",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001523",
+    "nombre": "Colegio Distrital INEM Francisco de Paula Santander",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001524",
+    "nombre": "Colegio Distrital Inem Francisco De Paula Santander -Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001525",
+    "nombre": "Colegio Distrital Isabel II -  Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700075",
+    "nombre": "Colegio Distrital Jackeline",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001526",
+    "nombre": "Colegio Distrital Jackeline Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001527",
+    "nombre": "Colegio Distrital Jaime Garzón",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001528",
+    "nombre": "Colegio Distrital Jhon F. Kennedy",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001529",
+    "nombre": "Colegio Distrital Kennedy",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001530",
+    "nombre": "Colegio Distrital La Amistad",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001531",
+    "nombre": "Colegio Distrital La Amistad - Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001532",
+    "nombre": "Colegio Distrital La Chucua",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001533",
+    "nombre": "Colegio Distrital La Floresta Sur - Sede 1",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001534",
+    "nombre": "Colegio Distrital La Floresta Sur Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001535",
+    "nombre": "Colegio Distrital La Magdalena",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001536",
+    "nombre": "Colegio Distrital Las Américas - Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001537",
+    "nombre": "Colegio Distrital Las Américas - Sede B (San Rafaél)",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001538",
+    "nombre": "Colegio Distrital Los Héroes",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001539",
+    "nombre": "Colegio Distrital Los Periodistas",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001540",
+    "nombre": "Colegio Distrital Manuel Cepeda Vargas",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001541",
+    "nombre": "Colegio Distrital Manuel Zapata Olivella",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001542",
+    "nombre": "Colegio Distrital Marsella",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001543",
+    "nombre": "Colegio Distrital Nueva Castilla",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001544",
+    "nombre": "Colegio Distrital OEA",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001545",
+    "nombre": "Colegio Distrital Patio Bonito",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001546",
+    "nombre": "Colegio Distrital Paulo VI Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001547",
+    "nombre": "Colegio Distrital República de Finlandia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001549",
+    "nombre": "Colegio Distrital Rodrigo de Triana - Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001548",
+    "nombre": "Colegio Distrital Rodrigo Triana Sede A (Paraiso)",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001550",
+    "nombre": "Colegio Distrital Rómulo Gallegos",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001551",
+    "nombre": "Colegio Distrital Saludcoop Sur",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001552",
+    "nombre": "Colegio Distrital San José",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001553",
+    "nombre": "Colegio Distrital San José de Castilla - Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001554",
+    "nombre": "Colegio Distrital San José de Castilla - Sede C",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001555",
+    "nombre": "Colegio Distrital San Pedro Claver Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001556",
+    "nombre": "Colegio Distrital San Pedro Claver Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001557",
+    "nombre": "Colegio Distrital San Rafael Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001558",
+    "nombre": "Colegio Distrital Tom Adams",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001559",
+    "nombre": "Colegio Distrital Villa Rica - Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001560",
+    "nombre": "Colegio Distrital Villa Rica - Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700070",
+    "nombre": "Colegio Fe y Alegría",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001563",
+    "nombre": "Colegio Fernando Soto Aparicio – Nuevo Kennedy",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001562",
+    "nombre": "Colegio Fernando Soto Aparicio Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001564",
+    "nombre": "Colegio Gimnasio Moderno San Francisco El Tintal",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700051",
+    "nombre": "Colegio Gustavo Rojas Pinilla",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700096",
+    "nombre": "Colegio Integracion Moderna",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001565",
+    "nombre": "Colegio Isabel II",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700055",
+    "nombre": "Colegio Jaime Garzon",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700071",
+    "nombre": "Colegio Jean Piaget",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700074",
+    "nombre": "Colegio La Magdalena",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700076",
+    "nombre": "Colegio Luz Y Vida",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001566",
+    "nombre": "Colegio Militar Manuel Murillo Toro",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700050",
+    "nombre": "Colegio Nelson Mandela",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001567",
+    "nombre": "Colegio Nicolás Esguerra",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700025",
+    "nombre": "Colegio Oea",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700093",
+    "nombre": "Colegio Oea Antonia Santos",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001568",
+    "nombre": "Colegio OEA Sede  Antonia Santos",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001569",
+    "nombre": "Colegio Privado C.E.L.C.O. San Lucas",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001570",
+    "nombre": "Colegio Privado Ciudad de Fómeque",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001571",
+    "nombre": "Colegio Privado Cooperativo de Timiza",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001575",
+    "nombre": "Colegio Privado de Integración Moderna",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001572",
+    "nombre": "Colegio Privado El Castillo",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001573",
+    "nombre": "Colegio Privado Ernesto Guhl",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001574",
+    "nombre": "Colegio Privado Jean Piaget",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001576",
+    "nombre": "Colegio Próspero Pinzón",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700077",
+    "nombre": "Colegio Rafael Goberna",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700064",
+    "nombre": "Colegio Rodrigo Triana",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001578",
+    "nombre": "Colegio Rosa María de Gordillo",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001579",
+    "nombre": "Colegio Sagrado Corazón Sede Principal",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700073",
+    "nombre": "Colegio San Pedro Claver Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001580",
+    "nombre": "Colegio Superior Americano",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700045",
+    "nombre": "Dindalito",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700016",
+    "nombre": "El Japon",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700018",
+    "nombre": "El Saucedal",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001581",
+    "nombre": "Escuela Tecnológica Instituto Técnico Central",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700017",
+    "nombre": "Estados Unidos Super 13",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700038",
+    "nombre": "Favidi Vision De Colombia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700085",
+    "nombre": "Fernando Soto Aparicio",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700078",
+    "nombre": "Fernando Soto Aparicio Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700026",
+    "nombre": "Floralia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700020",
+    "nombre": "Francisco Jose De Caldas",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700053",
+    "nombre": "Gema",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001582",
+    "nombre": "Gimnasio Cristiano Luz y Vida Sede C",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700007",
+    "nombre": "Gran Colombiano",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001583",
+    "nombre": "Instituto Comercial Loreto de Castilla",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700091",
+    "nombre": "Isabel II",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700037",
+    "nombre": "Jairo Anibal Niño",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700084",
+    "nombre": "Kennedy Central",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700023",
+    "nombre": "Kennedy Ley",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700010",
+    "nombre": "La Chucua",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700030",
+    "nombre": "La Floresta Sur",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700015",
+    "nombre": "La Macarena",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700013",
+    "nombre": "La Uba",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700029",
+    "nombre": "Las Americas",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700044",
+    "nombre": "Las Palmeras",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700079",
+    "nombre": "Liceo El Castillo",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700092",
+    "nombre": "Liceo Reynel",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700024",
+    "nombre": "Los Heroes",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700008",
+    "nombre": "Los Periodistas",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700033",
+    "nombre": "Mandalay - Colegio Kennedy",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700059",
+    "nombre": "Manuel Cepeda",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700049",
+    "nombre": "Maria Paz",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700031",
+    "nombre": "Marsella",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700072",
+    "nombre": "Metro",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700047",
+    "nombre": "Milenio Plaza",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700089",
+    "nombre": "Nicolás Esguerra",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700019",
+    "nombre": "Patio Bonito",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700058",
+    "nombre": "Patios",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700003",
+    "nombre": "Perpetuo Socorro",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700034",
+    "nombre": "Pio XII",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001585",
+    "nombre": "Polideportivo Castilla",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001586",
+    "nombre": "Polideportivo Cayetano Cañizares",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700022",
+    "nombre": "Prospero Pinzon",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700002",
+    "nombre": "Roma",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700086",
+    "nombre": "Rosa Maria De Gordillo",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700081",
+    "nombre": "Sagrado Corazon Sede B",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001587",
+    "nombre": "Salón Comunal",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001588",
+    "nombre": "Salón Comunal Aloha",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001589",
+    "nombre": "Salón Comunal Andalucia II Sector",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001590",
+    "nombre": "Salón Comunal Boita 1 Sector",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700094",
+    "nombre": "Salón Comunal Boita II Sector",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700087",
+    "nombre": "Salón Comunal Carvajal Osorio",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001593",
+    "nombre": "Salón Comunal Casablanca 32",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001594",
+    "nombre": "Salón Comunal El Ruby II Sector",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001595",
+    "nombre": "Salón Comunal Floralia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001597",
+    "nombre": "Salón Comunal María Paz",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700090",
+    "nombre": "Salón Comunal Marsella",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001598",
+    "nombre": "Salón Comunal Monterrey",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700083",
+    "nombre": "Salon Comunal Roma IV",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001599",
+    "nombre": "Salón Comunal Roma IV Segundo Sector",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700095",
+    "nombre": "Salón Comunal Santa Catalina",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001601",
+    "nombre": "Salón Comunal Urbanización Villa Andrea",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001602",
+    "nombre": "Salón Comunal Villa Adriana",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001603",
+    "nombre": "Salón Comunal Villa Alsacia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001604",
+    "nombre": "Salón Comunal Villa Claudia",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700066",
+    "nombre": "San Francisco En El Tintal",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700061",
+    "nombre": "Santa Maria De Kennedy",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700014",
+    "nombre": "Santa Marta De Pastrana",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700068",
+    "nombre": "Tagaste",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700062",
+    "nombre": "Tequendama Paulo VI Sede A",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700069",
+    "nombre": "Tierra De Castillos",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700012",
+    "nombre": "Timiza",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700043",
+    "nombre": "Tintalito",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "001605",
+    "nombre": "Universidad Uniagustiniana",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700046",
+    "nombre": "Valladolid",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700028",
+    "nombre": "Villa Adriana",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700054",
+    "nombre": "Villa Rica",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0700036",
+    "nombre": "Villanueva",
+    "localidad": "Kennedy"
+  },
+  {
+    "codigo": "0300002",
+    "nombre": "Alcald�a Mayor",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "0300004",
+    "nombre": "Archivo Distrital",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "0300007",
+    "nombre": "Autonoma De Colombia",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "001357",
+    "nombre": "Colegio Distrital La Concordia",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "0300006",
+    "nombre": "Colegio Mayor San Bartolomé",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "0300003",
+    "nombre": "Egipto",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "0300008",
+    "nombre": "Egipto Escuela Quinta Diaz",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "001360",
+    "nombre": "Escuela Nacional de Comercio -  Sede B",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "001359",
+    "nombre": "Escuela Nacional de Comercio (Sede Bachillerato)",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "001361",
+    "nombre": "Fundación Universidad Autónoma de Colombia",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "0300001",
+    "nombre": "La Concordia",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "0300009",
+    "nombre": "La Salle Candelaria",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "001362",
+    "nombre": "Ministerio de las Tecnologías de la Información",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "0300005",
+    "nombre": "Murillo Toro",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "001363",
+    "nombre": "Parqueadero de La Alcaldía Mayor y Palacio de Justicia",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "001364",
+    "nombre": "Universidad de La Salle",
+    "localidad": "La Candelaria"
+  },
+  {
+    "codigo": "9900014",
+    "nombre": "Antonio Ricaurte",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001263",
+    "nombre": "Centro Comercial Mallplaza",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900008",
+    "nombre": "Centro Crecer",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900016",
+    "nombre": "Centro De Memoria",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001265",
+    "nombre": "Centro Educativo Distrital Eduardo Santos",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001266",
+    "nombre": "Centro Memoria",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001267",
+    "nombre": "Colegio Distrital Agustín Nieto Caballero",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001268",
+    "nombre": "Colegio Distrital Antonio Ricaurte",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001269",
+    "nombre": "Colegio Distrital Antonio Ricaurte - Sede A",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001270",
+    "nombre": "Colegio Distrital Eduardo Santos - Sede B - Primera Infancia",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001271",
+    "nombre": "Colegio Distrital Panamericano",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001272",
+    "nombre": "Colegio Distrital República Bolivariana de Venezuela - Sede A",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001273",
+    "nombre": "Colegio Distrital República Bolivariana de Venezuela - Sede B",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001274",
+    "nombre": "Colegio Distrital San Francisco de Asís - Sede B",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001275",
+    "nombre": "Colegio Distrital Técnico Menorah",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001276",
+    "nombre": "Colegio Nuestra Señora de la Presentación",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001277",
+    "nombre": "Colegio Privado Bilingüe CEDAM",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900003",
+    "nombre": "Colseguros",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900010",
+    "nombre": "Eduardo Santos",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900009",
+    "nombre": "El Vergel",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900004",
+    "nombre": "Estacion De La Sabana",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900006",
+    "nombre": "La Estanzuela",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900012",
+    "nombre": "La Rebeca",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900013",
+    "nombre": "Panamericano",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900005",
+    "nombre": "Ricaurte",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001279",
+    "nombre": "Salón Comunal",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001280",
+    "nombre": "Salón Comunal Barrio El Progreso",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900017",
+    "nombre": "Salón Comunal Santa Isabel",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "001278",
+    "nombre": "Salones de la Estación",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900002",
+    "nombre": "Samper Mendoza",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900011",
+    "nombre": "San Fason",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900015",
+    "nombre": "San Francisco De Asis",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900001",
+    "nombre": "Santa Fe",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "9900007",
+    "nombre": "Veraguas",
+    "localidad": "Mártires"
+  },
+  {
+    "codigo": "1800021",
+    "nombre": "Alcala",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001305",
+    "nombre": "Alcaldía Local de Puente Aranda",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800005",
+    "nombre": "Alcaldia Puente Aranda",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800020",
+    "nombre": "Alqueria",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800023",
+    "nombre": "Autopista Sur",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800025",
+    "nombre": "Carrera Centro Comercial",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001306",
+    "nombre": "Centro Comercial",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001307",
+    "nombre": "Centro Comercial Outlet Factory",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001308",
+    "nombre": "Centro Comercial Puerto López",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001309",
+    "nombre": "Centro De Rehabilitación Para Adultos Ciegos - CRAC",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800042",
+    "nombre": "Centro Para Ciegos - CRAC",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800002",
+    "nombre": "Ciudad Montes",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001310",
+    "nombre": "Colegio Ciudad Montes",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001311",
+    "nombre": "Colegio Distrital Andrés Bello",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001312",
+    "nombre": "Colegio Distrital Benjamín Herrera - Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001313",
+    "nombre": "Colegio Distrital Benjamín Herrera Sede A",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001314",
+    "nombre": "Colegio Distrital Centro Educativo España",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001315",
+    "nombre": "Colegio Distrital Cultura Popular Sede A",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001336",
+    "nombre": "Colegio Distrital de Cultura Popular - Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001316",
+    "nombre": "Colegio Distrital El Jazmín - Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001317",
+    "nombre": "Colegio Distrital España - Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001318",
+    "nombre": "Colegio Distrital Francisco José de Sucre",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001319",
+    "nombre": "Colegio Distrital Jazmín - Sede A",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001320",
+    "nombre": "Colegio Distrital José Joaquín Casas - Sede A",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001321",
+    "nombre": "Colegio Distrital José Joaquín Casas Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001322",
+    "nombre": "Colegio Distrital José Manuel Restrepo",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001323",
+    "nombre": "Colegio Distrital Julio Garavito - Sede A",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001324",
+    "nombre": "Colegio Distrital Julio Garavito Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001325",
+    "nombre": "Colegio Distrital Luis Carlos Galán",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001326",
+    "nombre": "Colegio Distrital Luis Vargas Tejada - Sede A",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001327",
+    "nombre": "Colegio Distrital Luis Vargas Tejada - Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001328",
+    "nombre": "Colegio Distrital Marco Antonio Carreño - Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001329",
+    "nombre": "Colegio Distrital Marco Antonio Carreño - Sede C",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001330",
+    "nombre": "Colegio Distrital Marco Antonio Carreño Sede A",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001331",
+    "nombre": "Colegio Distrital Rafaél Sorrento - Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001332",
+    "nombre": "Colegio Distrital Rómulo Gallego",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001333",
+    "nombre": "Colegio Distrital Silvera Espinosa Rendón - Sede C",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001334",
+    "nombre": "Colegio Distrital Silveria Espinosa Rendon - Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800035",
+    "nombre": "Colegio Distrital Sorrento",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001335",
+    "nombre": "Colegio Distrital Sorrento Sede A",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001337",
+    "nombre": "Colegio José Allamano",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001338",
+    "nombre": "Colegio Luis Carlos Galán Sarmiento Sede B",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001339",
+    "nombre": "Colegio Nacional de Cultura Popular",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800032",
+    "nombre": "Colegio R�mulo Gallego",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800013",
+    "nombre": "Colon",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800028",
+    "nombre": "Colonia Oriental",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800037",
+    "nombre": "Cultura Popular",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800007",
+    "nombre": "Cundinamarca",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800001",
+    "nombre": "Delicias (Muzu)",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800015",
+    "nombre": "El Jazmin",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800031",
+    "nombre": "El Remanzo",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800019",
+    "nombre": "El Tejar",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800017",
+    "nombre": "Galan",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800034",
+    "nombre": "Instituto de Integración Cultural",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800041",
+    "nombre": "Jorge Gaitan Cortes",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800004",
+    "nombre": "La Asuncion",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800008",
+    "nombre": "La Francia",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800016",
+    "nombre": "La Ponderosa",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800012",
+    "nombre": "La Pradera",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800006",
+    "nombre": "La Primavera",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800011",
+    "nombre": "La Trinidad",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001341",
+    "nombre": "Localidad Puente Aranda",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800039",
+    "nombre": "Los Angeles",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800024",
+    "nombre": "Los Sauces",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800036",
+    "nombre": "Luis Carlos Galan Sarmiento",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800018",
+    "nombre": "Milenta",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800040",
+    "nombre": "Plaza Central",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800030",
+    "nombre": "Primavera Y Gorgonzola",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800009",
+    "nombre": "Puente Aranda",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800010",
+    "nombre": "Salazar Gomez",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001342",
+    "nombre": "Salón Comunal Barrio Autopista Sur",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001343",
+    "nombre": "Salón Comunal Barrio Colón",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001344",
+    "nombre": "Salón Comunal Bochica Central",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001345",
+    "nombre": "Salón Comunal Colonia Oriental",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001346",
+    "nombre": "Salón Comunal José Antonio Galán",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001347",
+    "nombre": "Salón Comunal La Francia",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001348",
+    "nombre": "Salón Comunal La Trinidad",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001349",
+    "nombre": "Salón Comunal Nueva Primavera",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001350",
+    "nombre": "Salón Comunal Primavera y Gorgonzola",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001351",
+    "nombre": "Salón Comunal Rafael Eucaliptos",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001352",
+    "nombre": "Salón Comunal Torremolinos I",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800033",
+    "nombre": "Salon Comunal Veraguas",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001353",
+    "nombre": "Salón Comunal Veraguas Central",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001354",
+    "nombre": "Salón Comunal Villa Inés",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "001355",
+    "nombre": "Salón Comunal Villas del Rosario",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800027",
+    "nombre": "Sal�n Comunal Col�n",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800029",
+    "nombre": "Sal�n Comunal La Trinidad",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800026",
+    "nombre": "San Andresito",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800038",
+    "nombre": "San Eusebio",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800014",
+    "nombre": "San Rafael",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800003",
+    "nombre": "Santa Matilde",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1800022",
+    "nombre": "Santa Rita",
+    "localidad": "Puente Aranda"
+  },
+  {
+    "codigo": "1900010",
+    "nombre": "Alcald�a Quiroga",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900008",
+    "nombre": "Alejandro Obregon Gustavo Rest",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900016",
+    "nombre": "Alexander Fleming San Jorge",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900050",
+    "nombre": "Alianza Quiroga",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900003",
+    "nombre": "Bravo Paez",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900048",
+    "nombre": "Cafam Santa Luc�a",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900005",
+    "nombre": "Centenario",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900011",
+    "nombre": "Central Quiroga",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900021",
+    "nombre": "Ciudad Bochica Sur",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900001",
+    "nombre": "Claret",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001365",
+    "nombre": "Colegio Distrital  Alexander Fleming - sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001366",
+    "nombre": "Colegio Distrital  Restrepo Millán Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001367",
+    "nombre": "Colegio Distrital Alejandro Obregón",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001368",
+    "nombre": "Colegio Distrital Alexander Fleming - Sede B",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001369",
+    "nombre": "Colegio Distrital Alexander Fleming - Sede D",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001370",
+    "nombre": "Colegio Distrital Alfredo Iriarte - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001371",
+    "nombre": "Colegio Distrital Alfredo Iriarte - Sede C",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001372",
+    "nombre": "Colegio Distrital Alfredo Iriarte Sede B",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001373",
+    "nombre": "Colegio Distrital Alianza Quiroga",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001374",
+    "nombre": "Colegio Distrital Antonio Baraya -  Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001375",
+    "nombre": "Colegio Distrital Bravo Páez",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001376",
+    "nombre": "Colegio Distrital Cafam Santa Lucía",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001378",
+    "nombre": "Colegio Distrital Clemencia de Caycedo",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001377",
+    "nombre": "Colegio Distrital Clemencia Holguín de Urdaneta",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001379",
+    "nombre": "Colegio Distrital Colombia Viva - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001380",
+    "nombre": "Colegio Distrital Diana Turbay",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001381",
+    "nombre": "Colegio Distrital Diana Turbay - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001382",
+    "nombre": "Colegio Distrital El Libertador",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001383",
+    "nombre": "Colegio Distrital El Libertador Sede B",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001384",
+    "nombre": "Colegio Distrital Enrique Olaya Herrera",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001385",
+    "nombre": "Colegio Distrital Estados Unidos de América",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001386",
+    "nombre": "Colegio Distrital Gustavo Restrepo - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001387",
+    "nombre": "Colegio Distrital Gustavo Restrepo - Sedes B y C",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001388",
+    "nombre": "Colegio Distrital Integración Rafael Delgado Salguero",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001389",
+    "nombre": "Colegio Distrital José Marti - Sede B",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001390",
+    "nombre": "Colegio Distrital José Marti - Sede C",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001391",
+    "nombre": "Colegio Distrital José Marti - Sede D",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001392",
+    "nombre": "Colegio Distrital José Marti Sede A -  Luis López de Mesa",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001393",
+    "nombre": "Colegio Distrital La Paz",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001394",
+    "nombre": "Colegio Distrital Liceo Femenino Mercedes Nariño",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001395",
+    "nombre": "Colegio Distrital Manuel del Socorro Rodríguez - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001396",
+    "nombre": "Colegio Distrital Manuel del Socorro Rodríguez - Sede B",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001398",
+    "nombre": "Colegio Distrital María Cano",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001397",
+    "nombre": "Colegio Distrital Marruecos y Molinos - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001399",
+    "nombre": "Colegio Distrital Misael Pastrana Borrero",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001400",
+    "nombre": "Colegio Distrital Palermo Sur",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001402",
+    "nombre": "Colegio Distrital Rafael Delgado Salguero - Sede C",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001401",
+    "nombre": "Colegio Distrital Rafael Delgado Salguero (General Paez) - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001403",
+    "nombre": "Colegio Distrital Reino de Holanda - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001404",
+    "nombre": "Colegio Distrital Reino de Holanda - Sede B",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001406",
+    "nombre": "Colegio Distrital Restrepo Millán - Sede B",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001405",
+    "nombre": "Colegio Distrital Restrepo Millan - Sede C",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001407",
+    "nombre": "Colegio Distrital San Agustín - Sede A",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001408",
+    "nombre": "Colegio Distrital Toribio de Mogrovejo",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001409",
+    "nombre": "Colegio Liceo Psicopedagógico Marco Fidel Suárez",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001410",
+    "nombre": "Colegio Parroquial San José",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900014",
+    "nombre": "Country Sur",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900029",
+    "nombre": "Covivienda Del Suroriente",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900049",
+    "nombre": "Diana Turbay",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900019",
+    "nombre": "El Socorro Sur",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900051",
+    "nombre": "Estados Unidos De America",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900025",
+    "nombre": "Granjas De San Pablo",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900035",
+    "nombre": "Gustavo Restrepo",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001411",
+    "nombre": "IDIPRON UPI Molinos (Unidad de Prevención Infantil)",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900002",
+    "nombre": "Ingl�s",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001412",
+    "nombre": "Instituto San Pablo Apóstol - ISPA",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900044",
+    "nombre": "Integ. Rafael Delgado Salguero",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001413",
+    "nombre": "Integración Social Mi Taller Creativo",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900041",
+    "nombre": "La Marqueza",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900013",
+    "nombre": "Las Colinas",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900015",
+    "nombre": "Las Lomas",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900004",
+    "nombre": "Libertador II",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "19100235",
+    "nombre": "Liceo Psicopedagógico Marco F. Suárez",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001414",
+    "nombre": "Liceo Psicopedagógico San Pablo",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900046",
+    "nombre": "Liceo Psicopedag�gico Marco F. Su�rez",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900039",
+    "nombre": "Liceo San Pablo",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001415",
+    "nombre": "Localidad Rafaél Uribe Uribe",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900022",
+    "nombre": "Los Molinos II Sector",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900018",
+    "nombre": "Marco Fidel Su�rez",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900030",
+    "nombre": "Marruecos Apartamentos",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900047",
+    "nombre": "Mar�a Cano",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900032",
+    "nombre": "Mirador De Marruecos",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900020",
+    "nombre": "Molinos Del Sur",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900006",
+    "nombre": "Olaya",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900023",
+    "nombre": "Palermo Sur",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900045",
+    "nombre": "Parroquial San Jos�",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900034",
+    "nombre": "Providencia",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900009",
+    "nombre": "Quiroga",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900042",
+    "nombre": "Rafael Delgado Sede C",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900027",
+    "nombre": "Rafael Uribe La Paz",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900017",
+    "nombre": "Reino De Holanda",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900026",
+    "nombre": "Resurreccion",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001416",
+    "nombre": "Salón Comunal Cebadal",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001417",
+    "nombre": "Salón Comunal Claret",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001418",
+    "nombre": "Salón Comunal Diana T Sector Ayacucho",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001419",
+    "nombre": "Salón Comunal Ingles",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001420",
+    "nombre": "Salón Comunal La Marqueza",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001421",
+    "nombre": "Salón Comunal La Paz Naranjos",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001422",
+    "nombre": "Salón Comunal Marruecos",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001423",
+    "nombre": "Salón Comunal Mirador de Marrocos",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "001424",
+    "nombre": "Salón Comunal Villa Mayor La Nueva",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900040",
+    "nombre": "Sal�n Comunal Cebadal",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900037",
+    "nombre": "Sal�n Comunal Claret",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900036",
+    "nombre": "Sal�n Comunal Ingl�s",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900031",
+    "nombre": "Sal�n Comunal La Marqueza",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900043",
+    "nombre": "Sal�n Comunal La Paz Naranjos",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900028",
+    "nombre": "San Agustin Sur",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900038",
+    "nombre": "San Jorge",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900007",
+    "nombre": "San Jose",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900033",
+    "nombre": "San Juanito",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900012",
+    "nombre": "Santa Lucia",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900052",
+    "nombre": "Torre Mayor",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "1900024",
+    "nombre": "Villa Mayor La Nueva",
+    "localidad": "Rafael Uribe Uribe"
+  },
+  {
+    "codigo": "04100407",
+    "nombre": "20 De Julio Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "9900045",
+    "nombre": "Aguas Claras",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100398",
+    "nombre": "Altamira",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100406",
+    "nombre": "Arboleda Sur",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "9900042",
+    "nombre": "Atenas",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100042",
+    "nombre": "Bellavista San Cristobal",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100395",
+    "nombre": "Bello Horizonte",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100405",
+    "nombre": "Canada Guira",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001659",
+    "nombre": "Centro de Desarrollo Comunitario La Victoria",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001660",
+    "nombre": "Colegio Distrital  Altamira - Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001661",
+    "nombre": "Colegio Distrital 20 de Julio",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001662",
+    "nombre": "Colegio Distrital Aguas Claras",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001663",
+    "nombre": "Colegio Distrital Aldemar Rojas Plazas",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001664",
+    "nombre": "Colegio Distrital Alemania Unificada - Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001665",
+    "nombre": "Colegio Distrital Alemania Unificada Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001666",
+    "nombre": "Colegio Distrital Altamira Sur Oriental - Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001667",
+    "nombre": "Colegio Distrital Altamira Sur Oriental Sede C - República de Israel",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001668",
+    "nombre": "Colegio Distrital Canadá Guira - Sede C",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001669",
+    "nombre": "Colegio Distrital El Quindío - Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001670",
+    "nombre": "Colegio Distrital El Rodeo Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001671",
+    "nombre": "Colegio Distrital El Rodeo Sede B - La Gloria",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001672",
+    "nombre": "Colegio Distrital Entre Nubes Sur  Oriental Sede A - Anibal Fernández de Soto",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001673",
+    "nombre": "Colegio Distrital Francisco Javier Matiz",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001674",
+    "nombre": "Colegio Distrital Francisco Javier Matiz Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001675",
+    "nombre": "Colegio Distrital José Acevedo y Gómez - Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001676",
+    "nombre": "Colegio Distrital José Acevedo y Gómez Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001677",
+    "nombre": "Colegio Distrital José Castro Martínez - Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001678",
+    "nombre": "Colegio Distrital José Félix Restrepo - Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001679",
+    "nombre": "Colegio Distrital José Félix Restrepo - Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001680",
+    "nombre": "Colegio Distrital José Félix Restrepo - Sede C",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001684",
+    "nombre": "Colegio Distrital Juán Evangelista Gómez",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001681",
+    "nombre": "Colegio Distrital Juan Rey - Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001682",
+    "nombre": "Colegio Distrital Juana Escobar",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001683",
+    "nombre": "Colegio Distrital Juana Escobar - Sede C",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001685",
+    "nombre": "Colegio Distrital La Victoria Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001686",
+    "nombre": "Colegio Distrital La Victoria Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001687",
+    "nombre": "Colegio Distrital Los Alpes",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001688",
+    "nombre": "Colegio Distrital Los Libertadores",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001689",
+    "nombre": "Colegio Distrital Los Libertadores - Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001690",
+    "nombre": "Colegio Distrital Manuelita Sáenz",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001691",
+    "nombre": "Colegio Distrital Montebello",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001692",
+    "nombre": "Colegio Distrital Montebello Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001693",
+    "nombre": "Colegio Distrital Moralba Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001694",
+    "nombre": "Colegio Distrital Nueva Delhi",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001695",
+    "nombre": "Colegio Distrital Pantaleón Gaitán Pérez",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001696",
+    "nombre": "Colegio Distrital Rafael Nuñez",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001697",
+    "nombre": "Colegio Distrital República del Ecuador I.E.D.",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001698",
+    "nombre": "Colegio Distrital San Cristóbal Sur - Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001699",
+    "nombre": "Colegio Distrital San Critóbal - Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001700",
+    "nombre": "Colegio Distrital San isidro Sur Oriental - Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001701",
+    "nombre": "Colegio Distrital Tomás Rueda Vargas - Sede A - parte posterior",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001702",
+    "nombre": "Colegio Distrital Tomás Rueda Vargas Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001703",
+    "nombre": "Colegio Nueva Roma i.D.E.",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001705",
+    "nombre": "Colegio privado Salesiano Juan del Rizzo Sede B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001704",
+    "nombre": "Colegio San Vicente I.D.E.",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001706",
+    "nombre": "Coliseo Deportivo Primera de Mayo",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "9900040",
+    "nombre": "El Portal",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100044",
+    "nombre": "El Quindio",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "9900039",
+    "nombre": "El Rodeo Sede B La Gloria",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100412",
+    "nombre": "Escuela La Victoria B",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100411",
+    "nombre": "Guacamayas II",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100392",
+    "nombre": "Juan Del Rizzo",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100400",
+    "nombre": "Juan Rey",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100413",
+    "nombre": "Juana Escobar Sede A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "9900044",
+    "nombre": "La Belleza",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "9900041",
+    "nombre": "La Castaña",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100399",
+    "nombre": "La Gloria",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100047",
+    "nombre": "La Gloria- Escuela Altamira",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100043",
+    "nombre": "La Victoria A",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100386",
+    "nombre": "Las Brisas",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100388",
+    "nombre": "Las Mercedes",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001707",
+    "nombre": "Localidad San Cristobal",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100402",
+    "nombre": "Los Libertadores",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100393",
+    "nombre": "Montebello",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100397",
+    "nombre": "Parqueadero Guacamayas",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001708",
+    "nombre": "Polideportivo Coliseo Villa de Los Alpes",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100390",
+    "nombre": "Primera De Mayo",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100394",
+    "nombre": "Ramajal",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100048",
+    "nombre": "Ramajal Amapolas",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100045",
+    "nombre": "Republica Del Canada",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100414",
+    "nombre": "Roma Colsubsidio",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001709",
+    "nombre": "Salón Comunal Atenas",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001710",
+    "nombre": "Salón Comunal La Castaña",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001711",
+    "nombre": "Salón Comunal La Roca",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001712",
+    "nombre": "Salón Comunal San Isidro II Sector",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001714",
+    "nombre": "Salón Comunal Villa del Cerro",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001713",
+    "nombre": "Salón Comunal Villa Javier La María",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100389",
+    "nombre": "San Blas",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100040",
+    "nombre": "San Cristobal Sur",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100408",
+    "nombre": "San Gerónimo",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100396",
+    "nombre": "San Isidro",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100046",
+    "nombre": "San Juan Bosco Santa Ana",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100041",
+    "nombre": "San Martin De Loba Sur",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100403",
+    "nombre": "San Pedro Sur Oriental",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100410",
+    "nombre": "San Vicente Colsubsidio",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100387",
+    "nombre": "Santa Ana Sur",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100391",
+    "nombre": "Sosiego",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100409",
+    "nombre": "Suramérica",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100401",
+    "nombre": "Villa de los Alpes",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "04100404",
+    "nombre": "Villa Del Cerro",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "9900043",
+    "nombre": "Villa Javier La María",
+    "localidad": "San Cristóbal"
+  },
+  {
+    "codigo": "001636",
+    "nombre": "Antigua Escuela Santa Ines",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100005",
+    "nombre": "Biblioteca Distrital Antonio N",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001637",
+    "nombre": "Biblioteca Distrital Antonio Nariño",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100001",
+    "nombre": "Camilo Torres",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001638",
+    "nombre": "Centro Comercial El Gran San",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001639",
+    "nombre": "Centro Comercial San Martín",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001640",
+    "nombre": "Centro Comunitario Lourdes",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100007",
+    "nombre": "Centro Oriente",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001641",
+    "nombre": "Colegio Distrital Antonio José Uribe",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001642",
+    "nombre": "Colegio Distrital Aulas Colombianas - Sede A",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001643",
+    "nombre": "Colegio Distrital Efraín Cañavera - Sede B (Los Pinos)",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001644",
+    "nombre": "Colegio Distrital El Verjón Alto - Sede B (Verjón)",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001645",
+    "nombre": "Colegio Distrital Externado Camilo Torres",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001646",
+    "nombre": "Colegio Distrital Jorge Soto del Corral - Sede A",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001651",
+    "nombre": "Colegio Distrital la Giralda",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001647",
+    "nombre": "Colegio Distrital Los Ángeles - Sede B (Santa Inés)",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001648",
+    "nombre": "Colegio Distrital Manuel Elkin Patarroyo",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001649",
+    "nombre": "Colegio Distrital Popicarpa Salavarrieta - Sede A",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001650",
+    "nombre": "Colegio Distrital República de Argentina - Sede B (Policarpa Salavarrieta)",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100018",
+    "nombre": "Colegio La Giralda",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100017",
+    "nombre": "Colegio Ramón Jimeno",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100011",
+    "nombre": "El Consuelo",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100016",
+    "nombre": "El Gran San",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100015",
+    "nombre": "El Verjon",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100010",
+    "nombre": "Girardot",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100002",
+    "nombre": "La Perseverancia",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100013",
+    "nombre": "Las Aguas",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100009",
+    "nombre": "Las Cruces",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100014",
+    "nombre": "Las Nieves",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100006",
+    "nombre": "Los Laches",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100012",
+    "nombre": "Medicina Legal",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100004",
+    "nombre": "Palacio San Francisco",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001654",
+    "nombre": "Parqueadero primer piso edificio Julio Mario Santo Domingo Universidad de los Andes",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100003",
+    "nombre": "Policarpa Salavarrieta",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100008",
+    "nombre": "San Bernardo",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100020",
+    "nombre": "Univ. Incca De Colombia",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "0100019",
+    "nombre": "Univ. Jorge Tadeo Lozano",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001655",
+    "nombre": "Universidad Antonio Nariño",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001656",
+    "nombre": "Universidad Central",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001657",
+    "nombre": "Universidad INCCA de Colombia Sede XXX Aniversario",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "001658",
+    "nombre": "Universidad Jorge Tadeo Lozano (Parqueadero)",
+    "localidad": "Santa Fe"
+  },
+  {
+    "codigo": "1000046",
+    "nombre": "Aldea La Palma",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001128",
+    "nombre": "Almacén Éxito la Colina",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000058",
+    "nombre": "Almacen �xito La Colina",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001129",
+    "nombre": "Arturo Calle Torre Empresarial",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000062",
+    "nombre": "Biblioteca Julio Mario Santo D",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001130",
+    "nombre": "Biblioteca Julio Mario Santo Domingo",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000034",
+    "nombre": "Bosques De Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000059",
+    "nombre": "Carulla Rincon De La Colina",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000007",
+    "nombre": "Casablanca Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000078",
+    "nombre": "CC Parque La Colina",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000077",
+    "nombre": "CC Portoalegre",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001131",
+    "nombre": "Centro Comercial BIMA",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000011",
+    "nombre": "Centro Comercial Bulevar Niza",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001132",
+    "nombre": "Centro Comercial Centro Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000028",
+    "nombre": "Centro Comercial Mazuren",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000056",
+    "nombre": "Centro Comercial Niza",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001133",
+    "nombre": "Centro Comercial Outlet La Floresta",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001134",
+    "nombre": "Centro Comercial Parque La Colina",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000057",
+    "nombre": "Centro Comercial Paseo San Raf",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001135",
+    "nombre": "Centro Comercial Plaza Imperial",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001136",
+    "nombre": "Centro Comercial Portoalegre",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000086",
+    "nombre": "Centro Comercial Santafé",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001138",
+    "nombre": "Centro Educativo Distrital Don Bosco V",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000068",
+    "nombre": "Chorrillos",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001139",
+    "nombre": "Colegio Abraham Lincoln Sede Bachillerato",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001140",
+    "nombre": "Colegio Agustiniano Norte",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000005",
+    "nombre": "Colegio Alberto Lleras Camargo",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000084",
+    "nombre": "Colegio Alfonso Jaramillo",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "11100156",
+    "nombre": "Colegio Álvaro Gómez",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000076",
+    "nombre": "Colegio Caro Y Cuervo",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000030",
+    "nombre": "Colegio Celestin Freinet",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000082",
+    "nombre": "Colegio Del Bosque",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001202",
+    "nombre": "Colegio del Bosque - Universidad Antonio Nariño - Sede Bachillerato",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000032",
+    "nombre": "Colegio Delia Zapata Olivella",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001142",
+    "nombre": "Colegio Distrital  Simón Bolívar Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001143",
+    "nombre": "Colegio Distrital 21 Ángeles",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001144",
+    "nombre": "Colegio Distrital Alberto Lleras Camargo",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001181",
+    "nombre": "Colegio Distrital Álvaro Gómez Hurtado",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001182",
+    "nombre": "Colegio Distrital Álvaro Gómez Hurtado Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001145",
+    "nombre": "Colegio Distrital Anibal Fernández de Soto",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001146",
+    "nombre": "Colegio Distrital Compartir Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001147",
+    "nombre": "Colegio Distrital Delia Zapata Olivella",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001148",
+    "nombre": "Colegio Distrital El Salitre Suba - Sede C",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001149",
+    "nombre": "Colegio Distrital Gerardo Molina Ramírez",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001150",
+    "nombre": "Colegio Distrital Gerardo Paredes - Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001151",
+    "nombre": "Colegio Distrital Gonzalo Arango",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001152",
+    "nombre": "Colegio Distrital Gustavo Morales Morales",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001153",
+    "nombre": "Colegio Distrital Gustavo Morales Morales - Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001154",
+    "nombre": "Colegio Distrital Hunza - Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001155",
+    "nombre": "Colegio Distrital Hunza - Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001156",
+    "nombre": "Colegio Distrital Jorge Mario Bergoglio",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001157",
+    "nombre": "Colegio Distrital Juan Lozano y Lozano Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001158",
+    "nombre": "Colegio Distrital La Gaitana",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001159",
+    "nombre": "Colegio Distrital La Gaitana Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001160",
+    "nombre": "Colegio Distrital La Toscana Lisboa",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001161",
+    "nombre": "Colegio Distrital Lisboa - Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001162",
+    "nombre": "Colegio Distrital Nicolás Buenaventura",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001163",
+    "nombre": "Colegio Distrital Nicolás Buenaventura Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001164",
+    "nombre": "Colegio Distrital Nueva Colombia",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001165",
+    "nombre": "Colegio Distrital Nueva Zelandia",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001166",
+    "nombre": "Colegio Distrital Prado Veraniego I - Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001167",
+    "nombre": "Colegio Distrital Prado Veraniego II - Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001168",
+    "nombre": "Colegio Distrital Ramón de Subiría - Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001169",
+    "nombre": "Colegio Distrital Ramón de Subiría - Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001170",
+    "nombre": "Colegio Distrital República Dominicana",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001171",
+    "nombre": "Colegio Distrital República Dominicana Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001172",
+    "nombre": "Colegio Distrital Salitre Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001173",
+    "nombre": "Colegio Distrital Santa Rosa - Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001174",
+    "nombre": "Colegio Distrital Tibabuyes Universal",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001175",
+    "nombre": "Colegio Distrital Tibabuyes Universal Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001176",
+    "nombre": "Colegio Distrital Veintiún Ángeles",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001177",
+    "nombre": "Colegio Distrital Villa Elisa - Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001178",
+    "nombre": "Colegio Distrital Villa Elisa Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001179",
+    "nombre": "Colegio Distrital Virginia Gutiérrez de Pineda",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001180",
+    "nombre": "Colegio Distrital Vista Bella - Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001183",
+    "nombre": "Colegio Emmanuel D'alzon",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000045",
+    "nombre": "Colegio Eucarístico Mercedario",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001185",
+    "nombre": "Colegio Externado Caro y Cuervo",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001186",
+    "nombre": "Colegio Fe y Alegría",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000054",
+    "nombre": "Colegio Gerardo Molina",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000049",
+    "nombre": "Colegio Gonzalo Arango",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001187",
+    "nombre": "Colegio Hijas de Cristo Rey",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001188",
+    "nombre": "Colegio Instituto Técnico Distrital Julio Flórez - Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000075",
+    "nombre": "Colegio John Dewey",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000066",
+    "nombre": "Colegio Jorge Mario Bergoglio",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000038",
+    "nombre": "Colegio La Khumbre",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000080",
+    "nombre": "Colegio Marymount",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001190",
+    "nombre": "Colegio Máximino Poitiers",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000041",
+    "nombre": "Colegio Nicolas Buenaventura",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001191",
+    "nombre": "Colegio Nueva Zelandia Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "11100173",
+    "nombre": "Colegio Pedagógico Dulce María",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000052",
+    "nombre": "Colegio Pedag�gico Dulce Mar�a",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001192",
+    "nombre": "Colegio Privado Helvetia",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001196",
+    "nombre": "Colegio Privado la Khumbre",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001193",
+    "nombre": "Colegio Privado Liceo Arkadia Colombia Sede B",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001194",
+    "nombre": "Colegio Privado Pedagógico Dulce Maria",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001195",
+    "nombre": "Colegio Privado Santa Isabel de Hungría",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000063",
+    "nombre": "Colegio Rafael Maya",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "11100160",
+    "nombre": "Colegio República Dominicana",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000035",
+    "nombre": "Colegio Rep�blica Dominicana",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000002",
+    "nombre": "Colegio San José de Calasanz",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000061",
+    "nombre": "Colegio Santa Isabel De Hungria",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000083",
+    "nombre": "Colegio Santiago Alberioni",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000044",
+    "nombre": "Colegio Simon Bolivar Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "11100184",
+    "nombre": "Colegio Veintiún Ángeles",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000067",
+    "nombre": "Colegio Veinti�n �ngeles",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000003",
+    "nombre": "Colegio Villa Elisa Sedes C y D",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "11100169",
+    "nombre": "Colegio Virginia Gutiérrez",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000048",
+    "nombre": "Colegio Virginia Guti�rrez",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001201",
+    "nombre": "Colegio Vista Bella",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000031",
+    "nombre": "Colegio �lvaro G�mez",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000027",
+    "nombre": "Colegio-Hijas De Cristo Rey",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000060",
+    "nombre": "Colsubsidio Mazuren",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000050",
+    "nombre": "Corinto-Colegio Nueva Colombia",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000055",
+    "nombre": "El Batan",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000004",
+    "nombre": "El Rincon",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000019",
+    "nombre": "Floresta Norte-Julio Florez",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000074",
+    "nombre": "Floresta Outlet",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001204",
+    "nombre": "Fundación Colegio Marymount",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001205",
+    "nombre": "Fundación San Felipe Neri",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000024",
+    "nombre": "Fundacion Universi. Luis Amigo",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001206",
+    "nombre": "Fundación Universitaria Luis Amigó",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000043",
+    "nombre": "Fundaci�n San Felipe Neri",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000069",
+    "nombre": "Hunza Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001207",
+    "nombre": "Institución Educativa Compartir Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000053",
+    "nombre": "Instituci�n Educativa Compartir Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000065",
+    "nombre": "Instituto San Basilio",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000033",
+    "nombre": "La Aguadita",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000017",
+    "nombre": "La Alhambra Carulla",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000014",
+    "nombre": "La Conejera",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000025",
+    "nombre": "La Gaitana",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000051",
+    "nombre": "La Toscana-Col.fe Y Alegria",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000079",
+    "nombre": "Liceo De Londres",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000036",
+    "nombre": "Lisboa-Colegio Distrital Lisboa",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000085",
+    "nombre": "Mirandela - Nueva Zelandia",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000070",
+    "nombre": "M�ximino Poitiers",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000016",
+    "nombre": "Niza IX",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000021",
+    "nombre": "Nueva Zelandia",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001209",
+    "nombre": "Parque El Batán",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000001",
+    "nombre": "Parque Fundacion De Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001210",
+    "nombre": "Parque Fundacional de Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001211",
+    "nombre": "Parqueadero Carulla Calle 116",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001212",
+    "nombre": "Parqueadero Carulla Rincón de la Colina",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001213",
+    "nombre": "Parqueadero Centro Comercial Bulevar Niza",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001214",
+    "nombre": "Parqueadero Centro Comercial Mazurén",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001215",
+    "nombre": "Parqueadero Centro Comercial Niza",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001216",
+    "nombre": "Parqueadero Centro Comercial Paseo San Rafael",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001217",
+    "nombre": "Parqueadero los Tres Elefantes",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000020",
+    "nombre": "Pasadena-Los Tres Elefantes",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000012",
+    "nombre": "Pontevedra",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000010",
+    "nombre": "Prado Ciudad Jardin",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000009",
+    "nombre": "Prado Pinz�n",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000039",
+    "nombre": "Prado Sur",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000015",
+    "nombre": "Prado Veraniego",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000018",
+    "nombre": "Puente Largo-Emmanuel D.alzon",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "11100168",
+    "nombre": "Ramón De Zubiría Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000047",
+    "nombre": "Ram�n De Zubir�a Sede A",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000026",
+    "nombre": "Sabana De Tibabuyes",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000071",
+    "nombre": "Salón Comunal Aures II",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001219",
+    "nombre": "Salón Comunal Barrio San Francisco",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001220",
+    "nombre": "Salón Comunal Ciudad Jardín Norte",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001221",
+    "nombre": "Salón Comunal El Solar 1",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001222",
+    "nombre": "Salón Comunal San Pedro de Tibabuyes",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001223",
+    "nombre": "Salón Comunal Santa Cecilia",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001224",
+    "nombre": "Salón Comunal Suba Compartir 1",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001225",
+    "nombre": "Salón Comunal Villa Cindy",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001226",
+    "nombre": "Salón Comunal Villa Maria",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000073",
+    "nombre": "Sal�n Comunal Villa Cindy",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000072",
+    "nombre": "Sal�n Comunal Villa Maria",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000023",
+    "nombre": "San Cipriano",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "11100188",
+    "nombre": "San José Bavaria-Abraham Lincoln",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000081",
+    "nombre": "San Jos� Bavaria-Abraham Lincoln",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000022",
+    "nombre": "San Luis Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000013",
+    "nombre": "San Nicolas-Agustiniano Norte",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000042",
+    "nombre": "Suba San Francisco",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000064",
+    "nombre": "Suba Santa Cecilia",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000040",
+    "nombre": "Supercade Suba",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000029",
+    "nombre": "Tejares Norte",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000006",
+    "nombre": "Tibabuyes Universal",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001227",
+    "nombre": "UNIAGRARIA",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001228",
+    "nombre": "Universidad Pedagógica Nacional",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000037",
+    "nombre": "Universidad UDCA",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "001230",
+    "nombre": "Vía Pública",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "1000008",
+    "nombre": "Villa Del Prado-Uni. Agraria",
+    "localidad": "Suba"
+  },
+  {
+    "codigo": "2000003",
+    "nombre": "Betania",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "001954",
+    "nombre": "Colegio Campestre Jaime Garzón Sede Santa Rosa",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "2000004",
+    "nombre": "La Union",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "2000005",
+    "nombre": "La Ye Santa Rosa",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "2000002",
+    "nombre": "Nazareth",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "001959",
+    "nombre": "Salón Comunal de Betania",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "001955",
+    "nombre": "Salón Comunal La Unión",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "001956",
+    "nombre": "Salón Comunal Mario Upegui",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "001957",
+    "nombre": "Salón Comunal Nazareth",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "001958",
+    "nombre": "Salón Comunal Nueva Granada",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "2000001",
+    "nombre": "San Juan De Sumapaz",
+    "localidad": "Sumapaz"
+  },
+  {
+    "codigo": "1200024",
+    "nombre": "Acevedo Tejada",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001862",
+    "nombre": "Acueducto",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200011",
+    "nombre": "Belalcazar",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200025",
+    "nombre": "Biblioteca Virgilio Barco",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200008",
+    "nombre": "Cafam Calle 51",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001865",
+    "nombre": "Casa de la Cultura",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001866",
+    "nombre": "Centro Comercial Galerías",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001867",
+    "nombre": "Centro Educativo Libertad - CEL",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200014",
+    "nombre": "Centro Nari�o",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001868",
+    "nombre": "Centro Superior de Estudios en Administración Deportiva - CEAD (Frente al Col. Cubierto El Campín)",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200021",
+    "nombre": "Ciudad Salitre",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200010",
+    "nombre": "Colegio Americano",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001870",
+    "nombre": "Colegio Antonio Nariño",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001871",
+    "nombre": "Colegio Calazanz Femenino",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001872",
+    "nombre": "Colegio Champagnat",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001877",
+    "nombre": "Colegio de la Contraloría",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200027",
+    "nombre": "Colegio Del Pilar",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001873",
+    "nombre": "Colegio Distrital Manuela Beltrán",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001874",
+    "nombre": "Colegio Distrital Palermo",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001875",
+    "nombre": "Colegio Nuestra Señora del Pilar",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200030",
+    "nombre": "Colegio Santa Clara",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001864",
+    "nombre": "CORFERIAS",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200022",
+    "nombre": "Corpus Christi",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200001",
+    "nombre": "Divino Salvador",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200003",
+    "nombre": "El Campin",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200006",
+    "nombre": "El Salitre",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001878",
+    "nombre": "Escuela Superior de Administración Pública - ESAP",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "Teusaquillo",
+    "nombre": "Punto de votación 18",
+    "localidad": ""
+  },
+  {
+    "codigo": "001880",
+    "nombre": "Gimnasio Boyacá",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "13100204",
+    "nombre": "Gimnasio Centro Nariño",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200029",
+    "nombre": "Gimnasio Centro Nari�o",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001881",
+    "nombre": "Gimnasio Mackinley",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001882",
+    "nombre": "Hemeroteca Nacional",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200026",
+    "nombre": "Imprenta Nacional",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001884",
+    "nombre": "Instituto Distrital Manuela Beltrán",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200007",
+    "nombre": "La Esmeralda",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200017",
+    "nombre": "La Magdalena",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200023",
+    "nombre": "Liceo Parroquial Sara Zapata",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001886",
+    "nombre": "Liceo Universidad Católica",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200004",
+    "nombre": "Nicolas De Federman",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200005",
+    "nombre": "Pablo VI",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200019",
+    "nombre": "Pablo VI II Etapa",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200009",
+    "nombre": "Palermo",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001887",
+    "nombre": "Parqueadero Centro Médico Cafam",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001888",
+    "nombre": "Plazoleta Centro Comercial Gran Estación",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001889",
+    "nombre": "Plazoleta Pablo VI",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200012",
+    "nombre": "Quinta Paredes A",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200013",
+    "nombre": "Quinta Paredes B",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200020",
+    "nombre": "Rafael Nu�ez",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200015",
+    "nombre": "Residencias B.C.H.",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001890",
+    "nombre": "Salón Comunal Acevedo Tejada",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001891",
+    "nombre": "Salón Comunal Salitre Greco",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200002",
+    "nombre": "San Luis",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200016",
+    "nombre": "Santa Teresita",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001892",
+    "nombre": "Sistema Distrital de Servicio a la Ciudadanía - Supercade CAD",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001893",
+    "nombre": "Teatro Bernardo Romero Lozano",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200018",
+    "nombre": "Teusaquillo",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001894",
+    "nombre": "Universidad Antonio Nariño",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1200028",
+    "nombre": "Universidad Ecci",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001895",
+    "nombre": "Universidad ECCI - Sede G",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "001896",
+    "nombre": "Universidad Nacional - Auditorio Alfonso López Pumarejo",
+    "localidad": "Teusaquillo"
+  },
+  {
+    "codigo": "1700003",
+    "nombre": "Abraham Lincoln",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700025",
+    "nombre": "Alcaldia Local De Tunjuelito",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001759",
+    "nombre": "Casa de Justicia de Tunjuelito",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001760",
+    "nombre": "Centro Educativo Distrital Nuevo Tunjuelito (Rufino José de Cuervo Sede C)",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700020",
+    "nombre": "Col Cooperativo Venecia",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001761",
+    "nombre": "Colegio Cooperativo Nuevo MUZU",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001762",
+    "nombre": "Colegio Cooperativo Venecia",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001763",
+    "nombre": "Colegio Distrital Cecilia de la Fuente Lleras - Sede B (Rufino José de Cuervo)",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001765",
+    "nombre": "Colegio Distrital Ciudad de Bogotá - Sede A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001764",
+    "nombre": "Colegio Distrital Ciudad De Bogotá Sede B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001766",
+    "nombre": "Colegio Distrital Instituto Técnico Piloto Sede C",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001767",
+    "nombre": "Colegio Distrital Isla del Sol",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001768",
+    "nombre": "Colegio Distrital José Antonio Ricaurte",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001769",
+    "nombre": "Colegio Distrital José María Córdoba",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001770",
+    "nombre": "Colegio Distrital Rafaél Uribe Uribe - Sede B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001771",
+    "nombre": "Colegio Distrital Rufino José de Cuervo - Sede A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001772",
+    "nombre": "Colegio Distrital San Benito Abad",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001773",
+    "nombre": "Colegio Distrital San Carlos - Sede B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001774",
+    "nombre": "Colegio Distrital Santiago Pérez - Sede A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001775",
+    "nombre": "Colegio Distrital Santiago Pérez Sede B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001776",
+    "nombre": "Colegio Distrital Venecia - Sede A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001777",
+    "nombre": "Colegio Distrital Venecia - Sede B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001778",
+    "nombre": "Colegio Instituto Técnico Industrial Piloto Sede B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "Tunjuelito",
+    "nombre": "Punto de votación 21",
+    "localidad": ""
+  },
+  {
+    "codigo": "001780",
+    "nombre": "Colegio Nuestra Señora de Las Victorias",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001781",
+    "nombre": "Colegio Privado Parroquial San Carlos",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001782",
+    "nombre": "Colegio Santa Cecilia De Tunjuelito",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700021",
+    "nombre": "Cooperativo Nuevo Muzu",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700007",
+    "nombre": "El Carmen Sur A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700015",
+    "nombre": "El Carmen Sur B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700006",
+    "nombre": "El Tunal A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700014",
+    "nombre": "El Tunal B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001783",
+    "nombre": "Externado Porfirio Barba Jacob",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700002",
+    "nombre": "Fatima A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700016",
+    "nombre": "Fatima B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001784",
+    "nombre": "Instituto Técnico Industrial Piloto - Sede A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700011",
+    "nombre": "Isla Del Sol",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001785",
+    "nombre": "Jardín Infantil Carmen Sur",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700018",
+    "nombre": "Jardín Infantil Isla del Sol",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001787",
+    "nombre": "Jardín Infantil Pablo de Tarso",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700022",
+    "nombre": "Liceo Campestre CAFAM",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700019",
+    "nombre": "Liceo Santa Bernardita",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700023",
+    "nombre": "Nuestra Señora Las Victorias",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700017",
+    "nombre": "Nuevo Muzo B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700010",
+    "nombre": "Nuevo Muzu A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001790",
+    "nombre": "Polideportivo Nuevo Muzu",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700026",
+    "nombre": "Porfirio Barba Jacob",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "001791",
+    "nombre": "Salón Comuna Isla del Sol",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700005",
+    "nombre": "San Benito",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700004",
+    "nombre": "San Carlos",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700008",
+    "nombre": "San Vicente Ferrer",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700024",
+    "nombre": "Santa Cecilia De Tunjuelito",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700001",
+    "nombre": "Tunjuelito A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700013",
+    "nombre": "Tunjuelito B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700009",
+    "nombre": "Venecia A",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "1700012",
+    "nombre": "Venecia B",
+    "localidad": "Tunjuelito"
+  },
+  {
+    "codigo": "0100000-NUEVO",
+    "nombre": "Colegio Eucaristico Villa Guadalupe",
+    "localidad": "Usaquen"
+  },
+  {
+    "codigo": "01100456",
+    "nombre": "Alessandro Volta",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001897",
+    "nombre": "Almacén Carulla Calle 140 - Parqueadero",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100014",
+    "nombre": "Alta Blanca",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100006",
+    "nombre": "Altos De San Isidro",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "9900046",
+    "nombre": "Anglo Americano",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100447",
+    "nombre": "Aquileo Parra",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100001",
+    "nombre": "Barrancas",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100460",
+    "nombre": "Buen Consejo",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100454",
+    "nombre": "Buenavista",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100000",
+    "nombre": "Calazanz",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100455",
+    "nombre": "Canaima",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100463",
+    "nombre": "Cardenal Sancha",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100459",
+    "nombre": "Carulla 140",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100453",
+    "nombre": "Cedro Golf",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001898",
+    "nombre": "Centro Comercial Belaire Plaza",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001899",
+    "nombre": "Centro Comercial Hacienda Santa Bárbara",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001900",
+    "nombre": "Centro Comercial Palatino",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001901",
+    "nombre": "Centro de Atención Distrital Especializado Servitá",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001902",
+    "nombre": "Colegio Alessandro Volta",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001903",
+    "nombre": "Colegio Anglo Americano",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001904",
+    "nombre": "Colegio Buen Consejo",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001905",
+    "nombre": "Colegio Calasanz - Sede Norte",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001906",
+    "nombre": "Colegio Campestre San José",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001907",
+    "nombre": "Colegio Cardenal Sancha",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001908",
+    "nombre": "Colegio Colsubsidio Norte",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001937",
+    "nombre": "Colegio de La Presentación Sans Facon",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001909",
+    "nombre": "Colegio Distrital Agustín Fernández - Sede A",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001910",
+    "nombre": "Colegio Distrital Aquileo Parra",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001911",
+    "nombre": "Colegio Distrital Aquileo Parra Sede Primaria",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001912",
+    "nombre": "Colegio Distrital Cristóbal Colón",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001913",
+    "nombre": "Colegio Distrital Divino Maestro - Sede A",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001914",
+    "nombre": "Colegio Distrital Divino Maestro - Sede B",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001915",
+    "nombre": "Colegio Distrital Friedrich Nauman Sede A",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001916",
+    "nombre": "Colegio Distrital Friedrich Nauman Sede B",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001917",
+    "nombre": "Colegio Distrital General Santander",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001918",
+    "nombre": "Colegio Distrital La Equidad SALUDCOOP",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001919",
+    "nombre": "Colegio Distrital Nuevo Horizonte - Sede D Torca",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001920",
+    "nombre": "Colegio Distrital Nuevo Horizonte Sede A",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001921",
+    "nombre": "Colegio Distrital Salud Coop Norte",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001922",
+    "nombre": "Colegio Distrital Toberín - Sede A",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001923",
+    "nombre": "Colegio Distrital Toberín Sede B",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001924",
+    "nombre": "Colegio Distrital Unión Colombia - Sede A",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001925",
+    "nombre": "Colegio Distrital Unión Colombia - Sede B",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001926",
+    "nombre": "Colegio Distrital Usaquén - Sede A",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001927",
+    "nombre": "Colegio Esclavas del Sagrado Corazón",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001928",
+    "nombre": "Colegio La Estrellita (antes Don Bosco III)",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001929",
+    "nombre": "Colegio María Auxiliadora Norte",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001930",
+    "nombre": "Colegio Mayor José Celestino Mutis",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001931",
+    "nombre": "Colegio Monterrosales",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001933",
+    "nombre": "Colegio Privado Pureza de María",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001932",
+    "nombre": "Colegio PROVINMA",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100019",
+    "nombre": "Colegio San Francisco",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001934",
+    "nombre": "Colegio San Francisco de Asis",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100464",
+    "nombre": "Colegio Sans Facon",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001935",
+    "nombre": "Colegio Santa María",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "Usaquén",
+    "nombre": "Punto de votación 40",
+    "localidad": ""
+  },
+  {
+    "codigo": "01100015",
+    "nombre": "Colegio Toberin B",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100010",
+    "nombre": "Cristobal Colon",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100011",
+    "nombre": "Divino Maestro A",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100012",
+    "nombre": "Divino Maestro B",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100017",
+    "nombre": "El Codito",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100016",
+    "nombre": "El Pite",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100462",
+    "nombre": "Esclavas del Sagrado Corazón",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001938",
+    "nombre": "Escuela Colombiana de Rehabilitación",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001939",
+    "nombre": "Fundación Ana Restrepo del Corral",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100005",
+    "nombre": "Hacienda Santa Barbara",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100003",
+    "nombre": "Instituto Pedagógico",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001940",
+    "nombre": "Instituto Pedagógico Nacional",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100009",
+    "nombre": "La Carolina",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100021",
+    "nombre": "La Estrellita",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100013",
+    "nombre": "Las Margaritas",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100007",
+    "nombre": "Las Orquideas",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100448",
+    "nombre": "Lijacá",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100008",
+    "nombre": "Los Cedritos",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100002",
+    "nombre": "Los Cedritos 151",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001941",
+    "nombre": "Parque Cedritos",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001942",
+    "nombre": "Parque Cedro Golf",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001943",
+    "nombre": "Parqueadero",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001944",
+    "nombre": "Parqueadero Centro Comercial Cedritos 151",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001945",
+    "nombre": "Parqueadero Plaza México",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001946",
+    "nombre": "Parqueadero Unicentro",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100451",
+    "nombre": "Plaza México",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100020",
+    "nombre": "Plazoleta Santa Barbara",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "9900047",
+    "nombre": "Pureza De María",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001947",
+    "nombre": "Salón Comunal San Cristóbal Norte",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001948",
+    "nombre": "Salón Comunal Tibabita",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001949",
+    "nombre": "Salón Comunal Villa Nidia",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100018",
+    "nombre": "Saludcoop Norte",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100449",
+    "nombre": "San Antonio Unión Colombia",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100452",
+    "nombre": "Santa Paula",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100450",
+    "nombre": "Santo Tomás de Aquino",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100446",
+    "nombre": "Servitá",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100022",
+    "nombre": "Siervas San Jose La Calleja",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100458",
+    "nombre": "Torca",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100004",
+    "nombre": "Unicentro",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001950",
+    "nombre": "Universidad El Bosque",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100461",
+    "nombre": "Universidad Militar",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100445",
+    "nombre": "Usaquén",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "01100457",
+    "nombre": "Verbenal Santa María",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001951",
+    "nombre": "Vía Pública",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "001952",
+    "nombre": "Vía Pública Universidad Militar",
+    "localidad": "Usaquén"
+  },
+  {
+    "codigo": "0200030",
+    "nombre": "Alfonso Lopez",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200006",
+    "nombre": "Almirante Padilla",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200023",
+    "nombre": "Brasilia",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200035",
+    "nombre": "Brazuelos",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200027",
+    "nombre": "Cabañas",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200036",
+    "nombre": "Cdc Julio Cesar Sanchez",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001715",
+    "nombre": "Centro Comercial Altavista",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001716",
+    "nombre": "Centro de Desarrollo Comunitario Julio César Sánchez",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200010",
+    "nombre": "Chuniza",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200029",
+    "nombre": "Col. Fernando Gonzalez Ochoa",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001717",
+    "nombre": "Colegio Andrés Escobar",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001718",
+    "nombre": "Colegio Distrital  Fabio Lozano Simonelli - Sede B",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001719",
+    "nombre": "Colegio Distrital Almirante Padilla",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001720",
+    "nombre": "Colegio Distrital Atabanzha",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001721",
+    "nombre": "Colegio Distrital Brasilia",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001722",
+    "nombre": "Colegio Distrital Brazuelos",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001723",
+    "nombre": "Colegio Distrital Chuniza",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001724",
+    "nombre": "Colegio Distrital Ciudad de Villavicencio Sede A",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001725",
+    "nombre": "Colegio Distrital Diego Montaño Cuellar",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001726",
+    "nombre": "Colegio Distrital Eduardo Mora Osejo",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001727",
+    "nombre": "Colegio Distrital Eduardo Umaña Mendoza",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001728",
+    "nombre": "Colegio Distrital El Cortijo Vianey - Sede A",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001729",
+    "nombre": "Colegio Distrital El Cortijo Vianey Sede B",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001730",
+    "nombre": "Colegio Distrital El Destino",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001731",
+    "nombre": "Colegio Distrital El Hato",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001732",
+    "nombre": "Colegio Distrital El Virrey Solís",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001733",
+    "nombre": "Colegio Distrital Estanislao Zuleta Sede A",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001734",
+    "nombre": "Colegio Distrital Estanislao Zuleta Sede B",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001735",
+    "nombre": "Colegio Distrital Fabio Lozano Simonelli",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001736",
+    "nombre": "Colegio Distrital Federico García Lorca Sede A",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001737",
+    "nombre": "Colegio Distrital Federico Lorca Sede B",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001738",
+    "nombre": "Colegio Distrital Fernando González Ochoa",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001739",
+    "nombre": "Colegio Distrital Francisco Antonio Zea - Sede A",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001740",
+    "nombre": "Colegio Distrital Francisco Antonio Zea - Sede B",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001741",
+    "nombre": "Colegio Distrital Gabriel García Marquez",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001742",
+    "nombre": "Colegio Distrital Gran Yomasa",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001743",
+    "nombre": "Colegio Distrital La Aurora",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001744",
+    "nombre": "Colegio Distrital Los Comuneros",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001745",
+    "nombre": "Colegio Distrital Los Tejares Sede A",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001746",
+    "nombre": "Colegio Distrital Miguel de Cervantes Saavedra Sede A",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001747",
+    "nombre": "Colegio Distrital Nueva Esperanza",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001748",
+    "nombre": "Colegio Distrital Nuevo San Andrés de Los Altos",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001749",
+    "nombre": "Colegio Distrital Ofelia Uribe de Acosta",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001750",
+    "nombre": "Colegio Distrital Orlando Fals Borda",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001751",
+    "nombre": "Colegio Distrital Paulo Freire",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001752",
+    "nombre": "Colegio Distrital Rural El Uval",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001753",
+    "nombre": "Colegio Distrital Santa Marta",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001754",
+    "nombre": "Colegio Distrital Usminia - Sede B",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001755",
+    "nombre": "Colegio Distrital Villa Hermosa",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001756",
+    "nombre": "Colegio José Eustasio Rivera",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200018",
+    "nombre": "El Bosque",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200024",
+    "nombre": "El Cortijo",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200015",
+    "nombre": "El Danubio Azul",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200002",
+    "nombre": "El Destino",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200012",
+    "nombre": "El Hato",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200014",
+    "nombre": "El Virrey",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200026",
+    "nombre": "Gran Yomasa",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001757",
+    "nombre": "Jardín Infantil Entre Nubes",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "001758",
+    "nombre": "Jardín Infantil la Fortaleza del Oso",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200016",
+    "nombre": "Juan Jose Rondon",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200031",
+    "nombre": "La Alborada",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200009",
+    "nombre": "La Aurora",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200021",
+    "nombre": "La Fiscala",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200011",
+    "nombre": "La Flora",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200017",
+    "nombre": "La Fortaleza",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200013",
+    "nombre": "Los Comuneros",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200008",
+    "nombre": "Marichuela",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200003",
+    "nombre": "Monteblanco",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200038",
+    "nombre": "Nusadal",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200022",
+    "nombre": "Portal Usme",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200005",
+    "nombre": "Santa Librada",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200004",
+    "nombre": "Santa Marta",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200028",
+    "nombre": "Tejares",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200025",
+    "nombre": "Tenerife",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200001",
+    "nombre": "Usme",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200034",
+    "nombre": "Usme - Centro",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200007",
+    "nombre": "Usminia",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200032",
+    "nombre": "Uval - Puerta Al Llano",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200020",
+    "nombre": "Valles De Cafam",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200037",
+    "nombre": "Vía Al Llano",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200033",
+    "nombre": "Villa Alemania",
+    "localidad": "Usme"
+  },
+  {
+    "codigo": "0200019",
+    "nombre": "Villa Hermosa",
+    "localidad": "Usme"
+  }
+]
