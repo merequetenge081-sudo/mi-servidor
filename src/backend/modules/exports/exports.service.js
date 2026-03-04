@@ -3,10 +3,219 @@
  * Lógica de negocio para exportación de datos
  */
 
+import axios from 'axios';
+import ExcelJS from 'exceljs';
+import PDFDocument from 'pdfkit';
+import QRCode from 'qrcode';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import exportsRepository from './exports.repository.js';
-import ExcelJS from 'exceljs';
+import analyticsService from '../analytics/analytics.service.js';
+import advancedService from '../analytics/advanced.service.js';
+import { Event } from '../../../models/Event.js';
+import { Puestos } from '../../../models/Puestos.js';
+
+const logger = createLogger('ExportsService');
+
+function escapeCsvValue(value) {
+  const stringValue = value === null || value === undefined ? '' : String(value);
+  if (/[",\n\r]/.test(stringValue)) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+  return stringValue;
+}
+
+function buildRegistrationsCsv(registrations) {
+  const headers = [
+    'id',
+    'firstName',
+    'lastName',
+    'cedula',
+    'email',
+    'phone',
+    'leaderName',
+    'leaderId',
+    'eventId',
+    'localidad',
+    'puesto',
+    'mesa',
+    'createdAt'
+  ];
+
+  const rows = registrations.map((reg) => {
+    const leader = reg.leaderId || {};
+    const puesto = reg.puestoId || {};
+    return [
+      reg._id,
+      reg.firstName,
+      reg.lastName,
+      reg.cedula,
+      reg.email,
+      reg.phone,
+      reg.leaderName || leader.name,
+      leader._id || reg.leaderId,
+      reg.eventId,
+      reg.localidad || puesto.localidad,
+      reg.votingPlace || puesto.nombre || puesto.codigoPuesto,
+      reg.mesa || reg.votingTable,
+      reg.createdAt
+    ];
+  });
+
+  return [
+    headers.map(escapeCsvValue).join(','),
+    ...rows.map((row) => row.map(escapeCsvValue).join(','))
+  ].join('\n');
+}
+
+async function getQuickChartImage(config, width = 420, height = 280) {
+  try {
+    const payload = {
+      width,
+      height,
+      backgroundColor: 'transparent',
+      format: 'png',
+      chart: config
+    };
+
+    const response = await axios.post('https://quickchart.io/chart', payload, {
+      responseType: 'arraybuffer',
+      timeout: 15000
+    });
+
+    return Buffer.from(response.data);
+  } catch (error) {
+    logger.warn('No se pudo generar grafico QuickChart', { message: error.message });
+    return null;
+  }
+}
+
+export async function exportRegistrationsCSV(eventId = null) {
+  try {
+    logger.info('Exportando registraciones CSV', { eventId });
+    const registrations = await exportsRepository.getRegistrationsForExport(eventId);
+    return buildRegistrationsCsv(registrations);
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error exportando registraciones CSV', error);
+    throw AppError.serverError('Error al exportar CSV');
+  }
+}
+
+export async function exportRegistrationsExcel(eventId = null) {
+  try {
+    logger.info('Exportando registraciones Excel', { eventId });
+
+    const registrations = await exportsRepository.getRegistrationsForExport(eventId);
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Registrations');
+
+    sheet.columns = [
+      { header: 'ID', key: 'id', width: 28 },
+      { header: 'Nombre', key: 'firstName', width: 18 },
+      { header: 'Apellido', key: 'lastName', width: 18 },
+      { header: 'Cedula', key: 'cedula', width: 16 },
+      { header: 'Email', key: 'email', width: 24 },
+      { header: 'Telefono', key: 'phone', width: 16 },
+      { header: 'Lider', key: 'leaderName', width: 22 },
+      { header: 'Lider ID', key: 'leaderId', width: 18 },
+      { header: 'Evento', key: 'eventId', width: 18 },
+      { header: 'Localidad', key: 'localidad', width: 18 },
+      { header: 'Puesto', key: 'puesto', width: 24 },
+      { header: 'Mesa', key: 'mesa', width: 10 },
+      { header: 'Fecha', key: 'createdAt', width: 18 }
+    ];
+
+    registrations.forEach((reg) => {
+      const leader = reg.leaderId || {};
+      const puesto = reg.puestoId || {};
+
+      sheet.addRow({
+        id: reg._id,
+        firstName: reg.firstName,
+        lastName: reg.lastName,
+        cedula: reg.cedula,
+        email: reg.email,
+        phone: reg.phone,
+        leaderName: reg.leaderName || leader.name,
+        leaderId: leader._id || reg.leaderId,
+        eventId: reg.eventId,
+        localidad: reg.localidad || puesto.localidad,
+        puesto: reg.votingPlace || puesto.nombre || puesto.codigoPuesto,
+        mesa: reg.mesa || reg.votingTable,
+        createdAt: reg.createdAt
+      });
+    });
+
+    return await workbook.xlsx.writeBuffer();
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error exportando registraciones Excel', error);
+    throw AppError.serverError('Error al exportar Excel');
+  }
+}
+
+export async function exportLeadersExcel() {
+  try {
+    logger.info('Exportando lideres Excel');
+
+    const leaders = await exportsRepository.getLeadersForExport();
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Leaders');
+
+    sheet.columns = [
+      { header: 'Nombre', key: 'name', width: 24 },
+      { header: 'Email', key: 'email', width: 26 },
+      { header: 'Cedula', key: 'cedula', width: 16 },
+      { header: 'Especialidad', key: 'specialty', width: 18 },
+      { header: 'Evento Asignado', key: 'assignedEventId', width: 18 },
+      { header: 'Creado', key: 'createdAt', width: 18 }
+    ];
+
+    leaders.forEach((leader) => {
+      sheet.addRow({
+        name: leader.name,
+        email: leader.email,
+        cedula: leader.cedula,
+        specialty: leader.specialty,
+        assignedEventId: leader.assignedEventId,
+        createdAt: leader.createdAt
+      });
+    });
+
+    return await workbook.xlsx.writeBuffer();
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error exportando lideres Excel', error);
+    throw AppError.serverError('Error al exportar Excel de lideres');
+  }
+}
+
+export async function generatePuestoQR(puestoId) {
+  try {
+    if (!puestoId) throw AppError.badRequest('Puesto ID requerido');
+
+    const puesto = await Puestos.findById(puestoId).lean();
+    if (!puesto) throw AppError.notFound('Puesto');
+
+    const payload = {
+      puestoId: puesto._id,
+      codigoPuesto: puesto.codigoPuesto,
+      nombre: puesto.nombre,
+      localidad: puesto.localidad,
+      ciudad: puesto.ciudad,
+      departamento: puesto.departamento
+    };
+
+    return await QRCode.toDataURL(JSON.stringify(payload), { errorCorrectionLevel: 'M' });
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error generando QR', error);
+    throw AppError.serverError('Error al generar QR');
+  }
+}
+
+export async function generateReportPDF(options = {}) {
   try {
     const {
       eventId = null,
@@ -89,7 +298,6 @@ import ExcelJS from 'exceljs';
           doc.fillColor('#94a3b8').fontSize(10).font('Helvetica').text(subtitle, x + 25, y + 85);
         };
 
-        // Page 1
         doc.rect(0, 0, 842, 595).fill('#f8fafc');
         drawHeader('INFORME EJECUTIVO PROFESIONAL');
         drawKPIBox(40, 150, 'REGISTROS', totalRegistrations.toLocaleString('es-CO'), 'Evento seleccionado', '#16a34a');
@@ -106,10 +314,8 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
         );
         doc.fillColor('#334155').fontSize(13).font('Helvetica-Bold').text('SINTESIS', 40, 426);
         doc.fillColor('#1e293b').fontSize(10).font('Helvetica').text(
-          `- Tendencia 30 dias: ${trendDirection} (${trendPct.toFixed(2)}%)
-` +
-          `- Proyeccion objetivo: ${(simulationData?.projectedTotal || 0).toLocaleString('es-CO')}
-` +
+          `- Tendencia 30 dias: ${trendDirection} (${trendPct.toFixed(2)}%)\n` +
+          `- Proyeccion objetivo: ${(simulationData?.projectedTotal || 0).toLocaleString('es-CO')}\n` +
           `- Top lider: ${simulationData?.topLeader || 'N/D'} (${simulationData?.topLeaderVotes || 0})`,
           50, 448, { width: 400, lineGap: 5 }
         );
@@ -126,7 +332,6 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
         if (kpiDonut) doc.image(kpiDonut, 500, 320, { width: 280 });
         drawFooter(1);
 
-        // Page 2
         doc.addPage({ margin: 0, size: [842, 595], layout: 'landscape' });
         doc.rect(0, 0, 842, 595).fill('#f8fafc');
         drawHeader('ANALISIS AVANZADO TERRITORIAL');
@@ -158,7 +363,6 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
         );
         drawFooter(2);
 
-        // Page 3
         doc.addPage({ margin: 0, size: [842, 595], layout: 'landscape' });
         doc.rect(0, 0, 842, 595).fill('#f8fafc');
         drawHeader('RENDIMIENTO DE LIDERES');
@@ -190,7 +394,6 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
         });
         drawFooter(3);
 
-        // Page 4
         doc.addPage({ margin: 0, size: [842, 595], layout: 'landscape' });
         doc.rect(0, 0, 842, 595).fill('#f8fafc');
         drawHeader('TENDENCIAS Y PROYECCION');
@@ -210,23 +413,14 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
         doc.rect(565, 145, 240, 260).fill('#ffffff');
         doc.fillColor('#0f172a').fontSize(12).font('Helvetica-Bold').text('Proyeccion', 580, 165);
         doc.fillColor('#334155').fontSize(10).font('Helvetica').text(
-          `Actual: ${(simulationData?.currentTotal || 0).toLocaleString('es-CO')}
-` +
-          `Ritmo diario: ${(simulationData?.dailyGrowthRate || 0).toFixed(1)}
-` +
-          `Dias restantes: ${simulationData?.daysRemaining || 0}
-` +
-          `Proy. 30 dias: ${(simulationData?.projection30Days || 0).toLocaleString('es-CO')}
-` +
-          `Proy. 60 dias: ${(simulationData?.projection60Days || 0).toLocaleString('es-CO')}
-` +
-          `Total objetivo: ${(simulationData?.projectedTotal || 0).toLocaleString('es-CO')}
-
-` +
-          `Top puesto: ${simulationData?.topPuesto || 'N/D'} (${simulationData?.topPuestoVotes || 0})
-` +
-          `Top localidad: ${simulationData?.topLocalidad || 'N/D'} (${simulationData?.topLocalidadVotes || 0})
-` +
+          `Actual: ${(simulationData?.currentTotal || 0).toLocaleString('es-CO')}\n` +
+          `Ritmo diario: ${(simulationData?.dailyGrowthRate || 0).toFixed(1)}\n` +
+          `Dias restantes: ${simulationData?.daysRemaining || 0}\n` +
+          `Proy. 30 dias: ${(simulationData?.projection30Days || 0).toLocaleString('es-CO')}\n` +
+          `Proy. 60 dias: ${(simulationData?.projection60Days || 0).toLocaleString('es-CO')}\n` +
+          `Total objetivo: ${(simulationData?.projectedTotal || 0).toLocaleString('es-CO')}\n\n` +
+          `Top puesto: ${simulationData?.topPuesto || 'N/D'} (${simulationData?.topPuestoVotes || 0})\n` +
+          `Top localidad: ${simulationData?.topLocalidad || 'N/D'} (${simulationData?.topLocalidadVotes || 0})\n` +
           `Top lider: ${simulationData?.topLeader || 'N/D'} (${simulationData?.topLeaderVotes || 0})`,
           580, 188, { width: 210, lineGap: 4 }
         );
@@ -246,4 +440,12 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
     logger.error('Error generando reporte PDF profesional', error);
     throw AppError.serverError('Error al generar PDF profesional en el servidor');
   }
-    logger.error('Error generando reporte PDF profesional', error);
+}
+
+export default {
+  exportRegistrationsCSV,
+  exportRegistrationsExcel,
+  exportLeadersExcel,
+  generatePuestoQR,
+  generateReportPDF
+};
