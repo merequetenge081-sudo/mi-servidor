@@ -412,6 +412,7 @@ export class RegistrationService {
           });
           continue;
         }
+        existingCedulasSet.add(cedulaStr);
 
         // ========== STEP 4: Fuzzy matching y autocorrección ==========
         let puestoId = null;
@@ -482,8 +483,8 @@ export class RegistrationService {
           firstName: reg.firstName.toString().trim(),
           lastName: reg.lastName.toString().trim(),
           cedula: cedulaStr,
-          email: reg.email.toString().trim(),
-          phone: reg.phone.toString().trim(),
+          email: reg.email ? reg.email.toString().trim() : "",
+          phone: reg.phone ? reg.phone.toString().trim() : "",
           votingPlace: votingPlace,
           puestoId: puestoId,
           mesa: mesa,

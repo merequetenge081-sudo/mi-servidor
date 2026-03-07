@@ -289,7 +289,7 @@ export class RegistrationController {
       if (!assignedEventId) {
         // Fallback robusto al primer evento activo global o ignorar si no hay
         const { default: mongoose } = await import('mongoose');
-        const Event = mongoose.model('Event');
+        const { Event } = await import('../../../models/index.js');
         const activeEvent = await Event.findOne({ status: 'active', organizationId: req.orgId }).lean();
         if (activeEvent) {
           assignedEventId = activeEvent._id;
