@@ -27,6 +27,8 @@ export const auth = {
     this.user = null;
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("admin_token");
+    sessionStorage.removeItem("admin_token");
   },
 
   isAuthenticated() {

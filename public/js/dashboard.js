@@ -2448,10 +2448,12 @@ async function confirmLogout() {
     localStorage.removeItem('username');
     localStorage.removeItem('leaderId');
     localStorage.removeItem('lastActivity');
+    localStorage.removeItem('admin_token');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('eventId');
     sessionStorage.removeItem('username');
+    sessionStorage.removeItem('admin_token');
     window.location.href = '/';
 }
 window.confirmLogout = confirmLogout;

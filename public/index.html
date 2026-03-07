@@ -967,6 +967,8 @@
 
                 if (res.ok && data.token) {
                     adminToken = data.token;
+                    localStorage.removeItem('admin_token');
+                    sessionStorage.removeItem('admin_token');
                     // Guardar token en ambos localStorage y sessionStorage para máxima compatibilidad
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('role', 'admin');
@@ -1038,6 +1040,8 @@
                         localStorage.setItem('temp_token', data.token);
                         window.location.href = `/reset-password.html?token=${data.token}&force=true`;
                     } else {
+                        localStorage.removeItem('admin_token');
+                        sessionStorage.removeItem('admin_token');
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('role', 'leader');
                         localStorage.setItem('leaderId', data.leaderId || '');

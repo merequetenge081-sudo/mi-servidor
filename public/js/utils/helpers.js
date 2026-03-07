@@ -208,11 +208,13 @@ const Helpers = {
         localStorage.removeItem('lastActivity');
         localStorage.removeItem('darkMode');
         localStorage.removeItem('sidebarCollapsed');
+        localStorage.removeItem('admin_token');
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('role');
         sessionStorage.removeItem('eventId');
         sessionStorage.removeItem('username');
         sessionStorage.removeItem('darkMode');
+        sessionStorage.removeItem('admin_token');
         window.location.href = '/';
     },
 

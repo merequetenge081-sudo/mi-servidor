@@ -49,10 +49,12 @@ export class StorageManager {
         localStorage.removeItem('leaderId');
         localStorage.removeItem('role');
         localStorage.removeItem('username');
+        localStorage.removeItem('admin_token');
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('leaderId');
         sessionStorage.removeItem('role');
         sessionStorage.removeItem('username');
+        sessionStorage.removeItem('admin_token');
     }
 }
 

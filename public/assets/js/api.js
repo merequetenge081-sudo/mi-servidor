@@ -128,10 +128,12 @@ function logout() {
   localStorage.removeItem("user");
   localStorage.removeItem("role");
   localStorage.removeItem("username");
+  localStorage.removeItem("admin_token");
   sessionStorage.removeItem("token");
   sessionStorage.removeItem("user");
   sessionStorage.removeItem("role");
   sessionStorage.removeItem("username");
+  sessionStorage.removeItem("admin_token");
   window.location.href = "/";
 }
 
