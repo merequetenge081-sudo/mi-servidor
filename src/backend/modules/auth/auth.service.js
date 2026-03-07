@@ -422,8 +422,10 @@ export async function impersonateLeader(adminUser, adminPassword, leaderId) {
     const token = jwt.sign(
       {
         userId: leader._id,
-          leaderId: leader._id,
-          role: 'leader',
+        leaderId: leader._id,
+        role: 'leader',
+        email: leader.email,
+        name: leader.name,
         organizationId: leader.organizationId
       },
       config.jwtSecret,
