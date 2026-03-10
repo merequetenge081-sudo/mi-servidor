@@ -67,6 +67,12 @@
                         <span>Exportar</span>
                     </a>
                 </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="validacion-datos-reales">
+                        <i class="bi bi-patch-check-fill"></i>
+                        <span>Confirmacion E14</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -246,7 +252,10 @@
             <!-- LEADERS SECTION -->
             <section id="leaders" class="section">
                 <div class="section-header">
-                    <h2>Gestión de Líderes</h2>
+                    <div class="section-title-group">
+                        <h2>Gestión de Líderes</h2>
+                        <p class="section-subtitle">Monitorea desempeño, credenciales y operación por líder del evento.</p>
+                    </div>
                     <div class="header-actions">
                         <input type="text" id="leaderSearchInput" class="search-input" placeholder="Buscar líder...">
                         <button class="btn btn-primary" id="newLeaderBtn">
@@ -413,30 +422,30 @@
             <section id="analytics" class="section">
                 <div class="section-header">
                     <h2>Análisis y Reportes</h2>
-                    <p style="color: #999; margin: 8px 0 0 0; font-size: 13px;">Análisis de registraciones por región, líder y confirmación</p>
+                    <p class="analytics-subtitle">Análisis de registraciones por región, líder y confirmación</p>
                 </div>
 
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 4px solid #667eea;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <div class="analytics-filter-panel">
+                    <div class="analytics-filter-grid">
                         <div>
-                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Región</label>
-                            <select id="analyticsRegionFilter" class="form-select" style="font-size: 14px;">
+                            <label class="analytics-filter-label">Región</label>
+                            <select id="analyticsRegionFilter" class="form-select analytics-filter-control">
                                 <option value="all">Todo el País</option>
                                 <option value="bogota">Solo Bogotá</option>
                                 <option value="resto">Resto del País</option>
                             </select>
                         </div>
                         <div>
-                            <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 6px;">Líder</label>
-                            <select id="analyticsLeaderFilter" class="form-select" style="font-size: 14px;">
+                            <label class="analytics-filter-label">Líder</label>
+                            <select id="analyticsLeaderFilter" class="form-select analytics-filter-control">
                                 <!-- Populated -->
                             </select>
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: flex-end;">
-                            <button class="btn btn-primary" id="applyAnalyticsFilterBtn" style="flex: 1; font-size: 14px;">
+                        <div class="analytics-filter-actions">
+                            <button class="btn btn-primary analytics-filter-btn" id="applyAnalyticsFilterBtn">
                                 <i class="bi bi-funnel"></i> Aplicar
                             </button>
-                            <button class="btn btn-outline" id="clearAnalyticsFilterBtn" style="flex: 1; font-size: 14px;">
+                            <button class="btn btn-outline analytics-filter-btn" id="clearAnalyticsFilterBtn">
                                 <i class="bi bi-arrow-clockwise"></i> Limpiar
                             </button>
                         </div>
@@ -444,40 +453,40 @@
                 </div>
 
                 <!-- KPI Cards -->
-                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 24px;">
-                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 100%); border-left: 4px solid #667eea;">
+                <div class="stats-grid analytics-kpi-grid">
+                    <div class="stat-card analytics-kpi analytics-kpi-primary">
                         <div class="stat-info">
-                            <h3 id="avgConfirmRate" style="margin: 0 0 8px 0; font-size: 32px; color: #667eea;">0%</h3>
-                            <span style="color: #666; font-size: 13px;">Tasa Confirmación</span>
+                            <h3 id="avgConfirmRate" class="analytics-kpi-value analytics-kpi-value-primary">0%</h3>
+                            <span class="analytics-kpi-label">Tasa Confirmación</span>
                         </div>
                     </div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.05) 100%); border-left: 4px solid #43e97b;">
+                    <div class="stat-card analytics-kpi analytics-kpi-success">
                         <div class="stat-info">
-                            <h3 id="avgRegsPerLeader" style="margin: 0 0 8px 0; font-size: 32px; color: #43e97b;">0</h3>
-                            <span style="color: #666; font-size: 13px;">Total Registros</span>
+                            <h3 id="avgRegsPerLeader" class="analytics-kpi-value analytics-kpi-value-success">0</h3>
+                            <span class="analytics-kpi-label">Total Registros</span>
                         </div>
                     </div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(63, 81, 181, 0.05) 100%); border-left: 4px solid #4facfe;">
+                    <div class="stat-card analytics-kpi analytics-kpi-info">
                         <div class="stat-info">
-                            <h3 id="bogotaCount" style="margin: 0 0 8px 0; font-size: 32px; color: #4facfe;">0</h3>
-                            <span style="color: #666; font-size: 13px;">Bogotá</span>
+                            <h3 id="bogotaCount" class="analytics-kpi-value analytics-kpi-value-info">0</h3>
+                            <span class="analytics-kpi-label">Bogota (Registros)</span>
                         </div>
                     </div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 87, 34, 0.05) 100%); border-left: 4px solid #ffa726;">
+                    <div class="stat-card analytics-kpi analytics-kpi-warning">
                         <div class="stat-info">
-                            <h3 id="restoCount" style="margin: 0 0 8px 0; font-size: 32px; color: #ffa726;">0</h3>
-                            <span style="color: #666; font-size: 13px;">Resto País</span>
+                            <h3 id="restoCount" class="analytics-kpi-value analytics-kpi-value-warning">0</h3>
+                            <span class="analytics-kpi-label">Resto Pais (Registros)</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Charts Row -->
-                <div class="dashboard-row" style="margin-bottom: 24px;">
+                <div class="dashboard-row analytics-row-spacing">
                     <div class="chart-container full-width">
-                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
-                            <i class="bi bi-bar-chart" style="color: #667eea; margin-right: 8px;"></i>Desempeño por Líder
+                        <h3 class="analytics-block-title">
+                            <i class="bi bi-bar-chart analytics-title-icon"></i>Desempeño por Líder
                         </h3>
-                        <div class="chart-wrapper" style="height: 350px;">
+                        <div class="chart-wrapper analytics-chart-medium">
                             <canvas id="leaderRegistrationsChart"></canvas>
                         </div>
                     </div>
@@ -486,38 +495,38 @@
                 <!-- Analytics Table and Chart Row -->
                 <div class="dashboard-row">
                     <div class="table-container half-width">
-                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
-                            <i class="bi bi-list-ol" style="color: #667eea; margin-right: 8px;"></i>Detalle por Líder
+                        <h3 class="analytics-block-title">
+                            <i class="bi bi-list-ol analytics-title-icon"></i>Detalle por Líder
                         </h3>
-                        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                            <table class="table" style="font-size: 14px; margin-bottom: 0;">
-                                <thead style="position: sticky; top: 0; background: #f8f9fa;">
+                        <div class="table-responsive analytics-table-scroll">
+                            <table class="table analytics-detail-table">
+                                <thead class="analytics-table-head">
                                     <tr>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb;">Líder</th>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Total</th>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Conf.</th>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">Pend.</th>
-                                        <th style="font-weight: 600; color: #1f2937; border-bottom: 2px solid #e5e7eb; text-align: center;">%</th>
+                                        <th class="analytics-th-left">Líder</th>
+                                        <th class="analytics-th-center">Total</th>
+                                        <th class="analytics-th-center">Conf.</th>
+                                        <th class="analytics-th-center">Pend.</th>
+                                        <th class="analytics-th-center">%</th>
                                     </tr>
                                 </thead>
-                                <tbody id="leaderDetailTable" style="font-size: 13px;"></tbody>
+                                <tbody id="leaderDetailTable" class="analytics-detail-body"></tbody>
                             </table>
                         </div>
-                        <div style="display: flex; justify-content: center; gap: 12px; padding: 12px 0; border-top: 1px solid #e5e7eb; margin-top: 12px;">
-                            <button id="prevLeaderPageBtn" class="page-btn" style="padding: 6px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; color: #667eea;">
+                        <div class="analytics-pager-row">
+                            <button id="prevLeaderPageBtn" class="page-btn analytics-pager-btn">
                                 <i class="bi bi-chevron-left"></i>
                             </button>
-                            <span id="leaderPageIndicator" style="align-self: center; font-size: 12px; color: #666; min-width: 70px; text-align: center;">Pág 1</span>
-                            <button id="nextLeaderPageBtn" class="page-btn" style="padding: 6px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; color: #667eea;">
+                            <span id="leaderPageIndicator" class="analytics-pager-indicator">Pág 1</span>
+                            <button id="nextLeaderPageBtn" class="page-btn analytics-pager-btn">
                                 <i class="bi bi-chevron-right"></i>
                             </button>
                         </div>
                     </div>
                     <div class="chart-container half-width">
-                        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
-                            <i class="bi bi-geo-alt" style="color: #667eea; margin-right: 8px;"></i>Top 10 Ubicaciones
+                        <h3 class="analytics-block-title">
+                            <i class="bi bi-geo-alt analytics-title-icon"></i>Top 10 Ubicaciones (Subconjunto)
                         </h3>
-                        <div class="chart-wrapper" style="height: 350px;">
+                        <div class="chart-wrapper analytics-chart-medium">
                             <canvas id="localityChart"></canvas>
                         </div>
                     </div>
@@ -529,6 +538,14 @@
                 <div class="section-header">
                     <h2>Centro de Descargas</h2>
                     <p>Exporta la información de tu evento en formato Excel.</p>
+                </div>
+                <div class="filter-bar export-universe-bar">
+                    <label for="exportLeaderUniverse" class="export-universe-label">Universo de Líderes:</label>
+                    <select id="exportLeaderUniverse" class="form-select export-universe-select">
+                        <option value="global" selected>Histórico/Global (Recomendado)</option>
+                        <option value="event">Evento Actual</option>
+                        <option value="filtered">Filtrado (según filtros activos)</option>
+                    </select>
                 </div>
 
                 <div class="export-grid">
@@ -565,6 +582,281 @@
                             <option value="">Seleccione una localidad...</option>
                         </select>
                         <button class="btn btn-outline" id="exportByLocalidadBtn">Exportar Localidad</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VALIDACIÓN DE DATOS REALES -->
+            <section id="validacion-datos-reales" class="section">
+                <div class="section-header">
+                    <h2>Confirmacion E14 por mesa</h2>
+                    <p>Compara votos reportados vs votos oficiales E14 (CAMARA, Bogota, candidata 105).</p>
+                </div>
+
+                <div class="stats-grid rdv-kpis">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="rdvKpiAnalizados">0</h3>
+                            <span>Mesas analizadas</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="rdvKpiPendientes">0</h3>
+                            <span>Pendientes E14</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="rdvKpiConfirmados">0</h3>
+                            <span>Confirmados</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="rdvKpiPromedio">0%</h3>
+                            <span>Confirmacion promedio</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="rdvKpiVotosReportados">0</h3>
+                            <span>Votos reportados</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="rdvKpiVotosE14">0</h3>
+                            <span>Votos E14</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header rdv-toolbar">
+                        <h3><i class="bi bi-clipboard-data"></i> Confirmacion E14 por mesa</h3>
+                        <div class="rdv-actions">
+                            <button class="btn btn-outline" id="rdvOpenE14BaseBtn">
+                                <i class="bi bi-box-arrow-up-right"></i> Abrir E14 Bogota
+                            </button>
+                            <button class="btn btn-outline" id="rdvRunValidationBtn">
+                                <i class="bi bi-arrow-repeat"></i> Recalcular estados
+                            </button>
+                            <button class="btn btn-primary" id="rdvSyncBtn">
+                                <i class="bi bi-cloud-download"></i> Sincronizar referencia E14 (opcional)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="rdvSyncProgress" class="rdv-progress" style="display:none;">
+                        <div class="loader-inline"></div>
+                        <span>Sincronizando referencia E14...</span>
+                    </div>
+                    <div id="rdvSyncResult" class="alert" style="display:none;"></div>
+
+                    <div class="filter-bar rdv-filters">
+                        <input id="rdvFilterSearch" class="search-input" type="text" placeholder="Buscar por localidad, puesto, mesa o archivo...">
+                        <select id="rdvFilterLocalidad" class="form-select">
+                            <option value="">Todas las localidades</option>
+                        </select>
+                        <select id="rdvFilterEstado" class="form-select">
+                            <option value="">Todo estado de confirmacion</option>
+                            <option value="pendiente_e14">Solo pendientes E14</option>
+                            <option value="confirmado">Solo confirmados</option>
+                            <option value="confirmacion_alta">Confirmacion alta</option>
+                            <option value="confirmacion_baja">Confirmacion baja</option>
+                            <option value="manual_only">Captura manual</option>
+                        </select>
+                        <select id="rdvFilterSourceStatus" class="form-select">
+                            <option value="">Todo estado OCR</option>
+                            <option value="ok">OCR OK</option>
+                            <option value="needs_manual_review">Revision manual</option>
+                            <option value="ocr_low_confidence">OCR baja confianza</option>
+                            <option value="page_not_found">Pagina no encontrada</option>
+                            <option value="download_error">Error descarga</option>
+                        </select>
+                        <button class="btn btn-primary" id="rdvApplyFiltersBtn">Aplicar</button>
+                        <button class="btn btn-outline" id="rdvResetFiltersBtn">Limpiar</button>
+                    </div>
+
+                    <div id="rdvLoading" class="rdv-loading" style="display:none;">
+                        <div class="loader-inline"></div>
+                        <span>Cargando confirmacion E14...</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Localidad</th>
+                                    <th>Puesto</th>
+                                    <th>Mesa</th>
+                                    <th># Registros</th>
+                                    <th>Votos reportados</th>
+                                    <th>Votos E14 (105)</th>
+                                    <th>% confirmacion</th>
+                                    <th>Diferencia</th>
+                                    <th>Estado</th>
+                                    <th>Evidencia OCR</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rdvTableBody">
+                                <tr><td colspan="11" class="text-center text-muted">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-container">
+                        <button id="rdvPrevPageBtn" class="page-btn"><i class="bi bi-chevron-left"></i></button>
+                        <span id="rdvPaginationInfo" class="page-indicator">Página 1 de 1</span>
+                        <button id="rdvNextPageBtn" class="page-btn"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div id="rdvManualModal" class="modal" style="display:none;">
+                    <div class="modal-content" style="max-width: 880px;">
+                        <div class="modal-header">
+                            <h3>Capturar votos E14</h3>
+                            <button id="rdvManualCloseBtn" class="close-btn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="rdvManualMesaKey">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Localidad</label>
+                                    <input id="rdvManualLocalidad" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Zona calculada</label>
+                                    <input id="rdvManualZone" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Puesto</label>
+                                    <input id="rdvManualPuesto" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Mesa</label>
+                                    <input id="rdvManualMesa" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label># registros agrupados</label>
+                                    <input id="rdvManualGroupCount" class="form-input" type="number" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Referencia E14</label>
+                                    <input id="rdvManualHint" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Votos reportados</label>
+                                    <input id="rdvManualReportedVotes" class="form-input" type="number" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Votos E14 candidata 105</label>
+                                    <input id="rdvManualE14Votes" class="form-input" type="number" min="0">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>% confirmacion (preview)</label>
+                                    <input id="rdvManualPreviewPercentage" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Diferencia (preview)</label>
+                                    <input id="rdvManualPreviewDifference" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Prioridad revision</label>
+                                    <input id="rdvManualPriority" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Task ID</label>
+                                    <input id="rdvManualTaskId" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Estado OCR origen</label>
+                                    <input id="rdvManualSourceStatus" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Confianza OCR</label>
+                                    <input id="rdvManualSourceConfidence" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Metodo de lectura</label>
+                                    <input id="rdvManualSourceMethod" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Archivo fuente</label>
+                                    <input id="rdvManualSourceFile" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Documento E14</label>
+                                    <input id="rdvManualSourceDocument" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>PDF local</label>
+                                    <input id="rdvManualSourceLocalFile" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Directorio debug</label>
+                                    <input id="rdvManualSourceDebug" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Capturas disponibles</label>
+                                    <input id="rdvManualSourceCapture" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Overlay</label>
+                                    <input id="rdvManualOverlayPath" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Celda 105</label>
+                                    <input id="rdvManualCellPath" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Mask</label>
+                                    <input id="rdvManualMaskPath" class="form-input" type="text" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Party block</label>
+                                    <input id="rdvManualPartyBlockPath" class="form-input" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Observaciones OCR / revision</label>
+                                <textarea id="rdvManualSourceNotes" class="form-input" rows="3" readonly></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Observaciones manuales</label>
+                                <textarea id="rdvManualNotes" class="form-input" rows="3" placeholder="Validado manualmente desde E14 mesa..."></textarea>
+                            </div>
+                            <div class="modal-actions">
+                                <button id="rdvManualOpenSourceBtn" class="btn btn-outline" type="button">Abrir PDF fuente</button>
+                                <button id="rdvManualOpenE14Btn" class="btn btn-outline" type="button">Abrir E14</button>
+                                <button id="rdvManualCopyRefBtn" class="btn btn-outline" type="button">Copiar referencia</button>
+                                <button id="rdvManualSaveBtn" class="btn btn-primary" type="button">Guardar validacion manual</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1247,3 +1539,4 @@
 </body>
 
 </html>
+
