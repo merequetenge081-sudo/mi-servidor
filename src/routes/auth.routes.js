@@ -18,7 +18,7 @@ import { loginRateLimitMiddleware } from "../middleware/rateLimit.middleware.js"
 
 const router = express.Router();
 
-router.post("/admin-login", loginRateLimitMiddleware, adminLogin);
+router.post("/admin-login", adminLogin);
 router.post("/leader-login", loginRateLimitMiddleware, leaderLogin);
 router.post("/leader-login-id", loginRateLimitMiddleware, leaderLoginById);
 router.post("/logout", authMiddleware, logout);
@@ -31,4 +31,3 @@ router.post("/accept-legal-terms", authMiddleware, acceptLegalTerms);
 router.get("/legal-terms-status", authMiddleware, checkLegalTermsStatus);
 
 export default router;
-
