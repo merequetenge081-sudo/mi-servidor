@@ -1,30 +1,29 @@
-import { AuditService } from "../services/audit.service.js";
-import logger from "../config/logger.js";
-import { buildOrgFilter } from "../middleware/organization.middleware.js";
+﻿import logger from "../config/logger.js";
+import { sendError } from "../utils/httpError.js";
+import auditService from "../backend/modules/audit/audit.service.js";
+
+function handleAuditError(res, error, fallbackCode) {
+  logger.error("Audit controller error:", { error: error.message, stack: error.stack, code: fallbackCode });
+  const status = error?.statusCode || 500;
+  return sendError(res, status, error?.message || "Error de auditoría", fallbackCode, error?.details ?? error?.message);
+}
 
 export async function getAuditLogs(req, res) {
   try {
     const { resourceType, action, page = 1, limit = 50 } = req.query;
-    const filter = buildOrgFilter(req); // Multi-tenant filtering
+    const organizationId = req.user?.organizationId || null;
 
-    if (resourceType) filter.resourceType = resourceType;
-    if (action) filter.action = action;
+    const result = await auditService.getAuditLogs(organizationId, resourceType, action, page, limit);
 
-    const skip = (page - 1) * limit;
-
-    const logs = await AuditService.getLogs(filter, parseInt(limit), skip);
-    const total = await AuditService.getLogs(filter, 0, 0);
-
-    res.json({
-      data: logs,
-      total: total.length,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(total.length / limit)
+    return res.json({
+      data: result.data,
+      total: result.pagination.total,
+      page: result.pagination.page,
+      limit: result.pagination.limit,
+      pages: result.pagination.pages
     });
   } catch (error) {
-    logger.error("Get audit logs error:", { error: error.message, stack: error.stack });
-    res.status(500).json({ error: "Error al obtener logs de auditoría" });
+    return handleAuditError(res, error, "GET_AUDIT_LOGS_ERROR");
   }
 }
 
@@ -32,10 +31,10 @@ export async function getAuditStats(req, res) {
   try {
     const { resourceType } = req.query;
     const organizationId = req.user?.organizationId || null;
-    const stats = await AuditService.getStats(organizationId, resourceType);
-    res.json(stats);
+    const result = await auditService.getAuditStats(organizationId, resourceType);
+
+    return res.json(result.stats);
   } catch (error) {
-    logger.error("Get audit stats error:", { error: error.message, stack: error.stack });
-    res.status(500).json({ error: "Error al obtener estadísticas de auditoría" });
+    return handleAuditError(res, error, "GET_AUDIT_STATS_ERROR");
   }
 }

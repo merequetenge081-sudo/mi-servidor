@@ -94,7 +94,7 @@ if (typeof Helpers !== 'undefined' && Helpers.bindSessionActivity) {
 ### PASO 7: Eliminar dashboard.js ✅
 **Archivo eliminado**: `public/js/dashboard.js`
 
-**Backup creado**: `public/js/dashboard.js.phase4.backup`
+**Backup histórico**: `public/js/dashboard.js.phase4.backup` (eliminado en limpieza posterior del repositorio)
 
 ---
 

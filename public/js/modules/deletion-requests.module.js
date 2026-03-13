@@ -15,7 +15,7 @@ async function loadDeletionRequests() {
         window.deletionRequests = deletionRequests;
         renderDeletionRequests();
         
-        // Cargar estadÃ­sticas de archivos
+        // Cargar estadísticas de archivos
         await loadArchivedStats();
         
         // Actualizar badge de notificaciones
@@ -73,7 +73,7 @@ function renderDeletionRequests(requests = deletionRequests) {
                     <i class="bi bi-inbox" style="font-size: 40px; color: #94a3b8;"></i>
                 </div>
                 <h3 style="color: #0f172a; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">No hay solicitudes</h3>
-                <p style="color: #64748b; margin: 0; font-size: 14px;">No hay solicitudes de eliminaciÃ³n en este momento</p>
+                <p style="color: #64748b; margin: 0; font-size: 14px;">No hay solicitudes de eliminación en este momento</p>
             </div>
         `;
         return;
@@ -149,7 +149,7 @@ function renderDeletionRequests(requests = deletionRequests) {
                     <div style="background: #f8fafc; border-left: 3px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
                         <p style="margin: 0; color: #0f172a; font-size: 14px; line-height: 1.6;">
                             <span style="text-transform: uppercase; font-size: 11px; color: #64748b; font-weight: 600; letter-spacing: 0.5px;">
-                                <i class="bi bi-chat-left-quote" style="color: #3b82f6;"></i> RazÃ³n
+                                <i class="bi bi-chat-left-quote" style="color: #3b82f6;"></i> Razón
                             </span><br>
                             <span style="color: #334155; margin-top: 6px; display: inline-block;">${req.reason}</span>
                         </p>
@@ -183,7 +183,7 @@ function renderDeletionRequests(requests = deletionRequests) {
                     ${req.reviewNotes ? `
                         <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9; grid-column: 1 / -1;">
                             <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 600;">
-                                <i class="bi bi-sticky"></i> Notas de revisiÃ³n
+                                <i class="bi bi-sticky"></i> Notas de revisión
                             </div>
                             <div style="color: #0f172a; font-size: 13px; font-weight: 500;">${req.reviewNotes}</div>
                         </div>
@@ -196,10 +196,10 @@ function renderDeletionRequests(requests = deletionRequests) {
                         <div style="display: flex; gap: 10px; align-items: start;">
                             <i class="bi bi-lightbulb" style="font-size: 16px; color: #f59e0b; flex-shrink: 0; margin-top: 2px;"></i>
                             <div style="color: #92400e; font-size: 13px; line-height: 1.5;">
-                                <strong style="display: block; margin-bottom: 6px; color: #78350f;">Opciones de aprobaciÃ³n:</strong>
+                                <strong style="display: block; margin-bottom: 6px; color: #78350f;">Opciones de aprobación:</strong>
                                 <div style="color: #92400e;">
-                                    <div style="margin-bottom: 3px;">â€¢ <strong>Aprobar y Archivar:</strong> Guarda copias para reutilizaciÃ³n futura</div>
-                                    <div>â€¢ <strong>Aprobar y Eliminar:</strong> EliminaciÃ³n permanente sin respaldo</div>
+                                    <div style="margin-bottom: 3px;">• <strong>Aprobar y Archivar:</strong> Guarda copias para reutilización futura</div>
+                                    <div>• <strong>Aprobar y Eliminar:</strong> Eliminación permanente sin respaldo</div>
                                 </div>
                             </div>
                         </div>
@@ -232,19 +232,19 @@ async function reviewDeletionRequest(requestId, action) {
     const actionText = actionTexts[action] || action;
     
     const confirmTexts = {
-        'approve': 'âš ï¸ ADVERTENCIA: Esta acciÃ³n ELIMINARÃ PERMANENTEMENTE todos los registros del lÃ­der SIN RESPALDO. Â¿EstÃ¡s seguro?',
-        'approve-and-archive': 'âœ… Esta acciÃ³n eliminarÃ¡ los registros del lÃ­der actual PERO guardarÃ¡ copias en la base de datos de archivo para uso futuro (auto-rellenar en prÃ³ximos eventos). Â¿Continuar?',
-        'reject': 'Â¿EstÃ¡s seguro de rechazar esta solicitud?'
+        'approve': '⚠️ ADVERTENCIA: Esta acción ELIMINARÁ PERMANENTEMENTE todos los registros del líder SIN RESPALDO. ¿Estás seguro?',
+        'approve-and-archive': '✅ Esta acción eliminará los registros del líder actual PERO guardará copias en la base de datos de archivo para uso futuro (auto-rellenar en próximos eventos). ¿Continuar?',
+        'reject': '¿Estás seguro de rechazar esta solicitud?'
     };
-    const confirmText = confirmTexts[action] || 'Â¿EstÃ¡s seguro?';
+    const confirmText = confirmTexts[action] || '¿Estás seguro?';
 
     if (!confirm(confirmText)) return;
 
     let notes = '';
     if (action === 'reject') {
-        notes = prompt('RazÃ³n del rechazo (opcional):') || '';
+        notes = prompt('Razón del rechazo (opcional):') || '';
     } else if (action === 'approve-and-archive') {
-        notes = 'Aprobado con archivo para reutilizaciÃ³n futura';
+        notes = 'Aprobado con archivo para reutilización futura';
     }
 
     try {
@@ -266,7 +266,7 @@ async function reviewDeletionRequest(requestId, action) {
         showAlert(data.message || `Solicitud ${actionText}da exitosamente`, 'success');
         await loadDeletionRequests();
         
-        // Si se aprobÃ³ (con o sin archivo), recargar registros y lÃ­deres
+        // Si se aprobó (con o sin archivo), recargar registros y líderes
         if (action === 'approve' || action === 'approve-and-archive') {
             await loadAllLeaders();
             await loadAllRegistrations();

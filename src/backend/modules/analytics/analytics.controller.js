@@ -38,14 +38,18 @@ export async function getDashboard(req, res, next) {
  */
 export async function getDashboardMetrics(req, res, next) {
   try {
-    const { eventId, region = 'all', leaderId = null } = req.query;
+    const { eventId, region = 'all', leaderId = null, includeDetails } = req.query;
+    const normalizedIncludeDetails = includeDetails === undefined
+      ? true
+      : !['0', 'false', 'no'].includes(String(includeDetails).trim().toLowerCase());
 
-    logger.info('Dashboard metrics request', { eventId, region, leaderId });
+    logger.info('Dashboard metrics request', { eventId, region, leaderId, includeDetails: normalizedIncludeDetails });
 
     const metrics = await analyticsService.getDashboardMetrics({
       eventId,
       region,
-      leaderId
+      leaderId,
+      includeDetails: normalizedIncludeDetails
     });
 
     res.json({
@@ -254,19 +258,180 @@ export async function getSummary(req, res, next) {
 }
 
 /**
+ * GET /api/v2/analytics/materialized
+ * Obtiene tablas materializadas (Daily/Campaign/Leader/Territory)
+ */
+export async function getMaterialized(req, res, next) {
+  try {
+    const { eventId } = req.query;
+    logger.info('Materialized metrics request', { eventId });
+
+    const data = await analyticsService.getMaterializedMetrics(eventId);
+    res.json({
+      success: true,
+      message: 'Materialized Metrics',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAdvancedSummary(req, res, next) {
+  try {
+    const { eventId = null, status = 'all', leaderId = null, region = 'all', includeCharts = 'true' } = req.query;
+    logger.info('Advanced summary request', { eventId, status, leaderId, region, includeCharts });
+
+    const data = await advancedService.getAdvancedSummaryAnalytics(
+      eventId,
+      status,
+      leaderId,
+      region,
+      includeCharts !== 'false' && includeCharts !== '0'
+    );
+
+    res.json({
+      success: true,
+      message: 'Advanced Summary Analytics',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAdvancedCharts(req, res, next) {
+  try {
+    const { eventId = null, status = 'all', leaderId = null, region = 'all' } = req.query;
+    logger.info('Advanced charts request', { eventId, status, leaderId, region });
+
+    const data = await advancedService.getAdvancedChartsAnalytics(
+      eventId,
+      status,
+      leaderId,
+      region
+    );
+
+    res.json({
+      success: true,
+      message: 'Advanced Charts Analytics',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getHierarchyLocalidades(req, res, next) {
+  try {
+    const data = await advancedService.getHierarchyLocalidades(req.query, {
+      organizationId: req.orgId || req.user?.organizationId || null
+    });
+    res.json({ success: true, message: 'Hierarchy Localidades', data });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getHierarchyPuestos(req, res, next) {
+  try {
+    const data = await advancedService.getHierarchyPuestosByLocalidad(req.params.localidadId, req.query, {
+      organizationId: req.orgId || req.user?.organizationId || null
+    });
+    res.json({ success: true, message: 'Hierarchy Puestos', data });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getHierarchyMesas(req, res, next) {
+  try {
+    const data = await advancedService.getHierarchyMesasByPuesto(req.params.puestoId, req.query, {
+      organizationId: req.orgId || req.user?.organizationId || null
+    });
+    res.json({ success: true, message: 'Hierarchy Mesas', data });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * GET /api/v2/analytics/advanced
  * Obtiene analíticas avanzadas para el panel de análisis
  */
 export async function getAdvanced(req, res, next) {
   try {
-    const { eventId, status, leaderId } = req.query;
-    logger.info('Advanced analytics request', { eventId, status, leaderId });
+    const { eventId, status, leaderId, region, includeHierarchy } = req.query;
+    logger.info('Advanced analytics request', { eventId, status, leaderId, region, includeHierarchy });
 
-    const data = await advancedService.getAdvancedAnalytics(eventId, status, leaderId);
+    const data = await advancedService.getAdvancedAnalytics(
+      eventId,
+      status,
+      leaderId,
+      region,
+      includeHierarchy !== 'false'
+    );
 
     res.json({
       success: true,
       message: 'Advanced Analytics',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getInvalidRows(req, res, next) {
+  try {
+    const {
+      eventId,
+      leaderId,
+      regionScope,
+      localidad,
+      reason,
+      reviewStatus,
+      search,
+      page,
+      limit,
+      countOnly
+    } = req.query;
+
+    const data = await advancedService.getInvalidDataAnalytics(
+      {
+        eventId,
+        leaderId,
+        regionScope,
+        localidad,
+        reason,
+        reviewStatus,
+        search,
+        page,
+        limit,
+        countOnly
+      },
+      { organizationId: req.orgId || null }
+    );
+
+    res.json({
+      success: true,
+      message: 'Invalid Data Analytics',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getInvalidRowDetail(req, res, next) {
+  try {
+    const data = await advancedService.getInvalidDataDetail(req.params.id, {
+      organizationId: req.orgId || null
+    });
+
+    res.json({
+      success: true,
+      message: 'Invalid Data Detail',
       data
     });
   } catch (error) {
@@ -288,6 +453,43 @@ export async function getSimulation(req, res, next) {
     res.json({
       success: true,
       message: 'Simulation Data',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getSimulationBase(req, res, next) {
+  try {
+    const data = await advancedService.getSimulationBaseData(req.query, {
+      organizationId: req.orgId || req.user?.organizationId || null
+    });
+
+    res.json({
+      success: true,
+      message: 'Simulation Base',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function runSimulation(req, res, next) {
+  try {
+    const payload = {
+      ...(req.body || {}),
+      eventId: req.body?.eventId || req.query?.eventId || null,
+      region: req.body?.region || req.query?.region || 'all'
+    };
+    const data = await advancedService.runCampaignSimulation(payload, {
+      organizationId: req.orgId || req.user?.organizationId || null
+    });
+
+    res.json({
+      success: true,
+      message: 'Simulation Result',
       data
     });
   } catch (error) {
@@ -335,8 +537,12 @@ export default {
   getTrends,
   comparePeriods,
   getSummary,
+  getMaterialized,
   getAdvanced,
+  getAdvancedCharts,
   getSimulation,
+  getSimulationBase,
+  runSimulation,
   runGlobalVerification,
   getLeaderPerformance
 };

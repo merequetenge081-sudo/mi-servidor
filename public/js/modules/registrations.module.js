@@ -1,24 +1,6 @@
 /**
  * REGISTRATIONS MODULE
- * =====================================================
- * Encapsula TODA la lógica de gestión de registros
- * - Filtrado
- * - Renderizado por tabs (Bogotá / Resto)
- * - Paginación
- * - Confirmación de registros
- * - Event listeners
- * 
- * Estado centralizado en AppState:
- * - AppState.data.registrations (registros)
- * - AppState.ui.currentPageBogota (página actual Bogotá)
- * - AppState.ui.currentPageResto (página actual Resto)
- * - AppState.ui.currentTab (tab active)
- * 
- * ARQUITECTURA:
- * - IIFE para encapsulación
- * - Métodos privados para lógica interna
- * - API pública para external callers
- * - Flag para evitar binding duplicado
+ * Server-side pagination for registrations using /api/v2/registrations
  */
 
 const RegistrationsModule = (() => {
@@ -26,99 +8,86 @@ const RegistrationsModule = (() => {
 
     let initialized = false;
     let eventsBound = false;
+    const tabState = {
+        bogota: { items: [], total: 0, page: 1, totalPages: 1 },
+        resto: { items: [], total: 0, page: 1, totalPages: 1 }
+    };
 
-    // ====== PRIVATE HELPERS ======
-
-    /**
-     * Obtiene las localidades de Bogotá desde AppState
-     */
-    function getBogotaLocalidades() {
-        return AppState.constants.BOGOTA_LOCALIDADES || [];
-    }
-
-    /**
-     * Determina si un registro es de Bogotá
-     */
-    function isBogotaRegistration(reg) {
-        return getBogotaLocalidades().includes(reg.localidad);
-    }
-
-    /**
-     * Aplica todos los filtros activos
-     * Retorna { bogota: [], resto: [] }
-     */
-    function applyAllFilters() {
-        const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    function getFilters() {
+        const search = document.getElementById('searchInput')?.value?.trim() || '';
         const leaderId = document.getElementById('leaderFilter')?.value || '';
         const unified = document.getElementById('unifiedFilter')?.value || '';
-
-        const registrations = AppState.data.registrations || [];
-
-        // Filtrar por búsqueda, líder y el filtro unificado
-        const filtered = registrations.filter(r => {
-            const matchSearch = !search ||
-                `${r.firstName} ${r.lastName}`.toLowerCase().includes(search) ||
-                (r.email && r.email.toLowerCase().includes(search)) ||
-                (r.cedula && r.cedula.includes(search));
-            const matchLeader = !leaderId || r.leaderId === leaderId;
-            
-            let matchUnified = true;
-            if (unified === 'confirmed') matchUnified = r.confirmed;
-            else if (unified === 'pending') matchUnified = !r.confirmed;
-            else if (unified === 'needs_review') matchUnified = (r.requiereRevisionPuesto && !r.revisionPuestoResuelta);
-            else if (unified === 'no_review') matchUnified = !(r.requiereRevisionPuesto && !r.revisionPuestoResuelta);
-            else if (unified === 'with_phone') matchUnified = !!(r.phone && r.phone.trim() !== '');
-            else if (unified === 'without_phone') matchUnified = !(r.phone && r.phone.trim() !== '');
-
-            return matchSearch && matchLeader && matchUnified;
-        });
-
-        // Separar por región
-        const bogotaFiltered = filtered.filter(r => isBogotaRegistration(r));
-        const restoFiltered = filtered.filter(r => !isBogotaRegistration(r) && r.departamento);
-
-        return { bogota: bogotaFiltered, resto: restoFiltered };
+        return { search, leaderId, unified };
     }
 
-    /**
-     * Renderiza tabla de registros para un tab
-     */
-    function renderTable(tab, data) {
-        const itemsPerPage = AppState.constants.ITEMS_PER_PAGE || 5;
-        let currentPage = tab === 'bogota' ? AppState.ui.currentPageBogota : AppState.ui.currentPageResto;
-        const totalPages = Math.ceil(data.length / itemsPerPage) || 1;
+    function buildQueryParams(tab) {
+        const { search, leaderId, unified } = getFilters();
+        const isBogota = tab === 'bogota';
+        const page = isBogota ? (AppState.ui.currentPageBogota || 1) : (AppState.ui.currentPageResto || 1);
+        const params = {
+            page,
+            limit: AppState.constants.ITEMS_PER_PAGE || 25,
+            sort: 'createdAt',
+            order: 'desc',
+            search,
+            leaderId: leaderId || undefined,
+            regionScope: isBogota ? 'bogota' : 'resto'
+        };
 
-        // Ajustar página si está fuera de rango
-        if (currentPage > totalPages) {
-            currentPage = 1;
-            if (tab === 'bogota') {
-                AppState.setUI({ currentPageBogota: 1 });
-            } else {
-                AppState.setUI({ currentPageResto: 1 });
-            }
-        }
+        if (unified === 'confirmed') params.confirmed = true;
+        if (unified === 'pending') params.confirmed = false;
+        if (unified === 'needs_review') params.dataIntegrityStatus = 'needs_review';
+        if (unified === 'no_review') params.dataIntegrityStatus = 'valid';
+        if (unified === 'with_phone') params.hasPhone = true;
+        if (unified === 'without_phone') params.hasPhone = false;
 
-        const start = (currentPage - 1) * itemsPerPage;
-        const paginated = data.slice(start, start + itemsPerPage);
+        return params;
+    }
 
-        // Generar HTML
+    function updatePaginationUI(tab, page, totalPages) {
+        const suffix = tab === 'bogota' ? 'Bogota' : 'Resto';
+        const pageIndicator = document.getElementById(`pageIndicator${suffix}`);
+        const prevPageBtn = document.getElementById(`prevPage${suffix}Btn`);
+        const nextPageBtn = document.getElementById(`nextPage${suffix}Btn`);
+        const firstPageBtn = document.getElementById(`firstPage${suffix}Btn`);
+
+        if (pageIndicator) pageIndicator.textContent = `Pagina ${page} de ${totalPages}`;
+        if (prevPageBtn) prevPageBtn.disabled = page <= 1;
+        if (nextPageBtn) nextPageBtn.disabled = page >= totalPages;
+        if (firstPageBtn) firstPageBtn.disabled = page <= 1;
+    }
+
+    function renderTable(tab, data, pagination) {
         const tableId = tab === 'bogota' ? 'bogotaTable' : 'restoTable';
-        const html = paginated.map(reg => {
-            const requiereRevision = reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta;
-            const puestoDisplay = reg.votingPlace || (reg.puestoId?.nombre || '-');
+        const tableEl = document.getElementById(tableId);
+        if (!tableEl) return;
+
+        const html = (data || []).map((reg) => {
+            const requiresReview = (reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta) || reg.puestoMatchReviewRequired === true;
+            const puestoDisplay = reg.puestoId?.nombre || reg.votingPlace || reg.puestoNombre || '-';
+            const legacyPuesto = reg.legacyVotingPlace && reg.legacyVotingPlace !== puestoDisplay
+                ? `<div style="font-size: 0.72rem; color: #92400e; margin-top: 2px;">Original: ${reg.legacyVotingPlace}</div>`
+                : '';
+            const createdAt = reg.date || reg.createdAt;
+            const dateObj = createdAt ? new Date(createdAt) : null;
+            const dateLabel = dateObj && !Number.isNaN(dateObj.getTime())
+                ? dateObj.toLocaleDateString('es-CO')
+                : '-';
+            const confirmed = reg.confirmed === true || reg.workflowStatus === 'confirmed';
+
             return `
         <tr>
-            <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
+            <td><strong>${reg.firstName || ''} ${reg.lastName || ''}</strong></td>
             <td>${reg.email || '-'}</td>
             <td>${reg.phone || '-'}</td>
             <td>${reg.cedula || '-'}</td>
-            <td>${tab === 'bogota' ? (reg.localidad || '-') : (reg.departamento || '-')}</td>
-            <td>${puestoDisplay}${requiereRevision ? ' <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.75rem; padding: 2px 8px;">⚠ Revisar</span>' : ''}</td>
+            <td>${tab === 'bogota' ? (reg.localidad || '-') : (reg.departamento || reg.localidad || '-')}</td>
+            <td>${puestoDisplay}${requiresReview ? ' <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.75rem; padding: 2px 8px;">Revisar</span>' : ''}${legacyPuesto}</td>
             <td>${reg.leaderName || '-'}</td>
-            <td>${new Date(reg.date).toLocaleDateString('es-CO')}</td>
-            <td><span class="badge ${reg.confirmed ? 'badge-confirmed' : 'badge-pending'}">${reg.confirmed ? '✓ Confirmado' : '⏳ Pendiente'}</span></td>
+            <td>${dateLabel}</td>
+            <td><span class="badge ${confirmed ? 'badge-confirmed' : 'badge-pending'}">${confirmed ? 'Confirmado' : 'Pendiente'}</span></td>
             <td>
-                <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${reg.confirmed}">
+                <button class="btn btn-sm btn-outline-secondary toggle-confirm-btn" data-reg-id="${reg._id}" data-confirmed="${confirmed}">
                     <i class="bi bi-check-circle"></i>
                 </button>
             </td>
@@ -126,113 +95,92 @@ const RegistrationsModule = (() => {
     `;
         }).join('');
 
-        const emptyMessage = tab === 'bogota'
-            ? '<tr><td colspan="10" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogotá</td></tr>'
-            : '<tr><td colspan="10" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del País</td></tr>';
+        const empty = tab === 'bogota'
+            ? '<tr><td colspan="10" class="text-center" style="padding: 40px; color: #999;">Sin registros en Bogota</td></tr>'
+            : '<tr><td colspan="10" class="text-center" style="padding: 40px; color: #999;">Sin registros en Resto del Pais</td></tr>';
 
-        const tableEl = document.getElementById(tableId);
-        if (tableEl) {
-            tableEl.innerHTML = html || emptyMessage;
-        }
-
-        // Actualizar controles de paginación
-        updatePaginationUI(tab, currentPage, totalPages);
-
-        // Eventos delegados desde core/events.js
+        tableEl.innerHTML = html || empty;
+        updatePaginationUI(tab, pagination.page || 1, pagination.totalPages || 1);
     }
 
-    /**
-     * Actualiza UI de paginación
-     */
-    function updatePaginationUI(tab, currentPage, totalPages) {
-        const suffix = tab === 'bogota' ? 'Bogota' : 'Resto';
-        const pageIndicator = document.getElementById(`pageIndicator${suffix}`);
-        const prevPageBtn = document.getElementById(`prevPage${suffix}Btn`);
-        const nextPageBtn = document.getElementById(`nextPage${suffix}Btn`);
-        const firstPageBtn = document.getElementById(`firstPage${suffix}Btn`);
-
-        if (pageIndicator) pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
-        if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
-        if (nextPageBtn) nextPageBtn.disabled = currentPage === totalPages;
-        if (firstPageBtn) firstPageBtn.disabled = currentPage === 1;
-    }
-
-    /**
-     * Maneja cambios de página para una región
-     */
-    function changePage(tab, direction) {
-        const { bogota, resto } = applyAllFilters();
-        const data = tab === 'bogota' ? bogota : resto;
-        const itemsPerPage = AppState.constants.ITEMS_PER_PAGE || 5;
-        const totalPages = Math.ceil(data.length / itemsPerPage) || 1;
-        const currentPageKey = tab === 'bogota' ? 'currentPageBogota' : 'currentPageResto';
-        const currentPage = AppState.ui[currentPageKey];
-
-        let newPage = currentPage;
-        if (direction === 'first') {
-            newPage = 1;
-        } else if (direction === 'prev' && currentPage > 1) {
-            newPage = currentPage - 1;
-        } else if (direction === 'next' && currentPage < totalPages) {
-            newPage = currentPage + 1;
+    async function loadTab(tab) {
+        if (typeof DataService === 'undefined' || !DataService.getRegistrationsPaginated) {
+            console.error('[RegistrationsModule] DataService.getRegistrationsPaginated no disponible');
+            return;
         }
 
-        if (newPage !== currentPage) {
-            AppState.setUI({ [currentPageKey]: newPage });
-        }
+        const params = buildQueryParams(tab);
+        console.debug('[V2 TRACE] registrations.table <- /api/v2/registrations', { tab, params });
 
-        // Renderizar tabla actualizada
-        applyFilters();
+        const result = await DataService.getRegistrationsPaginated(params);
+        const state = {
+            items: result.items || [],
+            total: result.total || 0,
+            page: result.page || params.page,
+            totalPages: result.totalPages || 1
+        };
+
+        tabState[tab] = state;
+        renderTable(tab, state.items, state);
+
+        const currentRegs = [...(tabState.bogota.items || []), ...(tabState.resto.items || [])];
+        AppState.setData('registrations', currentRegs);
     }
 
-    /**
-     * Alternar confirmación de registro
-     */
+    async function load() {
+        await Promise.all([loadTab('bogota'), loadTab('resto')]);
+    }
+
+    async function applyFilters() {
+        AppState.setUI({ currentPageBogota: 1, currentPageResto: 1 });
+        await load();
+    }
+
+    async function renderBogota() {
+        await loadTab('bogota');
+    }
+
+    async function renderResto() {
+        await loadTab('resto');
+    }
+
+    async function changePage(tab, direction) {
+        const isBogota = tab === 'bogota';
+        const key = isBogota ? 'currentPageBogota' : 'currentPageResto';
+        const currentPage = AppState.ui[key] || 1;
+        const totalPages = tabState[tab]?.totalPages || 1;
+        let nextPage = currentPage;
+
+        if (direction === 'first') nextPage = 1;
+        if (direction === 'prev') nextPage = Math.max(1, currentPage - 1);
+        if (direction === 'next') nextPage = Math.min(totalPages, currentPage + 1);
+
+        if (nextPage !== currentPage) {
+            AppState.setUI({ [key]: nextPage });
+            await loadTab(tab);
+        }
+    }
+
     async function toggleConfirm(regId, isConfirmed) {
         try {
-            const endpoint = isConfirmed ? `/api/registrations/${regId}/unconfirm` : `/api/registrations/${regId}/confirm`;
-            const response = await fetch(`${AppState.constants.API_URL}${endpoint}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${AppState.user.token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                // Recargar datos
-                console.log('✅ Registro actualizado');
-                loadDashboard();
-            } else {
-                console.error('❌ Error actualizando registro:', response.status);
-            }
+            await DataService.toggleRegistrationConfirmation(regId, isConfirmed);
+            await load();
         } catch (err) {
-            console.error('Error en toggleConfirm:', err);
+            const status = Number(err?.status || err?.response?.status || 0);
+            if (status) {
+                console.error('[RegistrationsModule] Error actualizando confirmacion:', status);
+            } else {
+                console.error('[RegistrationsModule] Error en toggleConfirm:', err);
+            }
         }
     }
 
-    /**
-     * Bind event listeners
-     * ✅ FASE 4: Todos los listeners removidos y delegados a core/events.js
-     * Se ejecutaba UNA SOLA VEZ mediante flag eventsBound (ahora vacío)
-     */
     function bindEvents() {
         if (eventsBound) return;
         eventsBound = true;
-
-        // Los eventos del módulo ahora son manejados por delegación centralizada:
-        // - Filtros (búsqueda, líder, estado, revisión)
-        // - Tabs (Bogotá, Resto)
-        // - Paginación
-        // - Exportación
-        // Ver: core/events.js > bindGlobalClicks()
-
-        console.log('✅ RegistrationsModule events bound (delegated to Events.js)');
+        console.log('[RegistrationsModule] eventos delegados a core/events.js');
     }
 
-    /**
-     * Muestra un tab específico
-     */
     function showTab(tab) {
         AppState.setUI({ currentTab: tab });
 
@@ -270,63 +218,23 @@ const RegistrationsModule = (() => {
         }
     }
 
-    // ====== PUBLIC API ======
-
     function init() {
         if (initialized) return;
         initialized = true;
-        console.log('🚀 RegistrationsModule.init()');
         bindEvents();
     }
 
-    /**
-     * Carga y renderiza registros en ambos tabs
-     */
-    function load() {
-        const { bogota, resto } = applyAllFilters();
-        renderTable('bogota', bogota);
-        renderTable('resto', resto);
-        console.log(`📊 Registrations loaded: ${bogota.length} Bogotá, ${resto.length} Resto`);
-    }
-
-    /**
-     * Aplica filtros y re-renderiza
-     */
-    function applyFilters() {
-        const { bogota, resto } = applyAllFilters();
-        renderTable('bogota', bogota);
-        renderTable('resto', resto);
-        console.log(`🔍 Filters applied: ${bogota.length} Bogotá, ${resto.length} Resto`);
-    }
-
-    /**
-     * Renderiza Bogotá
-     */
-    function renderBogota() {
-        const { bogota } = applyAllFilters();
-        renderTable('bogota', bogota);
-    }
-
-    /**
-     * Renderiza Resto del País
-     */
-    function renderResto() {
-        const { resto } = applyAllFilters();
-        renderTable('resto', resto);
-    }
-    
-    /**
-     * Ejecuta corrección y estandarización masiva de nombres
-     */
     async function fixNames() {
-        if (!confirm('¿Estás seguro de que deseas estandarizar y corregir los nombres de todos los registros del evento actual? Esta acción no se puede deshacer.')) return;
-        
+        if (!confirm('Esta seguro de que desea estandarizar y corregir nombres?')) return;
+
         try {
             const btn = document.getElementById('fixNamesBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
-            btn.disabled = true;
-            
+            const originalText = btn?.innerHTML;
+            if (btn) {
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+                btn.disabled = true;
+            }
+
             const res = await fetch(`${AppState.constants.API_URL}/api/registrations/fix-names`, {
                 method: 'POST',
                 headers: {
@@ -338,21 +246,16 @@ const RegistrationsModule = (() => {
 
             const data = await res.json();
             if (res.ok) {
-                Helpers.showAlert(data.message || `Se corrigieron mútiples registros con éxito.`, 'success');
-                // Reload dashboard data
-                if (typeof DashboardModule !== 'undefined' && DashboardModule.load) {
-                    DashboardModule.load();
-                } else {
-                    location.reload();
-                }
+                Helpers.showAlert(data.message || 'Correccion de nombres completada.', 'success');
+                await load();
             } else {
                 Helpers.showAlert(data.error || 'Error al corregir nombres', 'error');
             }
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
+
+            if (btn) {
+                btn.innerHTML = originalText || '<i class="bi bi-magic"></i> Corregir Nombres';
                 btn.disabled = false;
-            }, 1000);
+            }
         } catch (e) {
             console.error('[RegistrationsModule] fixNames err:', e);
             Helpers.showAlert('Error de red al intentar corregir nombres', 'error');
@@ -363,8 +266,6 @@ const RegistrationsModule = (() => {
             }
         }
     }
-
-    // ====== EXPOSED API ======
 
     return {
         init,
@@ -379,5 +280,4 @@ const RegistrationsModule = (() => {
     };
 })();
 
-// Exponer globalmente
 window.RegistrationsModule = RegistrationsModule;

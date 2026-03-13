@@ -23,6 +23,7 @@ router.use(organizationMiddleware);
 
 // Obtener todas las registrations
 router.get("/", controller.getRegistrations.bind(controller));
+router.get("/official-catalog/options", controller.getOfficialCorrectionCatalog.bind(controller));
 
 // Obtener registrations de un líder específico
 router.get("/leader/:leaderId", controller.getRegistrationsByLeader.bind(controller));
@@ -36,6 +37,9 @@ router.use(rolesMiddleware(["admin", "leader"]));
 
 // Actualizar registro
 router.put("/:id", controller.updateRegistration.bind(controller));
+router.get("/:id/official-correction/history", controller.getCorrectionHistory.bind(controller));
+router.post("/:id/official-correction/preview", controller.previewOfficialCorrection.bind(controller));
+router.post("/:id/official-correction/apply", controller.applyOfficialCorrection.bind(controller));
 
 // Eliminar registro
 router.delete("/:id", controller.deleteRegistration.bind(controller));
@@ -45,6 +49,10 @@ router.post("/:id/confirm", controller.confirmRegistration.bind(controller));
 
 // Desconfirmar asistencia
 router.post("/:id/unconfirm", controller.unconfirmRegistration.bind(controller));
+
+// Exportar registros con filtros v2
+router.post("/export", controller.exportRegistrations.bind(controller));
+router.post("/export/leader-summary", controller.exportLeaderSummary.bind(controller));
 
 // Bulk create
 router.post("/bulk/create", controller.bulkCreateRegistrations.bind(controller));

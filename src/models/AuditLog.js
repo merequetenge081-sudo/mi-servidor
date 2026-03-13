@@ -18,7 +18,8 @@ const auditLogSchema = new mongoose.Schema({
       'SEND_ACCESS_EMAIL',
       'SEND_QR',
       'SEND_WHATSAPP',
-      'PASSWORD_RESET_AUTO'
+      'PASSWORD_RESET_AUTO',
+      'MANUAL_OFFICIAL_CORRECTION'
     ]
   },
   resourceType: { type: String, required: true },

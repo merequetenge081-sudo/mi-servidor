@@ -1,77 +1,86 @@
 /**
  * Dashboard Module
- * Maneja estadísticas generales, actividad reciente
- * Parte de la arquitectura modular de dashboard.js
+ * Consume metricas limpias desde backend (/api/v2/analytics/metrics)
+ * para evitar calculos crudos en frontend.
  */
 
 const DashboardModule = (() => {
     'use strict';
 
-    // ===================================
-    // ESTADO INTERNO
-    // ===================================
-    let statsInterval = null;
+    let dashboardMetrics = null;
+    const shouldDebugTraces = () => {
+        try {
+            return window.APP_DEBUG_TRACES === true || localStorage.getItem('debugTraces') === '1';
+        } catch (_) {
+            return window.APP_DEBUG_TRACES === true;
+        }
+    };
+    const trace = (...args) => {
+        if (shouldDebugTraces()) console.debug(...args);
+    };
 
-    // ===================================
-    // ACTUALIZAR ESTADÍSTICAS
-    // ===================================
-    function updateStats() {
-        const leaders = AppState.data.leaders || [];
-        const registrations = AppState.data.registrations || [];
+    async function loadDashboardMetrics() {
+        if (typeof DataService === 'undefined' || !DataService.getDashboardMetrics) {
+            throw new Error('[DashboardModule] DataService.getDashboardMetrics no disponible');
+        }
 
-        // Registros confirmados
-        const confirmed = registrations.filter(r =>
-            r.confirmed === true || r.confirmed === 'true' || r.confirmado === true || r.confirmado === 'true'
-        ).length;
-        // Pendientes
-        const pending = registrations.length - confirmed;
-        // Tasa de confirmación
-        const confirmRate = registrations.length > 0 
-            ? ((confirmed / registrations.length) * 100).toFixed(1) 
-            : '0.0';
+        const metrics = await DataService.getDashboardMetrics();
+        dashboardMetrics = metrics || {};
 
-        // Actualizar DOM
-        DOMUtils.tryUpdate('totalLeaders', leaders.length);
-        DOMUtils.tryUpdate('totalRegistrations', registrations.length);
-        DOMUtils.tryUpdate('confirmedCount', confirmed);
-        DOMUtils.tryUpdate('confirmRate', `${confirmRate}%`);
+        const src = dashboardMetrics?.source || {};
+        trace('[KPI TRACE] dashboard.cards <- /api/v2/analytics/metrics', {
+            eventId: src?.filter?.eventId || AppState.user?.eventId || null,
+            region: src?.filter?.region || 'all',
+            leaderId: src?.filter?.leaderId || null,
+            timestamp: dashboardMetrics?.timestamp || null
+        });
+
+        return dashboardMetrics;
     }
 
-    // ===================================
-    // CARGAR REGISTROS RECIENTES
-    // ===================================
+    function updateStats() {
+        const totals = dashboardMetrics?.operationalTotals || dashboardMetrics?.totals || {};
+        const totalLeaders = totals.totalLeaders || totals.leadersCount || 0;
+        const totalRegistrations = totals.totalRegistrations || 0;
+        const confirmedCount = totals.confirmedCount || 0;
+        const confirmRate = totals.confirmRate || 0;
+        const eventId = dashboardMetrics?.source?.filter?.eventId || AppState.user?.eventId || null;
+
+        DOMUtils.tryUpdate('totalLeaders', totalLeaders);
+        DOMUtils.tryUpdate('totalRegistrations', totalRegistrations);
+        DOMUtils.tryUpdate('confirmedCount', confirmedCount);
+        DOMUtils.tryUpdate('confirmRate', `${confirmRate}%`);
+
+        trace('[KPI TRACE] Leaders Active -> eventId=' + (eventId || 'null'), { value: totalLeaders });
+        trace('[KPI TRACE] Total Records -> eventId=' + (eventId || 'null'), { value: totalRegistrations });
+        trace('[KPI TRACE] Confirmed -> eventId=' + (eventId || 'null'), { value: confirmedCount });
+        trace('[KPI TRACE] Confirm Rate -> eventId=' + (eventId || 'null'), {
+            value: confirmRate,
+            formula: `${confirmedCount}/${totalRegistrations}`
+        });
+    }
+
     function loadRecentRegistrations() {
-        const registrations = AppState.data.registrations || [];
+        const recent = dashboardMetrics?.recentRecords || [];
         const tbody = DOMUtils.byId('recentRegistrations');
-        
         if (!tbody) return;
 
-        // Ordenar por fecha reciente
-        const recent = [...registrations]
-            .sort((a, b) => {
-                const dateA = new Date(a.date || a.fechaRegistro || 0);
-                const dateB = new Date(b.date || b.fechaRegistro || 0);
-                const timeA = isNaN(dateA.getTime()) ? 0 : dateA.getTime();
-                const timeB = isNaN(dateB.getTime()) ? 0 : dateB.getTime();
-                return timeB - timeA;
-            })
-            .slice(0, 10); // Últimos 10
-
-        if (recent.length === 0) {
+        if (!Array.isArray(recent) || recent.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay registros recientes</td></tr>';
             return;
         }
 
-        tbody.innerHTML = recent.map(reg => {
-            const leaderName = reg.leaderName || reg.nombreLider || reg.liderNombre || 'Sin líder';
-            const isConfirmed = reg.confirmed === true || reg.confirmed === 'true' || reg.confirmado === true || reg.confirmado === 'true';
+        tbody.innerHTML = recent.map((reg) => {
+            const leaderName = reg.leaderName || 'Sin lider';
+            const isConfirmed = reg.confirmed === true || reg.workflowStatus === 'confirmed';
             const status = isConfirmed
                 ? '<span class="badge badge-success">Confirmado</span>'
                 : '<span class="badge badge-warning">Pendiente</span>';
-            const dateStr = reg.date || reg.fechaRegistro;
-            const dateObj = dateStr ? new Date(dateStr) : null;
-            const dateLabel = (dateObj && !isNaN(dateObj.getTime())) ? dateObj.toLocaleDateString('es-CO') : 'N/A';
-            const fullName = `${reg.firstName || reg.nombre || ''} ${reg.lastName || ''}`.trim() || 'Sin nombre';
+            const dateObj = reg.createdAt ? new Date(reg.createdAt) : null;
+            const dateLabel = (dateObj && !Number.isNaN(dateObj.getTime()))
+                ? dateObj.toLocaleDateString('es-CO')
+                : 'N/A';
+            const fullName = `${reg.firstName || ''} ${reg.lastName || ''}`.trim() || 'Sin nombre';
 
             return `
                 <tr>
@@ -87,36 +96,15 @@ const DashboardModule = (() => {
         }).join('');
     }
 
-    // ===================================
-    // CARGAR GRÁFICOS (Chart.js)
-    // ===================================
-    function loadCharts() {
-        try {
-            const registrations = AppState.data.registrations || [];
-            
-            // Destruir gráficos existentes PRIMERO con verificación
-            console.log('[DashboardModule] Limpiando gráficos previos...');
-            if (typeof ChartService !== 'undefined') {
-                ChartService.destroyChart('confirmationChart');
-                ChartService.destroyChart('topLeadersChart');
-            }
-            
-            // Pequeño delay para asegurar destrucción completa
-            setTimeout(() => {
-                loadConfirmationChart(registrations);
-                loadTopLeadersChart(registrations);
-                console.log('[DashboardModule] ✅ Gráficos cargados exitosamente');
-            }, 10);
-        } catch (err) {
-            console.error('[DashboardModule] Error en loadCharts:', err);
-        }
-    }
+    function loadConfirmationChart() {
+        const totals = dashboardMetrics?.operationalTotals || dashboardMetrics?.totals || {};
+        const total = Number(totals.totalRegistrations || 0);
+        const confirmed = Number(totals.confirmedCount || 0);
+        const pending = Math.max(total - confirmed, 0);
 
-    function loadConfirmationChart(registrations) {
-        const confirmed = registrations.filter(r =>
-            r.confirmed === true || r.confirmed === 'true' || r.confirmado === true || r.confirmado === 'true'
-        ).length;
-        const pending = registrations.length - confirmed;
+        if (typeof ChartService !== 'undefined') {
+            ChartService.destroyChart('confirmationChart');
+        }
 
         ChartService.createChart('confirmationChart', {
             type: 'doughnut',
@@ -145,27 +133,18 @@ const DashboardModule = (() => {
         });
     }
 
-    function loadTopLeadersChart(registrations) {
-        const leaders = AppState.data.leaders || [];
-        const countsByLeader = {};
+    function loadTopLeadersChart() {
+        const leaders = Array.isArray(dashboardMetrics?.leadersOperational)
+            ? dashboardMetrics.leadersOperational
+            : (Array.isArray(dashboardMetrics?.leaders) ? dashboardMetrics.leaders : []);
+        const top = leaders.slice(0, 5);
 
-        registrations.forEach(reg => {
-            const leaderId = reg.leaderId || reg.leader_id || reg.liderId;
-            const key = leaderId || reg.leaderName || reg.nombreLider || reg.liderNombre || 'sin-lider';
-            countsByLeader[key] = (countsByLeader[key] || 0) + 1;
-        });
+        const labels = top.length > 0 ? top.map((l) => l.name || 'Sin lider') : ['Sin datos'];
+        const data = top.length > 0 ? top.map((l) => Number(l.total || 0)) : [0];
 
-        const items = Object.entries(countsByLeader).map(([key, count]) => {
-            let name = 'Sin líder';
-            if (key !== 'sin-lider') {
-                const leader = leaders.find(l => l._id === key);
-                name = leader ? leader.name : key;
-            }
-            return { name, count };
-        }).sort((a, b) => b.count - a.count).slice(0, 5);
-
-        const labels = items.length > 0 ? items.map(i => i.name) : ['Sin datos'];
-        const data = items.length > 0 ? items.map(i => i.count) : [0];
+        if (typeof ChartService !== 'undefined') {
+            ChartService.destroyChart('topLeadersChart');
+        }
 
         ChartService.createChart('topLeadersChart', {
             type: 'bar',
@@ -182,66 +161,58 @@ const DashboardModule = (() => {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
-                    }
+                    legend: { display: false }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: {
-                            color: '#9ca3af'
-                        },
-                        grid: {
-                            color: 'rgba(156, 163, 175, 0.1)'
-                        }
-                },
-                x: {
-                    ticks: {
-                        color: '#9ca3af'
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: 'rgba(156, 163, 175, 0.1)' }
                     },
-                    grid: {
-                        display: false
+                    x: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { display: false }
                     }
                 }
-            }
             }
         });
     }
 
-    // ===================================
-    // INICIALIZACIÓN
-    // ===================================
-    function init() {
-        console.log('[DashboardModule] Inicializado');
-        
-        // No auto-refresh para evitar sobrecarga
-        // El refresh se hace desde loadDashboard() en data.service.js
+    function loadCharts() {
+        if (!dashboardMetrics) return;
+        loadConfirmationChart();
+        loadTopLeadersChart();
     }
 
-    function refresh() {
+    async function refresh() {
+        await loadDashboardMetrics();
+        trace('[VIEW TRACE] Dashboard <- dashboard.html/modules/dashboard.module.js', {
+            endpoint: '/api/v2/analytics/metrics',
+            eventId: dashboardMetrics?.source?.filter?.eventId || AppState.user?.eventId || null
+        });
         updateStats();
         loadRecentRegistrations();
-        // Gráficos solo se cargan una vez (lazy load)
+        loadCharts();
     }
 
-    // Exponer métodos públicos
+    function init() {
+        console.log('[DashboardModule] Inicializado');
+    }
+
     return {
         init,
         refresh,
         updateStats,
         loadRecentRegistrations,
-        loadCharts
+        loadCharts,
+        loadDashboardMetrics
     };
 })();
 
-// Auto-inicializar cuando DOM esté listo
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', DashboardModule.init);
 } else {
     DashboardModule.init();
 }
 
-// Export to window
 window.DashboardModule = DashboardModule;
-

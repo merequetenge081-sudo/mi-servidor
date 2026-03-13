@@ -9,16 +9,111 @@
 
 import { RegistrationRepository } from "./registration.repository.js";
 import { Leader } from "../../../models/Leader.js";
-import { ValidationService } from '../../../services/validation.service.js';
+import { Registration } from "../../../models/Registration.js";
+import { Puestos } from "../../../models/Puestos.js";
 import { AuditService } from '../../../services/audit.service.js';
 import { ConsentLogService } from '../../../services/consentLog.service.js';
-import { matchPuesto, matchLocalidad } from '../../../utils/fuzzyMatch.js';
-import { Puestos } from '../../../models/index.js';
 import { createLogger } from "../../core/Logger.js";
 import { AppError } from "../../core/AppError.js";
+import {
+  runValidationSkill,
+  runDeduplicationSkill,
+  persistDeduplicationFlags
+} from "../../skills/index.js";
+import votingHierarchyService from "../../../services/votingHierarchy.service.js";
+import officialE14CatalogService from "../../../services/officialE14Catalog.service.js";
+import puestoMatchingService from "../../../services/puestoMatching.service.js";
+import { canonicalizeBogotaLocality } from "../../../shared/territoryNormalization.js";
+import metricsCacheService from "../../../services/metricsCache.service.js";
 
 const logger = createLogger("RegistrationService");
 const repository = new RegistrationRepository();
+
+async function buildOfficialValidationFields(payload, organizationId) {
+  const catalog = await officialE14CatalogService.loadCatalog();
+  const validation = officialE14CatalogService.validateRegistrationAgainstOfficialCatalog(payload, catalog);
+
+  return {
+    officialValidationStatus: validation.mismatchType,
+    officialValidationReason: validation.mismatchReason,
+    officialValidationReviewed: false,
+    officialCatalogVersion: validation.catalogVersion || catalog.version || "",
+    officialLocalidadNombre: validation.officialLocalidadNombre || "",
+    officialPuestoNombre: validation.officialPuestoNombre || "",
+    officialPuestoCodigo: validation.officialPuestoCodigo || "",
+    officialMesaNumero: validation.officialMesaNumero ?? null,
+    officialMesaValid: validation.officialMesaValid === true,
+    officialPuestoValid: validation.officialPuestoValid === true,
+    movedToErrorBucket: validation.isOfficiallyValid !== true,
+    errorBucketReason: validation.isOfficiallyValid ? "" : validation.mismatchReason,
+    officialSuggestedPuesto: validation?.suggestedCorrection?.puesto || "",
+    officialSuggestedLocalidad: validation?.suggestedCorrection?.localidad || ""
+  };
+}
+
+async function resolveHierarchyForManualCorrection(payload, organizationId, currentRegistration = null) {
+  try {
+    return await votingHierarchyService.resolveHierarchyReference(payload, { organizationId });
+  } catch (primaryError) {
+    const canonicalLocalidad = canonicalizeBogotaLocality(payload.localidad) || payload.localidad || "";
+    const scopedPuestos = await Puestos.find(
+      {
+        $or: [
+          { organizationId },
+          { organizationId: null },
+          { organizationId: { $exists: false } }
+        ],
+        localidad: canonicalLocalidad,
+        activo: { $ne: false }
+      }
+    ).lean();
+
+    const candidates = scopedPuestos
+      .map((puesto) => ({
+        puesto,
+        match: puestoMatchingService.scoreMatch(payload.puesto || "", puesto)
+      }))
+      .sort((a, b) => b.match.score - a.match.score);
+
+    const best = candidates[0] || null;
+    if (best && best.match.score >= 0.9) {
+      return votingHierarchyService.resolveHierarchyReference(
+        {
+          localidad: canonicalLocalidad,
+          puestoId: String(best.puesto._id),
+          puesto: best.puesto.nombre,
+          mesa: payload.mesa
+        },
+        { organizationId }
+      );
+    }
+
+    if (currentRegistration?.puestoId) {
+      return votingHierarchyService.resolveHierarchyReference(
+        {
+          localidad: canonicalLocalidad,
+          puestoId: currentRegistration.puestoId,
+          puesto: currentRegistration.votingPlace || payload.puesto,
+          mesa: payload.mesa
+        },
+        { organizationId }
+      );
+    }
+
+    throw primaryError;
+  }
+}
+
+function serializeCorrectionHistoryItem(item = {}) {
+  return {
+    previous: item.previous || {},
+    next: item.next || {},
+    correctionNote: item.correctionNote || "",
+    correctedBy: item.correctedBy || "",
+    correctedAt: item.correctedAt || null,
+    source: item.source || "manual_admin_correction"
+  };
+}
 
 export class RegistrationService {
   /**
@@ -47,41 +142,66 @@ export class RegistrationService {
         throw AppError.forbidden("El líder está inactivo");
       }
 
-      // 3. Validar datos
-      const validation = ValidationService.validateRegistration({
-        leaderId: leader.leaderId || leader._id?.toString(),
-        eventId,
-        firstName,
-        lastName,
-        cedula,
-        registeredToVote,
-        puestoId,
-        mesa
+      // 3. Validar datos con Validation Skill
+      const validation = await runValidationSkill({
+        registration: {
+          leaderId: leader.leaderId || leader._id?.toString(),
+          eventId,
+          firstName,
+          lastName,
+          cedula,
+          phone,
+          localidad,
+          registeredToVote,
+          puestoId,
+          mesa
+        },
+        organizationId,
+        strict: true
       });
 
       if (!validation.valid) {
-        throw AppError.badRequest(validation.error);
+        throw AppError.badRequest(validation.errors.join("; "));
       }
 
-      // 4. Verificar duplicado
-      const duplicate = await repository.findByCedulaAndEvent(cedula, eventId);
+      const normalized = validation.normalized;
+
+      // 4. Verificar duplicado exacto por cédula/evento
+      const duplicate = await repository.findByCedulaAndEvent(normalized.cedula, eventId);
       if (duplicate) {
-        throw AppError.conflict(`Persona con cédula ${cedula} ya registrada`);
+        throw AppError.conflict(`Persona con cédula ${normalized.cedula} ya registrada`);
       }
 
       // 5. Validar puesto si está registrado para votar
       let resolvedMesa = null;
       let resolvedPuestoId = null;
-      let resolvedLocalidad = localidad;
+      let resolvedLocalidad = canonicalizeBogotaLocality(localidad) || localidad;
+      let resolvedLocalidadId = null;
+      let resolvedMesaId = null;
+      let resolvedPuestoName = votingPlace || "";
+      const legacyVotingPlace = votingPlace || "";
 
       if (registeredToVote) {
         const puesto = await repository.getPuestoById(puestoId);
         if (puesto.activo === false) {
           throw AppError.badRequest("Puesto no activo");
         }
-        resolvedPuestoId = puestoId;
-        resolvedMesa = Number(mesa);
-        resolvedLocalidad = puesto.localidad || localidad;
+        const hierarchy = await votingHierarchyService.resolveHierarchyReference(
+          {
+            localidadId: input.localidadId || null,
+            localidad,
+            puestoId,
+            puesto: votingPlace || puesto.nombre,
+            mesa
+          },
+          { organizationId }
+        );
+        resolvedPuestoId = hierarchy.puestoId;
+        resolvedMesa = hierarchy.mesa;
+        resolvedLocalidad = hierarchy.localidad || canonicalizeBogotaLocality(puesto.localidad || localidad) || puesto.localidad || localidad;
+        resolvedLocalidadId = hierarchy.localidadId || null;
+        resolvedMesaId = hierarchy.mesaId || null;
+        resolvedPuestoName = hierarchy.puesto || puesto.nombre || votingPlace || "";
       }
 
       // 6. Crear registro
@@ -90,24 +210,95 @@ export class RegistrationService {
         leaderName: leader.name,
         eventId,
         organizationId,
-        firstName,
-        lastName,
-        cedula,
+        firstName: normalized.firstName,
+        lastName: normalized.lastName,
+        cedula: normalized.cedula,
         email,
-        phone,
+        phone: normalized.phone,
         localidad: resolvedLocalidad,
+        localidadId: resolvedLocalidadId,
         departamento,
         puestoId: resolvedPuestoId,
         mesa: resolvedMesa,
-        votingPlace: votingPlace || resolvedLocalidad,
+        mesaId: resolvedMesaId,
+        votingPlace: resolvedPuestoName || votingPlace || "",
+        legacyVotingPlace: legacyVotingPlace && legacyVotingPlace !== (resolvedPuestoName || votingPlace || "") ? legacyVotingPlace : "",
         votingTable: votingTable || resolvedMesa,
+        puestoMatchStatus: registeredToVote && resolvedPuestoId ? "matched" : "not_applicable",
+        puestoMatchType: registeredToVote && resolvedPuestoId ? "form_canonical_match" : "",
+        puestoMatchConfidence: registeredToVote && resolvedPuestoId ? 1 : null,
+        puestoMatchReviewRequired: false,
+        puestoMatchRawName: legacyVotingPlace || "",
+        puestoMatchSuggestedPuestoId: resolvedPuestoId || null,
+        puestoMatchSuggestedLocalidadId: resolvedLocalidadId || null,
+        puestoMatchResolvedAt: registeredToVote && resolvedPuestoId ? new Date() : null,
         registeredToVote,
+        dataIntegrityStatus: validation.dataIntegrityStatus,
+        workflowStatus: validation.workflowStatus,
+        validationErrors: [...validation.errors, ...validation.warnings],
+        deduplicationFlags: [],
         confirmed: false,
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
+      Object.assign(
+        registrationData,
+        await buildOfficialValidationFields({
+          registrationId: null,
+          leaderName: leader.name,
+          localidad: registrationData.localidad,
+          puesto: registrationData.votingPlace,
+          mesa: registrationData.mesa,
+          puestoId: registrationData.puestoId,
+          legacyVotingPlace: registrationData.legacyVotingPlace,
+          isPendingNormalization: registrationData.puestoMatchReviewRequired === true
+        }, organizationId)
+      );
+
+      const dedup = await runDeduplicationSkill({
+        registration: registrationData,
+        organizationId
+      });
+
+      const hasExactDuplicate = dedup.flags.some((flag) => flag.flagType === "exact_duplicate");
+      if (hasExactDuplicate) {
+        throw AppError.conflict(`Persona con cédula ${normalized.cedula} ya registrada`);
+      }
+
+      registrationData.dataIntegrityStatus =
+        validation.dataIntegrityStatus === "invalid"
+          ? "invalid"
+          : dedup.dataIntegrityStatus === "invalid" || validation.needsReview || dedup.hasFlags
+            ? "needs_review"
+            : "valid";
+      registrationData.workflowStatus =
+        validation.dataIntegrityStatus === "invalid"
+          ? "invalid"
+          : dedup.workflowStatus === "duplicate"
+            ? "duplicate"
+            : validation.needsReview || dedup.hasFlags
+              ? "flagged"
+              : "validated";
+      registrationData.deduplicationFlags = dedup.flags.map((flag) => flag.flagType);
+
       const registration = await repository.create(registrationData);
+      votingHierarchyService.clearCaches();
+      await metricsCacheService.invalidateMetricsForRegistrationScope({
+        organizationId,
+        eventId,
+        leaderId: registrationData.leaderId
+      });
+
+      if (dedup.flags.length > 0) {
+        await persistDeduplicationFlags({
+          registrationId: registration._id,
+          organizationId,
+          eventId,
+          cedula: normalized.cedula,
+          flags: dedup.flags
+        });
+      }
 
       // 7. Registrar en audit
       await AuditService.logAction({
@@ -198,6 +389,49 @@ export class RegistrationService {
       const cleanUpdateData = { ...updateData };
       protectedFields.forEach(field => delete cleanUpdateData[field]);
 
+      const geographyChanged =
+        updateData.localidad !== undefined
+        || updateData.puestoId !== undefined
+        || updateData.votingPlace !== undefined
+        || updateData.mesa !== undefined
+        || updateData.votingTable !== undefined;
+
+      if (geographyChanged && (updateData.puestoId || registration.puestoId)) {
+        const hierarchy = await votingHierarchyService.resolveHierarchyReference(
+          {
+            localidadId: updateData.localidadId || registration.localidadId || null,
+            localidad: updateData.localidad || registration.localidad || "",
+            puestoId: updateData.puestoId || registration.puestoId || null,
+            puesto: updateData.votingPlace || registration.votingPlace || "",
+            mesa: updateData.mesa ?? updateData.votingTable ?? registration.mesa ?? registration.votingTable
+          },
+          { organizationId }
+        );
+
+        cleanUpdateData.localidad = hierarchy.localidad;
+        cleanUpdateData.localidadId = hierarchy.localidadId;
+        cleanUpdateData.puestoId = hierarchy.puestoId;
+        cleanUpdateData.mesa = hierarchy.mesa;
+        cleanUpdateData.mesaId = hierarchy.mesaId;
+        cleanUpdateData.legacyVotingPlace =
+          updateData.votingPlace
+          && updateData.votingPlace !== hierarchy.puesto
+            ? updateData.votingPlace
+            : registration.legacyVotingPlace || "";
+        cleanUpdateData.votingPlace = hierarchy.puesto;
+        cleanUpdateData.votingTable = hierarchy.mesa !== null ? String(hierarchy.mesa) : "";
+        cleanUpdateData.puestoMatchStatus = hierarchy.puestoId ? "matched" : registration.puestoMatchStatus || "not_applicable";
+        cleanUpdateData.puestoMatchType = hierarchy.puestoId ? "form_update_canonical_match" : registration.puestoMatchType || "";
+        cleanUpdateData.puestoMatchConfidence = hierarchy.puestoId ? 1 : registration.puestoMatchConfidence ?? null;
+        cleanUpdateData.puestoMatchReviewRequired = false;
+        cleanUpdateData.puestoMatchRawName = updateData.votingPlace || registration.puestoMatchRawName || registration.votingPlace || "";
+        cleanUpdateData.puestoMatchSuggestedPuestoId = hierarchy.puestoId || null;
+        cleanUpdateData.puestoMatchSuggestedLocalidadId = hierarchy.localidadId || null;
+        cleanUpdateData.puestoMatchResolvedAt = hierarchy.puestoId ? new Date() : registration.puestoMatchResolvedAt || null;
+      } else if (updateData.localidad !== undefined) {
+        cleanUpdateData.localidad = canonicalizeBogotaLocality(updateData.localidad) || updateData.localidad;
+      }
+
       // Si el registro requería revisión de puesto y se actualizaron campos relacionados,
       // marcar como resuelta la revisión
       if (registration.requiereRevisionPuesto && !registration.revisionPuestoResuelta) {
@@ -213,7 +447,27 @@ export class RegistrationService {
         }
       }
 
+      Object.assign(
+        cleanUpdateData,
+        await buildOfficialValidationFields({
+          registrationId,
+          leaderName: registration.leaderName || "",
+          localidad: cleanUpdateData.localidad ?? registration.localidad,
+          puesto: cleanUpdateData.votingPlace ?? registration.votingPlace,
+          mesa: cleanUpdateData.mesa ?? registration.mesa,
+          puestoId: cleanUpdateData.puestoId ?? registration.puestoId,
+          legacyVotingPlace: cleanUpdateData.legacyVotingPlace ?? registration.legacyVotingPlace,
+          isPendingNormalization: cleanUpdateData.puestoMatchReviewRequired ?? registration.puestoMatchReviewRequired
+        }, organizationId)
+      );
+
       const updated = await repository.update(registrationId, cleanUpdateData);
+      votingHierarchyService.clearCaches();
+      await metricsCacheService.invalidateMetricsForRegistrationScope({
+        organizationId,
+        eventId: registration.eventId,
+        leaderId: registration.leaderId
+      });
 
       logger.success("Registration actualizada", { registrationId });
       return updated;
@@ -237,10 +491,15 @@ export class RegistrationService {
         throw AppError.forbidden("No autorizado");
       }
 
+      const leaderId = registration.leaderId;
       await repository.delete(registrationId);
+      await metricsCacheService.invalidateMetricsForRegistrationScope({
+        organizationId,
+        eventId: registration.eventId,
+        leaderId
+      });
 
       // Decrementar contador del líder
-      const leaderId = registration.leaderId;
       if (leaderId) {
         const { default: mongoose } = await import('mongoose');
         const isValidObjectId = mongoose.Types.ObjectId.isValid(leaderId);
@@ -271,6 +530,11 @@ export class RegistrationService {
       }
 
       const updated = await repository.updateConfirmationStatus(registrationId, true);
+      await metricsCacheService.invalidateMetricsForRegistrationScope({
+        organizationId,
+        eventId: registration.eventId,
+        leaderId: registration.leaderId
+      });
 
       logger.success("Registration confirmada", { registrationId });
       return updated;
@@ -294,6 +558,11 @@ export class RegistrationService {
       }
 
       const updated = await repository.updateConfirmationStatus(registrationId, false);
+      await metricsCacheService.invalidateMetricsForRegistrationScope({
+        organizationId,
+        eventId: registration.eventId,
+        leaderId: registration.leaderId
+      });
 
       logger.success("Registration desconfirmada", { registrationId });
       return updated;
@@ -330,7 +599,7 @@ export class RegistrationService {
    */
   async bulkCreateRegistrations(registrationsData, organizationId, userId) {
     try {
-      logger.info("Bulk create registrations con fuzzy matching", { count: registrationsData.length });
+      logger.info("Bulk create registrations con resolucion canonica de puestos", { count: registrationsData.length });
 
       if (!Array.isArray(registrationsData) || registrationsData.length === 0) {
         throw AppError.badRequest("Datos inválidos");
@@ -340,17 +609,7 @@ export class RegistrationService {
         throw AppError.badRequest("Máximo 1000 registros por operación");
       }
 
-      const SIMILARITY_THRESHOLD = 0.80;
-      
-      // ========== STEP 1: Load ALL puestos for fuzzy matching ==========
-      const allPuestos = await Puestos.find({
-        organizationId,
-        activo: true
-      }).lean();
-
-      logger.info(`Loaded ${allPuestos.length} active puestos for fuzzy matching`);
-
-      // ========== STEP 2: Check duplicates ==========
+      // ========== STEP 1: Check duplicates ==========
       const cedulas = registrationsData.map(r => r.cedula).filter(Boolean);
       const { Registration } = await import('../../../models/index.js');
       
@@ -361,11 +620,12 @@ export class RegistrationService {
 
       const existingCedulasSet = new Set(existingRegs.map(r => r.cedula));
 
-      // ========== STEP 3: Process each row with fuzzy matching ==========
+      // ========== STEP 2: Process each row with canonical hierarchy resolution ==========
       const errors = [];
       const validRegistrations = [];
       const autocorrections = [];
       let requiresReviewCount = 0;
+      const officialCatalog = await officialE14CatalogService.loadCatalog();
 
       for (let i = 0; i < registrationsData.length; i++) {
         const reg = registrationsData[i];
@@ -414,54 +674,63 @@ export class RegistrationService {
         }
         existingCedulasSet.add(cedulaStr);
 
-        // ========== STEP 4: Fuzzy matching y autocorrección ==========
+        // ========== STEP 3: Canonical hierarchy resolution ==========
         let puestoId = null;
         let localidad = reg.localidad ? reg.localidad.toString().trim() : null;
         let votingPlace = reg.votingPlace ? reg.votingPlace.toString().trim() : null;
+        let legacyVotingPlace = votingPlace || "";
         let requiereRevisionPuesto = false;
         const rowCorrections = [];
 
-        // 4.1: Autocorregir localidad si es de Bogotá
         if (localidad) {
-          const localidadMatch = matchLocalidad(localidad, SIMILARITY_THRESHOLD);
-          if (localidadMatch) {
-            if (localidadMatch.corrected) {
+          const canonicalLocalidad = canonicalizeBogotaLocality(localidad);
+          if (canonicalLocalidad && canonicalLocalidad !== localidad) {
+            rowCorrections.push({
+              field: 'localidad',
+              original: localidad,
+              corrected: canonicalLocalidad,
+              similarity: 'canonico'
+            });
+          }
+          localidad = canonicalLocalidad || localidad;
+        }
+
+        if (votingPlace) {
+          const hierarchy = await votingHierarchyService.resolveHierarchyReference(
+            {
+              localidad,
+              puesto: votingPlace,
+              mesa
+            },
+            { organizationId }
+          );
+
+          if (hierarchy.puestoId) {
+            puestoId = hierarchy.puestoId;
+            if (hierarchy.localidad && hierarchy.localidad !== localidad) {
               rowCorrections.push({
                 field: 'localidad',
                 original: localidad,
-                corrected: localidadMatch.match,
-                similarity: (localidadMatch.similarity * 100).toFixed(1) + '%'
+                corrected: hierarchy.localidad,
+                similarity: 'canonico'
               });
             }
-            localidad = localidadMatch.match;
-          }
-        }
-
-        // 4.2: Fuzzy matching de puesto de votación
-        if (votingPlace && allPuestos.length > 0) {
-          const puestoMatch = matchPuesto(votingPlace, allPuestos, SIMILARITY_THRESHOLD);
-          
-          if (puestoMatch) {
-            puestoId = puestoMatch.puesto._id;
-            localidad = puestoMatch.puesto.localidad || localidad;
-            requiereRevisionPuesto = false;
-
-            if (puestoMatch.corrected) {
+            if (hierarchy.puesto && hierarchy.puesto !== votingPlace) {
               rowCorrections.push({
                 field: 'votingPlace',
                 original: votingPlace,
-                corrected: puestoMatch.puesto.nombre,
-                similarity: (puestoMatch.similarity * 100).toFixed(1) + '%'
+                corrected: hierarchy.puesto,
+                similarity: 'canonico'
               });
-              votingPlace = puestoMatch.puesto.nombre;
             }
+            localidad = hierarchy.localidad || localidad;
+            votingPlace = hierarchy.puesto || votingPlace;
           } else {
-            // No match - requiere revisión
             requiereRevisionPuesto = true;
-            requiresReviewCount++;
           }
-        } else if (votingPlace && allPuestos.length === 0) {
-          requiereRevisionPuesto = true;
+        }
+
+        if (requiereRevisionPuesto) {
           requiresReviewCount++;
         }
 
@@ -475,7 +744,7 @@ export class RegistrationService {
         }
 
         // Agregar a validRegistrations
-        validRegistrations.push({
+        const baseRow = {
           organizationId,
           leaderId: reg.leaderId || null,
           leaderName: reg.leaderName || null,
@@ -486,6 +755,7 @@ export class RegistrationService {
           email: reg.email ? reg.email.toString().trim() : "",
           phone: reg.phone ? reg.phone.toString().trim() : "",
           votingPlace: votingPlace,
+          legacyVotingPlace,
           puestoId: puestoId,
           mesa: mesa,
           localidad: localidad,
@@ -493,10 +763,50 @@ export class RegistrationService {
           capital: reg.capital ? reg.capital.toString().trim() : null,
           requiereRevisionPuesto: requiereRevisionPuesto,
           revisionPuestoResuelta: !requiereRevisionPuesto,
+          puestoMatchStatus: requiereRevisionPuesto ? "pending_review" : "matched",
+          puestoMatchType: requiereRevisionPuesto ? "bulk_pending_review" : "bulk_canonical_match",
+          puestoMatchConfidence: requiereRevisionPuesto ? null : 1,
+          puestoMatchReviewRequired: requiereRevisionPuesto,
+          puestoMatchRawName: legacyVotingPlace,
+          puestoMatchSuggestedPuestoId: puestoId || null,
+          puestoMatchResolvedAt: requiereRevisionPuesto ? null : new Date(),
           registeredToVote: true,
+          dataIntegrityStatus: requiereRevisionPuesto ? "needs_review" : "valid",
+          workflowStatus: requiereRevisionPuesto ? "flagged" : "validated",
+          validationErrors: requiereRevisionPuesto ? ["Requiere revision de puesto"] : [],
+          deduplicationFlags: [],
           confirmed: false,
           createdAt: new Date(),
           updatedAt: new Date()
+        };
+
+        const officialValidation = officialE14CatalogService.validateRegistrationAgainstOfficialCatalog({
+          registrationId: null,
+          leaderName: reg.leaderName || "",
+          localidad,
+          puesto: votingPlace,
+          mesa,
+          puestoId,
+          legacyVotingPlace,
+          isPendingNormalization: requiereRevisionPuesto
+        }, officialCatalog);
+
+        validRegistrations.push({
+          ...baseRow,
+          officialValidationStatus: officialValidation.mismatchType,
+          officialValidationReason: officialValidation.mismatchReason,
+          officialValidationReviewed: false,
+          officialCatalogVersion: officialValidation.catalogVersion || officialCatalog.version || "",
+          officialLocalidadNombre: officialValidation.officialLocalidadNombre || "",
+          officialPuestoNombre: officialValidation.officialPuestoNombre || "",
+          officialPuestoCodigo: officialValidation.officialPuestoCodigo || "",
+          officialMesaNumero: officialValidation.officialMesaNumero ?? null,
+          officialMesaValid: officialValidation.officialMesaValid === true,
+          officialPuestoValid: officialValidation.officialPuestoValid === true,
+          movedToErrorBucket: officialValidation.isOfficiallyValid !== true,
+          errorBucketReason: officialValidation.isOfficiallyValid ? "" : officialValidation.mismatchReason,
+          officialSuggestedPuesto: officialValidation?.suggestedCorrection?.puesto || "",
+          officialSuggestedLocalidad: officialValidation?.suggestedCorrection?.localidad || ""
         });
       }
 
@@ -534,6 +844,11 @@ export class RegistrationService {
       });
 
       logger.info(`Bulk import completed - Imported: ${insertedCount}, Autocorrected: ${autocorrections.length}, Review: ${requiresReviewCount}, Errors: ${errors.length}`);
+      await metricsCacheService.invalidateMetricsForRegistrationScope({
+        organizationId,
+        eventId: null,
+        leaderId: null
+      });
 
       return {
         success: true,
@@ -550,6 +865,236 @@ export class RegistrationService {
       if (error instanceof AppError) throw error;
       throw AppError.serverError("Error en bulk create");
     }
+  }
+
+  async getOfficialCorrectionCatalog(localidad = "", organizationId = null) {
+    const selectors = await officialE14CatalogService.getCatalogSelectors();
+    const puestos = localidad
+      ? await officialE14CatalogService.getPuestosByLocalidad(localidad)
+      : [];
+
+    return {
+      catalogVersion: selectors.catalogVersion,
+      localidades: selectors.localidades,
+      puestos
+    };
+  }
+
+  async previewOfficialCorrection(registrationId, payload, organizationId) {
+    const registration = await repository.findById(registrationId);
+    if (registration.organizationId !== organizationId) {
+      throw AppError.forbidden("No autorizado");
+    }
+
+    const selectedLocalidad = canonicalizeBogotaLocality(payload.localidad) || payload.localidad || "";
+    const selectedPuesto = String(payload.puesto || "").trim();
+    const selectedMesa = payload.mesa === "" || payload.mesa === undefined || payload.mesa === null
+      ? null
+      : Number.parseInt(String(payload.mesa), 10);
+
+    const catalog = await officialE14CatalogService.loadCatalog();
+    const selectorMesas = selectedLocalidad && selectedPuesto
+      ? await officialE14CatalogService.getMesasByPuesto(selectedLocalidad, selectedPuesto, { catalog })
+      : [];
+
+    let hierarchy = null;
+    let hierarchyError = "";
+    try {
+      hierarchy = await resolveHierarchyForManualCorrection(
+        {
+          localidad: selectedLocalidad,
+          puesto: selectedPuesto,
+          mesa: selectedMesa
+        },
+        organizationId,
+        registration
+      );
+    } catch (error) {
+      hierarchyError = error.message;
+    }
+
+    const validation = officialE14CatalogService.validateRegistrationAgainstOfficialCatalog({
+      registrationId,
+      leaderName: registration.leaderName || "",
+      localidad: selectedLocalidad,
+      puesto: selectedPuesto,
+      mesa: selectedMesa,
+      puestoId: hierarchy?.puestoId || registration.puestoId || null,
+      legacyVotingPlace: registration.legacyVotingPlace || registration.votingPlace || "",
+      isPendingNormalization: false
+    }, catalog);
+
+    return {
+      registrationId,
+      current: {
+        localidad: registration.localidad || "",
+        puesto: registration.votingPlace || "",
+        mesa: registration.mesa ?? null,
+        officialValidationStatus: registration.officialValidationStatus || "",
+        officialValidationReason: registration.officialValidationReason || ""
+      },
+      proposal: {
+        localidad: selectedLocalidad,
+        puesto: selectedPuesto,
+        mesa: selectedMesa,
+        hierarchyResolved: Boolean(hierarchy),
+        hierarchyError,
+        availableMesas: selectorMesas,
+        resolvedHierarchy: hierarchy
+      },
+      validation: {
+        status: validation.mismatchType,
+        reason: validation.mismatchReason,
+        isOfficialValid: validation.isOfficiallyValid === true,
+        officialPuestoNombre: validation.officialPuestoNombre || "",
+        officialLocalidadNombre: validation.officialLocalidadNombre || "",
+        officialPuestoCodigo: validation.officialPuestoCodigo || "",
+        mesaExistsInOfficialPuesto: validation.officialMesaValid === true,
+        puestoExistsInOfficialCatalog: validation.officialPuestoValid === true,
+        suggestion: validation.suggestedCorrection || null
+      }
+    };
+  }
+
+  async applyOfficialCorrection(registrationId, payload, organizationId, correctedBy = "admin") {
+    const registration = await repository.findById(registrationId);
+    if (registration.organizationId !== organizationId) {
+      throw AppError.forbidden("No autorizado");
+    }
+
+    const preview = await this.previewOfficialCorrection(registrationId, payload, organizationId);
+    const selectedLocalidad = preview.proposal.localidad;
+    const selectedPuesto = preview.proposal.puesto;
+    const selectedMesa = preview.proposal.mesa;
+    if (!preview.proposal.hierarchyResolved) {
+      throw AppError.badRequest(preview.proposal.hierarchyError || "La combinación seleccionada no pudo resolverse en la jerarquía interna");
+    }
+    const hierarchy = preview.proposal.resolvedHierarchy
+      || await resolveHierarchyForManualCorrection(
+        {
+          localidad: selectedLocalidad,
+          puesto: selectedPuesto,
+          mesa: selectedMesa
+        },
+        organizationId,
+        registration
+      );
+    const canonicalLocalidad = hierarchy?.localidad || selectedLocalidad;
+    const canonicalPuesto = hierarchy?.puesto || selectedPuesto;
+    const canonicalMesa = hierarchy?.mesa ?? selectedMesa;
+
+    const previousSnapshot = {
+      localidad: registration.localidad || "",
+      localidadId: registration.localidadId || null,
+      puesto: registration.votingPlace || "",
+      puestoId: registration.puestoId || null,
+      mesa: registration.mesa ?? null,
+      mesaId: registration.mesaId || null,
+      officialValidationStatus: registration.officialValidationStatus || "",
+      officialValidationReason: registration.officialValidationReason || ""
+    };
+
+    const updateData = {
+      localidad: canonicalLocalidad,
+      localidadId: hierarchy?.localidadId || registration.localidadId || null,
+      puestoId: hierarchy?.puestoId || registration.puestoId || null,
+      mesa: canonicalMesa,
+      mesaId: hierarchy?.mesaId || null,
+      votingPlace: canonicalPuesto,
+      votingTable: canonicalMesa !== null && canonicalMesa !== undefined ? String(canonicalMesa) : "",
+      legacyVotingPlace: registration.legacyVotingPlace || registration.votingPlace || "",
+      puestoMatchStatus: hierarchy?.puestoId ? "matched" : registration.puestoMatchStatus || "pending_review",
+      puestoMatchType: hierarchy?.puestoId ? "manual_admin_correction" : registration.puestoMatchType || "",
+      puestoMatchConfidence: hierarchy?.puestoId ? 1 : registration.puestoMatchConfidence ?? null,
+      puestoMatchReviewRequired: preview.validation.isOfficialValid !== true,
+      puestoMatchRawName: registration.puestoMatchRawName || registration.legacyVotingPlace || registration.votingPlace || "",
+      puestoMatchSuggestedPuestoId: hierarchy?.puestoId || null,
+      puestoMatchSuggestedLocalidadId: hierarchy?.localidadId || null,
+      puestoMatchResolvedAt: new Date(),
+      officialValidationReviewed: true,
+      updatedAt: new Date()
+    };
+
+    Object.assign(updateData, await buildOfficialValidationFields({
+      registrationId,
+      leaderName: registration.leaderName || "",
+      localidad: canonicalLocalidad,
+      puesto: canonicalPuesto,
+      mesa: canonicalMesa,
+      puestoId: hierarchy?.puestoId || registration.puestoId || null,
+      legacyVotingPlace: registration.legacyVotingPlace || registration.votingPlace || "",
+      isPendingNormalization: false
+    }, organizationId));
+    updateData.officialValidationReviewed = true;
+
+    const nextSnapshot = {
+      localidad: updateData.localidad || "",
+      localidadId: updateData.localidadId || null,
+      puesto: updateData.votingPlace || "",
+      puestoId: updateData.puestoId || null,
+      mesa: updateData.mesa ?? null,
+      mesaId: updateData.mesaId || null,
+      officialValidationStatus: updateData.officialValidationStatus || "",
+      officialValidationReason: updateData.officialValidationReason || ""
+    };
+
+    const correctionEntry = {
+      previous: previousSnapshot,
+      next: nextSnapshot,
+      correctionNote: String(payload.correctionNote || "").trim(),
+      correctedBy,
+      correctedAt: new Date(),
+      source: "manual_admin_correction"
+    };
+
+    const updated = await Registration.findOneAndUpdate(
+      {
+        _id: registrationId,
+        organizationId
+      },
+      {
+        $set: updateData,
+        $push: { correctionHistory: correctionEntry }
+      },
+      { new: true, runValidators: true }
+    ).lean();
+
+    votingHierarchyService.clearCaches();
+    await metricsCacheService.invalidateMetricsForRegistrationScope({
+      organizationId,
+      eventId: registration.eventId,
+      leaderId: registration.leaderId
+    });
+
+    await AuditService.logAction({
+      action: "MANUAL_OFFICIAL_CORRECTION",
+      userId: correctedBy,
+      resourceType: "Registration",
+      resourceId: registrationId,
+      organizationId,
+      description: `Correccion manual aplicada a registro ${registrationId}`
+    });
+
+    return {
+      registrationId,
+      updated,
+      preview: {
+        status: updateData.officialValidationStatus,
+        reason: updateData.officialValidationReason,
+        movedToOfficial: updateData.officialValidationStatus === "official_valid"
+      }
+    };
+  }
+
+  async getCorrectionHistory(registrationId, organizationId) {
+    const registration = await repository.findById(registrationId);
+    if (registration.organizationId !== organizationId) {
+      throw AppError.forbidden("No autorizado");
+    }
+
+    return (registration.correctionHistory || [])
+      .map(serializeCorrectionHistoryItem)
+      .sort((a, b) => new Date(b.correctedAt || 0).getTime() - new Date(a.correctedAt || 0).getTime());
   }
 
   /**

@@ -1,57 +1,356 @@
-import mongoose from "mongoose";
-import { Leader } from "../models/Leader.js";
-import { Puestos } from "../models/Puestos.js";
-import { Registration } from "../models/Registration.js";
-import { E14ConfirmationByMesa } from "../models/E14ConfirmationByMesa.js";
-import logger from "../config/logger.js";
-import { buildE14NavigationHint, getBogotaZoneCode } from "../shared/bogota-zones.js";
+import { Registration } from "../models/index.js";
+import votingHierarchyService from "./votingHierarchy.service.js";
 import {
-  getBogotaLocalidades,
-  isBogotaMunicipality,
-  normalizeBogotaLocalidad,
-  normalizeBogotaPuesto,
-  normalizeBogotaPuestoKey,
-  normalizeBogotaText,
-  resolveBogotaLocalidad
-} from "../shared/bogota-territory.js";
-
-function normalizeKey(value) {
-  return normalizeBogotaText(value);
-}
+  canonicalizeBogotaLocality,
+  getBogotaLocalidadesCanonical
+} from "../shared/territoryNormalization.js";
 
 function toInt(value) {
   if (value === null || value === undefined || value === "") return null;
-  const n = Number.parseInt(String(value).trim(), 10);
-  if (!Number.isFinite(n)) return null;
-  return n;
+  const parsed = Number.parseInt(String(value).trim(), 10);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
-function getReportedVotes(registration) {
-  const candidates = [
-    registration?.votosReportados,
-    registration?.reportedVotes,
-    registration?.votesReported,
-    registration?.votes,
-    registration?.votos
-  ];
-  for (const value of candidates) {
-    const parsed = toInt(value);
-    if (parsed !== null) return parsed;
-  }
-  return null;
-}
-
-function resolvePuestoText(registration) {
-  if (registration?.puestoResolvedName) return registration.puestoResolvedName;
-  if (registration?.votingPlace) return registration.votingPlace;
-  if (registration?.puestoId && typeof registration.puestoId === "object") {
-    return registration.puestoId.nombre || registration.puestoId.name || "";
-  }
+function parseRegionScope(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "bogota") return "bogota";
+  if (normalized === "resto" || normalized === "nacional") return "resto";
   return "";
 }
 
-function hasMissingLocationData({ localidad, puesto, mesa }) {
-  return !String(localidad || "").trim() || !String(puesto || "").trim() || mesa === null;
+function escapeRegex(value) {
+  return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function buildOfficialMatch(rawFilters = {}, organizationId = null) {
+  const query = {
+    officialValidationStatus: "official_valid"
+  };
+
+  if (organizationId) query.organizationId = organizationId;
+  if (rawFilters.eventId) query.eventId = String(rawFilters.eventId);
+  if (rawFilters.leaderId) query.leaderId = String(rawFilters.leaderId);
+
+  const regionScope = parseRegionScope(rawFilters.regionScope || rawFilters.regionScopeFilter);
+  if (regionScope === "bogota") {
+    query.localidad = { $in: getBogotaLocalidadesCanonical() };
+  } else if (regionScope === "resto") {
+    query.$or = [
+      { localidad: { $exists: false } },
+      { localidad: null },
+      { localidad: "" },
+      { localidad: { $nin: getBogotaLocalidadesCanonical() } }
+    ];
+  }
+
+  const localidad = canonicalizeBogotaLocality(rawFilters.localidad) || rawFilters.localidad;
+  if (localidad) {
+    query.localidad = String(localidad);
+    delete query.$or;
+  }
+
+  const search = String(rawFilters.search || "").trim();
+  if (search) {
+    const regex = new RegExp(escapeRegex(search), "i");
+    query.$and = query.$and || [];
+    query.$and.push({
+      $or: [
+        { leaderName: regex },
+        { localidad: regex },
+        { officialLocalidadNombre: regex },
+        { votingPlace: regex },
+        { officialPuestoNombre: regex },
+        { legacyVotingPlace: regex },
+        { votingTable: regex },
+        { cedula: regex },
+        { firstName: regex },
+        { lastName: regex }
+      ]
+    });
+  }
+
+  return query;
+}
+
+function buildComparisonBasePipeline(rawFilters = {}, organizationId = null) {
+  const eventId = rawFilters.eventId ? String(rawFilters.eventId) : null;
+
+  return [
+    { $match: buildOfficialMatch(rawFilters, organizationId) },
+    {
+      $project: {
+        organizationId: 1,
+        eventId: 1,
+        leaderName: 1,
+        localidadId: 1,
+        puestoId: 1,
+        localidadLabel: { $ifNull: ["$officialLocalidadNombre", "$localidad"] },
+        puestoLabel: { $ifNull: ["$officialPuestoNombre", "$votingPlace"] },
+        puestoCodigo: { $ifNull: ["$officialPuestoCodigo", ""] },
+        mesaNumero: {
+          $ifNull: [
+            "$officialMesaNumero",
+            "$mesa",
+            {
+              $convert: {
+                input: "$votingTable",
+                to: "int",
+                onError: null,
+                onNull: null
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      $match: {
+        localidadLabel: { $ne: null, $ne: "" },
+        puestoLabel: { $ne: null, $ne: "" },
+        mesaNumero: { $ne: null }
+      }
+    },
+    {
+      $group: {
+        _id: {
+          organizationId: "$organizationId",
+          eventId: "$eventId",
+          localidadId: "$localidadId",
+          puestoId: "$puestoId",
+          localidad: "$localidadLabel",
+          puesto: "$puestoLabel",
+          puestoCodigo: "$puestoCodigo",
+          mesa: "$mesaNumero"
+        },
+        repVotes: { $sum: 1 },
+        totalRegistros: { $sum: 1 }
+      }
+    },
+    {
+      $lookup: {
+        from: "e14_confirmation_by_mesa",
+        let: {
+          organizationId: "$_id.organizationId",
+          eventId: "$_id.eventId",
+          localidadId: "$_id.localidadId",
+          puestoId: "$_id.puestoId",
+          mesa: "$_id.mesa"
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$organizationId", "$$organizationId"] },
+                  eventId
+                    ? { $eq: ["$eventId", "$$eventId"] }
+                    : { $eq: [1, 1] },
+                  { $eq: ["$localidadId", "$$localidadId"] },
+                  { $eq: ["$puestoId", "$$puestoId"] },
+                  { $eq: ["$mesa", "$$mesa"] }
+                ]
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              votosE14Candidate105: 1,
+              votosE14SuggestedCandidate105: 1,
+              sourceEstadoRevision: 1,
+              sourceConfidence: 1,
+              sourceDocumento: 1,
+              sourceArchivo: 1,
+              reviewRequired: 1,
+              reviewReason: 1,
+              notes: 1,
+              source: 1
+            }
+          },
+          { $limit: 1 }
+        ],
+        as: "confirmation"
+      }
+    },
+    {
+      $addFields: {
+        confirmation: { $first: "$confirmation" }
+      }
+    },
+    {
+      $addFields: {
+        id: {
+          $concat: [
+            { $ifNull: [{ $toString: "$_id.localidadId" }, "sin-localidad"] },
+            "::",
+            { $ifNull: [{ $toString: "$_id.puestoId" }, "sin-puesto"] },
+            "::",
+            { $toString: "$_id.mesa" }
+          ]
+        },
+        localidad: "$_id.localidad",
+        puesto: "$_id.puesto",
+        puestoCodigo: "$_id.puestoCodigo",
+        mesa: "$_id.mesa",
+        e14Votes: {
+          $ifNull: [
+            "$confirmation.votosE14Candidate105",
+            "$confirmation.votosE14SuggestedCandidate105"
+          ]
+        },
+        sourceStatus: { $ifNull: ["$confirmation.sourceEstadoRevision", ""] },
+        sourceConfidence: { $ifNull: ["$confirmation.sourceConfidence", null] },
+        sourceDocumento: { $ifNull: ["$confirmation.sourceDocumento", ""] },
+        sourceArchivo: { $ifNull: ["$confirmation.sourceArchivo", ""] },
+        reviewRequired: { $ifNull: ["$confirmation.reviewRequired", false] },
+        reviewReason: { $ifNull: ["$confirmation.reviewReason", ""] },
+        notes: { $ifNull: ["$confirmation.notes", ""] },
+        source: { $ifNull: ["$confirmation.source", null] }
+      }
+    },
+    {
+      $addFields: {
+        porcentajeConfirmacion: {
+          $cond: [
+            {
+              $and: [
+                { $gt: ["$repVotes", 0] },
+                { $ne: ["$e14Votes", null] }
+              ]
+            },
+            {
+              $min: [
+                100,
+                {
+                  $round: [
+                    {
+                      $multiply: [
+                        { $divide: ["$e14Votes", "$repVotes"] },
+                        100
+                      ]
+                    },
+                    2
+                  ]
+                }
+              ]
+            },
+            null
+          ]
+        },
+        diferencia: {
+          $cond: [
+            { $ne: ["$e14Votes", null] },
+            { $subtract: ["$e14Votes", "$repVotes"] },
+            null
+          ]
+        }
+      }
+    },
+    {
+      $addFields: {
+        status: {
+          $switch: {
+            branches: [
+              { case: { $lte: ["$repVotes", 0] }, then: "sin_votos_reportados" },
+              { case: { $eq: ["$e14Votes", null] }, then: "pendiente_e14" },
+              { case: { $gte: ["$porcentajeConfirmacion", 100] }, then: "confirmado" },
+              { case: { $gte: ["$porcentajeConfirmacion", 60] }, then: "confirmacion_alta" },
+              { case: { $gte: ["$porcentajeConfirmacion", 30] }, then: "confirmacion_parcial" },
+              { case: { $gte: ["$porcentajeConfirmacion", 1] }, then: "confirmacion_baja" }
+            ],
+            default: "sin_confirmacion"
+          }
+        }
+      }
+    }
+  ];
+}
+
+function buildRowFilters(rawFilters = {}) {
+  const pipeline = [];
+  const estado = String(rawFilters.estado || "").trim();
+  const ocr = String(rawFilters.ocr || rawFilters.sourceStatus || "").trim();
+  const queue = String(rawFilters.queue || rawFilters.workQueue || "").trim().toLowerCase();
+
+  if (queue === "pending") {
+    pipeline.push({
+      $match: {
+        $or: [
+          { status: { $in: ["pendiente_e14", "sin_confirmacion", "confirmacion_baja", "confirmacion_parcial", "confirmacion_alta"] } },
+          { reviewRequired: true }
+        ]
+      }
+    });
+  } else if (queue === "differences") {
+    pipeline.push({
+      $match: {
+        e14Votes: { $ne: null },
+        diferencia: { $ne: 0 }
+      }
+    });
+  } else if (queue === "confirmed") {
+    pipeline.push({ $match: { status: "confirmado" } });
+  } else if (queue === "sin_e14") {
+    pipeline.push({ $match: { status: "pendiente_e14" } });
+  }
+
+  if (estado) {
+    if (estado === "manual_only") {
+      pipeline.push({ $match: { source: "manual" } });
+    } else {
+      pipeline.push({ $match: { status: estado } });
+    }
+  }
+
+  if (ocr) {
+    pipeline.push({ $match: { sourceStatus: ocr } });
+  }
+
+  return pipeline;
+}
+
+async function getFilterOptions(rawFilters = {}, organizationId = null) {
+  const base = buildOfficialMatch(
+    {
+      ...rawFilters,
+      search: "",
+      estado: "",
+      sourceStatus: "",
+      ocr: ""
+    },
+    organizationId
+  );
+
+  const localidadValues = (await Registration.distinct("localidad", base))
+    .filter(Boolean)
+    .sort((a, b) => String(a).localeCompare(String(b), "es"));
+
+  const puestoPipeline = [
+    { $match: base },
+    {
+      $project: {
+        puestoLabel: { $ifNull: ["$officialPuestoNombre", "$votingPlace"] }
+      }
+    }
+  ];
+  if (rawFilters.localidad) {
+    puestoPipeline.unshift({
+      $match: { localidad: canonicalizeBogotaLocality(rawFilters.localidad) || String(rawFilters.localidad) }
+    });
+  }
+  puestoPipeline.push(
+    { $match: { puestoLabel: { $ne: null, $ne: "" } } },
+    { $group: { _id: "$puestoLabel" } },
+    { $sort: { _id: 1 } }
+  );
+
+  const puestos = await Registration.aggregate(puestoPipeline);
+
+  return {
+    regionScope: parseRegionScope(rawFilters.regionScope || rawFilters.regionScopeFilter),
+    localidadesDisponibles: localidadValues.map((value) => ({ value, label: value })),
+    puestosDisponibles: puestos.map((row) => ({ value: row._id, label: row._id }))
+  };
 }
 
 export function calculateE14Confirmation({ votosReportadosTotales, votosE14Candidate105, hasMissingLocation = false }) {
@@ -59,10 +358,10 @@ export function calculateE14Confirmation({ votosReportadosTotales, votosE14Candi
     return { porcentaje: null, diferencia: null, estado: "datos_incompletos" };
   }
 
-  const reportados = toInt(votosReportadosTotales);
-  const e14 = toInt(votosE14Candidate105);
+  const reportados = Number.isFinite(votosReportadosTotales) ? votosReportadosTotales : 0;
+  const e14 = Number.isFinite(votosE14Candidate105) ? votosE14Candidate105 : null;
 
-  if (reportados === null || reportados <= 0) {
+  if (reportados <= 0) {
     return {
       porcentaje: null,
       diferencia: e14 === null ? null : e14,
@@ -74,7 +373,7 @@ export function calculateE14Confirmation({ votosReportadosTotales, votosE14Candi
     return { porcentaje: null, diferencia: null, estado: "pendiente_e14" };
   }
 
-  const porcentaje = Math.min(Number((((e14 / reportados) * 100)).toFixed(2)), 100);
+  const porcentaje = Math.min(Number(((e14 / reportados) * 100).toFixed(2)), 100);
   const diferencia = e14 - reportados;
 
   let estado = "sin_confirmacion";
@@ -86,603 +385,287 @@ export function calculateE14Confirmation({ votosReportadosTotales, votosE14Candi
   return { porcentaje, diferencia, estado };
 }
 
-function normalizeFilters(raw = {}) {
-  return {
-    eventId: raw.eventId || null,
-    leaderId: raw.leaderId || null,
-    localidad: raw.localidad || "",
-    puesto: raw.puesto || "",
-    mesa: raw.mesa || "",
-    estado: raw.estado || raw.estadoConfirmacion || raw.estadoValidacion || "",
-    sourceStatus: raw.sourceStatus || raw.estadoOcr || "",
-    search: raw.search || "",
-    page: Math.max(1, Number.parseInt(raw.page, 10) || 1),
-    limit: Math.min(200, Math.max(1, Number.parseInt(raw.limit, 10) || 25))
-  };
-}
-
-function buildRegistrationQuery(filters, organizationId) {
-  const query = {};
-  if (organizationId) query.organizationId = organizationId;
-  if (filters.eventId) query.eventId = String(filters.eventId);
-  if (filters.leaderId) query.leaderId = String(filters.leaderId);
-  if (filters.search) {
-    const regex = new RegExp(filters.search, "i");
-    query.$or = [
-      { firstName: regex },
-      { lastName: regex },
-      { cedula: regex },
-      { email: regex },
-      { phone: regex },
-      { leaderName: regex },
-      { votingPlace: regex },
-      { localidad: regex }
-    ];
-  }
-  return query;
-}
-
-async function resolvePuestoMap(puestoIds = []) {
-  const uniqueIds = [...new Set(puestoIds.filter(Boolean).map(String))];
-  if (uniqueIds.length === 0) return new Map();
-  const puestos = await Puestos.find({ _id: { $in: uniqueIds } }, { nombre: 1, localidad: 1, ciudad: 1, departamento: 1 }).lean();
-  const map = new Map();
-  puestos.forEach((puesto) => {
-    map.set(String(puesto._id), {
-      nombre: `${puesto.nombre || ""}`.trim(),
-      localidad: `${puesto.localidad || ""}`.trim(),
-      ciudad: `${puesto.ciudad || ""}`.trim(),
-      departamento: `${puesto.departamento || ""}`.trim()
-    });
-  });
-  return map;
-}
-
-function createTraceStats() {
-  return {
-    totalRegistros: 0,
-    incluidos: 0,
-    excluidos: 0,
-    excludedByReason: {
-      localidad_invalida: 0,
-      municipio_no_bogota: 0,
-      puesto_vacio: 0,
-      mesa_invalida: 0
-    },
-    sampleInvalidLocalidades: []
-  };
-}
-
-function pushInvalidLocalidadSample(traceStats, payload) {
-  if (traceStats.sampleInvalidLocalidades.length >= 8) return;
-  traceStats.sampleInvalidLocalidades.push(payload);
-}
-
-function resolveLocalidadFromRegistration(doc, puestoInfo) {
-  const candidates = [
-    doc?.localidad,
-    puestoInfo?.localidad
-  ];
-  for (const raw of candidates) {
-    const resolved = resolveBogotaLocalidad(raw);
-    if (resolved) {
-      return {
-        rawLocalidad: raw || "",
-        normalizedLocalidad: normalizeKey(raw),
-        resolvedLocalidad: resolved.displayName,
-        zoneCode: resolved.zoneCode
-      };
+export async function getE14ConfirmationSummaryData(rawFilters = {}, options = {}) {
+  const organizationId = options.organizationId || null;
+  const summaryPipeline = [
+    ...buildComparisonBasePipeline(rawFilters, organizationId),
+    ...buildRowFilters(rawFilters),
+    {
+      $group: {
+        _id: null,
+        mesas: { $sum: 1 },
+        mesasConciliadas: {
+          $sum: { $cond: [{ $ne: ["$e14Votes", null] }, 1, 0] }
+        },
+        pendientes: {
+          $sum: { $cond: [{ $eq: ["$status", "pendiente_e14"] }, 1, 0] }
+        },
+        confirmadas: {
+          $sum: { $cond: [{ $eq: ["$status", "confirmado"] }, 1, 0] }
+        },
+        mesasConDiferencia: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $ne: ["$e14Votes", null] },
+                  { $ne: ["$diferencia", 0] }
+                ]
+              },
+              1,
+              0
+            ]
+          }
+        },
+        votosReportados: { $sum: "$repVotes" },
+        votosE14: { $sum: { $ifNull: ["$e14Votes", 0] } },
+        totalRegistros: { $sum: "$totalRegistros" },
+        totalPorcentaje: {
+          $sum: { $cond: [{ $ne: ["$porcentajeConfirmacion", null] }, "$porcentajeConfirmacion", 0] }
+        },
+        totalConPorcentaje: {
+          $sum: { $cond: [{ $ne: ["$porcentajeConfirmacion", null] }, 1, 0] }
+        }
+      }
     }
-  }
-
-  return {
-    rawLocalidad: candidates.find((value) => String(value || "").trim()) || "",
-    normalizedLocalidad: normalizeKey(candidates.find((value) => String(value || "").trim()) || ""),
-    resolvedLocalidad: ""
-  };
-}
-
-function inferBogotaMembership(doc, puestoInfo, resolvedLocalidad) {
-  const municipalityCandidates = [
-    doc?.capital,
-    doc?.ciudad,
-    doc?.municipio,
-    doc?.municipality,
-    puestoInfo?.ciudad
   ];
 
-  const hasExplicitNonBogota = municipalityCandidates.some((value) => {
-    const normalized = normalizeKey(value);
-    return normalized && !isBogotaMunicipality(value);
-  });
+  const [summaryRow, excludedTotal] = await Promise.all([
+    Registration.aggregate(summaryPipeline),
+    Registration.countDocuments({
+      ...buildOfficialMatch(rawFilters, organizationId),
+      officialValidationStatus: { $ne: "official_valid" }
+    })
+  ]);
 
-  if (hasExplicitNonBogota) return false;
-  if (resolvedLocalidad) return true;
-
-  return [doc?.departamento, puestoInfo?.departamento].some((value) => {
-    const normalized = normalizeKey(value);
-    return normalized === "BOGOTA" || normalized === "BOGOTA D C" || normalized === "BOGOTA D.C.";
-  });
-}
-
-function logGroupTrace(payload) {
-  logger.info("[E14 GROUP TRACE]", payload);
-}
-
-async function buildMesaRows(filters, organizationId) {
-  const query = buildRegistrationQuery(filters, organizationId);
-  const docs = await Registration.find(query, {
-    eventId: 1,
-    leaderId: 1,
-    localidad: 1,
-    capital: 1,
-    departamento: 1,
-    mesa: 1,
-    votingTable: 1,
-    votingPlace: 1,
-    puestoId: 1,
-    votosReportados: 1,
-    reportedVotes: 1,
-    votesReported: 1,
-    votes: 1,
-    votos: 1
-  }).lean();
-
-  const puestoMap = await resolvePuestoMap(docs.map((d) => d.puestoId));
-  const groups = new Map();
-  const traceStats = createTraceStats();
-
-  traceStats.totalRegistros = docs.length;
-
-  docs.forEach((doc) => {
-    const puestoInfo = puestoMap.get(String(doc.puestoId || "")) || null;
-    const localidadInfo = resolveLocalidadFromRegistration(doc, puestoInfo);
-    const localidad = localidadInfo.resolvedLocalidad || "";
-    const puesto = normalizeBogotaPuesto(puestoInfo?.nombre || resolvePuestoText(doc) || "");
-    const mesa = toInt(doc.mesa ?? doc.votingTable);
-    const zoneCode = localidadInfo.zoneCode || getBogotaZoneCode(localidad);
-    const normalizedLocalidad = normalizeKey(localidad);
-    const normalizedPuesto = normalizeBogotaPuestoKey(puesto);
-    const includedInBogotaAggregation = Boolean(
-      localidad
-      && puesto
-      && mesa !== null
-      && inferBogotaMembership(doc, puestoInfo, localidad)
-    );
-
-    logGroupTrace({
-      rawLocalidad: localidadInfo.rawLocalidad || "",
-      normalizedLocalidad: localidadInfo.normalizedLocalidad || "",
-      resolvedLocalidad: localidad || null,
-      rawPuesto: puestoInfo?.nombre || resolvePuestoText(doc) || "",
-      normalizedPuesto,
-      rawMesa: doc.mesa ?? doc.votingTable ?? null,
-      votosReportados: getReportedVotes(doc),
-      includedInBogotaAggregation
-    });
-
-    if (!localidad) {
-      traceStats.excluidos += 1;
-      traceStats.excludedByReason.localidad_invalida += 1;
-      pushInvalidLocalidadSample(traceStats, {
-        rawLocalidad: localidadInfo.rawLocalidad || "",
-        normalizedLocalidad: localidadInfo.normalizedLocalidad || "",
-        puesto: puestoInfo?.nombre || resolvePuestoText(doc) || "",
-        mesa: doc.mesa ?? doc.votingTable ?? null
-      });
-      return;
-    }
-    if (!inferBogotaMembership(doc, puestoInfo, localidad)) {
-      traceStats.excluidos += 1;
-      traceStats.excludedByReason.municipio_no_bogota += 1;
-      return;
-    }
-    if (!puesto) {
-      traceStats.excluidos += 1;
-      traceStats.excludedByReason.puesto_vacio += 1;
-      return;
-    }
-    if (mesa === null || mesa <= 0) {
-      traceStats.excluidos += 1;
-      traceStats.excludedByReason.mesa_invalida += 1;
-      return;
-    }
-
-    traceStats.incluidos += 1;
-    const key = `${normalizedLocalidad}||${normalizedPuesto}||${mesa ?? "NULL"}`;
-
-    if (!groups.has(key)) {
-      groups.set(key, {
-        key,
-        localidad,
-        puesto,
-        mesa,
-        zoneCode,
-        normalizedLocalidad,
-        normalizedPuesto,
-        votosReportadosTotales: 0,
-        groupCount: 0,
-        leaders: new Set()
-      });
-    }
-    const bucket = groups.get(key);
-    const reported = getReportedVotes(doc);
-    bucket.groupCount += 1;
-    if (Number.isFinite(reported)) bucket.votosReportadosTotales += reported;
-    if (doc.leaderId) bucket.leaders.add(String(doc.leaderId));
-  });
-
-  const confirmationQuery = { organizationId };
-  if (filters.eventId) confirmationQuery.eventId = String(filters.eventId);
-  const confirmations = await E14ConfirmationByMesa.find(confirmationQuery).lean();
-  const confirmationMap = new Map();
-  confirmations.forEach((row) => {
-    const key = `${row.normalizedLocalidad}||${row.normalizedPuesto}||${row.mesa}`;
-    confirmationMap.set(key, row);
-  });
-
-  const rows = [...groups.values()].map((group) => {
-    const saved = confirmationMap.get(group.key);
-    const votosE14Candidate105 = saved?.votosE14Candidate105 ?? null;
-    const votosE14SuggestedCandidate105 = saved?.votosE14SuggestedCandidate105 ?? null;
-    const hasMissing = hasMissingLocationData(group);
-    const calc = calculateE14Confirmation({
-      votosReportadosTotales: group.votosReportadosTotales,
-      votosE14Candidate105,
-      hasMissingLocation: hasMissing
-    });
-    const hint = buildE14NavigationHint({
-      localidad: group.localidad,
-      puesto: group.puesto,
-      mesa: group.mesa,
-      e14ZoneCode: group.zoneCode
-    });
-    return {
-      mesaKey: group.key,
-      eventId: filters.eventId || null,
-      localidad: group.localidad,
-      puesto: group.puesto,
-      mesa: group.mesa,
-      zoneCode: group.zoneCode || null,
-      zoneLabel: hint.zoneLabel || null,
-      votosReportadosTotales: group.votosReportadosTotales,
-      votosE14Candidate105,
-      e14ListVotes: saved?.e14ListVotes ?? null,
-      confirmacionPorcentaje: calc.porcentaje,
-      diferencia: calc.diferencia,
-      estado: calc.estado,
-      notes: saved?.notes || "",
-      validatedAt: saved?.validatedAt || null,
-      validatedBy: saved?.validatedBy || null,
-      source: saved?.source || null,
-      groupCount: group.groupCount,
-      leadersCount: group.leaders.size,
-      e14Reference: hint,
-      votosE14SuggestedCandidate105,
-      reviewRequired: Boolean(saved?.reviewRequired),
-      reviewReason: saved?.reviewReason || "",
-      taskId: saved?.taskId || "",
-      reviewPriorityRank: saved?.reviewPriorityRank ?? null,
-      sourceEstadoRevision: saved?.sourceEstadoRevision || "",
-      sourceConfidence: saved?.sourceConfidence ?? null,
-      sourceScoreDigito: saved?.sourceScoreDigito ?? null,
-      sourceScoreSegundo: saved?.sourceScoreSegundo ?? null,
-      sourceMetodoDigito: saved?.sourceMetodoDigito || "",
-      sourceDebugDir: saved?.sourceDebugDir || "",
-      sourceDocumento: saved?.sourceDocumento || "",
-      sourceArchivo: saved?.sourceArchivo || "",
-      sourceLocalFileUri: saved?.sourceLocalFileUri || "",
-      sourceCaptureAvailable: Boolean(saved?.sourceCaptureAvailable),
-      sourceOverlayPath: saved?.sourceOverlayPath || "",
-      sourceCellPath: saved?.sourceCellPath || "",
-      sourceMaskPath: saved?.sourceMaskPath || "",
-      sourcePartyBlockPath: saved?.sourcePartyBlockPath || "",
-    };
-  });
-
-  const confirmationOnlyRows = confirmations
-    .filter((saved) => !groups.has(`${saved.normalizedLocalidad}||${saved.normalizedPuesto}||${saved.mesa}`))
-    .map((saved) => {
-      const votosE14Candidate105 = saved?.votosE14Candidate105 ?? null;
-      const calc = calculateE14Confirmation({
-        votosReportadosTotales: saved?.votosReportadosTotales ?? 0,
-        votosE14Candidate105,
-        hasMissingLocation: hasMissingLocationData({
-          localidad: saved?.localidad,
-          puesto: saved?.puesto,
-          mesa: saved?.mesa,
-        }),
-      });
-      const hint = buildE14NavigationHint({
-        localidad: saved?.localidad,
-        puesto: saved?.puesto,
-        mesa: saved?.mesa,
-        e14ZoneCode: saved?.zoneCode,
-      });
-      return {
-        mesaKey: `${saved.normalizedLocalidad}||${saved.normalizedPuesto}||${saved.mesa}`,
-        eventId: saved?.eventId || filters.eventId || null,
-        localidad: saved?.localidad || "",
-        puesto: saved?.puesto || "",
-        mesa: saved?.mesa ?? null,
-        zoneCode: saved?.zoneCode || null,
-        zoneLabel: hint.zoneLabel || null,
-        votosReportadosTotales: saved?.votosReportadosTotales ?? 0,
-        votosE14Candidate105,
-        e14ListVotes: saved?.e14ListVotes ?? null,
-        confirmacionPorcentaje: calc.porcentaje,
-        diferencia: calc.diferencia,
-        estado: calc.estado,
-        notes: saved?.notes || "",
-        validatedAt: saved?.validatedAt || null,
-        validatedBy: saved?.validatedBy || null,
-        source: saved?.source || null,
-        groupCount: 0,
-        leadersCount: 0,
-        e14Reference: hint,
-        votosE14SuggestedCandidate105: saved?.votosE14SuggestedCandidate105 ?? null,
-        reviewRequired: Boolean(saved?.reviewRequired),
-        reviewReason: saved?.reviewReason || "",
-        taskId: saved?.taskId || "",
-        reviewPriorityRank: saved?.reviewPriorityRank ?? null,
-        sourceEstadoRevision: saved?.sourceEstadoRevision || "",
-        sourceConfidence: saved?.sourceConfidence ?? null,
-        sourceScoreDigito: saved?.sourceScoreDigito ?? null,
-        sourceScoreSegundo: saved?.sourceScoreSegundo ?? null,
-        sourceMetodoDigito: saved?.sourceMetodoDigito || "",
-        sourceDebugDir: saved?.sourceDebugDir || "",
-        sourceDocumento: saved?.sourceDocumento || "",
-        sourceArchivo: saved?.sourceArchivo || "",
-        sourceLocalFileUri: saved?.sourceLocalFileUri || "",
-        sourceCaptureAvailable: Boolean(saved?.sourceCaptureAvailable),
-        sourceOverlayPath: saved?.sourceOverlayPath || "",
-        sourceCellPath: saved?.sourceCellPath || "",
-        sourceMaskPath: saved?.sourceMaskPath || "",
-        sourcePartyBlockPath: saved?.sourcePartyBlockPath || "",
-      };
-    });
-
-  rows.push(...confirmationOnlyRows);
-
-  logger.info("[E14 GROUP SUMMARY]", {
-    totalRegistros: traceStats.totalRegistros,
-    incluidos: traceStats.incluidos,
-    excluidos: traceStats.excluidos,
-    excludedByReason: traceStats.excludedByReason,
-    sampleInvalidLocalidades: traceStats.sampleInvalidLocalidades
-  });
-
-  return { rows, traceStats };
-}
-
-function computeKpis(rows) {
-  const mesasAnalizadas = rows.length;
-  const mesasPendientesE14 = rows.filter((r) => r.estado === "pendiente_e14").length;
-  const mesasConfirmadas = rows.filter((r) => r.estado === "confirmado").length;
-  const conPorcentaje = rows.filter((r) => typeof r.confirmacionPorcentaje === "number");
-  const sum = conPorcentaje.reduce((acc, row) => acc + row.confirmacionPorcentaje, 0);
-  const confirmacionPromedio = conPorcentaje.length > 0 ? Number((sum / conPorcentaje.length).toFixed(2)) : 0;
-  const votosReportadosTotales = rows.reduce((acc, row) => acc + (Number.isFinite(row.votosReportadosTotales) ? row.votosReportadosTotales : 0), 0);
-  const votosE14Totales = rows.reduce((acc, row) => acc + (Number.isFinite(row.votosE14Candidate105) ? row.votosE14Candidate105 : 0), 0);
+  const row = summaryRow[0] || {};
   return {
-    mesasAnalizadas,
-    mesasPendientesE14,
-    mesasConfirmadas,
-    confirmacionPromedio,
-    votosReportadosTotales,
-    votosE14Totales
+    mesas: row.mesas || 0,
+    totalRegistros: row.totalRegistros || row.votosReportados || 0,
+    expectedVotes: row.votosReportados || 0,
+    realVotes: row.votosE14 || 0,
+    missingVotes: Math.max((row.votosReportados || 0) - (row.votosE14 || 0), 0),
+    pendientes: row.pendientes || 0,
+    confirmadas: row.confirmadas || 0,
+    verificadas: (row.mesas || 0) - (row.pendientes || 0),
+    mesasConciliadas: row.mesasConciliadas || 0,
+    mesasConDiferencia: row.mesasConDiferencia || 0,
+    porcentajeConfirmacion: row.totalConPorcentaje
+      ? Number((row.totalPorcentaje / row.totalConPorcentaje).toFixed(2))
+      : 0,
+    porcentajeAvanceVotos: (row.votosReportados || 0)
+      ? Number((Math.min((row.votosE14 || 0), row.votosReportados || 0) / (row.votosReportados || 1) * 100).toFixed(2))
+      : 0,
+    porcentajeAvanceRevision: row.mesas
+      ? Number((((row.mesasConciliadas || 0) / row.mesas) * 100).toFixed(2))
+      : 0,
+    votosReportados: row.votosReportados || 0,
+    votosE14: row.votosE14 || 0,
+    diferenciaAcumulada: (row.votosE14 || 0) - (row.votosReportados || 0),
+    promedioRegistrosPorMesa: row.mesas
+      ? Number(((row.totalRegistros || row.votosReportados || 0) / row.mesas).toFixed(2))
+      : 0,
+    excludedTotal
   };
 }
 
 export async function getE14ConfirmationByMesaData(rawFilters = {}, options = {}) {
-  const filters = normalizeFilters(rawFilters);
   const organizationId = options.organizationId || null;
-  const { rows: baseRows, traceStats } = await buildMesaRows(filters, organizationId);
-  const selectedLocalidad = normalizeBogotaLocalidad(filters.localidad);
-  const rowsForPuestoOptions = selectedLocalidad
-    ? baseRows.filter((row) => row.localidad === selectedLocalidad)
-    : baseRows;
-  const localidadOptions = getBogotaLocalidades()
-    .filter((item) => baseRows.some((row) => row.localidad === item.displayName))
-    .map((item) => ({
-      value: item.displayName,
-      label: item.displayName,
-      zoneCode: item.zoneCode
-    }));
-  const puestoOptions = [...new Set(rowsForPuestoOptions.map((row) => row.puesto).filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b, "es"))
-    .map((puesto) => ({ value: puesto, label: puesto }));
-  let rows = [...baseRows];
+  const page = Math.max(toInt(rawFilters.page) || 1, 1);
+  const limit = Math.min(Math.max(toInt(rawFilters.limit) || 25, 1), 200);
+  const skip = (page - 1) * limit;
 
-  if (selectedLocalidad) {
-    rows = rows.filter((r) => r.localidad === selectedLocalidad);
-  }
-  if (filters.puesto) {
-    const needle = normalizeBogotaPuestoKey(filters.puesto);
-    rows = rows.filter((r) => normalizeBogotaPuestoKey(r.puesto) === needle);
-  }
-  if (filters.mesa) {
-    const mesaNeedle = toInt(filters.mesa);
-    rows = rows.filter((r) => r.mesa === mesaNeedle);
-  }
-  if (filters.estado) {
-    if (filters.estado === "manual_only") {
-      rows = rows.filter((r) => r.source === "manual");
-    } else {
-      rows = rows.filter((r) => r.estado === filters.estado);
+  const pipeline = [
+    ...buildComparisonBasePipeline(rawFilters, organizationId),
+    ...buildRowFilters(rawFilters),
+    {
+      $facet: {
+        rows: [
+          { $sort: { localidad: 1, puesto: 1, mesa: 1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              _id: 0,
+              id: 1,
+              localidad: 1,
+              puesto: 1,
+              mesa: 1,
+              repVotes: "$repVotes",
+              votosReportadosTotales: "$repVotes",
+              e14Votes: "$e14Votes",
+              votosE14Candidate105: "$e14Votes",
+              status: 1,
+              estado: "$status",
+              porcentajeConfirmacion: 1,
+              confirmacionPorcentaje: "$porcentajeConfirmacion",
+              diferencia: 1,
+              ocrEvidence: "$sourceArchivo",
+              sourceEstadoRevision: "$sourceStatus",
+              sourceConfidence: 1,
+              sourceDocumento: 1,
+              sourceArchivo: 1,
+              reviewRequired: 1,
+              reviewReason: 1,
+              notes: 1,
+              source: 1,
+              puestoCodigo: 1
+            }
+          }
+        ],
+        total: [{ $count: "count" }]
+      }
     }
-  }
-  if (filters.sourceStatus) {
-    rows = rows.filter((r) => String(r.sourceEstadoRevision || "") === String(filters.sourceStatus));
-  }
-  if (filters.search) {
-    const needle = normalizeKey(filters.search);
-    rows = rows.filter((row) => (
-      normalizeKey(row.localidad).includes(needle)
-      || normalizeBogotaPuestoKey(row.puesto).includes(needle)
-      || normalizeKey(row.mesa).includes(needle)
-      || normalizeKey(row.sourceArchivo).includes(needle)
-      || normalizeKey(row.sourceEstadoRevision).includes(needle)
-    ));
-  }
+  ];
 
-  rows.sort((a, b) => {
-    const byLoc = String(a.localidad || "").localeCompare(String(b.localidad || ""));
-    if (byLoc !== 0) return byLoc;
-    const byPuesto = String(a.puesto || "").localeCompare(String(b.puesto || ""));
-    if (byPuesto !== 0) return byPuesto;
-    return (a.mesa || 0) - (b.mesa || 0);
-  });
+  const [result, filters] = await Promise.all([
+    Registration.aggregate(pipeline),
+    getFilterOptions(rawFilters, organizationId)
+  ]);
 
-  const kpis = computeKpis(rows);
-  const total = rows.length;
-  const totalPages = Math.max(1, Math.ceil(total / filters.limit));
-  const start = (filters.page - 1) * filters.limit;
-  const end = start + filters.limit;
-  const items = rows.slice(start, end);
+  const payload = result[0] || {};
+  const total = payload.total?.[0]?.count || 0;
 
   return {
-    kpis,
-    items,
+    rows: Array.isArray(payload.rows) ? payload.rows : [],
+    items: Array.isArray(payload.rows) ? payload.rows : [],
+    page,
+    limit,
+    total,
     pagination: {
+      page,
+      limit,
       total,
-      page: filters.page,
-      limit: filters.limit,
-      totalPages
+      totalPages: Math.max(Math.ceil(total / limit), 1)
     },
-    context: {
-      aggregation: "by_mesa",
-      corporation: "CAMARA",
-      municipality: "BOGOTA",
-      candidateCode: 105,
-      party: "CENTRO DEMOCRATICO"
-    },
-    filters: {
-      localidadesDisponibles: localidadOptions,
-      puestosDisponibles: puestoOptions
-    },
-    debug: {
-      totalInputRecords: traceStats.totalRegistros,
-      includedRecords: traceStats.incluidos,
-      excludedRecords: traceStats.excluidos,
-      excludedByReason: traceStats.excludedByReason,
-      sampleInvalidLocalidades: traceStats.sampleInvalidLocalidades
-    }
+    filters
   };
 }
 
-async function findSingleMesaGroup(payload, organizationId) {
-  const filters = {
-    eventId: payload.eventId || null,
-    localidad: payload.localidad || "",
-    puesto: payload.puesto || "",
-    mesa: payload.mesa
+export async function getE14ProgressTreeData(rawFilters = {}, options = {}) {
+  const organizationId = options.organizationId || null;
+  const rows = await Registration.aggregate([
+    ...buildComparisonBasePipeline(rawFilters, organizationId),
+    ...buildRowFilters(rawFilters),
+    {
+      $project: {
+        _id: 0,
+        id: 1,
+        localidad: 1,
+        puesto: 1,
+        puestoCodigo: 1,
+        mesa: 1,
+        expectedVotes: "$repVotes",
+        realVotes: { $ifNull: ["$e14Votes", 0] },
+        hasE14: { $ne: ["$e14Votes", null] },
+        difference: {
+          $cond: [
+            { $ne: ["$e14Votes", null] },
+            "$diferencia",
+            { $multiply: ["$repVotes", -1] }
+          ]
+        },
+        status: 1
+      }
+    },
+    { $sort: { localidad: 1, puesto: 1, mesa: 1 } }
+  ]);
+
+  const localidadesMap = new Map();
+  const summary = {
+    expectedVotes: 0,
+    realVotes: 0,
+    difference: 0,
+    localidades: 0,
+    puestos: 0,
+    mesas: rows.length
   };
-  const { rows } = await buildMesaRows(filters, organizationId);
-  const targetMesa = toInt(payload.mesa);
-  const normalizedLocalidad = normalizeKey(normalizeBogotaLocalidad(payload.localidad));
-  const normalizedPuesto = normalizeBogotaPuestoKey(payload.puesto);
-  return rows.find((row) =>
-    normalizeKey(row.localidad) === normalizedLocalidad
-    && normalizeBogotaPuestoKey(row.puesto) === normalizedPuesto
-    && row.mesa === targetMesa
-  ) || null;
+
+  rows.forEach((row) => {
+    const localidadName = String(row.localidad || "Sin localidad");
+    const puestoName = String(row.puesto || "Sin puesto");
+    const expectedVotes = Number(row.expectedVotes || 0);
+    const realVotes = Number(row.realVotes || 0);
+    const difference = Number(row.difference || 0);
+
+    summary.expectedVotes += expectedVotes;
+    summary.realVotes += realVotes;
+    summary.difference += difference;
+
+    let localidadNode = localidadesMap.get(localidadName);
+    if (!localidadNode) {
+      localidadNode = {
+        id: localidadName,
+        name: localidadName,
+        expectedVotes: 0,
+        realVotes: 0,
+        difference: 0,
+        puestos: []
+      };
+      localidadNode._puestosMap = new Map();
+      localidadesMap.set(localidadName, localidadNode);
+    }
+
+    localidadNode.expectedVotes += expectedVotes;
+    localidadNode.realVotes += realVotes;
+    localidadNode.difference += difference;
+
+    let puestoNode = localidadNode._puestosMap.get(puestoName);
+    if (!puestoNode) {
+      puestoNode = {
+        id: `${localidadName}::${puestoName}`,
+        name: puestoName,
+        puestoCodigo: row.puestoCodigo || "",
+        expectedVotes: 0,
+        realVotes: 0,
+        difference: 0,
+        mesas: []
+      };
+      localidadNode._puestosMap.set(puestoName, puestoNode);
+      localidadNode.puestos.push(puestoNode);
+    }
+
+    puestoNode.expectedVotes += expectedVotes;
+    puestoNode.realVotes += realVotes;
+    puestoNode.difference += difference;
+    puestoNode.mesas.push({
+      id: row.id || `${puestoNode.id}::${row.mesa}`,
+      numero: row.mesa,
+      expectedVotes,
+      realVotes,
+      difference,
+      status: row.status,
+      hasE14: Boolean(row.hasE14)
+    });
+  });
+
+  const localidades = Array.from(localidadesMap.values())
+    .map((localidad) => {
+      delete localidad._puestosMap;
+      localidad.puestos.sort((a, b) => String(a.name).localeCompare(String(b.name), "es"));
+      localidad.puestos.forEach((puesto) => {
+        puesto.mesas.sort((a, b) => Number(a.numero || 0) - Number(b.numero || 0));
+      });
+      return localidad;
+    })
+    .sort((a, b) => String(a.name).localeCompare(String(b.name), "es"));
+
+  summary.localidades = localidades.length;
+  summary.puestos = localidades.reduce((acc, localidad) => acc + localidad.puestos.length, 0);
+
+  return { summary, localidades };
+}
+
+export async function getE14InvalidRowsData(rawFilters = {}, options = {}) {
+  return votingHierarchyService.getInvalidDataPage(rawFilters, options);
+}
+
+export async function getE14ConfirmationData(rawFilters = {}, options = {}) {
+  return getE14ConfirmationByMesaData(rawFilters, options);
 }
 
 export async function saveManualByMesa(payload = {}, options = {}) {
-  const organizationId = options.organizationId || null;
-  if (!organizationId) {
-    throw new Error("organizationId requerido");
-  }
-  const localidad = String(payload.localidad || "").trim();
-  const resolvedLocalidad = normalizeBogotaLocalidad(localidad);
-  const puesto = normalizeBogotaPuesto(payload.puesto || "");
-  const mesa = toInt(payload.mesa);
-  if (!resolvedLocalidad || !puesto || mesa === null || mesa <= 0) {
-    throw new Error("localidad, puesto y mesa son requeridos");
-  }
-
-  const group = await findSingleMesaGroup(payload, organizationId);
-  const votosReportadosTotales = group?.votosReportadosTotales ?? 0;
-  const zoneCode = payload.zoneCode || getBogotaZoneCode(resolvedLocalidad) || null;
-  const votosE14Candidate105 = toInt(payload.votosE14Candidate105);
-  if (votosE14Candidate105 === null || votosE14Candidate105 < 0) {
-    throw new Error("votosE14Candidate105 debe ser un numero mayor o igual a 0");
-  }
-  const calc = calculateE14Confirmation({
-    votosReportadosTotales,
-    votosE14Candidate105,
-    hasMissingLocation: hasMissingLocationData({ localidad: resolvedLocalidad, puesto, mesa })
-  });
-
-  const normalizedLocalidad = normalizeKey(resolvedLocalidad);
-  const normalizedPuesto = normalizeBogotaPuestoKey(puesto);
-  const validatedBy = payload.validatedBy || options.validatedBy || "admin";
-
-  await E14ConfirmationByMesa.updateOne(
-    {
-      organizationId,
-      eventId: payload.eventId || null,
-      normalizedLocalidad,
-      normalizedPuesto,
-      mesa
-    },
-    {
-      $set: {
-        organizationId,
-        eventId: payload.eventId || null,
-        localidad: resolvedLocalidad,
-        puesto,
-        mesa,
-        zoneCode,
-        normalizedLocalidad,
-        normalizedPuesto,
-        votosReportadosTotales,
-        votosE14Candidate105,
-        votosE14SuggestedCandidate105: votosE14Candidate105,
-        e14ListVotes: toInt(payload.e14ListVotes),
-        confirmacionPorcentaje: calc.porcentaje,
-        diferencia: calc.diferencia,
-        estado: calc.estado,
-        notes: payload.notes || "",
-        reviewRequired: false,
-        reviewReason: "",
-        taskId: payload.taskId || "",
-        reviewPriorityRank: payload.reviewPriorityRank ?? null,
-        sourceEstadoRevision: payload.sourceEstadoRevision || "manual",
-        sourceConfidence: payload.sourceConfidence ?? null,
-        sourceScoreDigito: payload.sourceScoreDigito ?? null,
-        sourceScoreSegundo: payload.sourceScoreSegundo ?? null,
-        sourceMetodoDigito: payload.sourceMetodoDigito || "manual",
-        sourceDebugDir: payload.sourceDebugDir || "",
-        sourceDocumento: payload.sourceDocumento || "",
-        sourceArchivo: payload.sourceArchivo || "",
-        sourceLocalFileUri: payload.sourceLocalFileUri || "",
-        sourceCaptureAvailable: Boolean(payload.sourceCaptureAvailable),
-        sourceOverlayPath: payload.sourceOverlayPath || "",
-        sourceCellPath: payload.sourceCellPath || "",
-        sourceMaskPath: payload.sourceMaskPath || "",
-        sourcePartyBlockPath: payload.sourcePartyBlockPath || "",
-        validatedAt: new Date(),
-        validatedBy,
-        source: "manual"
-      }
-    },
-    { upsert: true }
-  );
-
-  return {
-    localidad: resolvedLocalidad,
-    puesto,
-    mesa,
-    zoneCode,
-    votosReportadosTotales,
-    votosE14Candidate105,
-    votosE14SuggestedCandidate105: votosE14Candidate105,
-    confirmacionPorcentaje: calc.porcentaje,
-    diferencia: calc.diferencia,
-    estado: calc.estado
-  };
+  return votingHierarchyService.saveE14ManualByMesa(payload, options);
 }
 
 export async function saveManualE14Confirmation(payload = {}, options = {}) {
@@ -690,17 +673,22 @@ export async function saveManualE14Confirmation(payload = {}, options = {}) {
   if (!registrationId) {
     throw new Error("registrationId es requerido");
   }
+
   const query = { _id: registrationId };
   if (options.organizationId) query.organizationId = options.organizationId;
   const reg = await Registration.findOne(query).lean();
   if (!reg) throw new Error("Registro no encontrado");
+
   return saveManualByMesa(
     {
       eventId: reg.eventId || null,
+      localidadId: reg.localidadId || null,
       localidad: reg.localidad || "",
-      puesto: resolvePuestoText(reg),
+      puestoId: reg.puestoId || null,
+      puesto: reg.votingPlace || "",
+      mesaId: reg.mesaId || null,
       mesa: toInt(reg.mesa ?? reg.votingTable),
-      zoneCode: payload.e14ZoneCode || reg.e14ZoneCode || getBogotaZoneCode(reg.localidad),
+      zoneCode: payload.e14ZoneCode || reg.e14ZoneCode || null,
       votosE14Candidate105: payload.e14VotesCandidate105,
       e14ListVotes: payload.e14ListVotes,
       notes: payload.notes,
@@ -711,29 +699,25 @@ export async function saveManualE14Confirmation(payload = {}, options = {}) {
 }
 
 export async function recalculateE14Confirmation(rawFilters = {}, options = {}) {
-  const filters = normalizeFilters(rawFilters);
-  const organizationId = options.organizationId || null;
-  const rows = await getE14ConfirmationByMesaData(filters, { organizationId });
-  const counters = {
-    processed: rows.items.length,
-    confirmed: rows.items.filter((r) => r.estado === "confirmado").length,
-    pending: rows.items.filter((r) => r.estado === "pendiente_e14").length,
-    incomplete: rows.items.filter((r) => r.estado === "datos_incompletos").length,
-    low: rows.items.filter((r) => r.estado === "confirmacion_baja" || r.estado === "sin_confirmacion").length,
-    noReported: rows.items.filter((r) => r.estado === "sin_votos_reportados").length,
+  const [summary, rows] = await Promise.all([
+    getE14ConfirmationSummaryData(rawFilters, options),
+    getE14ConfirmationByMesaData(rawFilters, options)
+  ]);
+  return {
+    processed: rows?.pagination?.total || 0,
+    confirmed: summary?.confirmadas || 0,
+    pending: summary?.pendientes || 0,
     updated: 0
   };
-  return counters;
-}
-
-export async function getE14ConfirmationData(rawFilters = {}, options = {}) {
-  return getE14ConfirmationByMesaData(rawFilters, options);
 }
 
 export default {
   calculateE14Confirmation,
   getE14ConfirmationData,
   getE14ConfirmationByMesaData,
+  getE14ConfirmationSummaryData,
+  getE14ProgressTreeData,
+  getE14InvalidRowsData,
   saveManualByMesa,
   saveManualE14Confirmation,
   recalculateE14Confirmation

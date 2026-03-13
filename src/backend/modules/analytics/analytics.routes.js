@@ -27,16 +27,30 @@ router.get('/metrics', analyticsController.getDashboardMetrics);
  */
 router.get('/summary', analyticsController.getSummary);
 /**
+ * GET /api/v2/analytics/materialized
+ * Métricas persistidas (tablas resumen)
+ */
+router.get('/materialized', analyticsController.getMaterialized);
+/**
  * GET /api/v2/analytics/advanced
  * Analíticas avanzadas (público)
  */
 router.get('/advanced', analyticsController.getAdvanced);
+router.get('/advanced-summary', analyticsController.getAdvancedSummary);
+router.get('/advanced-charts', analyticsController.getAdvancedCharts);
+router.get('/hierarchy/localidades', analyticsController.getHierarchyLocalidades);
+router.get('/hierarchy/localidades/:localidadId/puestos', analyticsController.getHierarchyPuestos);
+router.get('/hierarchy/puestos/:puestoId/mesas', analyticsController.getHierarchyMesas);
+router.get('/invalid-rows', analyticsController.getInvalidRows);
+router.get('/invalid-rows/:id', analyticsController.getInvalidRowDetail);
 
 /**
  * GET /api/v2/analytics/simulation
  * Simulación de campaña (público)
  */
 router.get('/simulation', analyticsController.getSimulation);
+router.get('/simulation/base', analyticsController.getSimulationBase);
+router.post('/simulation/run', analyticsController.runSimulation);
 
 /**
  * GET /api/v2/analytics/leader-performance

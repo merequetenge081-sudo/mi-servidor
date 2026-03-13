@@ -13,6 +13,7 @@ import { decodeJwtToken } from '../../../utils/jwt.js';
 import crypto from 'crypto';
 import * as authFallback from '../../../utils/authFallback.js';
 import { isTempPasswordExpired } from '../../../utils/tempPassword.js';
+import { generateTemporaryPassword as generateTempPasswordSecure } from '../../../utils/tempPasswordGenerator.js';
 
 const { findAdminLocal, findLeaderLocal, verifyPasswordLocal } = authFallback;
 
@@ -383,7 +384,7 @@ export function verifyToken(token) {
  * Generar contraseña temporal
  */
 export function generateTemporaryPassword() {
-  return crypto.randomBytes(6).toString('hex').toUpperCase();
+  return generateTempPasswordSecure();
 }
 
 /**

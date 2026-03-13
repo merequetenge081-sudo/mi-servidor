@@ -42,6 +42,29 @@ export class AuditService {
   }
 
   /**
+   * Compat wrapper used by older and newer service layers.
+   */
+  static async logAction(payload = {}) {
+    const user = {
+      userId: payload.userId,
+      id: payload.userId,
+      role: payload.userRole || payload.role,
+      username: payload.userName || payload.username,
+      organizationId: payload.organizationId
+    };
+
+    return this.log(
+      payload.action || "UNKNOWN",
+      payload.resourceType || "Unknown",
+      payload.resourceId || "",
+      user,
+      payload.details || payload.changes || {},
+      payload.description || "",
+      payload.req || null
+    );
+  }
+
+  /**
    * Get audit logs with organization filtering
    */
   static async getLogs(filter = {}, limit = 100, skip = 0) {

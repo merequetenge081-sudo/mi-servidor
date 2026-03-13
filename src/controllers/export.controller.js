@@ -1,10 +1,44 @@
-import { Registration } from "../models/Registration.js";
+﻿import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
 import { Puestos } from "../models/index.js";
 import { AuditService } from "../services/audit.service.js";
 import ExcelJS from "exceljs";
 import logger from "../config/logger.js";
+import { sendError } from "../utils/httpError.js";
+import exportsService from "../backend/modules/exports/exports.service.js";
+
+const yesNo = (value) => (value ? "Sí" : "No");
+
+const registrationColumns = [
+  { header: "Cédula", key: "cedula", width: 15 },
+  { header: "Nombre", key: "firstName", width: 20 },
+  { header: "Apellido", key: "lastName", width: 20 },
+  { header: "Teléfono", key: "phone", width: 15 },
+  { header: "Localidad", key: "localidad", width: 20 },
+  { header: "Registrado a Votar", key: "registeredToVote", width: 20 },
+  { header: "Puesto de Votación", key: "puestoNombre", width: 30 },
+  { header: "Mesa", key: "mesa", width: 10 },
+  { header: "Confirmado", key: "confirmed", width: 15 },
+  { header: "Fecha de Registro", key: "date", width: 15 }
+];
+
+const leaderColumns = [
+  { header: "ID Líder", key: "leaderId", width: 15 },
+  { header: "Nombre", key: "name", width: 25 },
+  { header: "Teléfono", key: "phone", width: 15 },
+  { header: "Área", key: "area", width: 20 },
+  { header: "Registros", key: "registrations", width: 12 },
+  { header: "Activo", key: "active", width: 10 }
+];
+
+const eventColumns = [
+  { header: "Nombre", key: "name", width: 25 },
+  { header: "Descripción", key: "description", width: 30 },
+  { header: "Fecha", key: "date", width: 15 },
+  { header: "Ubicación", key: "location", width: 25 },
+  { header: "Activo", key: "active", width: 10 }
+];
 
 export async function exportData(req, res) {
   try {
@@ -17,8 +51,36 @@ export async function exportData(req, res) {
       ? Math.min(pageSizeRaw, 50000)
       : 5000;
 
-    if (!["registrations", "leaders", "events"].includes(type)) {
-      return res.status(400).json({ error: "Tipo de export inválido" });
+    if (!["registrations", "leaders", "events", "all"].includes(type)) {
+      return sendError(res, 400, "Tipo de export inválido");
+    }
+
+    // Delegate to modular service for simple single-sheet exports.
+    if (type === "leaders") {
+      const leadersBuffer = await exportsService.exportLeadersExcel();
+      await AuditService.log("EXPORT", "LEADERS", "", user, { type }, "Datos de leaders exportados");
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", `attachment; filename="export-${type}-${new Date().toISOString().split("T")[0]}.xlsx"`);
+      return res.send(leadersBuffer);
+    }
+
+    if (type === "registrations") {
+      const pageSizeRaw = Number.parseInt(req.query.pageSize || req.query.limit, 10);
+      const pageSize = Number.isFinite(pageSizeRaw) && pageSizeRaw > 0 ? Math.min(pageSizeRaw, 50000) : 5000;
+      const page = Number.parseInt(req.query.page, 10);
+      const pagedResult = await exportsService.exportRegistrationsExcelPaged(eventId || null, { page, pageSize });
+
+      res.setHeader("X-Export-Total", pagedResult.meta.total);
+      res.setHeader("X-Export-Page-Size", pagedResult.meta.pageSize);
+      res.setHeader("X-Export-Total-Pages", pagedResult.meta.totalPages);
+      if (pagedResult.meta.requestedPage) {
+        res.setHeader("X-Export-Page", pagedResult.meta.requestedPage);
+      }
+
+      await AuditService.log("EXPORT", "REGISTRATIONS", "", user, { type, eventId: eventId || null }, "Datos de registrations exportados");
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", `attachment; filename="export-${type}-${new Date().toISOString().split("T")[0]}.xlsx"`);
+      return res.send(pagedResult.buffer);
     }
 
     const workbook = new ExcelJS.Workbook();
@@ -57,18 +119,7 @@ export async function exportData(req, res) {
           : [];
         const puestoById = new Map(puestos.map(puesto => [puesto._id.toString(), puesto]));
 
-        worksheet.columns = [
-          { header: "Cédula", key: "cedula", width: 15 },
-          { header: "Nombre", key: "firstName", width: 20 },
-          { header: "Apellido", key: "lastName", width: 20 },
-          { header: "Teléfono", key: "phone", width: 15 },
-          { header: "Localidad", key: "localidad", width: 20 },
-          { header: "Registrado a Votar", key: "registeredToVote", width: 20 },
-          { header: "Puesto de Votación", key: "puestoNombre", width: 30 },
-          { header: "Mesa", key: "mesa", width: 10 },
-          { header: "Confirmado", key: "confirmed", width: 15 },
-          { header: "Fecha de Registro", key: "date", width: 15 }
-        ];
+        worksheet.columns = registrationColumns;
 
         registrations.forEach(reg => {
           const puesto = reg.puestoId ? puestoById.get(reg.puestoId.toString()) : null;
@@ -78,7 +129,7 @@ export async function exportData(req, res) {
             lastName: reg.lastName,
             phone: reg.phone,
             localidad: reg.localidad,
-            registeredToVote: reg.registeredToVote ? "Sí" : "No",
+            registeredToVote: yesNo(reg.registeredToVote),
             puestoNombre: puesto?.nombre || "-",
             mesa: reg.mesa ?? "-",
             confirmed: reg.confirmed ? "Confirmado" : "Pendiente",
@@ -92,14 +143,7 @@ export async function exportData(req, res) {
       const worksheet = workbook.addWorksheet("Líderes");
       const leaders = await Leader.find();
 
-      worksheet.columns = [
-        { header: "ID Líder", key: "leaderId", width: 15 },
-        { header: "Nombre", key: "name", width: 25 },
-        { header: "Teléfono", key: "phone", width: 15 },
-        { header: "Área", key: "area", width: 20 },
-        { header: "Registros", key: "registrations", width: 12 },
-        { header: "Activo", key: "active", width: 10 }
-      ];
+      worksheet.columns = leaderColumns;
 
       leaders.forEach(leader => {
         worksheet.addRow({
@@ -108,7 +152,7 @@ export async function exportData(req, res) {
           phone: leader.phone,
           area: leader.area,
           registrations: leader.registrations,
-          active: leader.active ? "Sí" : "No"
+          active: yesNo(leader.active)
         });
       });
     }
@@ -117,13 +161,7 @@ export async function exportData(req, res) {
       const worksheet = workbook.addWorksheet("Eventos");
       const events = await Event.find();
 
-      worksheet.columns = [
-        { header: "Nombre", key: "name", width: 25 },
-        { header: "Descripción", key: "description", width: 30 },
-        { header: "Fecha", key: "date", width: 15 },
-        { header: "Ubicación", key: "location", width: 25 },
-        { header: "Activo", key: "active", width: 10 }
-      ];
+      worksheet.columns = eventColumns;
 
       events.forEach(event => {
         worksheet.addRow({
@@ -131,7 +169,7 @@ export async function exportData(req, res) {
           description: event.description,
           date: event.date,
           location: event.location,
-          active: event.active ? "Sí" : "No"
+          active: yesNo(event.active)
         });
       });
     }
@@ -145,6 +183,9 @@ export async function exportData(req, res) {
     res.end();
   } catch (error) {
     logger.error("Export error:", { error: error.message, stack: error.stack });
-    res.status(500).json({ error: "Error al exportar datos" });
+    return sendError(res, 500, "Error al exportar datos", "EXPORT_DATA_ERROR", error.message);
   }
 }
+
+
+

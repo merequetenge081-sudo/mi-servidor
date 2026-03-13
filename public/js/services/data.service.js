@@ -40,6 +40,19 @@ const DataService = {
         }
     },
 
+    extractErrorMessage(data, fallback = 'Error de API') {
+        if (!data) return fallback;
+        if (typeof data === 'string') return data;
+        if (typeof data?.error === 'string') return data.error;
+        if (typeof data?.error?.message === 'string') return data.error.message;
+        if (typeof data?.message === 'string') return data.message;
+        try {
+            return JSON.stringify(data?.error || data?.message || data);
+        } catch (_) {
+            return fallback;
+        }
+    },
+
     buildQueryString(params = {}) {
         const qs = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {
@@ -419,7 +432,7 @@ const DataService = {
     /**
      * Obtiene metricas limpias unificadas para dashboard/analytics
      */
-    async getDashboardMetrics({ region = 'all', leaderId = null } = {}) {
+    async getDashboardMetrics({ region = 'all', leaderId = null, includeDetails = true } = {}) {
         const storageEventId = window.AppCommon?.getSelectedEventId?.()
             || sessionStorage.getItem('eventId')
             || localStorage.getItem('eventId')
@@ -435,6 +448,7 @@ const DataService = {
         if (eventId) params.set('eventId', eventId);
         if (region && region !== 'all') params.set('region', region);
         if (leaderId) params.set('leaderId', leaderId);
+        if (includeDetails === false) params.set('includeDetails', '0');
         const endpoint = params.toString()
             ? `/api/v2/analytics/metrics?${params.toString()}`
             : '/api/v2/analytics/metrics';
@@ -616,6 +630,7 @@ const DataService = {
         const query = this.buildQueryString({
             eventId: params.eventId || AppState.user.eventId || '',
             leaderId: params.leaderId || '',
+            regionScope: params.regionScope || '',
             localidad: params.localidad || '',
             puesto: params.puesto || '',
             mesa: params.mesa || '',
@@ -623,17 +638,69 @@ const DataService = {
             sourceStatus: params.sourceStatus || '',
             search: params.search || '',
             page: params.page || 1,
-            limit: params.limit || 25
+            limit: params.limit || 25,
+            includeInvalidItems: params.includeInvalidItems,
+            invalidLimit: params.invalidLimit
         });
         let endpoint = `/api/v2/admin/e14-confirmation/by-mesa${query ? `?${query}` : ''}`;
-        let response = await this.apiCall(endpoint);
+        let response = await this.apiCall(endpoint, { signal: params.signal });
         if (response.status === 404) {
             endpoint = `/api/admin/e14-confirmation/by-mesa${query ? `?${query}` : ''}`;
-            response = await this.apiCall(endpoint);
+            response = await this.apiCall(endpoint, { signal: params.signal });
         }
         const data = await response.json().catch(() => null);
         if (!response.ok || !data?.success) {
-            const message = data?.error || data?.message || await this.parseApiError(response, 'No se pudo consultar validación de datos reales');
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo consultar validación de datos reales'));
+            throw new Error(message);
+        }
+        return data.data || data || {};
+    },
+
+    async getE14ConfirmationSummary(params = {}) {
+        const query = this.buildQueryString({
+            eventId: params.eventId || AppState.user.eventId || '',
+            leaderId: params.leaderId || '',
+            regionScope: params.regionScope || '',
+            localidad: params.localidad || '',
+            estado: params.estado || params.estadoValidacion || '',
+            queue: params.queue || params.workQueue || '',
+            ocr: params.ocr || params.sourceStatus || '',
+            search: params.search || ''
+        });
+        let endpoint = `/api/v2/admin/e14-confirmation/summary${query ? `?${query}` : ''}`;
+        let response = await this.apiCall(endpoint, { signal: params.signal });
+        if (response.status === 404) {
+            endpoint = `/api/admin/e14-confirmation/summary${query ? `?${query}` : ''}`;
+            response = await this.apiCall(endpoint, { signal: params.signal });
+        }
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo consultar el resumen E14'));
+            throw new Error(message);
+        }
+        return data.data || data || {};
+    },
+
+    async getE14ConfirmationProgressTree(params = {}) {
+        const query = this.buildQueryString({
+            eventId: params.eventId || AppState.user.eventId || '',
+            leaderId: params.leaderId || '',
+            regionScope: params.regionScope || '',
+            localidad: params.localidad || '',
+            estado: params.estado || '',
+            queue: params.queue || '',
+            ocr: params.ocr || params.sourceStatus || '',
+            search: params.search || ''
+        });
+        let endpoint = `/api/v2/admin/e14-confirmation/progress-tree${query ? `?${query}` : ''}`;
+        let response = await this.apiCall(endpoint, { signal: params.signal });
+        if (response.status === 404) {
+            endpoint = `/api/admin/e14-confirmation/progress-tree${query ? `?${query}` : ''}`;
+            response = await this.apiCall(endpoint, { signal: params.signal });
+        }
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo consultar el informe de conciliación'));
             throw new Error(message);
         }
         return data.data || data || {};
@@ -643,6 +710,7 @@ const DataService = {
         const body = {
             eventId: payload.eventId || AppState.user.eventId || null,
             leaderId: payload.leaderId || null,
+            regionScope: payload.regionScope || '',
             localidad: payload.localidad || '',
             puesto: payload.puesto || '',
             mesa: payload.mesa || '',
@@ -664,7 +732,7 @@ const DataService = {
         }
         const data = await response.json().catch(() => null);
         if (!response.ok || !data?.success) {
-            const message = data?.error || data?.message || await this.parseApiError(response, 'No se pudo ejecutar validación masiva');
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo ejecutar validación masiva'));
             throw new Error(message);
         }
         return data.data || data || {};
@@ -692,7 +760,7 @@ const DataService = {
         }
         const data = await response.json().catch(() => null);
         if (!response.ok || !data?.success) {
-            const message = data?.error || data?.message || await this.parseApiError(response, 'No se pudo guardar confirmacion E14 manual');
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo guardar confirmacion E14 manual'));
             throw new Error(message);
         }
         return data.data || data || {};
@@ -703,7 +771,127 @@ const DataService = {
     },
 
     async getE14ConfirmationByMesa(params = {}) {
-        return this.getRealDataValidation(params);
+        const query = this.buildQueryString({
+            eventId: params.eventId || AppState.user.eventId || '',
+            leaderId: params.leaderId || '',
+            regionScope: params.regionScope || '',
+            localidad: params.localidad || '',
+            puesto: params.puesto || '',
+            mesa: params.mesa || '',
+            estado: params.estado || params.estadoValidacion || '',
+            queue: params.queue || params.workQueue || '',
+            ocr: params.ocr || params.sourceStatus || '',
+            search: params.search || '',
+            page: params.page || 1,
+            limit: params.limit || 25
+        });
+        let endpoint = `/api/v2/admin/e14-confirmation/by-mesa${query ? `?${query}` : ''}`;
+        let response = await this.apiCall(endpoint, { signal: params.signal });
+        if (response.status === 404) {
+            endpoint = `/api/admin/e14-confirmation/by-mesa${query ? `?${query}` : ''}`;
+            response = await this.apiCall(endpoint, { signal: params.signal });
+        }
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo consultar comparativo E14 por mesa'));
+            throw new Error(message);
+        }
+        return data.data || data || {};
+    },
+
+    async getE14InvalidRows(params = {}) {
+        const query = this.buildQueryString({
+            eventId: params.eventId || AppState.user.eventId || '',
+            regionScope: params.regionScope || '',
+            localidad: params.localidad || '',
+            search: params.search || '',
+            reason: params.reason || '',
+            reviewStatus: params.reviewStatus || '',
+            page: params.page || 1,
+            limit: params.limit || 25,
+            countOnly: params.countOnly ? 1 : ''
+        });
+        let endpoint = `/api/v2/admin/e14-confirmation/invalid-rows${query ? `?${query}` : ''}`;
+        let response = await this.apiCall(endpoint, { signal: params.signal });
+        if (response.status === 404) {
+            endpoint = `/api/admin/e14-confirmation/invalid-rows${query ? `?${query}` : ''}`;
+            response = await this.apiCall(endpoint, { signal: params.signal });
+        }
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo consultar registros excluidos'));
+            throw new Error(message);
+        }
+        return data.data || data || {};
+    },
+
+    async previewE14ExcelImport(payload = {}) {
+        const { signal, ...body } = payload;
+        let endpoint = '/api/v2/admin/e14-confirmation/import/preview';
+        let response = await this.apiCall(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(body),
+            signal
+        });
+        if (response.status === 404) {
+            endpoint = '/api/admin/e14-confirmation/import/preview';
+            response = await this.apiCall(endpoint, {
+                method: 'POST',
+                body: JSON.stringify(body),
+                signal
+            });
+        }
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo generar la vista previa de importación E14'));
+            throw new Error(message);
+        }
+        return data.data || data || {};
+    },
+
+    async applyE14ExcelImport(payload = {}) {
+        const { signal, ...body } = payload;
+        let endpoint = '/api/v2/admin/e14-confirmation/import/apply';
+        let response = await this.apiCall(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(body),
+            signal
+        });
+        if (response.status === 404) {
+            endpoint = '/api/admin/e14-confirmation/import/apply';
+            response = await this.apiCall(endpoint, {
+                method: 'POST',
+                body: JSON.stringify(body),
+                signal
+            });
+        }
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo aplicar la importación E14'));
+            throw new Error(message);
+        }
+        return data.data || data || {};
+    },
+
+    async getE14ImportHistory(params = {}) {
+        const query = this.buildQueryString({
+            eventId: params.eventId || AppState.user.eventId || '',
+            search: params.search || '',
+            page: params.page || 1,
+            limit: params.limit || 10
+        });
+        let endpoint = `/api/v2/admin/e14-confirmation/import/history${query ? `?${query}` : ''}`;
+        let response = await this.apiCall(endpoint, { signal: params.signal });
+        if (response.status === 404) {
+            endpoint = `/api/admin/e14-confirmation/import/history${query ? `?${query}` : ''}`;
+            response = await this.apiCall(endpoint, { signal: params.signal });
+        }
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo cargar el historial de importaciones E14'));
+            throw new Error(message);
+        }
+        return data.data || data || {};
     },
 
     async saveE14ConfirmationByMesaManual(payload = {}) {
@@ -731,10 +919,59 @@ const DataService = {
         }
         const data = await response.json().catch(() => null);
         if (!response.ok || !data?.success) {
-            const message = data?.error || data?.message || await this.parseApiError(response, 'No se pudo guardar confirmacion por mesa');
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo guardar confirmacion por mesa'));
             throw new Error(message);
         }
         return data.data || data || {};
+    },
+
+    async getOfficialCorrectionCatalog(params = {}) {
+        const query = this.buildQueryString({
+            localidad: params.localidad || ''
+        });
+        const response = await this.apiCall(`/api/v2/registrations/official-catalog/options${query ? `?${query}` : ''}`);
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo cargar el catálogo oficial de corrección'));
+            throw new Error(message);
+        }
+        return data.data || {};
+    },
+
+    async previewOfficialCorrection(registrationId, payload = {}) {
+        const response = await this.apiCall(`/api/v2/registrations/${encodeURIComponent(registrationId)}/official-correction/preview`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo previsualizar la corrección'));
+            throw new Error(message);
+        }
+        return data.data || {};
+    },
+
+    async applyOfficialCorrection(registrationId, payload = {}) {
+        const response = await this.apiCall(`/api/v2/registrations/${encodeURIComponent(registrationId)}/official-correction/apply`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo aplicar la corrección'));
+            throw new Error(message);
+        }
+        return data.data || {};
+    },
+
+    async getOfficialCorrectionHistory(registrationId) {
+        const response = await this.apiCall(`/api/v2/registrations/${encodeURIComponent(registrationId)}/official-correction/history`);
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.success) {
+            const message = this.extractErrorMessage(data, await this.parseApiError(response, 'No se pudo cargar el historial de correcciones'));
+            throw new Error(message);
+        }
+        return data.data || [];
     }
 };
 

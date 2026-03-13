@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos Erróneos o Incompletos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f3f4f6; font-family: 'Inter', sans-serif; }
+        .card { background: white; border-radius: 0.75rem; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); }
+        .modal-backdrop { background: rgba(15, 23, 42, 0.55); }
+    </style>
+</head>
+<body>
+    <nav class="bg-slate-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-triangle-exclamation text-amber-300 text-2xl"></i>
+                    <div>
+                        <div class="font-bold text-xl tracking-wide">Datos erróneos o incompletos</div>
+                        <div class="text-xs text-slate-300">Revisión y corrección de registros excluidos</div>
+                    </div>
+                </div>
+                <a href="/analytics.html" class="px-4 py-2 rounded-md border border-slate-700 hover:bg-slate-800 text-sm font-medium">
+                    <i class="fas fa-arrow-left mr-2"></i>Volver a analytics
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="card p-5"><div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Registros excluidos</div><div id="stat-invalid-total" class="text-4xl font-bold text-slate-900 mt-2">0</div><div id="stat-invalid-meta" class="text-sm text-slate-500 mt-1">Sin datos</div></div>
+            <div class="card p-5"><div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Motivo principal</div><div id="stat-invalid-top-reason" class="text-lg font-semibold text-amber-700 mt-2">-</div><div class="text-sm text-slate-500 mt-1">Clasificación más frecuente</div></div>
+            <div class="card p-5"><div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Catálogo oficial</div><div id="stat-invalid-catalog-version" class="text-lg font-semibold text-slate-900 mt-2">-</div><div class="text-sm text-slate-500 mt-1">Versión validada</div></div>
+            <div class="card p-5"><div class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Ámbito actual</div><div id="stat-invalid-scope" class="text-lg font-semibold text-slate-900 mt-2">Bogotá</div><div class="text-sm text-slate-500 mt-1">Resultados paginados y filtrables</div></div>
+        </section>
+
+        <section class="card p-5 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div class="md:col-span-2"><label for="filter-search" class="block text-sm font-medium text-slate-700 mb-1">Buscar</label><input id="filter-search" type="text" placeholder="Registro, puesto raw o normalizado" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></div>
+                <div><label for="filter-localidad" class="block text-sm font-medium text-slate-700 mb-1">Localidad</label><select id="filter-localidad" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="">Todas</option></select></div>
+                <div><label for="filter-reason" class="block text-sm font-medium text-slate-700 mb-1">Motivo</label><select id="filter-reason" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="">Todos</option></select></div>
+                <div><label for="filter-status" class="block text-sm font-medium text-slate-700 mb-1">Estado</label><select id="filter-status" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="">Todos</option><option value="pending">Pendiente</option><option value="reviewed">Revisado</option></select></div>
+                <div><label for="filter-region" class="block text-sm font-medium text-slate-700 mb-1">Territorio</label><select id="filter-region" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><option value="bogota">Bogotá</option><option value="resto">Resto del país</option><option value="all">Todo el evento</option></select></div>
+            </div>
+            <div class="flex items-center justify-between mt-4 gap-3 flex-wrap">
+                <div class="text-sm text-slate-500" id="invalid-table-meta">Cargando registros excluidos...</div>
+                <div class="flex gap-2">
+                    <button id="btn-apply-filters" class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800">Aplicar filtros</button>
+                    <button id="btn-clear-filters" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50">Limpiar</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="card overflow-hidden">
+            <div class="border-b border-slate-200 px-5 py-4 flex items-center justify-between">
+                <div><h2 class="text-lg font-semibold text-slate-900">Revisión de registros excluidos</h2><p class="text-sm text-slate-500">Este panel es independiente del árbol oficial para evitar renders frágiles.</p></div>
+                <div id="invalid-page-loading" class="hidden text-sm text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i>Cargando</div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                            <th class="px-4 py-3">Líder</th><th class="px-4 py-3">Registro</th><th class="px-4 py-3">Localidad raw</th><th class="px-4 py-3">Puesto raw</th><th class="px-4 py-3">Mesa raw</th><th class="px-4 py-3">Normalizado</th><th class="px-4 py-3">Sugerencia oficial</th><th class="px-4 py-3">Motivo</th><th class="px-4 py-3">Estado</th><th class="px-4 py-3">Fecha</th><th class="px-4 py-3 text-right">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invalid-table-body" class="divide-y divide-slate-100 bg-white"><tr><td colspan="11" class="px-4 py-6 text-center text-slate-500">Cargando registros...</td></tr></tbody>
+                </table>
+            </div>
+            <div class="border-t border-slate-200 px-5 py-4 flex items-center justify-between flex-wrap gap-3">
+                <div id="invalid-pagination-meta" class="text-sm text-slate-500">Página 1</div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-prev-page" class="px-3 py-2 rounded border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50" disabled><i class="fas fa-chevron-left"></i></button>
+                    <button id="btn-next-page" class="px-3 py-2 rounded border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50" disabled><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="detail-modal" class="fixed inset-0 hidden modal-backdrop z-50"><div class="min-h-full flex items-center justify-center p-4"><div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full"><div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between"><h3 id="detail-modal-title" class="text-lg font-semibold text-slate-900">Detalle de registro excluido</h3><button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-700 text-xl">&times;</button></div><div id="detail-modal-body" class="px-6 py-5 text-sm text-slate-700">Cargando detalle...</div></div></div></div>
+    <div id="correction-modal" class="fixed inset-0 hidden modal-backdrop z-50"><div class="min-h-full flex items-center justify-center p-4"><div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full"><div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between"><h3 class="text-lg font-semibold text-slate-900">Corregir registro excluido</h3><button onclick="closeCorrectionModal()" class="text-slate-400 hover:text-slate-700 text-xl">&times;</button></div><div class="px-6 py-5 space-y-5"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="rounded-lg border border-slate-200 bg-slate-50 p-4"><h4 class="font-semibold text-slate-800 mb-3">Datos actuales</h4><div id="correction-current-summary" class="space-y-1 text-sm text-slate-700"></div></div><div class="rounded-lg border border-slate-200 bg-slate-50 p-4"><h4 class="font-semibold text-slate-800 mb-3">Resultado esperado</h4><div id="correction-preview-state" class="rounded border px-4 py-3 text-sm bg-slate-50 border-slate-200 text-slate-700">Seleccione una localidad, un puesto y una mesa oficial para validar la corrección.</div></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label for="correction-localidad" class="block text-sm font-medium text-slate-700 mb-1">Localidad oficial</label><select id="correction-localidad" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select></div><div><label for="correction-puesto" class="block text-sm font-medium text-slate-700 mb-1">Puesto oficial</label><select id="correction-puesto" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select></div><div><label for="correction-mesa" class="block text-sm font-medium text-slate-700 mb-1">Mesa oficial</label><select id="correction-mesa" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></select></div></div><div><label for="correction-note" class="block text-sm font-medium text-slate-700 mb-1">Nota de corrección</label><textarea id="correction-note" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Motivo o contexto de la corrección"></textarea></div><div class="rounded-lg border border-slate-200 bg-slate-50 p-4"><h4 class="font-semibold text-slate-800 mb-3">Historial de correcciones</h4><div id="correction-history-body" class="space-y-3 text-sm text-slate-700">Sin correcciones previas.</div></div></div><div class="px-6 py-4 border-t border-slate-200 flex items-center justify-end gap-3"><button onclick="closeCorrectionModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50">Cancelar</button><button id="btn-apply-correction" onclick="applyOfficialCorrection()" class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700">Guardar corrección</button></div></div></div></div>
+
+    <script>
+        const PAGE_LIMIT = 25;
+        let invalidRows = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFilters = { search: '', localidad: '', reason: '', reviewStatus: '', regionScope: 'bogota' };
+        let correctionRow = null;
+        let officialCorrectionCatalog = null;
+        let officialCorrectionPuestos = [];
+        let officialCorrectionMesas = [];
+
+        function getToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token') || '';
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function escapeJs(value) {
+            return String(value ?? '')
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'");
+        }
+
+        function formatDateTime(value) {
+            if (!value) return '-';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '-';
+            return date.toLocaleString('es-CO');
+        }
+
+        function showToast(message, tone = 'info') {
+            const palette = { success: 'bg-emerald-600', error: 'bg-red-600', info: 'bg-slate-900' };
+            const toast = document.createElement('div');
+            toast.className = `fixed top-5 right-5 z-[70] px-4 py-3 rounded-lg text-white text-sm shadow-lg ${palette[tone] || palette.info}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function normalizeInvalidRow(item = {}, index = 0) {
+            return {
+                id: item.id || item.registrationId || item._id || `invalid-${index}`,
+                registrationId: item.registrationId || item._id || '',
+                leaderName: item.leaderName || item.liderNombre || 'Sin líder',
+                rawLocalidad: item.rawLocalidad || item.localidadRaw || '',
+                rawPuesto: item.rawPuesto || item.puestoRaw || '',
+                rawMesa: item.rawMesa ?? item.mesaRaw ?? '',
+                normalizedLocalidad: item.normalizedLocalidad || item.localidadNormalizada || '',
+                normalizedPuesto: item.normalizedPuesto || item.puestoNormalizado || '',
+                suggestedOfficialPuesto: item.suggestedOfficialPuesto || '',
+                suggestedOfficialLocalidad: item.suggestedOfficialLocalidad || '',
+                officialValidationStatus: item.officialValidationStatus || item.status || '',
+                officialValidationReason: item.officialValidationReason || item.reason || '',
+                createdAt: item.createdAt || '',
+                reviewStatus: item.reviewStatus || 'pending',
+                cedula: item.cedula || '',
+                firstName: item.firstName || '',
+                lastName: item.lastName || '',
+                legacyVotingPlace: item.legacyVotingPlace || '',
+                puestoMatchStatus: item.puestoMatchStatus || '',
+                puestoMatchConfidence: item.puestoMatchConfidence ?? null
+            };
+        }
+
+        async function fetchInvalidRows(page = 1) {
+            const loading = document.getElementById('invalid-page-loading');
+            loading.classList.remove('hidden');
+
+            try {
+                const query = new URLSearchParams({
+                    page: String(page),
+                    limit: String(PAGE_LIMIT),
+                    regionScope: currentFilters.regionScope || 'bogota'
+                });
+                if (currentFilters.search) query.set('search', currentFilters.search);
+                if (currentFilters.localidad) query.set('localidad', currentFilters.localidad);
+                if (currentFilters.reason) query.set('reason', currentFilters.reason);
+                if (currentFilters.reviewStatus) query.set('reviewStatus', currentFilters.reviewStatus);
+
+                const response = await fetch(`/api/v2/analytics/invalid-rows?${query.toString()}`, {
+                    headers: { Authorization: `Bearer ${getToken()}` }
+                });
+                const result = await response.json().catch(() => null);
+                if (!response.ok || !result?.success) {
+                    throw new Error(result?.error || result?.message || 'No se pudo cargar el listado de datos erróneos o incompletos');
+                }
+
+                const data = result.data || {};
+                invalidRows = (Array.isArray(data.rows) ? data.rows : []).map(normalizeInvalidRow);
+                currentPage = Number(data.page || 1);
+                totalPages = Number(data.totalPages || 1);
+                renderInvalidStats(data);
+                renderInvalidFilters(data);
+                renderInvalidTable();
+                renderPagination(data);
+            } catch (error) {
+                renderInvalidErrorState(error.message || 'No se pudieron cargar los registros excluidos.');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function renderInvalidStats(data) {
+            const total = Number(data?.total || 0);
+            const topReason = Array.isArray(data?.summary?.byReason) ? data.summary.byReason[0]?.reason : '';
+            document.getElementById('stat-invalid-total').textContent = total.toLocaleString();
+            document.getElementById('stat-invalid-meta').textContent = `Página ${currentPage} de ${Math.max(Number(data?.totalPages || 1), 1)}`;
+            document.getElementById('stat-invalid-top-reason').textContent = topReason || '-';
+            document.getElementById('stat-invalid-catalog-version').textContent = data?.context?.officialCatalogVersion || '-';
+            document.getElementById('stat-invalid-scope').textContent = currentFilters.regionScope === 'resto'
+                ? 'Resto del país'
+                : currentFilters.regionScope === 'all'
+                ? 'Todo el evento'
+                : 'Bogotá';
+            document.getElementById('invalid-table-meta').textContent = `${total.toLocaleString()} registros excluidos en el alcance actual`;
+        }
+
+        function renderInvalidFilters(data) {
+            const reasonSelect = document.getElementById('filter-reason');
+            const localidadSelect = document.getElementById('filter-localidad');
+            const reasons = [...new Set((data?.summary?.byReason || []).map((item) => item.reason).filter(Boolean))];
+            const localidades = [...new Set((data?.summary?.byLocalidad || []).map((item) => item.localidad).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, 'es'));
+            const currentReason = currentFilters.reason;
+            const currentLocalidad = currentFilters.localidad;
+            reasonSelect.innerHTML = '<option value="">Todos</option>' + reasons.map((reason) => `<option value="${escapeHtml(reason)}">${escapeHtml(reason)}</option>`).join('');
+            localidadSelect.innerHTML = '<option value="">Todas</option>' + localidades.map((localidad) => `<option value="${escapeHtml(localidad)}">${escapeHtml(localidad)}</option>`).join('');
+            reasonSelect.value = reasons.includes(currentReason) ? currentReason : '';
+            localidadSelect.value = localidades.includes(currentLocalidad) ? currentLocalidad : '';
+        }
+
+        function renderInvalidTable() {
+            const tbody = document.getElementById('invalid-table-body');
+            if (!invalidRows.length) {
+                tbody.innerHTML = '<tr><td colspan="11" class="px-4 py-6 text-center text-slate-500">No hay datos erróneos o incompletos para los filtros seleccionados.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = invalidRows.map((row) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-4 py-3 text-sm text-slate-700">${escapeHtml(row.leaderName)}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700 font-mono">${escapeHtml(row.registrationId)}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700">${escapeHtml(row.rawLocalidad || '-')}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700">${escapeHtml(row.rawPuesto || '-')}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700">${escapeHtml(String(row.rawMesa ?? '-'))}</td>
+                    <td class="px-4 py-3 text-sm text-slate-700"><div>${escapeHtml(row.normalizedLocalidad || '-')}</div><div>${escapeHtml(row.normalizedPuesto || '-')}</div></td>
+                    <td class="px-4 py-3 text-sm text-slate-700"><div>${escapeHtml(row.suggestedOfficialLocalidad || '-')}</div><div>${escapeHtml(row.suggestedOfficialPuesto || '-')}</div></td>
+                    <td class="px-4 py-3 text-sm"><span class="inline-flex rounded-full bg-amber-100 text-amber-800 px-2 py-1 text-xs font-semibold">${escapeHtml(row.officialValidationReason || row.officialValidationStatus || '-')}</span></td>
+                    <td class="px-4 py-3 text-sm"><span class="inline-flex rounded-full ${row.reviewStatus === 'reviewed' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'} px-2 py-1 text-xs font-semibold">${escapeHtml(row.reviewStatus === 'reviewed' ? 'Revisado' : 'Pendiente')}</span></td>
+                    <td class="px-4 py-3 text-sm text-slate-700">${escapeHtml(formatDateTime(row.createdAt))}</td>
+                    <td class="px-4 py-3 text-sm text-right"><div class="flex justify-end gap-2"><button class="px-3 py-2 text-xs font-semibold rounded bg-slate-900 text-white hover:bg-slate-800" onclick="openDetailModal('${escapeJs(row.registrationId)}')">Ver detalle</button><button class="px-3 py-2 text-xs font-semibold rounded bg-indigo-600 text-white hover:bg-indigo-700" onclick="openCorrectionModal('${escapeJs(row.registrationId)}')">Corregir</button></div></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderInvalidErrorState(message) {
+            document.getElementById('invalid-table-body').innerHTML = `<tr><td colspan="11" class="px-4 py-6 text-center text-red-500">${escapeHtml(message)}</td></tr>`;
+            document.getElementById('invalid-table-meta').textContent = 'No se pudieron cargar los registros excluidos.';
+        }
+
+        function renderPagination(data) {
+            const total = Number(data?.total || 0);
+            document.getElementById('invalid-pagination-meta').textContent = `Página ${currentPage} de ${totalPages} · ${total.toLocaleString()} registros`;
+            document.getElementById('btn-prev-page').disabled = currentPage <= 1;
+            document.getElementById('btn-next-page').disabled = currentPage >= totalPages;
+        }
+
+        async function openDetailModal(registrationId) {
+            const modal = document.getElementById('detail-modal');
+            const body = document.getElementById('detail-modal-body');
+            document.getElementById('detail-modal-title').textContent = `Registro excluido ${registrationId}`;
+            body.innerHTML = '<div class="text-slate-500">Cargando detalle...</div>';
+            modal.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`/api/v2/analytics/invalid-rows/${encodeURIComponent(registrationId)}`, {
+                    headers: { Authorization: `Bearer ${getToken()}` }
+                });
+                const result = await response.json().catch(() => null);
+                if (!response.ok || !result?.success) {
+                    throw new Error(result?.error || result?.message || 'No se pudo cargar el detalle del registro');
+                }
+                const row = normalizeInvalidRow(result.data || {});
+                body.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                            <h4 class="font-semibold text-slate-800 mb-3">Trazabilidad original</h4>
+                            <div class="space-y-1">
+                                <div><span class="font-semibold">Líder:</span> ${escapeHtml(row.leaderName || 'Sin líder')}</div>
+                                <div><span class="font-semibold">Registro:</span> ${escapeHtml(row.registrationId || '-')}</div>
+                                <div><span class="font-semibold">Localidad raw:</span> ${escapeHtml(row.rawLocalidad || '-')}</div>
+                                <div><span class="font-semibold">Puesto raw:</span> ${escapeHtml(row.rawPuesto || '-')}</div>
+                                <div><span class="font-semibold">Mesa raw:</span> ${escapeHtml(String(row.rawMesa ?? '-'))}</div>
+                                <div><span class="font-semibold">Fecha:</span> ${escapeHtml(formatDateTime(row.createdAt))}</div>
+                            </div>
+                        </div>
+                        <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                            <h4 class="font-semibold text-slate-800 mb-3">Normalización y validación</h4>
+                            <div class="space-y-1">
+                                <div><span class="font-semibold">Localidad normalizada:</span> ${escapeHtml(row.normalizedLocalidad || '-')}</div>
+                                <div><span class="font-semibold">Puesto normalizado:</span> ${escapeHtml(row.normalizedPuesto || '-')}</div>
+                                <div><span class="font-semibold">Sugerencia oficial:</span> ${escapeHtml(row.suggestedOfficialLocalidad || '-')} / ${escapeHtml(row.suggestedOfficialPuesto || '-')}</div>
+                                <div><span class="font-semibold">Estado:</span> ${escapeHtml(row.officialValidationStatus || '-')}</div>
+                                <div><span class="font-semibold">Motivo:</span> ${escapeHtml(row.officialValidationReason || '-')}</div>
+                                <div><span class="font-semibold">Estado revisión:</span> ${escapeHtml(row.reviewStatus || 'pending')}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                body.innerHTML = `<div class="text-red-500">${escapeHtml(error.message || 'No se pudo cargar el detalle.')}</div>`;
+            }
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        async function loadOfficialCorrectionCatalog(localidad = '') {
+            const query = new URLSearchParams();
+            if (localidad) query.set('localidad', localidad);
+            const response = await fetch(`/api/v2/registrations/official-catalog/options${query.toString() ? `?${query.toString()}` : ''}`, {
+                headers: { Authorization: `Bearer ${getToken()}` }
+            });
+            const result = await response.json().catch(() => null);
+            if (!response.ok || !result?.success) {
+                throw new Error(result?.error || result?.message || 'No se pudo cargar el catálogo oficial');
+            }
+            return result.data || {};
+        }
+
+        function populateCorrectionLocalidades(selectedLocalidad = '') {
+            const select = document.getElementById('correction-localidad');
+            const localidades = Array.isArray(officialCorrectionCatalog?.localidades) ? officialCorrectionCatalog.localidades : [];
+            select.innerHTML = '<option value="">Seleccione localidad oficial</option>' + localidades.map((item) => `<option value="${escapeHtml(item.value || '')}">${escapeHtml(item.value || '')}</option>`).join('');
+            select.value = localidades.some((item) => item.value === selectedLocalidad) ? selectedLocalidad : '';
+        }
+
+        async function refreshCorrectionPuestos(selectedPuesto = '') {
+            const localidad = document.getElementById('correction-localidad').value || '';
+            const puestoSelect = document.getElementById('correction-puesto');
+            const mesaSelect = document.getElementById('correction-mesa');
+            if (!localidad) {
+                officialCorrectionPuestos = [];
+                officialCorrectionMesas = [];
+                puestoSelect.innerHTML = '<option value="">Seleccione localidad primero</option>';
+                mesaSelect.innerHTML = '<option value="">Seleccione puesto primero</option>';
+                return;
+            }
+            const data = await loadOfficialCorrectionCatalog(localidad);
+            officialCorrectionPuestos = Array.isArray(data?.puestos) ? data.puestos : [];
+            puestoSelect.innerHTML = '<option value="">Seleccione puesto oficial</option>' + officialCorrectionPuestos.map((item) => `<option value="${escapeHtml(item.puesto)}">${escapeHtml(item.puesto)}</option>`).join('');
+            puestoSelect.value = officialCorrectionPuestos.some((item) => item.puesto === selectedPuesto) ? selectedPuesto : '';
+            await refreshCorrectionMesas();
+        }
+
+        async function refreshCorrectionMesas(selectedMesa = '') {
+            const puesto = document.getElementById('correction-puesto').value || '';
+            const mesaSelect = document.getElementById('correction-mesa');
+            const matched = officialCorrectionPuestos.find((item) => item.puesto === puesto);
+            officialCorrectionMesas = Array.isArray(matched?.mesas) ? matched.mesas : [];
+            mesaSelect.innerHTML = '<option value="">Seleccione mesa oficial</option>' + officialCorrectionMesas.map((mesa) => `<option value="${mesa}">Mesa ${mesa}</option>`).join('');
+            const mesaString = selectedMesa === null || selectedMesa === undefined ? '' : String(selectedMesa);
+            mesaSelect.value = officialCorrectionMesas.some((mesa) => String(mesa) === mesaString) ? mesaString : '';
+        }
+
+        function setCorrectionPreviewState(message, tone = 'slate') {
+            const container = document.getElementById('correction-preview-state');
+            const palette = { slate: 'bg-slate-50 border-slate-200 text-slate-700', green: 'bg-emerald-50 border-emerald-200 text-emerald-800', amber: 'bg-amber-50 border-amber-200 text-amber-800', red: 'bg-red-50 border-red-200 text-red-800' };
+            container.className = `rounded border px-4 py-3 text-sm ${palette[tone] || palette.slate}`;
+            container.textContent = message;
+        }
+
+        async function loadCorrectionHistory(registrationId) {
+            const response = await fetch(`/api/v2/registrations/${encodeURIComponent(registrationId)}/official-correction/history`, {
+                headers: { Authorization: `Bearer ${getToken()}` }
+            });
+            const result = await response.json().catch(() => null);
+            const container = document.getElementById('correction-history-body');
+            if (!response.ok || !result?.success) {
+                container.innerHTML = '<div class="text-red-500">No se pudo cargar el historial.</div>';
+                return;
+            }
+            const items = Array.isArray(result.data) ? result.data : [];
+            if (!items.length) {
+                container.innerHTML = '<div class="text-slate-500">Sin correcciones previas.</div>';
+                return;
+            }
+            container.innerHTML = items.slice(0, 6).map((item) => `
+                <div class="rounded border border-slate-200 bg-white p-3">
+                    <div class="font-semibold">${escapeHtml(item.correctedBy || 'Admin')} · ${escapeHtml(formatDateTime(item.correctedAt))}</div>
+                    <div class="mt-1">Antes: ${escapeHtml(item.previous?.localidad || '-')} / ${escapeHtml(item.previous?.puesto || '-')} / Mesa ${escapeHtml(String(item.previous?.mesa ?? '-'))}</div>
+                    <div>Después: ${escapeHtml(item.next?.localidad || '-')} / ${escapeHtml(item.next?.puesto || '-')} / Mesa ${escapeHtml(String(item.next?.mesa ?? '-'))}</div>
+                    <div>Resultado: ${escapeHtml(item.next?.officialValidationStatus || '-')} - ${escapeHtml(item.next?.officialValidationReason || '-')}</div>
+                    <div>Nota: ${escapeHtml(item.correctionNote || '-')}</div>
+                </div>
+            `).join('');
+        }
+
+        async function runCorrectionPreview() {
+            if (!correctionRow) return;
+            const localidad = document.getElementById('correction-localidad').value || '';
+            const puesto = document.getElementById('correction-puesto').value || '';
+            const mesa = document.getElementById('correction-mesa').value || '';
+            if (!localidad || !puesto || !mesa) {
+                setCorrectionPreviewState('Faltan datos para validar la corrección propuesta.', 'amber');
+                return;
+            }
+
+            const response = await fetch(`/api/v2/registrations/${encodeURIComponent(correctionRow.registrationId)}/official-correction/preview`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ localidad, puesto, mesa })
+            });
+            const result = await response.json().catch(() => null);
+            if (!response.ok || !result?.success) {
+                setCorrectionPreviewState(result?.error || result?.message || 'No se pudo previsualizar la corrección.', 'red');
+                return;
+            }
+
+            const validation = result.data?.validation || {};
+            const tone = validation.isOfficialValid ? 'green' : validation.status === 'invalid_mesa' || validation.status === 'mismatched_localidad' ? 'amber' : 'red';
+            const message = validation.isOfficialValid
+                ? `La propuesta quedará oficial válida: ${validation.officialLocalidadNombre || localidad} / ${validation.officialPuestoNombre || puesto} / Mesa ${mesa}.`
+                : `La propuesta sigue excluida: ${validation.status || '-'} - ${validation.reason || '-'}${result.data?.proposal?.hierarchyError ? ` | Jerarquía interna: ${result.data.proposal.hierarchyError}` : ''}`;
+            setCorrectionPreviewState(message, tone);
+        }
+
+        async function openCorrectionModal(registrationId) {
+            correctionRow = invalidRows.find((item) => item.registrationId === registrationId);
+            if (!correctionRow) {
+                showToast('No se encontró el registro seleccionado.', 'error');
+                return;
+            }
+
+            document.getElementById('correction-current-summary').innerHTML = `
+                <div><span class="font-semibold">Líder:</span> ${escapeHtml(correctionRow.leaderName || 'Sin líder')}</div>
+                <div><span class="font-semibold">Registro:</span> ${escapeHtml(correctionRow.registrationId || '-')}</div>
+                <div><span class="font-semibold">Localidad raw:</span> ${escapeHtml(correctionRow.rawLocalidad || '-')}</div>
+                <div><span class="font-semibold">Puesto raw:</span> ${escapeHtml(correctionRow.rawPuesto || '-')}</div>
+                <div><span class="font-semibold">Mesa raw:</span> ${escapeHtml(String(correctionRow.rawMesa ?? '-'))}</div>
+                <div><span class="font-semibold">Estado:</span> ${escapeHtml(correctionRow.officialValidationStatus || '-')}</div>
+                <div><span class="font-semibold">Motivo:</span> ${escapeHtml(correctionRow.officialValidationReason || '-')}</div>
+            `;
+            document.getElementById('correction-note').value = '';
+            document.getElementById('correction-history-body').innerHTML = '<div class="text-slate-500">Cargando historial...</div>';
+            setCorrectionPreviewState('Seleccione una localidad, un puesto y una mesa oficial para validar la corrección.', 'slate');
+
+            officialCorrectionCatalog = await loadOfficialCorrectionCatalog();
+            const suggestedLocalidad = correctionRow.suggestedOfficialLocalidad || correctionRow.normalizedLocalidad || '';
+            populateCorrectionLocalidades(suggestedLocalidad);
+            await refreshCorrectionPuestos(correctionRow.suggestedOfficialPuesto || correctionRow.normalizedPuesto || '');
+            await refreshCorrectionMesas(correctionRow.rawMesa || '');
+            document.getElementById('correction-modal').classList.remove('hidden');
+            await loadCorrectionHistory(correctionRow.registrationId);
+            await runCorrectionPreview();
+        }
+
+        function closeCorrectionModal() {
+            document.getElementById('correction-modal').classList.add('hidden');
+            correctionRow = null;
+        }
+
+        async function applyOfficialCorrection() {
+            if (!correctionRow) return;
+            const localidad = document.getElementById('correction-localidad').value || '';
+            const puesto = document.getElementById('correction-puesto').value || '';
+            const mesa = document.getElementById('correction-mesa').value || '';
+            const correctionNote = document.getElementById('correction-note').value || '';
+            if (!localidad || !puesto || !mesa) {
+                showToast('Debes seleccionar localidad, puesto y mesa oficiales.', 'error');
+                return;
+            }
+
+            const button = document.getElementById('btn-apply-correction');
+            const originalHtml = button.innerHTML;
+            try {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
+                const response = await fetch(`/api/v2/registrations/${encodeURIComponent(correctionRow.registrationId)}/official-correction/apply`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ localidad, puesto, mesa, correctionNote })
+                });
+                const result = await response.json().catch(() => null);
+                if (!response.ok || !result?.success) {
+                    throw new Error(result?.error || result?.message || 'No se pudo aplicar la corrección');
+                }
+                showToast('Corrección aplicada y revalidada correctamente.', 'success');
+                closeCorrectionModal();
+                await fetchInvalidRows(currentPage);
+            } catch (error) {
+                showToast(error.message || 'No se pudo aplicar la corrección.', 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }
+        }
+
+        function bindEvents() {
+            document.getElementById('btn-apply-filters').addEventListener('click', () => {
+                currentFilters = {
+                    search: document.getElementById('filter-search').value.trim(),
+                    localidad: document.getElementById('filter-localidad').value,
+                    reason: document.getElementById('filter-reason').value,
+                    reviewStatus: document.getElementById('filter-status').value,
+                    regionScope: document.getElementById('filter-region').value
+                };
+                fetchInvalidRows(1);
+            });
+
+            document.getElementById('btn-clear-filters').addEventListener('click', () => {
+                document.getElementById('filter-search').value = '';
+                document.getElementById('filter-localidad').value = '';
+                document.getElementById('filter-reason').value = '';
+                document.getElementById('filter-status').value = '';
+                document.getElementById('filter-region').value = 'bogota';
+                currentFilters = { search: '', localidad: '', reason: '', reviewStatus: '', regionScope: 'bogota' };
+                fetchInvalidRows(1);
+            });
+
+            document.getElementById('btn-prev-page').addEventListener('click', () => {
+                if (currentPage > 1) fetchInvalidRows(currentPage - 1);
+            });
+            document.getElementById('btn-next-page').addEventListener('click', () => {
+                if (currentPage < totalPages) fetchInvalidRows(currentPage + 1);
+            });
+
+            document.getElementById('filter-search').addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') document.getElementById('btn-apply-filters').click();
+            });
+
+            document.getElementById('correction-localidad').addEventListener('change', async () => {
+                await refreshCorrectionPuestos('');
+                await runCorrectionPreview();
+            });
+            document.getElementById('correction-puesto').addEventListener('change', async () => {
+                await refreshCorrectionMesas('');
+                await runCorrectionPreview();
+            });
+            document.getElementById('correction-mesa').addEventListener('change', runCorrectionPreview);
+
+            document.getElementById('detail-modal').addEventListener('click', (event) => {
+                if (event.target.id === 'detail-modal') closeDetailModal();
+            });
+            document.getElementById('correction-modal').addEventListener('click', (event) => {
+                if (event.target.id === 'correction-modal') closeCorrectionModal();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            bindEvents();
+            fetchInvalidRows(1);
+        });
+    </script>
+</body>
+</html>

@@ -6,7 +6,6 @@
     <title>Panel de Análisis Avanzado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -25,6 +24,11 @@
             height: 300px;
             width: 100%;
         }
+        .chart-placeholder {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+        }
         
         /* Toggle Switch */
         .toggle-checkbox:checked {
@@ -35,103 +39,9 @@
             background-color: #4F46E5;
         }
         
-        /* Spotify Wrapped Simulation Styles */
-        #simulation-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1DB954, #191414);
-            z-index: 9999;
-            color: white;
-            overflow: hidden;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .sim-slide {
-            display: none;
-            text-align: center;
-            animation: fadeIn 1s ease-in-out;
-            width: 100%;
-            max-width: 800px;
-            padding: 2rem;
-        }
-        
-        .sim-slide.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .loading-spinner {
-            border: 8px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top: 8px solid white;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .big-number {
-            font-size: 6rem;
-            font-weight: 900;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin: 1rem 0;
-            color: #fff;
-        }
-        
-        .progress-bar-container {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.2);
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: white;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-        
-        .sim-btn {
-            background: white;
-            color: #191414;
-            border-radius: 50px;
-            padding: 10px 30px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 2rem;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .sim-btn:hover {
-            transform: scale(1.05);
         }
         
         /* Hierarchical Table Styles */
@@ -142,8 +52,6 @@
         .expanded .fa-chevron-right { transform: rotate(90deg); }
         .chevron-icon { transition: transform 0.2s; display: inline-block; width: 20px; }
     </style>
-    <!-- Contenedor PDF Script -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <nav class="bg-indigo-900 text-white shadow-lg">
@@ -157,6 +65,9 @@
                     <a href="/leader-performance.html" id="btnLeaderPerformance" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-md flex items-center">
                         <i class="fas fa-users-cog mr-2"></i>Rendimiento
                     </a>
+                    <button id="btn-export-jerarquia" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-md flex items-center">
+                        <i class="fas fa-file-csv mr-2"></i>Exportar Jerarquía
+                    </button>
                     <button id="btn-export-pdf" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-bold transition-colors shadow-md flex items-center">
                         <i class="fas fa-file-pdf mr-2"></i>Exportar Informe
                     </button>
@@ -179,7 +90,7 @@
             <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
                 <!-- Region Toggle -->
                 <div class="flex items-center">
-                    <span class="mr-3 text-gray-700 font-semibold" id="label-nacional">Nacional</span>
+                    <span class="mr-3 text-gray-700 font-semibold" id="label-nacional">Total Evento</span>
                     <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
                         <input type="checkbox" name="toggle" id="region-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 z-10"/>
                         <label for="region-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-colors duration-300"></label>
@@ -196,6 +107,10 @@
                         <option value="unconfirmed">Solo datos sin confirmar</option>
                     </select>
                 </div>
+
+                <a id="btn-invalid-data-page" href="/invalid-data.html" class="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-3 py-2 font-semibold hover:bg-amber-100 transition-colors">
+                    Ver datos erróneos o incompletos
+                </a>
                 
                 <!-- Global Leader Filter -->
                 <div class="flex items-center">
@@ -212,6 +127,7 @@
                     <label for="simulation-target-date" class="text-sm font-medium text-gray-700">Elecciones:</label>
                     <input type="date" id="simulation-target-date" value="2026-03-05" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
                 </div>
+                <p class="text-xs text-gray-500 max-w-sm text-right">Escenarios basados en votos oficiales, lideres activos y registros corregibles. No modifica los datos reales.</p>
                 <button id="btn-start-simulation" class="bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 flex items-center">
                     <i class="fas fa-play-circle text-2xl mr-2"></i>
                     <span>Iniciar Simulación de Campaña</span>
@@ -229,11 +145,11 @@
         <div id="dashboard-content" class="hidden">
             
             <!-- Top Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
                 <div class="card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="text-blue-100 text-sm font-semibold uppercase tracking-wider">Total Votos</p>
+                            <p class="text-blue-100 text-sm font-semibold uppercase tracking-wider">Total Registros</p>
                             <h3 class="text-4xl font-bold mt-1" id="stat-total-votos">0</h3>
                         </div>
                         <i class="fas fa-users text-5xl opacity-20"></i>
@@ -242,10 +158,10 @@
                 <div class="card bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="text-emerald-100 text-sm font-semibold uppercase tracking-wider">Total Puestos</p>
+                            <p class="text-emerald-100 text-sm font-semibold uppercase tracking-wider">Confirmados</p>
                             <h3 class="text-4xl font-bold mt-1" id="stat-total-puestos">0</h3>
                         </div>
-                        <i class="fas fa-map-marker-alt text-5xl opacity-20"></i>
+                        <i class="fas fa-check-circle text-5xl opacity-20"></i>
                     </div>
                 </div>
                 <div class="card bg-gradient-to-br from-purple-500 to-purple-600 text-white">
@@ -257,9 +173,27 @@
                         <i class="fas fa-user-tie text-5xl opacity-20"></i>
                     </div>
                 </div>
+                <div class="card bg-gradient-to-br from-slate-700 to-slate-800 text-white">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-slate-200 text-sm font-semibold uppercase tracking-wider">Oficiales</p>
+                            <h3 class="text-4xl font-bold mt-1" id="stat-official-valid">0</h3>
+                        </div>
+                        <i class="fas fa-shield-check text-5xl opacity-20"></i>
+                    </div>
+                </div>
+                <div class="card bg-gradient-to-br from-amber-500 to-orange-500 text-white">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-amber-100 text-sm font-semibold uppercase tracking-wider">Erróneos/Incompletos</p>
+                            <h3 class="text-4xl font-bold mt-1" id="stat-invalid-total">0</h3>
+                        </div>
+                        <i class="fas fa-triangle-exclamation text-5xl opacity-20"></i>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 official-only">
                 
                 <!-- Puestos Chart -->
                 <div class="card">
@@ -267,6 +201,7 @@
                         <i class="fas fa-chart-bar text-indigo-500 mr-2"></i>Top 10 Puestos de Votación
                     </h3>
                     <div class="chart-container">
+                        <div id="puestos-chart-placeholder" class="chart-placeholder"></div>
                         <canvas id="puestosChart"></canvas>
                     </div>
                 </div>
@@ -277,7 +212,74 @@
                         <i class="fas fa-chart-pie text-pink-500 mr-2"></i>Distribución por Localidad/Municipio
                     </h3>
                     <div class="chart-container">
+                        <div id="localidades-chart-placeholder" class="chart-placeholder"></div>
                         <canvas id="localidadesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-filter text-slate-500 mr-2"></i>Cobertura del Breakdown
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-6 gap-3 text-sm">
+                        <div class="bg-slate-50 rounded p-3">
+                            <div class="text-slate-500">Total Registros Analizados</div>
+                            <div id="coverage-total-region" class="text-slate-800 font-bold text-lg">0</div>
+                        </div>
+                        <div class="bg-slate-50 rounded p-3">
+                            <div class="text-slate-500">Localidades con Datos</div>
+                            <div id="coverage-locality-total" class="text-slate-800 font-bold text-lg">0</div>
+                        </div>
+                        <div class="bg-slate-50 rounded p-3">
+                            <div class="text-slate-500">Sin Localidad</div>
+                            <div id="coverage-no-locality" class="text-slate-800 font-bold text-lg">0</div>
+                        </div>
+                        <div class="bg-slate-50 rounded p-3">
+                            <div class="text-slate-500">Sin Puesto</div>
+                            <div id="coverage-no-polling" class="text-slate-800 font-bold text-lg">0</div>
+                        </div>
+                        <div class="bg-slate-50 rounded p-3">
+                            <div class="text-slate-500">Inconsistentes</div>
+                            <div id="coverage-inconsistent" class="text-slate-800 font-bold text-lg">0</div>
+                        </div>
+                        <div class="bg-slate-50 rounded p-3">
+                            <div class="text-slate-500">Ocultos por Limpio</div>
+                            <div id="coverage-hidden-clean" class="text-slate-800 font-bold text-lg">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex justify-between items-center">
+                        <span><i class="fas fa-clipboard-check text-amber-500 mr-2"></i>Registros Sin Puesto Asignado</span>
+                        <button id="btn-review-missing-polling" class="px-3 py-2 text-xs font-semibold rounded bg-amber-500 text-white hover:bg-amber-600">
+                            Marcar y Notificar
+                        </button>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm mb-3">
+                        <div class="bg-amber-50 rounded p-3">
+                            <div class="text-amber-700">Total sin puesto</div>
+                            <div id="missing-polling-total" class="text-amber-900 font-bold text-lg">0</div>
+                        </div>
+                        <div class="bg-slate-50 rounded p-3 md:col-span-2">
+                            <div class="text-slate-600">Líderes afectados</div>
+                            <div id="missing-polling-leaders-total" class="text-slate-900 font-bold text-lg">0</div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Líder</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Pendientes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="missing-polling-leaders-body" class="bg-white divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="2" class="px-4 py-3 text-center text-gray-500">Sin datos</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -285,7 +287,21 @@
                 <div class="card lg:col-span-2">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex justify-between items-center">
                         <span><i class="fas fa-sitemap text-green-500 mr-2"></i>Estructura de Votación (Jerárquica)</span>
-                        <span class="text-sm font-normal text-gray-500">Clic para expandir</span>
+                        <div class="flex items-center gap-3 flex-wrap justify-end">
+                            <div class="flex items-center gap-2">
+                                <label for="hierarchy-sort-localidades" class="text-xs font-semibold text-gray-500 uppercase">Localidades</label>
+                                <select id="hierarchy-sort-localidades" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2"></select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label for="hierarchy-sort-puestos" class="text-xs font-semibold text-gray-500 uppercase">Puestos</label>
+                                <select id="hierarchy-sort-puestos" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2"></select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label for="hierarchy-sort-mesas" class="text-xs font-semibold text-gray-500 uppercase">Mesas</label>
+                                <select id="hierarchy-sort-mesas" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2"></select>
+                            </div>
+                            <span class="text-sm font-normal text-gray-500">Clic para expandir</span>
+                        </div>
                     </h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200" id="hierarchical-table">
@@ -302,17 +318,39 @@
                     </div>
                 </div>
 
-                <!-- Leader Performance (En Desarrollo) -->
+                <!-- Leader Performance -->
                 <div class="card lg:col-span-2" id="leader-performance">
                     <div class="flex justify-between items-center mb-4 border-b pb-2">
                         <h3 class="text-lg font-semibold text-gray-800">
-                            <i class="fas fa-tools text-amber-500 mr-2"></i>Rendimiento de Líderes
+                            <i class="fas fa-users text-amber-500 mr-2"></i>Rendimiento de Lideres
                         </h3>
+                        <input
+                            id="leader-filter"
+                            type="text"
+                            placeholder="Filtrar lider..."
+                            class="border border-gray-300 rounded px-3 py-2 text-sm w-full max-w-xs"
+                        />
                     </div>
-                    <div class="flex items-center justify-center py-8 text-gray-500">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Lider</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Registros</th>
+                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">% Region</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaders-table-body" class="bg-white divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="3" class="px-4 py-6 text-center text-gray-500">Sin datos disponibles</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div id="leaders-table-meta" class="text-xs text-gray-500 mt-2">0 lideres</div>
+                    </div>
+                    <div id="leaders-empty-state" class="hidden flex items-center justify-center py-6 text-gray-500">
                         <div class="text-center">
-                            <div class="text-lg font-semibold">En desarrollo</div>
-                            <div class="text-sm">Estamos rediseñando este modulo.</div>
+                            <div class="text-sm">Sin lideres para los filtros actuales.</div>
                         </div>
                     </div>
                 </div>
@@ -321,802 +359,82 @@
         </div>
     </div>
 
-    <!-- Spotify Wrapped Style Simulation Overlay -->
-    <div id="simulation-overlay">
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="sim-progress"></div>
-        </div>
-        
-        <!-- Slide 1: Loading -->
-        <div class="sim-slide active" id="slide-loading">
-            <div class="loading-spinner mb-8"></div>
-            <h2 class="text-3xl font-bold mb-2">Analizando datos de campaña...</h2>
-            <p class="text-xl opacity-80">Calculando proyecciones y tendencias</p>
-        </div>
-        
-        <!-- Slide 2: Intro -->
-        <div class="sim-slide" id="slide-intro">
-            <h2 class="text-4xl font-bold mb-4">Tu Campaña en Resumen</h2>
-            <p class="text-2xl opacity-90 mb-8">Hemos analizado todos los datos hasta hoy.</p>
-            <i class="fas fa-chart-line text-6xl mb-8" style="animation: pulse 2s infinite;"></i>
-            <p class="text-xl">Prepárate para ver los resultados...</p>
-        </div>
-        
-        <!-- Slide 3: Current Status -->
-        <div class="sim-slide" id="slide-current">
-            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">Hasta el momento tienes</p>
-            <div class="big-number text-green-400" id="sim-val-current">0</div>
-            <p class="text-3xl font-bold">Votos Asegurados</p>
-            <p class="mt-6 text-xl opacity-80">¡Un excelente punto de partida!</p>
-        </div>
-        
-        <!-- Slide 4: Growth Rate -->
-        <div class="sim-slide" id="slide-rate">
-            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">Tu ritmo de crecimiento es de</p>
-            <div class="big-number text-blue-400" id="sim-val-rate">0</div>
-            <p class="text-3xl font-bold">Votos por Día</p>
-            <div class="mt-8 flex items-center justify-center space-x-4">
-                <i class="fas fa-fire text-4xl text-orange-500"></i>
-                <p class="text-xl">La campaña está en movimiento</p>
+    <div id="simulation-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm">
+        <div class="max-w-6xl mx-auto h-full flex items-center justify-center px-4 py-8">
+            <div class="w-full max-h-full overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200">
+                <div class="px-6 py-5 border-b border-slate-200 flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Simulación avanzada de campaña</h2>
+                        <p class="text-sm text-slate-500 mt-1">Proyecta crecimiento, recuperación y movilización usando datos oficiales validados.</p>
+                    </div>
+                    <button id="simulation-close-btn" class="text-slate-400 hover:text-slate-700 text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 xl:grid-cols-[360px_minmax(0,1fr)] max-h-[80vh]">
+                    <aside class="border-r border-slate-200 bg-slate-50 p-5 overflow-y-auto">
+                        <div id="simulation-base-summary" class="mb-4"></div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Tipo de escenario</label>
+                                <select id="simulation-scenario-type" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    <option value="conservador">Conservador</option>
+                                    <option value="moderado" selected>Moderado</option>
+                                    <option value="optimista">Optimista</option>
+                                    <option value="personalizado">Personalizado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Localidades objetivo</label>
+                                <select id="simulation-localidades" multiple class="w-full min-h-[120px] rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Líderes objetivo</label>
+                                <select id="simulation-leaders" multiple class="w-full min-h-[120px] rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">% crecimiento oficial</label>
+                                    <input id="simulation-growth-official" type="number" min="0" step="1" value="8" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">% recuperación</label>
+                                    <input id="simulation-recovery-percent" type="number" min="0" step="1" value="12" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">% movilización líder</label>
+                                    <input id="simulation-leader-mobilization" type="number" min="0" step="1" value="5" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">% turnout localidad</label>
+                                    <input id="simulation-turnout-percent" type="number" min="0" step="1" value="4" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                </div>
+                            </div>
+                            <label class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700">
+                                <input id="simulation-include-invalid" type="checkbox" checked class="rounded border-slate-300 text-indigo-600">
+                                Incluir recuperación de registros corregibles
+                            </label>
+                        </div>
+                        <div class="mt-5 flex items-center gap-3">
+                            <button id="simulation-run-btn" class="flex-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-3">Actualizar simulación</button>
+                            <button id="simulation-cancel-btn" class="rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold px-4 py-3">Cerrar</button>
+                        </div>
+                    </aside>
+                    <section class="p-6 overflow-y-auto bg-white">
+                        <div id="simulation-loading"></div>
+                        <div id="simulation-results" class="hidden space-y-5">
+                            <div id="simulation-assumptions"></div>
+                            <div id="simulation-summary-cards"></div>
+                            <div class="grid grid-cols-1 2xl:grid-cols-2 gap-5">
+                                <div id="simulation-ranking-localidades"></div>
+                                <div id="simulation-ranking-lideres"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
-        </div>
-        
-        <!-- Slide 5: Top Puesto -->
-        <div class="sim-slide" id="slide-top-puesto">
-            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">El Puesto de Votación Más Fuerte</p>
-            <div class="big-number text-purple-400 text-5xl mt-6 mb-4" id="sim-val-top-puesto-name">Puesto X</div>
-            <div class="text-3xl font-bold flex flex-col items-center mt-4">
-                <span class="text-gray-300 text-xl font-normal mb-1">Total de votos asegurados</span>
-                <span class="text-4xl text-white font-black" id="sim-val-top-puesto-votes">0</span>
-            </div>
-            <i class="fas fa-map-marker-alt text-6xl text-purple-500 mt-8" style="animation: pulse 2s infinite;"></i>
-        </div>
-
-        <!-- Slide 6: Top Localidad -->
-        <div class="sim-slide" id="slide-top-localidad">
-            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">La Localidad Destacada</p>
-            <div class="big-number text-pink-400 text-5xl mt-6 mb-4" id="sim-val-top-localidad-name">Localidad Y</div>
-            <div class="text-3xl font-bold flex flex-col items-center mt-4">
-                <span class="text-gray-300 text-xl font-normal mb-1">Impacto total en la zona</span>
-                <span class="text-4xl text-white font-black" id="sim-val-top-localidad-votes">0</span>
-            </div>
-            <i class="fas fa-city text-6xl text-pink-500 mt-8" style="animation: pulse 2s infinite;"></i>
-        </div>
-
-        <!-- Slide 7: Top Lider -->
-        <div class="sim-slide" id="slide-top-leader">
-            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">El Líder del momento</p>
-            <div class="big-number text-orange-400 text-5xl mt-6 mb-4" id="sim-val-top-leader-name">Líder Z</div>
-            <div class="text-3xl font-bold flex flex-col items-center mt-4">
-                <span class="text-gray-300 text-xl font-normal mb-1">Votos aportados</span>
-                <span class="text-4xl text-white font-black" id="sim-val-top-leader-votes">0</span>
-            </div>
-            <i class="fas fa-star text-6xl text-orange-500 mt-8" style="animation: pulse 2s infinite;"></i>
-        </div>
-
-        <!-- Slide 8: Projection Target Data -->
-        <div class="sim-slide" id="slide-proj-target">
-            <p class="text-2xl font-semibold uppercase tracking-widest opacity-80">Proyección al Final de las Elecciones</p>
-            <div class="big-number text-yellow-400" id="sim-val-target-votes">0</div>
-            <p class="text-3xl font-bold">Votos Estimados para Ganar</p>
-            <i class="fas fa-trophy text-6xl text-yellow-500 mt-8" style="animation: pulse 2s infinite;"></i>
-        </div>
-        
-        <!-- Slide 7: Outro -->
-        <div class="sim-slide" id="slide-outro">
-            <h2 class="text-5xl font-bold mb-6">¡Sigue así!</h2>
-            <p class="text-2xl mb-8">Cada voto cuenta. El trabajo en equipo de tus líderes está dando frutos.</p>
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center mt-4">
-                <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 flex items-center justify-center text-xl z-50" onclick="downloadSimulationPDF()" id="btn-download-pdf">
-                    <i class="fas fa-file-pdf mr-2"></i> Descargar Reporte PDF
-                </button>
-                <button class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 flex items-center justify-center text-xl z-50" onclick="closeSimulation()">
-                    <i class="fas fa-times mr-2"></i> Volver al Panel
-                </button>
-            </div>
-        </div>
-        
-        <!-- Navigation hints -->
-        <div class="absolute bottom-8 left-0 w-full text-center opacity-50 text-sm tracking-widest uppercase" id="sim-hint">
-            Toca para continuar
         </div>
     </div>
-
-    <!-- Contenedor oculto para la generación del PDF -->
-    <div id="pdf-report-container" style="position: absolute; left: -9999px; width: 1056px; background: white; color: black; padding: 50px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; overflow: visible; height: auto;">
-          <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #4f46e5; padding-bottom: 20px;">
-              <h1 style="color: #312e81; font-size: 38px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Reporte de Simulación de Campaña</h1>
-              <p style="color: #6b7280; font-size: 18px; margin-top: 10px;">Metas y Proyecciones Electorales (Formato Presentación)</p>
-              <p style="color: #9ca3af; font-size: 15px; margin-top: 5px;">Generado el: <strong id="pdf-date"></strong></p>
-        
-        <div style="display: flex; justify-content: space-between; gap: 20px; margin-bottom: 30px;">
-            <div style="flex: 1; background: #f3f4f6; padding: 25px; border-radius: 12px; border-left: 5px solid #10b981;">
-                <h3 style="margin-top: 0; color: #374151; font-size: 18px; text-transform: uppercase;">Estado Actual</h3>
-                <p style="font-size: 36px; font-weight: 800; color: #059669; margin: 15px 0 5px 0;"><span id="pdf-val-current">0</span></p>
-                <p style="font-size: 16px; font-weight: normal; color: #6b7280; margin: 0;">Votos Asegurados</p>
-                
-                <p style="font-size: 24px; font-weight: 700; color: #2563eb; margin: 20px 0 5px 0;"><span id="pdf-val-rate">0</span></p>
-                <p style="font-size: 14px; font-weight: normal; color: #6b7280; margin: 0;">Ritmo (Votos / Día)</p>
-            </div>
-            
-            <div style="flex: 1; background: #fffbeb; padding: 25px; border-radius: 12px; border-left: 5px solid #f59e0b;">
-                <h3 style="margin-top: 0; color: #374151; font-size: 18px; text-transform: uppercase;">Proyección a Meta</h3>
-                <p style="color: #6b7280; font-size: 14px; margin-top: -5px; margin-bottom: 15px;">Fecha límite: <strong id="pdf-target-date-display">...</strong></p>
-                <p style="font-size: 42px; font-weight: 900; color: #d97706; margin: 15px 0 5px 0;"><span id="pdf-val-target">0</span></p>
-                <p style="font-size: 16px; font-weight: normal; color: #6b7280; margin: 0;">Votos Estimados para Ganar</p>
-            </div>
-        </div>
-
-        <h2 style="color: #312e81; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-top: 40px; margin-bottom: 25px; font-size: 22px;">Métricas Destacadas</h2>
-        
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <div style="background: #fafafa; padding: 15px 20px; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h3 style="color: #4b5563; margin: 0 0 5px 0; font-size: 14px; text-transform: uppercase;">📍 Top Puesto de Votación</h3>
-                    <p style="font-size: 20px; font-weight: bold; margin: 0; color: #111827;" id="pdf-val-top-puesto-name">Puesto</p>
-                </div>
-                <div style="text-align: right;">
-                    <p style="font-size: 24px; font-weight: bold; color: #8b5cf6; margin: 0;" id="pdf-val-top-puesto-votes">0</p>
-                    <p style="font-size: 12px; color: #6b7280; margin: 0;">votos</p>
-                </div>
-            </div>
-
-            <div style="background: #fafafa; padding: 15px 20px; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h3 style="color: #4b5563; margin: 0 0 5px 0; font-size: 14px; text-transform: uppercase;">🌆 Top Localidad / Municipio</h3>
-                    <p style="font-size: 20px; font-weight: bold; margin: 0; color: #111827;" id="pdf-val-top-localidad-name">Localidad</p>
-                </div>
-                <div style="text-align: right;">
-                    <p style="font-size: 24px; font-weight: bold; color: #ec4899; margin: 0;" id="pdf-val-top-localidad-votes">0</p>
-                    <p style="font-size: 12px; color: #6b7280; margin: 0;">votos</p>
-                </div>
-            </div>
-
-            <div style="background: #fafafa; padding: 15px 20px; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h3 style="color: #4b5563; margin: 0 0 5px 0; font-size: 14px; text-transform: uppercase;">⭐ Top Líder</h3>
-                    <p style="font-size: 20px; font-weight: bold; margin: 0; color: #111827;" id="pdf-val-top-leader-name">Líder</p>
-                </div>
-                <div style="text-align: right;">
-                    <p style="font-size: 24px; font-weight: bold; color: #ea580c; margin: 0;" id="pdf-val-top-leader-votes">0</p>
-                    <p style="font-size: 12px; color: #6b7280; margin: 0;">votos</p>
-                </div>
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin-top: 50px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-            <p style="color: #9ca3af; font-size: 12px; margin: 0;">Generado automáticamente por el Sistema de Panel de Control Electoral.</p>
-            <p style="color: #9ca3af; font-size: 12px; margin: 5px 0 0 0;">Este documento es una proyección analítica basada en tendencias del momento.</p>
-        </div>
-    </div>
-
-    <script>
-        // Global State
-        let analyticsData = null;
-        let currentRegion = 'nacional'; // 'nacional' or 'bogota'
-        let charts = {};
-        
-        // DOM Elements
-        const toggleCheckbox = document.getElementById('region-toggle');
-        const labelNacional = document.getElementById('label-nacional');
-        const labelBogota = document.getElementById('label-bogota');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const dashboardContent = document.getElementById('dashboard-content');
-        const leaderFilter = document.getElementById('leader-filter');
-        const dataStatusFilter = document.getElementById('data-status-filter');
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchAnalyticsData();
-
-              // Load all leaders into the new filter
-              const globalLeaderFilter = document.getElementById('global-leader-filter');
-              if (globalLeaderFilter) {
-                  const token = localStorage.getItem('token');
-                  fetch('/api/v2/leaders?limit=1000', {
-                      headers: { 'Authorization': `Bearer ${token}` }
-                  })
-                  .then(r => r.json())
-                  .then(result => {
-                      const leaders = (result && result.success && result.data) ? result.data : (Array.isArray(result) ? result : []);
-                      leaders.forEach(l => {
-                          const opt = document.createElement('option');
-                          opt.value = l.leaderId || l._id || l.id || '';
-                          opt.textContent = l.name || l.leaderName || 'Líder';
-                          globalLeaderFilter.appendChild(opt);
-                      });
-                  })
-                  .catch(err => console.error('Error fetching leaders', err));
-
-                  // Listen for global leader changes
-                  globalLeaderFilter.addEventListener('change', () => {
-                      fetchAnalyticsData();
-                  });
-              }
-
-              // Toggle Event Listener
-            toggleCheckbox.addEventListener('change', (e) => {
-                currentRegion = e.target.checked ? 'bogota' : 'nacional';
-                updateToggleLabels();
-                renderDashboard();
-            });
-
-            // Data Status Filter Event Listener
-            dataStatusFilter.addEventListener('change', () => {
-                fetchAnalyticsData();
-            });
-            
-            // Leader Filter Event Listener
-            if (leaderFilter) {
-                leaderFilter.addEventListener('input', (e) => {
-                    renderLeadersTable(e.target.value);
-                });
-            }
-            
-            // Verify Global Button
-            document.getElementById('btn-verify-global').addEventListener('click', runGlobalVerification);
-
-            // Export PDF Button
-            document.getElementById('btn-export-pdf').addEventListener('click', exportToPDF);
-
-            // Simulation Button
-            document.getElementById('btn-start-simulation').addEventListener('click', startSimulation);
-        });
-        
-        function updateToggleLabels() {
-            if (currentRegion === 'bogota') {
-                labelBogota.classList.remove('text-gray-400');
-                labelBogota.classList.add('text-indigo-600');
-                labelNacional.classList.remove('text-indigo-600');
-                labelNacional.classList.add('text-gray-400');
-            } else {
-                labelNacional.classList.remove('text-gray-400');
-                labelNacional.classList.add('text-indigo-600');
-                labelBogota.classList.remove('text-indigo-600');
-                labelBogota.classList.add('text-gray-400');
-            }
-        }
-        
-        function getSelectedEventId() {
-            return localStorage.getItem('eventId') || sessionStorage.getItem('eventId') || '';
-        }
-
-        async function fetchAnalyticsData() {
-            try {
-                loadingIndicator.classList.remove('hidden');
-                dashboardContent.classList.add('hidden');
-
-                const token = localStorage.getItem('token');
-                const status = dataStatusFilter.value;
-                const globalLeaderFilter = document.getElementById('global-leader-filter');
-                const leaderId = globalLeaderFilter ? globalLeaderFilter.value : '';
-                const eventId = getSelectedEventId();
-                const params = new URLSearchParams({ status });
-                if (leaderId) params.set('leaderId', leaderId);
-                if (eventId) params.set('eventId', eventId);
-
-                const response = await fetch(`/api/v2/analytics/advanced?${params.toString()}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) throw new Error('Error fetching data');
-                
-                const result = await response.json();
-                if (result.success) {
-                    analyticsData = result.data;
-                    loadingIndicator.classList.add('hidden');
-                    dashboardContent.classList.remove('hidden');
-                    updateToggleLabels();
-                    renderDashboard();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                loadingIndicator.innerHTML = `<div class="text-red-500"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Error al cargar los datos.</p></div>`;
-            }
-        }
-        
-        function renderDashboard() {
-            if (!analyticsData) return;
-            
-            const data = analyticsData[currentRegion] || { topPuestos: [], topLocalidades: [], topLideres: [], jerarquia: [], totalVotos: 0 };
-            
-            // Update Top Stats
-            document.getElementById('stat-total-votos').textContent = data.totalVotos.toLocaleString();
-            document.getElementById('stat-total-puestos').textContent = data.topPuestos.length.toLocaleString();
-            document.getElementById('stat-total-lideres').textContent = data.topLideres.length.toLocaleString();
-            
-            // Render Charts
-            renderPuestosChart(data.topPuestos);
-            renderLocalidadesChart(data.topLocalidades);
-            
-            // Render Tables
-            renderHierarchicalTable(data.jerarquia);
-            renderLeadersTable();
-        }
-        
-        function renderPuestosChart(puestosData) {
-            const ctx = document.getElementById('puestosChart').getContext('2d');
-            
-            if (charts.puestos) charts.puestos.destroy();
-            
-            const labels = puestosData.slice(0, 10).map(p => p._id || 'Desconocido');
-            const data = puestosData.slice(0, 10).map(p => p.totalVotos);
-            
-            charts.puestos = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Votos',
-                        data: data,
-                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                        borderColor: 'rgba(99, 102, 241, 1)',
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-        }
-        
-        function renderLocalidadesChart(localidadesData) {
-            const ctx = document.getElementById('localidadesChart').getContext('2d');
-            
-            if (charts.localidades) charts.localidades.destroy();
-            
-            const labels = localidadesData.slice(0, 8).map(l => l._id || 'Desconocido');
-            const data = localidadesData.slice(0, 8).map(l => l.totalVotos);
-            
-            // Generate colors
-            const colors = [
-                '#ec4899', '#8b5cf6', '#3b82f6', '#10b981', 
-                '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'
-            ];
-            
-            charts.localidades = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors.slice(0, data.length),
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right' }
-                    },
-                    cutout: '60%'
-                }
-            });
-        }
-        
-        function renderHierarchicalTable(jerarquia) {
-            const tbody = document.getElementById('hierarchical-table-body');
-            tbody.innerHTML = '';
-            
-            if (!jerarquia || jerarquia.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">No hay datos disponibles</td></tr>';
-                return;
-            }
-            
-            jerarquia.forEach((loc, locIndex) => {
-                const locId = `loc-${locIndex}`;
-                
-                // Locality Row
-                const trLoc = document.createElement('tr');
-                trLoc.className = 'table-row-locality';
-                trLoc.onclick = () => toggleChildren(locId);
-                trLoc.innerHTML = `
-                    <td class="px-6 py-3 whitespace-nowrap">
-                        <span class="chevron-icon" id="icon-${locId}"><i class="fas fa-chevron-right"></i></span>
-                        <i class="fas fa-city text-blue-500 mr-2"></i>${loc.localidad || 'Desconocida'}
-                    </td>
-                    <td class="px-6 py-3 whitespace-nowrap text-right font-bold text-indigo-600">${loc.totalVotos}</td>
-                `;
-                tbody.appendChild(trLoc);
-                
-                // Puestos Rows
-                if (loc.puestos) {
-                    loc.puestos.forEach((puesto, pIndex) => {
-                        const puestoId = `${locId}-p-${pIndex}`;
-                        
-                        const trPuesto = document.createElement('tr');
-                        trPuesto.className = `table-row-puesto child-of-${locId}`;
-                        trPuesto.onclick = (e) => {
-                            e.stopPropagation();
-                            toggleChildren(puestoId);
-                        };
-                        trPuesto.innerHTML = `
-                            <td class="px-6 py-2 whitespace-nowrap">
-                                <span class="chevron-icon" id="icon-${puestoId}"><i class="fas fa-chevron-right"></i></span>
-                                <i class="fas fa-map-marker-alt text-red-400 mr-2"></i>${puesto.puesto || 'Desconocido'}
-                            </td>
-                            <td class="px-6 py-2 whitespace-nowrap text-right font-semibold">${puesto.totalVotos}</td>
-                        `;
-                        tbody.appendChild(trPuesto);
-                        
-                        // Mesas Rows
-                        if (puesto.mesas) {
-                            puesto.mesas.forEach(mesa => {
-                                  const titleModal = `${puesto.puesto || 'Puesto'} - Mesa ${mesa.mesa || 'N/A'}`;
-                                  
-                                  const trMesa = document.createElement('tr');
-                                  trMesa.className = `table-row-mesa child-of-${puestoId} hover:bg-indigo-50 transition-colors`;
-                                  trMesa.style.cursor = 'pointer';
-                                  trMesa.onclick = () => openVotersModal(titleModal, mesa.voters);
-                                  
-                                  trMesa.innerHTML = `
-                                      <td class="px-6 py-1 whitespace-nowrap">
-                                          <i class="fas fa-table text-indigo-400 mr-2 ml-4"></i><span class="text-indigo-600 underline decoration-indigo-300 underline-offset-2">Mesa ${mesa.mesa || 'N/A'}</span>
-                                      </td>
-                                      <td class="px-6 py-1 whitespace-nowrap text-right"><span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">${mesa.totalVotos}</span></td>
-                                `;
-                                tbody.appendChild(trMesa);
-                            });
-                        }
-                    });
-                }
-            });
-        }
-        
-        function toggleChildren(parentId) {
-            const icon = document.getElementById(`icon-${parentId}`);
-            const children = document.querySelectorAll(`.child-of-${parentId}`);
-            
-            let isExpanding = false;
-            
-            if (icon) {
-                icon.classList.toggle('expanded');
-                isExpanding = icon.classList.contains('expanded');
-            }
-            
-            children.forEach(child => {
-                if (isExpanding) {
-                    child.style.display = 'table-row';
-                } else {
-                    child.style.display = 'none';
-                    // If collapsing, also collapse all sub-children
-                    const childIcon = child.querySelector('.chevron-icon');
-                    if (childIcon && childIcon.classList.contains('expanded')) {
-                        childIcon.classList.remove('expanded');
-                        const childId = childIcon.id.replace('icon-', '');
-                        const subChildren = document.querySelectorAll(`.child-of-${childId}`);
-                        subChildren.forEach(sc => sc.style.display = 'none');
-                    }
-                }
-            });
-        }
-        
-        function renderLeadersTable() {
-            return;
-        }
-        
-        // --- Toast Notification ---
-        function showToast(message, type = 'success') {
-            let container = document.getElementById('toast-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'toast-container';
-                container.className = 'fixed bottom-4 right-4 z-50 flex flex-col gap-2';
-                document.body.appendChild(container);
-            }
-
-            const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
-            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
-            
-            toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0`;
-            toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
-            
-            container.appendChild(toast);
-            
-            // Animate in
-            setTimeout(() => {
-                toast.classList.remove('translate-y-10', 'opacity-0');
-            }, 10);
-
-            // Remove after 5 seconds
-            setTimeout(() => {
-                toast.classList.add('translate-y-10', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 5000);
-        }
-
-        // --- Global Verification ---
-        async function runGlobalVerification() {
-            const btn = document.getElementById('btn-verify-global');
-            const originalHtml = btn.innerHTML;
-            
-            try {
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verificando...';
-                btn.disabled = true;
-                
-                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                const eventId = localStorage.getItem('eventId') || sessionStorage.getItem('eventId');
-                const url = eventId ? `/api/v2/analytics/verify-global?eventId=${eventId}` : '/api/v2/analytics/verify-global';
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const result = await response.json();
-                
-                if (result.success || result.assigned !== undefined) {
-                    const d = result.data || result; // Fallback in case data is directly returned
-                    const msg = `Verificación completada.<br>Asignados: ${d.assigned || 0}<br>Autocorregidos: ${d.autoCorrected || 0}<br>Para revisión: ${d.needsReview || 0}<br>Inconsistencias: ${d.severeInconsistency || 0}`;
-                    showToast(msg, 'success');
-                    // Reload data to reflect changes
-                    fetchAnalyticsData();
-                } else {
-                    const errorMsg = result.error?.message || result.error || result.message || 'Error desconocido';
-                    showToast('Error en la verificación: ' + errorMsg, 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error de conexión al verificar datos.', 'error');
-            } finally {
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-            }
-        }
-        
-        // --- Spotify Wrapped Simulation ---
-        let simSlides = [];
-        let currentSlideIndex = 0;
-        let simInterval = null;
-        let simData = null;
-        
-        async function startSimulation() {
-            try {
-                // Fetch simulation data
-                const token = localStorage.getItem('token');
-                const targetDate = document.getElementById('simulation-target-date').value || '2026-03-05';
-                const eventId = getSelectedEventId();
-                const params = new URLSearchParams({ targetDate });
-                if (eventId) params.set('eventId', eventId);
-                const response = await fetch(`/api/v2/analytics/simulation?${params.toString()}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    simData = result.data;
-                    
-                    // Populate data in slides
-                    document.getElementById('sim-val-current').textContent = simData.currentTotal.toLocaleString();
-                    document.getElementById('sim-val-rate').textContent = simData.dailyGrowthRate.toLocaleString(undefined, { maximumFractionDigits: 1 });
-                    
-                    document.getElementById('sim-val-top-puesto-name').textContent = simData.topPuesto || 'No Data';
-                    document.getElementById('sim-val-top-puesto-votes').textContent = (simData.topPuestoVotes || 0).toLocaleString();
-                    
-                    document.getElementById('sim-val-top-localidad-name').textContent = simData.topLocalidad || 'No Data';
-                    document.getElementById('sim-val-top-localidad-votes').textContent = (simData.topLocalidadVotes || 0).toLocaleString();
-                    
-                    document.getElementById('sim-val-top-leader-name').textContent = simData.topLeader || 'No Data';
-                    document.getElementById('sim-val-top-leader-votes').textContent = (simData.topLeaderVotes || 0).toLocaleString();
-                    
-                    document.getElementById('sim-val-target-votes').textContent = simData.projectedTotal.toLocaleString();
-                    
-                    // Populate PDF Report template data
-                    document.getElementById('pdf-date').textContent = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
-                    document.getElementById('pdf-target-date-display').textContent = targetDate;
-                    document.getElementById('pdf-val-current').textContent = simData.currentTotal.toLocaleString();
-                    document.getElementById('pdf-val-rate').textContent = simData.dailyGrowthRate.toLocaleString(undefined, { maximumFractionDigits: 1 });
-                    document.getElementById('pdf-val-target').textContent = simData.projectedTotal.toLocaleString();
-                    document.getElementById('pdf-val-top-puesto-name').textContent = simData.topPuesto || 'No Data';
-                    document.getElementById('pdf-val-top-puesto-votes').textContent = (simData.topPuestoVotes || 0).toLocaleString();
-                    document.getElementById('pdf-val-top-localidad-name').textContent = simData.topLocalidad || 'No Data';
-                    document.getElementById('pdf-val-top-localidad-votes').textContent = (simData.topLocalidadVotes || 0).toLocaleString();
-                    document.getElementById('pdf-val-top-leader-name').textContent = simData.topLeader || 'No Data';
-                    document.getElementById('pdf-val-top-leader-votes').textContent = (simData.topLeaderVotes || 0).toLocaleString();
-                    
-                    // Setup UI
-                    const overlay = document.getElementById('simulation-overlay');
-                    overlay.style.display = 'flex';
-                    
-                    simSlides = Array.from(document.querySelectorAll('.sim-slide'));
-                    currentSlideIndex = 0;
-                    
-                    showSlide(0);
-                    
-                    // Auto advance loading slide
-                    setTimeout(() => {
-                        nextSlide();
-                        setupSimulationInteraction();
-                    }, 2500);
-                }
-            } catch (error) {
-                console.error('Error starting simulation:', error);
-                alert('No se pudo cargar la simulación.');
-            }
-        }
-        
-        function setupSimulationInteraction() {
-            const overlay = document.getElementById('simulation-overlay');
-            
-            // Click to advance
-            overlay.onclick = (e) => {
-                // Don't advance if clicking the close button
-                if (e.target.tagName === 'BUTTON') return;
-                
-                if (currentSlideIndex > 0 && currentSlideIndex < simSlides.length - 1) {
-                    nextSlide();
-                }
-            };
-            
-            // Auto advance every 5 seconds
-            startAutoAdvance();
-        }
-        
-        function startAutoAdvance() {
-            clearInterval(simInterval);
-            simInterval = setInterval(() => {
-                if (currentSlideIndex > 0 && currentSlideIndex < simSlides.length - 1) {
-                    nextSlide();
-                } else {
-                    clearInterval(simInterval);
-                }
-            }, 5000);
-        }
-        
-        function showSlide(index) {
-            simSlides.forEach(s => s.classList.remove('active'));
-            simSlides[index].classList.add('active');
-            
-            // Update progress bar
-            const progress = ((index) / (simSlides.length - 1)) * 100;
-            document.getElementById('sim-progress').style.width = `${progress}%`;
-            
-            // Hide hint on last slide
-            if (index === simSlides.length - 1) {
-                document.getElementById('sim-hint').style.display = 'none';
-            } else if (index > 0) {
-                document.getElementById('sim-hint').style.display = 'block';
-            }
-            
-            // Change background color based on slide
-            const overlay = document.getElementById('simulation-overlay');
-            const colors = [
-                'linear-gradient(135deg, #1DB954, #191414)', // Loading
-                'linear-gradient(135deg, #8A2387, #E94057, #F27121)', // Intro
-                'linear-gradient(135deg, #11998e, #38ef7d)', // Current
-                'linear-gradient(135deg, #2193b0, #6dd5ed)', // Rate
-                'linear-gradient(135deg, #4A00E0, #8E2DE2)', // Top Puesto
-                'linear-gradient(135deg, #ff0844, #ffb199)', // Top Localidad
-                'linear-gradient(135deg, #f12711, #f5af19)', // Top Leader
-                'linear-gradient(135deg, #000000, #e74c3c)', // Projection Target
-                'linear-gradient(135deg, #1DB954, #191414)'  // Outro
-            ];
-            
-            if (colors[index]) {
-                overlay.style.background = colors[index];
-            }
-        }
-        
-        function nextSlide() {
-            if (currentSlideIndex < simSlides.length - 1) {
-                currentSlideIndex++;
-                showSlide(currentSlideIndex);
-                startAutoAdvance(); // Reset timer
-            }
-        }
-        
-        function closeSimulation() {
-            clearInterval(simInterval);
-            document.getElementById('simulation-overlay').style.display = 'none';
-        }
-
-        async function downloadSimulationPDF() {
-            const btn = document.getElementById('btn-download-pdf');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generando...';
-            btn.disabled = true;
-
-            try {
-                await (document.fonts ? document.fonts.ready : Promise.resolve());
-                if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
-                    throw new Error('html2canvas o jsPDF no estan disponibles');
-                }
-
-                const slideIds = [
-                    'slide-intro',
-                    'slide-current',
-                    'slide-rate',
-                    'slide-top-puesto',
-                    'slide-top-localidad',
-                    'slide-top-leader',
-                    'slide-proj-target',
-                    'slide-outro'
-                ];
-                const colors = [
-                    'linear-gradient(135deg, #8A2387, #E94057, #F27121)',
-                    'linear-gradient(135deg, #11998e, #38ef7d)',
-                    'linear-gradient(135deg, #2193b0, #6dd5ed)',
-                    'linear-gradient(135deg, #4A00E0, #8E2DE2)',
-                    'linear-gradient(135deg, #ff0844, #ffb199)',
-                    'linear-gradient(135deg, #f12711, #f5af19)',
-                    'linear-gradient(135deg, #000000, #e74c3c)',
-                    'linear-gradient(135deg, #1DB954, #191414)'
-                ];
-
-                const container = document.createElement('div');
-                container.id = 'simulation-pdf-container';
-                container.style.position = 'fixed';
-                container.style.top = '0';
-                container.style.left = '-2000px';
-                container.style.width = '1056px';
-                container.style.pointerEvents = 'none';
-                container.style.background = '#ffffff';
-                document.body.appendChild(container);
-
-                const { jsPDF } = window.jspdf;
-                const pageWidth = 1056;
-                const pageHeight = 816;
-                const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [pageWidth, pageHeight] });
-
-                let firstPage = true;
-                for (let i = 0; i < slideIds.length; i += 1) {
-                    const slide = document.getElementById(slideIds[i]);
-                    if (!slide) continue;
-
-                    const clone = slide.cloneNode(true);
-                    clone.classList.add('active');
-                    clone.style.display = 'flex';
-                    clone.style.minHeight = `${pageHeight}px`;
-                    clone.style.width = `${pageWidth}px`;
-                    clone.style.padding = '48px';
-                    clone.style.boxSizing = 'border-box';
-                    clone.style.background = colors[i] || '#111827';
-
-                    container.innerHTML = '';
-                    container.appendChild(clone);
-
-                    const canvas = await window.html2canvas(container, {
-                        scale: 2,
-                        useCORS: true,
-                        backgroundColor: '#ffffff',
-                        width: pageWidth,
-                        height: pageHeight,
-                        windowWidth: pageWidth,
-                        windowHeight: pageHeight,
-                        scrollX: 0,
-                        scrollY: 0
-                    });
-
-                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
-                    if (!firstPage) pdf.addPage([pageWidth, pageHeight], 'landscape');
-                    firstPage = false;
-                    pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
-                }
-
-                pdf.save(`Presentacion_Simulacion_${new Date().toISOString().split('T')[0]}.pdf`);
-                document.body.removeChild(container);
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                alert('Hubo un error al generar el PDF.');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-    </script>
-
     <!-- Modal para mostrar Votantes de una Mesa -->
     <div id="voters-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-3/4 max-w-4xl shadow-lg rounded-md bg-white">
@@ -1150,85 +468,6 @@
         </div>
     </div>
 
-    <script>
-        function openVotersModal(title, voters) {
-            document.getElementById('voters-modal-title').textContent = title;
-            const tbody = document.getElementById('voters-modal-body');
-            tbody.innerHTML = '';
-            
-            if (!voters || voters.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">No hay detalles disponibles</td></tr>';
-            } else {
-                voters.forEach(v => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="px-4 py-2 text-left font-medium text-gray-900">${v.nombre || '-'}</td>
-                        <td class="px-4 py-2 text-left text-gray-500">${v.cedula || '-'}</td>
-                        <td class="px-4 py-2 text-left text-blue-600"><i class="fas fa-user-tie mr-1 text-xs"></i>${v.lider || '-'}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-            
-            document.getElementById('voters-modal').classList.remove('hidden');
-        }
-
-        function closeVotersModal() {
-            document.getElementById('voters-modal').classList.add('hidden');
-        }
-
-        // --- PDF Export ---
-        async function exportToPDF() {
-            const btn = document.getElementById('btn-export-pdf');
-            const originalHtml = btn.innerHTML;
-
-            try {
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generando Informe...';
-                btn.disabled = true;
-                const token = localStorage.getItem('token');
-                const status = document.getElementById('data-status-filter')?.value || 'all';
-                const leaderId = document.getElementById('global-leader-filter')?.value || '';
-                const eventId = getSelectedEventId();
-                const targetDate = document.getElementById('simulation-target-date')?.value || '';
-
-                const params = new URLSearchParams();
-                if (eventId) params.set('eventId', eventId);
-                if (status) params.set('status', status);
-                if (leaderId) params.set('leaderId', leaderId);
-                if (targetDate) params.set('targetDate', targetDate);
-                params.set('region', currentRegion || 'nacional');
-
-                const response = await fetch(`/api/v2/exports/pdf/report?${params.toString()}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error al generar el PDF en el servidor');
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Informe_Analitico_${new Date().toISOString().split('T')[0]}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-
-                showToast('Informe analítico descargado exitosamente', 'success');
-            } catch (error) {
-                console.error("Error generando PDF:", error);
-                alert("Ocurrió un error al generar el PDF: " + error.message);
-            } finally {
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-            }
-        }
-    </script>
+    <script type="module" src="/js/pages/analytics.page.js"></script>
 </body>
 </html>

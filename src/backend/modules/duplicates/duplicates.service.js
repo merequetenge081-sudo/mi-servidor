@@ -6,6 +6,11 @@
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import duplicatesRepository from './duplicates.repository.js';
+import { Registration } from '../../../models/Registration.js';
+import {
+  runDeduplicationSkill,
+  persistDeduplicationFlags
+} from '../../skills/index.js';
 
 const logger = createLogger('DuplicatesService');
 
@@ -115,8 +120,83 @@ export async function getDuplicateDetails(cedula, eventId = null) {
   }
 }
 
+/**
+ * Ejecuta un barrido de deduplicación sobre registros existentes.
+ * No rompe endpoints actuales; complementa el reporte legacy.
+ */
+export async function runDeduplicationScan({ organizationId = null, eventId = null, limit = 300 } = {}) {
+  try {
+    logger.info('Ejecutando deduplication scan', { organizationId, eventId, limit });
+
+    const query = {
+      ...(organizationId ? { organizationId } : {}),
+      ...(eventId ? { eventId } : {})
+    };
+
+    const registrations = await Registration.find(query)
+      .select('_id organizationId eventId cedula firstName lastName phone leaderId localidad puestoId dataIntegrityStatus workflowStatus')
+      .sort({ createdAt: -1 })
+      .limit(Math.max(1, Math.min(limit, 2000)))
+      .lean();
+
+    let scanned = 0;
+    let flagged = 0;
+    let critical = 0;
+    const byType = {};
+
+    for (const reg of registrations) {
+      scanned += 1;
+      const dedup = await runDeduplicationSkill({
+        registration: reg,
+        organizationId: reg.organizationId || organizationId,
+        excludeRegistrationId: reg._id
+      });
+
+      if (!dedup.hasFlags) continue;
+
+      flagged += 1;
+      if (dedup.hasCritical) critical += 1;
+      dedup.flags.forEach((f) => {
+        byType[f.flagType] = (byType[f.flagType] || 0) + 1;
+      });
+
+      await persistDeduplicationFlags({
+        registrationId: reg._id,
+        organizationId: reg.organizationId || organizationId,
+        eventId: reg.eventId,
+        cedula: reg.cedula,
+        flags: dedup.flags
+      });
+
+      await Registration.updateOne(
+        { _id: reg._id },
+        {
+          $set: {
+            deduplicationFlags: dedup.flags.map((f) => f.flagType),
+            dataIntegrityStatus:
+              dedup.dataIntegrityStatus === 'invalid' ? 'invalid' : 'needs_review',
+            workflowStatus: dedup.workflowStatus
+          }
+        }
+      );
+    }
+
+    return {
+      scanned,
+      flagged,
+      critical,
+      byType
+    };
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error en deduplication scan', error);
+    throw AppError.serverError('Error al ejecutar deduplication scan');
+  }
+}
+
 export default {
   getDuplicatesReport,
   getDuplicateStats,
-  getDuplicateDetails
+  getDuplicateDetails,
+  runDeduplicationScan
 };

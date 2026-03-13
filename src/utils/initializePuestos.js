@@ -8,6 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Puestos } from '../models/index.js';
 import logger from '../config/logger.js';
+import { applyPollingPlaceOverride } from '../shared/polling-place-overrides.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,7 +62,7 @@ export async function initializePuestosIfEmpty() {
           aliases.push(props.PVONSITIO);
         }
 
-        return {
+        return applyPollingPlaceOverride({
           codigoPuesto: props.PVOCODIGO,
           nombre: nombre,
           localidad: props.LOCNOMBRE,
@@ -77,7 +78,7 @@ export async function initializePuestosIfEmpty() {
           activo: true,
           createdAt: new Date(),
           updatedAt: new Date()
-        };
+        });
       });
     } else {
       logger.error('❌ No se encontraron archivos de puestos');

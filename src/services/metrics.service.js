@@ -3,52 +3,19 @@ import { Registration } from "../models/Registration.js";
 import { Leader } from "../models/Leader.js";
 import { Event } from "../models/Event.js";
 import { Puestos } from "../models/Puestos.js";
+import { applyCleanAnalyticsFilter } from "../shared/analyticsFilter.js";
+import {
+  getBogotaLocalidadesNormalized,
+  normalizeTerritoryText
+} from "../shared/territoryNormalization.js";
+import metricsCacheService from "./metricsCache.service.js";
 
-const BOGOTA_LOCALIDADES = [
-  "Usaquén",
-  "Chapinero",
-  "Santa Fe",
-  "San Cristóbal",
-  "Usme",
-  "Tunjuelito",
-  "Bosa",
-  "Kennedy",
-  "Fontibón",
-  "Engativá",
-  "Suba",
-  "Barrios Unidos",
-  "Teusaquillo",
-  "Los Mártires",
-  "Antonio Nariño",
-  "Puente Aranda",
-  "La Candelaria",
-  "Rafael Uribe Uribe",
-  "Ciudad Bolívar",
-  "Sumapaz"
-];
-
-const BOGOTA_LOCALIDADES_UPPER = BOGOTA_LOCALIDADES.map((l) => l.toUpperCase());
-const BOGOTA_LOCALIDADES_NORMALIZED_UPPER = BOGOTA_LOCALIDADES.map((l) =>
-  l
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase()
-);
+const BOGOTA_LOCALIDADES_NORMALIZED_UPPER = getBogotaLocalidadesNormalized();
 
 let bogotaLocalidadesCache = {
   list: [...BOGOTA_LOCALIDADES_NORMALIZED_UPPER],
   updatedAt: 0
 };
-
-function normalizeLocalidadString(value) {
-  return (value || "")
-    .toString()
-    .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/Ñ/g, "N")
-    .toUpperCase();
-}
 
 async function loadBogotaLocalidadesFromDb() {
   const cacheTtlMs = 10 * 60 * 1000;
@@ -56,26 +23,8 @@ async function loadBogotaLocalidadesFromDb() {
     return bogotaLocalidadesCache.list;
   }
 
-  const puestos = await Puestos.find(
-    {
-      localidad: { $nin: [null, ""] },
-      $or: [
-        { ciudad: /bogot/i },
-        { departamento: /bogot/i },
-        { departamento: /cundinamarca/i }
-      ]
-    },
-    { localidad: 1 }
-  ).lean();
-
-  const merged = new Set(BOGOTA_LOCALIDADES_NORMALIZED_UPPER);
-  puestos.forEach((puesto) => {
-    const normalized = normalizeLocalidadString(puesto.localidad);
-    if (normalized) merged.add(normalized);
-  });
-
   bogotaLocalidadesCache = {
-    list: Array.from(merged),
+    list: [...BOGOTA_LOCALIDADES_NORMALIZED_UPPER],
     updatedAt: Date.now()
   };
 
@@ -83,9 +32,6 @@ async function loadBogotaLocalidadesFromDb() {
 }
 
 function normalizeLocalidadExpr(fieldExpr) {
-  let expr = { 
-    $trim: { input: { $toUpper: { $ifNull: [fieldExpr, ""] } } }
-  };
   const replacements = [
     { find: "Á", replacement: "A" },
     { find: "É", replacement: "E" },
@@ -100,14 +46,31 @@ function normalizeLocalidadExpr(fieldExpr) {
     { find: "ó", replacement: "O" },
     { find: "ú", replacement: "U" },
     { find: "ü", replacement: "U" },
-    { find: "ñ", replacement: "N" }
+    { find: "ñ", replacement: "N" },
+    { find: "Ã¡", replacement: "A" },
+    { find: "Ã©", replacement: "E" },
+    { find: "Ã­", replacement: "I" },
+    { find: "Ã³", replacement: "O" },
+    { find: "Ãº", replacement: "U" },
+    { find: "Ã±", replacement: "N" },
+    { find: "?", replacement: "" }
   ];
 
-  replacements.forEach((rule) => {
-    expr = { $replaceAll: { input: expr, find: rule.find, replacement: rule.replacement } };
-  });
-
-  return expr;
+  return {
+    $reduce: {
+      input: replacements,
+      initialValue: {
+        $trim: { input: { $toUpper: { $ifNull: [fieldExpr, ""] } } }
+      },
+      in: {
+        $replaceAll: {
+          input: "$$value",
+          find: "$$this.find",
+          replacement: "$$this.replacement"
+        }
+      }
+    }
+  };
 }
 
 function buildBaseMatch({ organizationId, eventId, leaderId, includeInvalid }) {
@@ -115,45 +78,16 @@ function buildBaseMatch({ organizationId, eventId, leaderId, includeInvalid }) {
   if (organizationId) match.organizationId = organizationId;
   if (eventId) match.eventId = eventId;
   if (leaderId) match.leaderId = leaderId;
-  if (!includeInvalid) match.dataIntegrityStatus = { $ne: "invalid" };
-  return match;
+  return applyCleanAnalyticsFilter(match, { includeInvalid });
 }
 
 function buildRegionMatch(region, bogotaLocalidadesUpper = BOGOTA_LOCALIDADES_NORMALIZED_UPPER) {
   if (!region || region === "all") return null;
 
   const isBogotaExpr = {
-    $or: [
-      {
-        $in: [
-          normalizeLocalidadExpr("$localidadResolved"),
-          bogotaLocalidadesUpper
-        ]
-      },
-      {
-        $regexMatch: {
-          input: { $ifNull: ["$departamento", ""] },
-          regex: /bogot|cundinamarca/i
-        }
-      },
-      {
-        $regexMatch: {
-          input: { $ifNull: ["$capital", ""] },
-          regex: /bogot/i
-        }
-      },
-      {
-        $regexMatch: {
-          input: { $ifNull: ["$puesto.departamento", ""] },
-          regex: /bogot|cundinamarca/i
-        }
-      },
-      {
-        $regexMatch: {
-          input: { $ifNull: ["$puesto.ciudad", ""] },
-          regex: /bogot/i
-        }
-      }
+    $in: [
+      normalizeLocalidadExpr("$localidadResolved"),
+      bogotaLocalidadesUpper
     ]
   };
 
@@ -456,80 +390,222 @@ export async function getDashboardSummary(eventId = null, options = {}) {
   };
 }
 
-export async function getDashboardMetrics(options = {}) {
-  const bogotaLocalidadesUpper = await loadBogotaLocalidadesFromDb();
-  
-  // Base match (includes leaderId, eventId, etc)
-  const baseMatch = buildBaseMatch(options);
+async function getDashboardMetricsCompact(options = {}) {
+  return metricsCacheService.getOrComputeCompactMetrics(options, async () => {
+    const bogotaLocalidadesUpper = await loadBogotaLocalidadesFromDb();
+    const baseMatch = buildBaseMatch({ ...options, includeInvalid: true });
 
-  const initialAggPipeline = [
-    { $match: baseMatch },
-    {
-      $lookup: {
-        from: "puestos",
-        localField: "puestoId",
-        foreignField: "_id",
-        as: "puesto"
-      }
-    },
-    { $addFields: { puesto: { $arrayElemAt: ["$puesto", 0] } } },
-    {
-      $addFields: {
-        localidadResolved: {
-          $ifNull: ["$puesto.localidad", "$localidad"]
-        }
-      }
-    },
-    {
-      $addFields: {
-        isBogota: {
-          $or: [
-            {
-              $in: [
-                normalizeLocalidadExpr("$localidadResolved"),
-                bogotaLocalidadesUpper
-              ]
-            },
-            {
-              $regexMatch: {
-                input: { $ifNull: ["$departamento", ""] },
-                regex: /bogot|cundinamarca/i
-              }
-            },
-            {
-              $regexMatch: {
-                input: { $ifNull: ["$capital", ""] },
-                regex: /bogot/i
-              }
-            },
-            {
-              $regexMatch: {
-                input: { $ifNull: ["$puesto.departamento", ""] },
-                regex: /bogot|cundinamarca/i
-              }
-            },
-            {
-              $regexMatch: {
-                input: { $ifNull: ["$puesto.ciudad", ""] },
-                regex: /bogot/i
-              }
-            }
+    const localidadMetricExpr = {
+      $let: {
+        vars: {
+          officialLocalidad: { $trim: { input: { $ifNull: ["$officialLocalidadNombre", ""] } } },
+          fallbackLocalidad: { $trim: { input: { $ifNull: ["$localidad", ""] } } }
+        },
+        in: {
+          $cond: [
+            { $gt: [{ $strLenCP: "$$officialLocalidad" }, 0] },
+            "$$officialLocalidad",
+            "$$fallbackLocalidad"
           ]
         }
       }
+    };
+
+    const pipeline = [{ $match: baseMatch }];
+
+    if (options.region && options.region !== "all") {
+      pipeline.push(
+        {
+          $addFields: {
+            localidadMetric: localidadMetricExpr,
+            isBogotaMetric: {
+              $in: [normalizeLocalidadExpr(localidadMetricExpr), bogotaLocalidadesUpper]
+            }
+          }
+        },
+        {
+          $match: {
+            isBogotaMetric: options.region === "bogota"
+          }
+        }
+      );
     }
+
+    pipeline.push(
+      {
+        $group: {
+          _id: null,
+          totalRegistros: { $sum: 1 },
+          confirmados: { $sum: { $cond: ["$confirmed", 1, 0] } },
+          oficiales: {
+            $sum: {
+              $cond: [{ $eq: ["$officialValidationStatus", "official_valid"] }, 1, 0]
+            }
+          },
+          erroneosOIncompletos: {
+            $sum: {
+              $cond: [{ $eq: ["$movedToErrorBucket", true] }, 1, 0]
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          totalRegistros: 1,
+          confirmados: 1,
+          oficiales: 1,
+          erroneosOIncompletos: 1,
+          porcentajeConfirmacion: {
+            $cond: [
+              { $gt: ["$totalRegistros", 0] },
+              {
+                $round: [
+                  {
+                    $multiply: [
+                      { $divide: ["$confirmados", "$totalRegistros"] },
+                      100
+                    ]
+                  },
+                  1
+                ]
+              },
+              0
+            ]
+          }
+        }
+      }
+    );
+
+    const [aggregateRow, totalLeaders] = await Promise.all([
+      Registration.aggregate(pipeline).then((rows) => rows[0] || null),
+      Leader.countDocuments({
+        ...(options.organizationId && { organizationId: options.organizationId }),
+        ...(options.eventId && { eventId: options.eventId }),
+        active: true
+      })
+    ]);
+
+    const metrics = {
+      totalRegistros: Number(aggregateRow?.totalRegistros || 0),
+      confirmados: Number(aggregateRow?.confirmados || 0),
+      totalLideres: Number(totalLeaders || 0),
+      oficiales: Number(aggregateRow?.oficiales || 0),
+      erroneosOIncompletos: Number(aggregateRow?.erroneosOIncompletos || 0),
+      porcentajeConfirmacion: Number(aggregateRow?.porcentajeConfirmacion || 0)
+    };
+
+    return {
+      ...metrics,
+      totals: {
+        totalRegistrations: metrics.totalRegistros,
+        confirmedCount: metrics.confirmados,
+        confirmRate: metrics.porcentajeConfirmacion,
+        totalLeaders: metrics.totalLideres,
+        leadersCount: metrics.totalLideres,
+        oficiales: metrics.oficiales,
+        erroneosOIncompletos: metrics.erroneosOIncompletos
+      },
+      operationalTotals: {
+        totalRegistrations: metrics.totalRegistros,
+        confirmedCount: metrics.confirmados,
+        confirmRate: metrics.porcentajeConfirmacion,
+        totalLeaders: metrics.totalLideres,
+        leadersCount: metrics.totalLideres,
+        oficiales: metrics.oficiales,
+        erroneosOIncompletos: metrics.erroneosOIncompletos
+      },
+      source: {
+        metricEndpoint: "/api/v2/analytics/metrics",
+        usesCleanFilter: false,
+        includesOperationalTotals: false,
+        includeDetails: false,
+        cacheable: true,
+        filter: {
+          organizationId: options.organizationId || null,
+          eventId: options.eventId || null,
+          region: options.region || "all",
+          leaderId: options.leaderId || null
+        }
+      },
+      timestamp: new Date()
+    };
+  });
+}
+
+export async function prewarmDashboardMetricsCommonScopes() {
+  const scopes = [
+    { region: "all", includeDetails: false },
+    { region: "bogota", includeDetails: false }
   ];
 
-  if (options.region && options.region !== "all") {
-    initialAggPipeline.push({
-      $match: {
-        isBogota: options.region === "bogota"
-      }
-    });
+  const results = await Promise.allSettled(
+    scopes.map((scope) => getDashboardMetricsCompact(scope))
+  );
+
+  return results.map((result, index) => ({
+    scope: scopes[index],
+    success: result.status === "fulfilled",
+    error: result.status === "rejected" ? String(result.reason?.message || result.reason || "") : ""
+  }));
+}
+
+export async function getDashboardMetrics(options = {}) {
+  if (options.includeDetails === false) {
+    return getDashboardMetricsCompact(options);
   }
 
-  const agg = await Registration.aggregate([
-    ...initialAggPipeline,
+  const bogotaLocalidadesUpper = await loadBogotaLocalidadesFromDb();
+
+  const baseMatchClean = buildBaseMatch(options);
+  const baseMatchRaw = buildBaseMatch({ ...options, includeInvalid: true });
+
+  const buildInitialAggPipeline = (baseMatch) => {
+    const pipeline = [
+      { $match: baseMatch },
+      {
+        $lookup: {
+          from: "puestos",
+          localField: "puestoId",
+          foreignField: "_id",
+          as: "puesto"
+        }
+      },
+      { $addFields: { puesto: { $arrayElemAt: ["$puesto", 0] } } },
+      {
+        $addFields: {
+          localidadResolved: {
+            $ifNull: ["$puesto.localidad", "$localidad"]
+          }
+        }
+      },
+      {
+        $addFields: {
+          isBogota: {
+            $in: [
+              normalizeLocalidadExpr("$localidadResolved"),
+              bogotaLocalidadesUpper
+            ]
+          }
+        }
+      }
+    ];
+
+    if (options.region && options.region !== "all") {
+      pipeline.push({
+        $match: {
+          isBogota: options.region === "bogota"
+        }
+      });
+    }
+    return pipeline;
+  };
+
+  const initialAggPipelineClean = buildInitialAggPipeline(baseMatchClean);
+  const initialAggPipelineRaw = buildInitialAggPipeline(baseMatchRaw);
+
+  const aggClean = await Registration.aggregate([
+    ...initialAggPipelineClean,
     {
       $group: {
         _id: "$leaderId",
@@ -541,7 +617,20 @@ export async function getDashboardMetrics(options = {}) {
     }
   ]);
 
-  const leaderIds = agg.map((l) => l._id).filter(Boolean);
+  const aggRaw = await Registration.aggregate([
+    ...initialAggPipelineRaw,
+    {
+      $group: {
+        _id: "$leaderId",
+        total: { $sum: 1 },
+        confirmed: { $sum: { $cond: ["$confirmed", 1, 0] } },
+        bogota: { $sum: { $cond: ["$isBogota", 1, 0] } },
+        resto: { $sum: { $cond: ["$isBogota", 0, 1] } }
+      }
+    }
+  ]);
+
+  const leaderIds = [...aggClean, ...aggRaw].map((l) => l._id).filter(Boolean);
   const objectLeaderIds = leaderIds
     .filter((id) => mongoose.Types.ObjectId.isValid(id))
     .map((id) => new mongoose.Types.ObjectId(id));
@@ -561,7 +650,8 @@ export async function getDashboardMetrics(options = {}) {
     if (leader.leaderId) leaderById.set(leader.leaderId, leader.name);
   });
 
-  const leaderTable = agg
+  const mapLeaderRows = (rows) =>
+    rows
     .map((item) => {
       const name = leaderById.get(String(item._id)) || item._id || "Sin lider";
       return {
@@ -577,6 +667,9 @@ export async function getDashboardMetrics(options = {}) {
     })
     .sort((a, b) => b.total - a.total);
 
+  const leaderTable = mapLeaderRows(aggClean);
+  const leaderTableOperational = mapLeaderRows(aggRaw);
+
   const totals = leaderTable.reduce(
     (acc, item) => {
       acc.total += item.total;
@@ -588,8 +681,19 @@ export async function getDashboardMetrics(options = {}) {
     { total: 0, confirmed: 0, bogota: 0, resto: 0 }
   );
 
+  const operationalTotals = leaderTableOperational.reduce(
+    (acc, item) => {
+      acc.total += item.total;
+      acc.confirmed += item.confirmed;
+      acc.bogota += item.bogota;
+      acc.resto += item.resto;
+      return acc;
+    },
+    { total: 0, confirmed: 0, bogota: 0, resto: 0 }
+  );
+
   const localityAgg = await Registration.aggregate([
-    ...initialAggPipeline,
+    ...initialAggPipelineClean,
     {
       $group: {
         _id: { $ifNull: ["$localidadResolved", { $ifNull: ["$puesto.departamento", "$departamento"] }] },
@@ -600,10 +704,57 @@ export async function getDashboardMetrics(options = {}) {
     { $limit: 10 }
   ]);
 
+  const localityAggRaw = await Registration.aggregate([
+    ...initialAggPipelineRaw,
+    {
+      $group: {
+        _id: { $ifNull: ["$localidadResolved", { $ifNull: ["$puesto.departamento", "$departamento"] }] },
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { count: -1 } },
+    { $limit: 10 }
+  ]);
+
+  const recentAgg = await Registration.aggregate([
+    ...initialAggPipelineClean,
+    { $sort: { createdAt: -1 } },
+    { $limit: 10 },
+    {
+      $project: {
+        _id: 1,
+        firstName: 1,
+        lastName: 1,
+        email: 1,
+        phone: 1,
+        cedula: 1,
+        leaderId: 1,
+        leaderName: 1,
+        createdAt: 1,
+        date: 1,
+        confirmed: 1,
+        workflowStatus: 1,
+        dataIntegrityStatus: 1
+      }
+    }
+  ]);
+
   const totalLeaders = await Leader.countDocuments({
     ...(options.organizationId && { organizationId: options.organizationId }),
     active: true
   });
+
+  const totalLeadersByEvent = options.eventId
+    ? await Leader.countDocuments({
+        ...(options.organizationId && { organizationId: options.organizationId }),
+        active: true,
+        eventId: options.eventId
+      })
+    : totalLeaders;
+
+  const totalLeadersOperational = options.eventId
+    ? Math.max(totalLeadersByEvent, leaderTableOperational.length)
+    : totalLeaders;
 
   return {
     totals: {
@@ -613,15 +764,60 @@ export async function getDashboardMetrics(options = {}) {
       bogotaCount: totals.bogota,
       restoCount: totals.resto,
       leadersCount: leaderTable.length,
-      totalLeaders,
+      totalLeaders: totalLeadersOperational,
       avgRegsPerLeader:
         leaderTable.length > 0 ? (totals.total / leaderTable.length).toFixed(1) : 0
     },
+    operationalTotals: {
+      totalRegistrations: operationalTotals.total,
+      confirmedCount: operationalTotals.confirmed,
+      confirmRate:
+        operationalTotals.total > 0
+          ? ((operationalTotals.confirmed / operationalTotals.total) * 100).toFixed(1)
+          : 0,
+      bogotaCount: operationalTotals.bogota,
+      restoCount: operationalTotals.resto,
+      leadersCount: leaderTableOperational.length,
+      totalLeaders: totalLeadersOperational,
+      avgRegsPerLeader:
+        leaderTableOperational.length > 0
+          ? (operationalTotals.total / leaderTableOperational.length).toFixed(1)
+          : 0
+    },
     leaders: leaderTable,
-    locality: localityAgg.map((item) => ({
+    leadersOperational: leaderTableOperational,
+    locality: (Array.isArray(localityAgg) ? localityAgg : []).map((item) => ({
       name: item._id || "Sin dato",
       count: item.count
     })),
+    localityOperational: (Array.isArray(localityAggRaw) ? localityAggRaw : []).map((item) => ({
+      name: item._id || "Sin dato",
+      count: item.count
+    })),
+    recentRecords: (Array.isArray(recentAgg) ? recentAgg : []).map((item) => ({
+      id: item._id,
+      firstName: item.firstName || "",
+      lastName: item.lastName || "",
+      email: item.email || "",
+      phone: item.phone || "",
+      cedula: item.cedula || "",
+      leaderId: item.leaderId || null,
+      leaderName: leaderById.get(String(item.leaderId)) || item.leaderName || "Sin lider",
+      createdAt: item.createdAt || item.date || null,
+      confirmed: item.confirmed === true || item.workflowStatus === "confirmed",
+      workflowStatus: item.workflowStatus || null,
+      dataIntegrityStatus: item.dataIntegrityStatus || null
+    })),
+    source: {
+      metricEndpoint: "/api/v2/analytics/metrics",
+      usesCleanFilter: true,
+      includesOperationalTotals: true,
+      filter: {
+        eventId: options.eventId || null,
+        region: options.region || "all",
+        leaderId: options.leaderId || null
+      }
+    },
     timestamp: new Date()
   };
 }
@@ -636,5 +832,7 @@ export default {
   getPuestoStats,
   getTimeSeriesStats,
   getDashboardSummary,
-  getDashboardMetrics
+  getDashboardMetrics,
+  prewarmDashboardMetricsCommonScopes
 };
+

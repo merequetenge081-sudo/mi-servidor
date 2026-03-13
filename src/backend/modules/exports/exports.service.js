@@ -7,6 +7,7 @@ import axios from 'axios';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
+import crypto from 'crypto';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import exportsRepository from './exports.repository.js';
@@ -14,6 +15,7 @@ import analyticsService from '../analytics/analytics.service.js';
 import advancedService from '../analytics/advanced.service.js';
 import { Event } from '../../../models/Event.js';
 import { Puestos } from '../../../models/Puestos.js';
+import { repairTextEncoding } from '../../../shared/textNormalization.js';
 
 const logger = createLogger('ExportsService');
 
@@ -23,6 +25,33 @@ function escapeCsvValue(value) {
     return `"${stringValue.replace(/"/g, '""')}"`;
   }
   return stringValue;
+}
+
+function getCanonicalPuestoLabel(reg = {}, puesto = {}) {
+  return puesto?.nombre || reg.votingPlace || reg.legacyVotingPlace || puesto?.codigoPuesto || "";
+}
+
+function resolveAnalyticsLabel(item = {}, scope = 'generic', fallback = 'N/A') {
+  const candidates = scope === 'puesto'
+    ? [item.name, item.puestoNombre, item.puesto, item.label, item._id]
+    : scope === 'localidad'
+      ? [item.name, item.localidadNombre, item.localidad, item.municipio, item.label, item._id]
+      : [item.name, item.label, item._id];
+
+  for (const candidate of candidates) {
+    const repaired = String(repairTextEncoding(candidate) || '').trim();
+    if (repaired) return repaired;
+  }
+
+  return fallback;
+}
+
+function resolveAnalyticsValue(item = {}, fallbackKeys = []) {
+  for (const key of fallbackKeys) {
+    const value = Number(item?.[key]);
+    if (Number.isFinite(value)) return value;
+  }
+  return 0;
 }
 
 function buildRegistrationsCsv(registrations) {
@@ -56,7 +85,7 @@ function buildRegistrationsCsv(registrations) {
       leader._id || reg.leaderId,
       reg.eventId,
       reg.localidad || puesto.localidad,
-      reg.votingPlace || puesto.nombre || puesto.codigoPuesto,
+      getCanonicalPuestoLabel(reg, puesto),
       reg.mesa || reg.votingTable,
       reg.createdAt
     ];
@@ -141,7 +170,7 @@ export async function exportRegistrationsExcel(eventId = null) {
         leaderId: leader._id || reg.leaderId,
         eventId: reg.eventId,
         localidad: reg.localidad || puesto.localidad,
-        puesto: reg.votingPlace || puesto.nombre || puesto.codigoPuesto,
+        puesto: getCanonicalPuestoLabel(reg, puesto),
         mesa: reg.mesa || reg.votingTable,
         createdAt: reg.createdAt
       });
@@ -152,6 +181,79 @@ export async function exportRegistrationsExcel(eventId = null) {
     if (error.isOperational) throw error;
     logger.error('Error exportando registraciones Excel', error);
     throw AppError.serverError('Error al exportar Excel');
+  }
+}
+
+export async function exportRegistrationsExcelPaged(eventId = null, options = {}) {
+  try {
+    const pageInput = Number.parseInt(options.page, 10);
+    const pageSizeInput = Number.parseInt(options.pageSize, 10);
+    const pageSize = Number.isFinite(pageSizeInput) && pageSizeInput > 0 ? Math.min(pageSizeInput, 50000) : 5000;
+
+    const total = await exportsRepository.countRegistrationsForExport(eventId);
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const requestedPage = Number.isFinite(pageInput) && pageInput > 0 ? Math.min(pageInput, totalPages) : null;
+    const pages = requestedPage ? [requestedPage] : Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    const workbook = new ExcelJS.Workbook();
+    const registrationColumns = [
+      { header: 'Cédula', key: 'cedula', width: 15 },
+      { header: 'Nombre', key: 'firstName', width: 20 },
+      { header: 'Apellido', key: 'lastName', width: 20 },
+      { header: 'Teléfono', key: 'phone', width: 15 },
+      { header: 'Localidad', key: 'localidad', width: 20 },
+      { header: 'Registrado a Votar', key: 'registeredToVote', width: 20 },
+      { header: 'Puesto de Votación', key: 'puestoNombre', width: 30 },
+      { header: 'Mesa', key: 'mesa', width: 10 },
+      { header: 'Confirmado', key: 'confirmed', width: 15 },
+      { header: 'Fecha de Registro', key: 'date', width: 15 }
+    ];
+    const yesNo = (value) => (value ? 'Sí' : 'No');
+
+    for (const currentPage of pages) {
+      const worksheet = workbook.addWorksheet(requestedPage ? 'Registros' : `Registros_${currentPage}`);
+      const registrations = await exportsRepository.getRegistrationsForExportPaged(eventId, currentPage, pageSize);
+
+      const puestoIds = [...new Set(
+        registrations
+          .map((reg) => reg.puestoId)
+          .filter(Boolean)
+          .map((id) => id.toString())
+      )];
+      const puestos = puestoIds.length > 0 ? await Puestos.find({ _id: { $in: puestoIds } }).lean() : [];
+      const puestoById = new Map(puestos.map((puesto) => [puesto._id.toString(), puesto]));
+
+      worksheet.columns = registrationColumns;
+      registrations.forEach((reg) => {
+        const puesto = reg.puestoId ? puestoById.get(reg.puestoId.toString()) : null;
+        worksheet.addRow({
+          cedula: reg.cedula,
+          firstName: reg.firstName,
+          lastName: reg.lastName,
+          phone: reg.phone,
+          localidad: reg.localidad,
+          registeredToVote: yesNo(reg.registeredToVote),
+          puestoNombre: puesto?.nombre || '-',
+          mesa: reg.mesa ?? '-',
+          confirmed: reg.confirmed ? 'Confirmado' : 'Pendiente',
+          date: reg.date
+        });
+      });
+    }
+
+    return {
+      buffer: await workbook.xlsx.writeBuffer(),
+      meta: {
+        total,
+        pageSize,
+        totalPages,
+        requestedPage
+      }
+    };
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error exportando registraciones Excel paginado', error);
+    throw AppError.serverError('Error al exportar Excel paginado');
   }
 }
 
@@ -274,7 +376,7 @@ export async function generateReportPDF(options = {}) {
         doc.on('end', () => resolve(Buffer.concat(buffers)));
 
         const nowStr = new Date().toLocaleDateString('es-CO');
-        const sessionId = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const sessionId = crypto.randomBytes(3).toString('hex').toUpperCase();
         const renderFilterValue = (value, fallback = 'Todos') => (value === null || value === undefined || value === '' ? fallback : String(value));
 
         const drawHeader = (title) => {
@@ -340,7 +442,10 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
         const topLocalidades = (regionData.topLocalidades || []).slice(0, 8);
         const puestosCfg = {
           type: 'bar',
-          data: { labels: topPuestos.map((p) => String(p._id || 'N/A').slice(0, 18)), datasets: [{ label: 'Votos', data: topPuestos.map((p) => p.totalVotos || 0), backgroundColor: '#3b82f6' }] },
+          data: {
+            labels: topPuestos.map((p) => resolveAnalyticsLabel(p, 'puesto').slice(0, 18)),
+            datasets: [{ label: 'Votos', data: topPuestos.map((p) => resolveAnalyticsValue(p, ['totalVotos', 'totalVotes', 'totalRegistros'])), backgroundColor: '#3b82f6' }]
+          },
           options: { plugins: { title: { display: true, text: 'Top Puestos (region seleccionada)' }, legend: { display: false } }, scales: { y: { beginAtZero: true } } }
         };
         const puestosImg = await getQuickChartImage(puestosCfg, 390, 260);
@@ -349,8 +454,8 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
         const locCfg = {
           type: 'pie',
           data: {
-            labels: topLocalidades.map((l) => String(l._id || 'N/A').slice(0, 16)),
-            datasets: [{ data: topLocalidades.map((l) => l.totalVotos || 0), backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'] }]
+            labels: topLocalidades.map((l) => resolveAnalyticsLabel(l, 'localidad').slice(0, 16)),
+            datasets: [{ data: topLocalidades.map((l) => resolveAnalyticsValue(l, ['totalVotos', 'totalVotes', 'totalRegistros'])), backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'] }]
           },
           options: { plugins: { title: { display: true, text: 'Distribucion por Localidad' } } }
         };
@@ -445,6 +550,7 @@ Lider: ${renderFilterValue(leaderId, 'Todos')}`,
 export default {
   exportRegistrationsCSV,
   exportRegistrationsExcel,
+  exportRegistrationsExcelPaged,
   exportLeadersExcel,
   generatePuestoQR,
   generateReportPDF

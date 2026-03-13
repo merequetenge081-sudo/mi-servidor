@@ -4,6 +4,9 @@ const e14ConfirmationByMesaSchema = new mongoose.Schema(
   {
     organizationId: { type: String, required: true, index: true },
     eventId: { type: String, default: null, index: true },
+    localidadId: { type: mongoose.Schema.Types.ObjectId, ref: "Localidad", default: null, index: true },
+    puestoId: { type: mongoose.Schema.Types.ObjectId, ref: "Puestos", default: null, index: true },
+    mesaId: { type: mongoose.Schema.Types.ObjectId, ref: "Mesa", default: null, index: true },
     localidad: { type: String, required: true, trim: true },
     puesto: { type: String, required: true, trim: true },
     mesa: { type: Number, required: true, index: true },
@@ -52,7 +55,12 @@ const e14ConfirmationByMesaSchema = new mongoose.Schema(
     sourcePartyBlockPath: { type: String, default: "" },
     validatedAt: { type: Date, default: null },
     validatedBy: { type: String, default: null },
-    source: { type: String, enum: ["manual", "system"], default: "manual" }
+    source: { type: String, enum: ["manual", "system", "excel_import"], default: "manual" },
+    importBatchId: { type: mongoose.Schema.Types.ObjectId, ref: "E14ImportBatch", default: null, index: true },
+    importFileName: { type: String, default: "" },
+    importRowNumber: { type: Number, default: null },
+    importOriginalRow: { type: mongoose.Schema.Types.Mixed, default: null },
+    importObservation: { type: String, default: "" }
   },
   {
     collection: "e14_confirmation_by_mesa",

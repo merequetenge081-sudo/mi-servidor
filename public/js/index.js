@@ -24,6 +24,8 @@
         'utils/formatters.js',
         'utils/validators.js',
         'utils/helpers.js',
+        'utils/skills-ui.helpers.js',
+        'utils/bogota-zones.js',
         
         // SERVICES (dependen de core + utils)
         'services/data.service.js',
@@ -40,6 +42,8 @@
         'modules/notifications.module.js',
         'modules/export.module.js',
         'modules/deletion-requests.module.js',
+        'modules/skills.module.js',
+        'modules/real-data-validation.module.js',
         
         // CORE EVENTS (delegacion centralizada)
         'core/events.js',

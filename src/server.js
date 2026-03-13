@@ -6,6 +6,7 @@ import { initMemoryAuth } from "./utils/authFallback.js";
 import logger from "./config/logger.js";
 import { startTempPasswordCleanup } from "./services/tempPasswordCleanup.service.js";
 import { initializePuestosIfEmpty } from "./utils/initializePuestos.js";
+import metricsWarmupService from "./services/metricsWarmup.service.js";
 
 async function startServer() {
   try {
@@ -39,11 +40,15 @@ async function startServer() {
     // Inicializar autenticación en memoria (fallback para desarrollo)
     await initMemoryAuth();
 
-    // Conectar a MongoDB antes del listen
-    await connectDB();
+    // Conectar a MongoDB antes del listen (puede devolver false en modo opcional sin DB)
+    const dbConnected = await connectDB();
 
-    // Inicializar puestos si la colección está vacía
-    await initializePuestosIfEmpty();
+    // Inicializar puestos solo si hay conexión activa a DB
+    if (dbConnected) {
+      await initializePuestosIfEmpty();
+    } else {
+      logger.warn("[BOOT] Servidor iniciado en modo sin DB (solo desarrollo)");
+    }
 
     startTempPasswordCleanup();
 
@@ -51,15 +56,18 @@ async function startServer() {
     const server = http.createServer(app);
 
     server.listen(PORT, "0.0.0.0", () => {
-      console.log("===================================");
-      console.log("🚀 SERVER STARTED");
-      console.log("ENV:", process.env.NODE_ENV);
-      console.log("PORT:", PORT);
-      console.log("CWD:", process.cwd());
-      console.log("===================================");
+      logger.info("SERVER STARTED", {
+        env: process.env.NODE_ENV,
+        port: PORT,
+        cwd: process.cwd()
+      });
+
+      if (dbConnected) {
+        metricsWarmupService.start();
+      }
     });
   } catch (error) {
-    console.error("❌ Failed to start server:", error);
+    logger.error("Failed to start server", { error: error.message, stack: error.stack });
     process.exit(1);
   }
 }

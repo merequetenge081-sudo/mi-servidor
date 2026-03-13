@@ -229,9 +229,10 @@ export class RegistrationsManager {
             ? '<span class="badge badge-success">✓ Confirmado</span>'
             : '<span class="badge badge-warning">⏱ Pendiente</span>';
 
-        const revisionBadge = (reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta)
+        const revisionBadge = ((reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta) || reg.puestoMatchReviewRequired === true)
             ? '<span class="badge badge-revision">⚠ Revisar puesto</span>'
             : '';
+        const puestoDisplay = reg.puestoId?.nombre || reg.votingPlace || reg.legacyVotingPlace || '';
 
         const isChecked = this.selectedIds && this.selectedIds.has(reg._id) ? 'checked' : '';
         return `
@@ -244,7 +245,7 @@ export class RegistrationsManager {
                 <td>${reg.phone || ''}</td>
                 <td>${reg.cedula || ''}</td>
                 <td>${reg.localidad || ''}</td>
-                <td>${reg.votingPlace || ''}</td>
+                <td>${puestoDisplay}</td>
                 <td>${reg.votingTable || ''}</td>
                 <td>${formatDate(reg.date)}</td>
                 <td>${statusBadge} ${revisionBadge}</td>

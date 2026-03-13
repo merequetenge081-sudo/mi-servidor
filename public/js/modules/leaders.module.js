@@ -21,6 +21,11 @@ const LeadersModule = (() => {
     let eventsBound = false;
     let pendingEmailData = null;
     let leaderToDeleteId = null;
+    let currentSearch = '';
+    let currentSort = 'name';
+    let currentOrder = 'asc';
+    let currentPage = 1;
+    const pageSize = 25;
 
     // ====== HELPERS ======
     function showAlert(message, type = 'info') {
@@ -64,12 +69,33 @@ const LeadersModule = (() => {
     }
 
     // ====== LOAD LEADERS TABLE ======
-    function loadTable() {
-        const allLeaders = window.AppState.data.leaders;
+    async function loadTable(options = {}) {
+        currentSearch = options.search !== undefined ? options.search : currentSearch;
+        currentSort = options.sort || currentSort;
+        currentOrder = options.order || currentOrder;
+        currentPage = options.page || currentPage;
+
+        const pageResponse = await DataService.getLeadersPaginated({
+            page: currentPage,
+            limit: pageSize,
+            sort: currentSort,
+            order: currentOrder,
+            search: currentSearch,
+            includeMetrics: true
+        });
+        const allLeaders = pageResponse.items || [];
+        window.AppState.data.leaders = allLeaders;
         
         const html = allLeaders.map(leader => {
             console.log('📊 Renderizando líder:', leader.name, '| ID:', leader._id, '| Password status: passwordResetRequested=', leader.passwordResetRequested, 'isTemporaryPassword=', leader.isTemporaryPassword, 'username=', leader.username);
-            
+            const leaderDisplayName = leader.name || 'Sin nombre';
+            const initials = leaderDisplayName
+                .trim()
+                .split(/\s+/)
+                .slice(0, 2)
+                .map((part) => (part[0] || '').toUpperCase())
+                .join('') || 'L';
+             
             // Determinar estado de contraseña
             let passwordStatus = '';
             if (leader.passwordResetRequested) {
@@ -84,10 +110,18 @@ const LeadersModule = (() => {
 
             return `
             <tr>
-                <td><strong style="color: inherit;">${leader.name}</strong></td>
+                <td>
+                    <div class="leader-cell">
+                        <span class="leader-avatar-initial">${initials}</span>
+                        <div class="leader-main-info">
+                            <strong class="leader-primary-text">${leaderDisplayName}</strong>
+                            <span class="leader-secondary-text">${leader.leaderId || leader._id || ''}</span>
+                        </div>
+                    </div>
+                </td>
                 <td style="color: inherit;">${leader.email || '<span style="color: #666;">Sin correo</span>'}</td>
                 <td style="color: inherit;">${leader.phone || '-'}</td>
-                <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${leader.registrations || 0}</span></td>
+                <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${Number(leader?.metrics?.total ?? leader?.registrations ?? 0)}</span></td>
                 <td>${passwordStatus}</td>
                 <td>
                     ${leader.username ?
@@ -128,64 +162,10 @@ const LeadersModule = (() => {
 
     // ====== FILTER LEADERS BY NAME ======
     function filterByName(searchTerm) {
-        const allLeaders = window.AppState.data.leaders;
-        const filtered = searchTerm.trim() === '' ? allLeaders :
-            allLeaders.filter(leader => leader.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
-        // Create filtered table using existing renderLeadersTable logic
-        const html = filtered.map(leader => {
-            let passwordStatus = '';
-            if (leader.passwordResetRequested) {
-                passwordStatus = '<span style="background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-exclamation-triangle"></i> Reset Solicitado</span>';
-            } else if (leader.isTemporaryPassword) {
-                passwordStatus = '<span style="background: #cfe2ff; color: #084298; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-clock"></i> Temporal</span>';
-            } else if (leader.username) {
-                passwordStatus = '<span style="background: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-lock"></i> Fija</span>';
-            } else {
-                passwordStatus = '<span style="background: #f8d7da; color: #842029; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-x-circle"></i> Sin configurar</span>';
-            }
-
-            return `
-            <tr>
-                <td><strong style="color: inherit;">${leader.name}</strong></td>
-                <td style="color: inherit;">${leader.email || '<span style="color: #666;">Sin correo</span>'}</td>
-                <td style="color: inherit;">${leader.phone || '-'}</td>
-                <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${leader.registrations || 0}</span></td>
-                <td>${passwordStatus}</td>
-                <td>
-                    ${leader.username ?
-                    `<button class="btn btn-sm btn-outline-info view-credentials-btn" data-leader-id="${leader._id}" title="Ver Credenciales (Usuario y Contraseña)" style="color: #1e40af; font-weight: 600;">
-                            <i class="bi bi-eye"></i> Ver Credenciales
-                        </button>`
-                    : '<span style="color: #666; font-size: 12px;">Sin usuario</span>'}
-                </td>
-                <td>
-                    <div class="action-menu-container">
-                        <button class="action-menu-btn" data-leader-id="${leader._id}">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <div class="action-menu-dropdown" data-leader-id="${leader._id}">
-                            <button class="menu-item menu-scroll menu-scroll-up" data-scroll="up"><i class="bi bi-chevron-up"></i> Subir</button>
-                            ${leader.email ? `<button class="menu-item send-email-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}" data-leader-email="${leader.email}"><i class=\"bi bi-envelope\"></i> Enviar Correo</button>` : ''}
-                            <button class="menu-item impersonate-btn" data-leader-id="${leader._id}" style="color: #10b981; font-weight: 600;">
-                                <i class="bi bi-box-arrow-in-right"></i> Ingresar al perfil
-                            </button>
-                            <button class="menu-item qr-btn" data-leader-id="${leader._id}" data-leader-name="${leader.name}"><i class=\"bi bi-qr-code\"></i> Ver QR</button>
-                            <a href="/form.html?token=${leader.token || leader.leaderId || leader._id}" target="_blank" class="menu-item" style="text-decoration: none;"><i class=\"bi bi-box-arrow-up-right\"></i> Ver Formulario</a>
-                            <button class="menu-item edit-leader-btn" data-leader-id="${leader._id}"><i class=\"bi bi-pencil\"></i> Editar</button>
-                            <button class="menu-item gen-pass-btn" data-leader-id="${leader._id}" style="color: #dc2626; font-weight: 600;\"><i class=\"bi bi-key\"></i> Generar Contraseña</button>
-                            <button class="menu-item delete-leader-btn" data-leader-id="${leader._id}" style="color: #dc2626; font-weight: 600;\"><i class=\"bi bi-trash\"></i> Eliminar</button>
-                            <button class="menu-item menu-scroll menu-scroll-down" data-scroll="down"><i class="bi bi-chevron-down"></i> Bajar</button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `;
-        }).join('');
-
-        document.getElementById('leadersTable').innerHTML = html || '<tr><td colspan="8" class="text-center" style="padding: 40px; color: #999;">Sin líderes</td></tr>';
-
-        console.log('📌 Eventos delegados desde core/events.js');
+        currentPage = 1;
+        loadTable({ search: searchTerm.trim(), page: 1 }).catch((err) => {
+            console.error('[LeadersModule] Error filtrando líderes:', err);
+        });
     }
 
     // ====== SEND ACCESS EMAIL ======
@@ -258,22 +238,15 @@ const LeadersModule = (() => {
                 resultDiv.textContent = '📧 Enviando correos...';
             }
 
-            const res = await DataService.apiCall(`/api/leaders/${leaderId}/send-access`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    sendWelcomeEmail: sendWelcome,
-                    sendCredentialsEmail: sendCredentials,
-                    sendQRCodeEmail: sendQR,
-                    sendWarningEmail: sendWarning
-                })
+            const result = await DataService.sendLeaderAccessEmail(leaderId, {
+                sendWelcomeEmail: sendWelcome,
+                sendCredentialsEmail: sendCredentials,
+                sendQRCodeEmail: sendQR,
+                sendWarningEmail: sendWarning
             });
-
-            if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.error || 'Error al enviar correo');
+            if (result?.success === false) {
+                throw new Error(result.error || result.message || 'Error al enviar correo');
             }
-
-            const result = await res.json();
 
             // VALIDACIÓN: Verificar success===true o que al menos un email fue enviado
             const anyEmailSent = result.emailResults && Object.values(result.emailResults).some(r => r && r.success === true);
@@ -400,9 +373,7 @@ const LeadersModule = (() => {
                 btn.innerHTML = '<i class="bi bi-check-circle"></i> ¡Listo!';
                 btn.classList.remove('btn-primary');
                 btn.classList.add('btn-success');
-                if (typeof window.loadDashboard === 'function') {
-                    window.loadDashboard(); // Refresh table to show updated username
-                }
+                await loadTable(); // Refresh table to show updated username
             } else {
                 showAlert('Error: ' + (data.error || 'No se pudo restablecer'), 'error');
                 btn.disabled = false;
@@ -431,14 +402,10 @@ const LeadersModule = (() => {
         const btnBg = isDarkMode ? '#4a5568' : '#6c757d';
 
         try {
-            const res = await DataService.apiCall(`/api/leaders/${leaderId}/credentials`);
-
-            if (!res.ok) {
-                const errorData = await res.json();
-                return showAlert(errorData.error || 'Error al obtener credenciales', 'error');
+            const data = await DataService.getLeaderCredentials(leaderId);
+            if (data?.success === false) {
+                return showAlert(data.error || data.message || 'Error al obtener credenciales', 'error');
             }
-
-            const data = await res.json();
 
             if (!data.hasCredentials) {
                 return showAlert('Este líder no tiene credenciales configuradas', 'warning');
@@ -502,7 +469,7 @@ const LeadersModule = (() => {
             allLeaders.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
     }
 
-    function populateExportLeader() {
+    async function populateExportLeader() {
         const allLeaders = window.AppState.data.leaders || [];
         const sorted = [...allLeaders].sort((a, b) => a.name.localeCompare(b.name));
         const select = document.getElementById('exportLeaderSelect');
@@ -511,12 +478,16 @@ const LeadersModule = (() => {
                 sorted.map(l => `<option value="${l._id}">${l.name}</option>`).join('');
         }
         
-        // También popular exportLocalidadSelect
+        // También popular exportLocalidadSelect (fuente v2, no snapshot local)
         const locSelect = document.getElementById('exportLocalidadSelect');
         if (locSelect) {
-            const allRegistrations = window.AppState.data.registrations || [];
-            const uniqueLocalidades = [...new Set(allRegistrations.map(r => r.localidad).filter(l => l && l.trim() !== ''))].sort();
-            locSelect.innerHTML = '<option value="">Seleccione una localidad...</option>' + 
+            let uniqueLocalidades = [];
+            try {
+                uniqueLocalidades = await DataService.getRegistrationLocalities();
+            } catch (err) {
+                console.warn('[LeadersModule] No se pudo cargar localidades v2 para export:', err);
+            }
+            locSelect.innerHTML = '<option value="">Seleccione una localidad...</option>' +
                 uniqueLocalidades.map(loc => `<option value="${loc}">${loc}</option>`).join('');
         }
     }
@@ -578,27 +549,16 @@ const LeadersModule = (() => {
 
         (async () => {
             try {
-                const res = await DataService.apiCall(`/api/leaders/${leaderToDeleteId}`, {
-                    method: 'DELETE'
-                });
+                const payload = await DataService.deleteLeaderV2(leaderToDeleteId);
 
-                if (!res.ok) {
-                    const data = await res.json();
-                    showAlert('Error al eliminar: ' + (data.error || 'desconocido'), 'error');
+                if (payload?.success === false) {
+                    showAlert('Error al eliminar: ' + (payload.error || payload.message || 'desconocido'), 'error');
                     return;
                 }
 
-                // Éxito: Actualizar datos
-                const leadersRes = await DataService.apiCall('/api/leaders');
-                const leadersData = await leadersRes.json();
-                
-                if (leadersData.data) {
-                    AppState.updateData({ leaders: leadersData.data });
-                }
-                
-                // Cerrar modal y recargar tabla
+                // Éxito: recargar tabla desde fuente v2
                 closeDeleteLeaderModals();
-                populateLeadersTable();
+                await loadTable();
                 showAlert('¡Líder eliminado correctamente!', 'success');
                 
             } catch (err) {
@@ -631,24 +591,16 @@ const LeadersModule = (() => {
         if (!name) return showAlert('El nombre es obligatorio', 'warning');
 
         try {
-            const res = await DataService.apiCall(`/api/leaders/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify({ name, email, phone })
-            });
+            const payload = await DataService.updateLeaderV2(id, { name, email, phone });
 
-            if (res.ok) {
+            if (payload?.success !== false) {
                 document.getElementById('editLeaderModal').classList.remove('active');
-                if (typeof window.loadDashboard === 'function') {
-                    window.loadDashboard();
-                } else {
-                    location.reload();
-                }
+                await loadTable();
                 if (typeof window.showSuccessModal === 'function') {
                     window.showSuccessModal('¡Actualizado!', 'La información del líder ha sido actualizada.');
                 }
             } else {
-                const data = await res.json();
-                showAlert('Error: ' + (data.error || 'No se pudo actualizar'), 'error');
+                showAlert('Error: ' + (payload.error || payload.message || 'No se pudo actualizar'), 'error');
             }
         } catch (err) {
             console.error(err);
@@ -675,14 +627,9 @@ const LeadersModule = (() => {
                 customUsername: customUsername || undefined
             };
 
-            const res = await DataService.apiCall('/api/leaders', {
-                method: 'POST',
-                body: JSON.stringify(body)
-            });
+            const data = await DataService.createLeaderV2(body);
 
-            const data = await res.json();
-
-            if (res.ok) {
+            if (data?.success !== false) {
                 // Cerrar modal y limpiar formulario
                 document.getElementById('leaderModal').classList.remove('active');
                 document.getElementById('leaderName').value = '';
@@ -691,7 +638,7 @@ const LeadersModule = (() => {
                 document.getElementById('leaderUsername').value = '';
 
                 // Recargar datos
-                loadTable();
+                await loadTable();
 
                 // Mostrar credenciales si se generaron
                 if (data._username && data._tempPassword) {
@@ -708,7 +655,7 @@ const LeadersModule = (() => {
                     showAlert('¡Líder creado correctamente!', 'success');
                 }
             } else {
-                showAlert('Error: ' + (data.error || 'No se pudo crear'), 'error');
+                showAlert('Error: ' + (data.error || data.message || 'No se pudo crear'), 'error');
             }
         } catch (err) {
             console.error('[LeadersModule] Error creando líder:', err);

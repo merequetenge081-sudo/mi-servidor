@@ -31,6 +31,30 @@ export async function getRegistrationsForExport(eventId = null, filters = {}) {
   }
 }
 
+export async function countRegistrationsForExport(eventId = null) {
+  try {
+    const query = eventId ? { eventId } : {};
+    return await Registration.countDocuments(query);
+  } catch (error) {
+    logger.error('Error contando registraciones para exportar', error);
+    throw AppError.serverError('Error al contar registraciones');
+  }
+}
+
+export async function getRegistrationsForExportPaged(eventId = null, page = 1, pageSize = 5000) {
+  try {
+    const query = eventId ? { eventId } : {};
+    const skip = Math.max(0, (page - 1) * pageSize);
+    return await Registration.find(query)
+      .skip(skip)
+      .limit(pageSize)
+      .lean();
+  } catch (error) {
+    logger.error('Error obteniendo registraciones paginadas para exportar', error);
+    throw AppError.serverError('Error al obtener registraciones paginadas');
+  }
+}
+
 /**
  * Obtiene líderes para exportar
  */
@@ -116,6 +140,8 @@ export async function getRegistrationsByDateRange(startDate, endDate, eventId = 
 
 export default {
   getRegistrationsForExport,
+  countRegistrationsForExport,
+  getRegistrationsForExportPaged,
   getLeadersForExport,
   getEventsForExport,
   getPuestosForQR,

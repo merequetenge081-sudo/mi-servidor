@@ -26,6 +26,9 @@ router.get('/', leaderController.getLeaders);
 // Obtener líder destacados
 router.get('/top', leaderController.getTopLeaders);
 
+// Exportar líderes con filtros v2
+router.post('/export', leaderController.exportLeaders);
+
 // Obtener un líder por ID
 router.get('/:id', leaderController.getLeader);
 

@@ -91,6 +91,9 @@ const Events = (() => {
             const navLink = target.closest('[data-section]');
             if (navLink) {
                 e.preventDefault();
+                if (typeof Router !== 'undefined' && Router.trace) {
+                    Router.trace('[ROUTER TRACE] clicked route=' + navLink.dataset.section);
+                }
                 Router.navigate(navLink.dataset.section);
                 return;
             }
@@ -362,7 +365,7 @@ const Events = (() => {
                         qrContainer.innerHTML = '';
                         const leader = AppState.data.leaders.find(l => l._id === leaderId);
                         const token = leader ? (leader.token || leader.leaderId || leaderId) : leaderId;
-                        const link = `${window.location.origin}/form.html?token=${token}`;
+                        const link = `${window.location.origin}/form.html?token=${encodeURIComponent(token)}`;
                         
                         const linkInput = document.getElementById('qrLink');
                         if (linkInput) linkInput.value = link;
@@ -426,8 +429,8 @@ const Events = (() => {
 
             // Copy credentials button
             if (target.id === 'copyCredsBtn') {
-                const user = document.getElementById('resultUsername')?.textContent;
-                const pass = document.getElementById('resultPassword')?.textContent;
+                const user = document.getElementById('resultUsername').textContent;
+                const pass = document.getElementById('resultPassword').textContent;
                 if (user && pass) {
                     const text = `Usuario: ${user}\nContrase├▒a: ${pass}`;
                     navigator.clipboard.writeText(text).then(() => {
@@ -503,16 +506,19 @@ const Events = (() => {
             // =====================================
 
             if (target.id === 'exportBogotaBtn') {
+                console.info('[EXPORT REAL TRACE] button=exportBogotaBtn -> function=ExportsModule.exportBogota -> endpoint=/api/v2/registrations/export');
                 ExportsModule.exportBogota();
                 return;
             }
 
             if (target.id === 'exportRestoBtn') {
+                console.info('[EXPORT REAL TRACE] button=exportRestoBtn -> function=ExportsModule.exportResto -> endpoint=/api/v2/registrations/export');
                 ExportsModule.exportResto();
                 return;
             }
 
             if (target.id === 'exportRegsBtn' || target.id === 'exportRegsMainBtn') {
+                console.info('[EXPORT REAL TRACE] button=' + target.id + ' -> function=ExportsModule.exportAllRegistrations -> endpoint=/api/v2/registrations/export');
                 ExportsModule.exportAllRegistrations();
                 return;
             }
@@ -528,16 +534,19 @@ const Events = (() => {
             }
 
             if (target.id === 'exportLeadersMainBtn') {
+                console.info('[EXPORT REAL TRACE] button=exportLeadersMainBtn -> function=ExportsModule.exportAllLeaders -> endpoint=/api/v2/registrations/export/leader-summary');
                 ExportsModule.exportAllLeaders();
                 return;
             }
 
             if (target.id === 'exportByLeaderBtn') {
+                console.info('[EXPORT REAL TRACE] button=exportByLeaderBtn -> function=ExportsModule.exportByLeader -> endpoint=/api/v2/registrations/export');
                 ExportsModule.exportByLeader();
                 return;
             }
 
             if (target.id === 'exportLeaderStatsBtn') {
+                console.info('[EXPORT REAL TRACE] button=exportLeaderStatsBtn -> function=ExportsModule.exportLeaderStats -> endpoint=/api/v2/registrations/export/leader-summary');
                 ExportsModule.exportLeaderStats();
                 return;
             }

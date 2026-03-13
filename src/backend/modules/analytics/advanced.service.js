@@ -1,26 +1,31 @@
-import { Registration } from '../../../models/Registration.js';
+﻿import { Registration } from '../../../models/Registration.js';
 import { Puestos } from '../../../models/Puestos.js';
 import { Leader } from '../../../models/Leader.js';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
+import { applyCleanAnalyticsFilter } from '../../../shared/analyticsFilter.js';
+import {
+  canonicalizeBogotaLocality,
+  isBogotaTerritory,
+  normalizeTerritoryText
+} from '../../../shared/territoryNormalization.js';
+import votingHierarchyService from '../../../services/votingHierarchy.service.js';
+import campaignSimulationService from '../../../services/campaign-simulation.service.js';
 
 const logger = createLogger('AdvancedAnalyticsService');
 
-const BOGOTA_LOCALIDADES = [
-  'Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 
-  'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 
-  'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 
-  'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'
-];
+function canonicalTerritoryLabel(rawLocation, fallbackDepartment) {
+  const canonicalBogota = canonicalizeBogotaLocality(rawLocation);
+  if (canonicalBogota) return canonicalBogota;
 
-// Helper para determinar si es Bogotá
-const isBogota = (departamento, localidad) => {
-  if (departamento && (departamento.toUpperCase().includes('BOGOT') || departamento.toUpperCase() === 'CUNDINAMARCA')) {
-    if (BOGOTA_LOCALIDADES.some(l => localidad && localidad.toUpperCase() === l.toUpperCase())) return true;
-  }
-  if (BOGOTA_LOCALIDADES.some(l => localidad && localidad.toUpperCase() === l.toUpperCase())) return true;
-  return false;
-};
+  const normalizedRaw = normalizeTerritoryText(rawLocation);
+  if (normalizedRaw) return rawLocation.toString().trim();
+
+  const normalizedDepartment = normalizeTerritoryText(fallbackDepartment);
+  if (normalizedDepartment) return fallbackDepartment.toString().trim();
+
+  return 'Sin Localidad';
+}
 
 export async function validateAndFixLocation(registrationId, providedReg = null, providedPuesto = null) {
   try {
@@ -48,11 +53,18 @@ export async function validateAndFixLocation(registrationId, providedReg = null,
     const regDepto = normalize(reg.departamento);
     const regLoc = normalize(reg.localidad);
     
-    const puestoCiudad = normalize(puesto.ciudad || 'bogotá');
-    const puestoDepto = normalize(puesto.departamento || 'bogotá d.c.');
+    const puestoCiudad = normalize(puesto.ciudad || 'bogotÃ¡');
+    const puestoDepto = normalize(puesto.departamento || 'bogotÃ¡ d.c.');
     const puestoLoc = normalize(puesto.localidad);
 
-    const isPuestoBogota = puestoCiudad.includes('bogot') || BOGOTA_LOCALIDADES.some(l => l.toLowerCase() === puestoLoc);
+    const isPuestoBogota = isBogotaTerritory({
+      localidad: reg.localidad,
+      departamento: reg.departamento,
+      capital: reg.capital,
+      puestoLocalidad: puesto.localidad,
+      puestoCiudad: puesto.ciudad,
+      puestoDepartamento: puesto.departamento
+    });
     
     // Coincidencia de ciudad -> 20%
     if (regCiudad === puestoCiudad || (isPuestoBogota && regCiudad.includes('bogot'))) score += 20;
@@ -73,8 +85,8 @@ export async function validateAndFixLocation(registrationId, providedReg = null,
 
     if (score >= 80) {
       if (isPuestoBogota) {
-        reg.capital = 'Bogotá';
-        reg.departamento = 'Bogotá D.C.';
+        reg.capital = 'BogotÃ¡';
+        reg.departamento = 'BogotÃ¡ D.C.';
       } else {
         reg.capital = puesto.ciudad || reg.capital;
         reg.departamento = puesto.departamento || reg.departamento;
@@ -82,15 +94,15 @@ export async function validateAndFixLocation(registrationId, providedReg = null,
       reg.localidad = puesto.localidad;
       reg.verificadoAuto = true;
       autoCorrected = true;
-      message = 'Datos corregidos automáticamente';
+      message = 'Datos corregidos automÃ¡ticamente';
     } else if (score >= 60) {
       reg.localidad = puesto.localidad;
       reg.necesitaRevision = true;
       needsReview = true;
-      message = 'Datos parcialmente corregidos. Requiere revisión manual.';
+      message = 'Datos parcialmente corregidos. Requiere revisiÃ³n manual.';
     } else {
       reg.inconsistenciaGrave = true;
-      message = 'Inconsistencia detectada. Revisión obligatoria.';
+      message = 'Inconsistencia detectada. RevisiÃ³n obligatoria.';
     }
 
     await reg.save();
@@ -117,7 +129,7 @@ export async function validateAndFixLocation(registrationId, providedReg = null,
 
 export async function runGlobalVerification(eventId = null) {
   try {
-    logger.info(`Iniciando verificación global de matching... Evento: ${eventId || 'Todos'}`);
+    logger.info(`Iniciando verificaciÃ³n global de matching... Evento: ${eventId || 'Todos'}`);
     
     const baseQuery = eventId ? { eventId } : {};
     
@@ -161,7 +173,7 @@ export async function runGlobalVerification(eventId = null) {
       }));
     }
     
-    // 2. Ejecutar validación inteligente para todos los que tienen puestoId
+    // 2. Ejecutar validaciÃ³n inteligente para todos los que tienen puestoId
     const assignedQuery = { ...baseQuery, puestoId: { $ne: null } };
     const assignedRegistrations = await Registration.find(assignedQuery).populate('puestoId').limit(5000);
     let autoCorrectedCount = 0;
@@ -185,7 +197,7 @@ export async function runGlobalVerification(eventId = null) {
       }));
     }
     
-    logger.info(`Verificación global completada. ${matchedCount} puestos asignados. ${autoCorrectedCount} autocorregidos, ${needsReviewCount} para revisión, ${severeInconsistencyCount} inconsistencias graves.`);
+    logger.info(`VerificaciÃ³n global completada. ${matchedCount} puestos asignados. ${autoCorrectedCount} autocorregidos, ${needsReviewCount} para revisiÃ³n, ${severeInconsistencyCount} inconsistencias graves.`);
     
     return { 
       success: true, 
@@ -199,229 +211,159 @@ export async function runGlobalVerification(eventId = null) {
       } 
     };
   } catch (error) {
-    logger.error('Error en verificación global:', error);
-    throw AppError.serverError('Error al ejecutar verificación global: ' + (error.message || 'Desconocido'));
+    logger.error('Error en verificaciÃ³n global:', error);
+    throw AppError.serverError('Error al ejecutar verificaciÃ³n global: ' + (error.message || 'Desconocido'));
   }
 }
 
-export async function getAdvancedAnalytics(eventId = null, status = 'all', leaderId = null) {
-    try {
-      const matchQuery = eventId ? { eventId } : {};
-
-  matchQuery.dataIntegrityStatus = { $ne: 'invalid' };
-
-      if (leaderId) {
-          matchQuery.leaderId = leaderId;
-      }
-    
-    if (status === 'confirmed') {
-      matchQuery.puestoId = { $ne: null };
-    } else if (status === 'unconfirmed') {
-      matchQuery.puestoId = null;
-    }
-
-    const registrations = await Registration.aggregate([
-      { $match: { ...matchQuery } },
-      {
-        $lookup: {
-          from: 'puestos',
-          localField: 'puestoId',
-          foreignField: '_id',
-          as: 'puesto'
-        }
-      },
-      {
-        $addFields: {
-          puesto: { $arrayElemAt: ['$puesto', 0] }
-        }
-      }
-    ]);
-
-    const data = {
-      bogota: { topPuestos: {}, topMesas: {}, leadersByLocalidad: {}, topLocalidades: {} },
-      nacional: { topPuestos: {}, topMesas: {}, leadersByLocalidad: {}, topLocalidades: {} }
-    };
-
-    registrations.forEach(reg => {
-      const isBogotaRegion = isBogota(reg.departamento, reg.puesto?.localidad || reg.localidad);
-      const region = isBogotaRegion ? 'bogota' : 'nacional';
-      const loc = reg.puesto?.localidad || reg.localidad || 'Desconocida';
-      const puestoName = reg.puesto?.nombre || 'Sin Puesto Asignado';
-      const mesa = reg.mesa || reg.votingTable || 'Sin Mesa';
-      const leader = reg.leaderName || 'Desconocido';
-
-      if (!data[region].topPuestos[puestoName]) data[region].topPuestos[puestoName] = { count: 0, localidad: loc };
-      data[region].topPuestos[puestoName].count++;
-
-      if (!data[region].topMesas[loc]) data[region].topMesas[loc] = {};
-      if (!data[region].topMesas[loc][puestoName]) data[region].topMesas[loc][puestoName] = {};
-if (!data[region].topMesas[loc][puestoName][mesa]) data[region].topMesas[loc][puestoName][mesa] = { count: 0, voters: [] };
-        data[region].topMesas[loc][puestoName][mesa].count++;
-        // Limit to 100 to avoid giant JSONs
-        if (data[region].topMesas[loc][puestoName][mesa].voters.length < 100) {
-            data[region].topMesas[loc][puestoName][mesa].voters.push({
-                nombre: `${reg.firstName || ''} ${reg.lastName || ''}`.trim(),
-                cedula: reg.cedula,
-                lider: leader
-            });
-        }
-
-      if (!data[region].leadersByLocalidad[loc]) data[region].leadersByLocalidad[loc] = {};
-      if (!data[region].leadersByLocalidad[loc][leader]) data[region].leadersByLocalidad[loc][leader] = 0;
-      data[region].leadersByLocalidad[loc][leader]++;
-
-      if (!data[region].topLocalidades[loc]) data[region].topLocalidades[loc] = 0;
-      data[region].topLocalidades[loc]++;
+export async function getAdvancedAnalytics(eventId = null, status = 'all', leaderId = null, region = 'all', includeHierarchy = true) {
+  try {
+    const response = await votingHierarchyService.getAnalyticsTree({
+      eventId,
+      status,
+      leaderId,
+      region,
+      includeHierarchy,
+      includeInvalidData: false
     });
 
-    const formatRegionData = (regionData) => {
-      const topPuestosArr = Object.entries(regionData.topPuestos)
-        .filter(([nombre]) => nombre !== 'Sin Puesto Asignado')
-        .map(([nombre, info]) => ({ _id: nombre, totalVotos: info.count, localidad: info.localidad }))
-        .sort((a, b) => b.totalVotos - a.totalVotos)
-        .slice(0, 15);
+    logger.info('[ADV TRACE] advanced analytics computed', {
+      eventId: eventId || null,
+      status: status || 'all',
+      leaderId: leaderId || null,
+      totalRaw: response.summary.totalRaw,
+      totalClean: response.summary.totalClean,
+      allLocalityBreakdownTotal: response.all?.localityBreakdownTotal || 0,
+      excluded: response.all?.excluded || {}
+    });
 
-      const topLocalidadesArr = Object.entries(regionData.topLocalidades)
-        .map(([nombre, count]) => ({ _id: nombre, totalVotos: count }))
-        .sort((a, b) => b.totalVotos - a.totalVotos);
-
-      const leadersArr = Object.entries(regionData.leadersByLocalidad).map(([loc, leaders]) => {
-        return Object.entries(leaders).map(([name, count]) => ({ liderNombre: name, totalVotos: count }));
-      }).flat();
-      
-      // Sumar votos del mismo líder en diferentes localidades
-      const leaderTotals = {};
-      for (const leader of leadersArr) {
-        const name = leader.liderNombre.trim().toUpperCase(); // Normalizar nombre
-        if (!leaderTotals[name]) {
-          leaderTotals[name] = { liderNombre: leader.liderNombre, totalVotos: 0 };
-        }
-        leaderTotals[name].totalVotos += leader.totalVotos;
-      }
-      
-      const uniqueLeaders = Object.values(leaderTotals).sort((a, b) => b.totalVotos - a.totalVotos);
-
-      const jerarquia = Object.entries(regionData.topMesas).map(([localidad, puestos]) => {
-        const puestosArr = Object.entries(puestos).map(([puesto, mesas]) => {
-const mesasArr = Object.entries(mesas).map(([mesa, mesaData]) => ({
-              mesa,
-              totalVotos: mesaData.count,
-              voters: mesaData.voters
-          })).sort((a, b) => b.totalVotos - a.totalVotos);
-          
-          const totalPuesto = mesasArr.reduce((sum, m) => sum + m.totalVotos, 0);
-          
-          return {
-            puesto,
-            totalVotos: totalPuesto,
-            mesas: mesasArr
-          };
-        }).sort((a, b) => b.totalVotos - a.totalVotos);
-        
-        const totalLocalidad = puestosArr.reduce((sum, p) => sum + p.totalVotos, 0);
-        
-        return {
-          localidad,
-          totalVotos: totalLocalidad,
-          puestos: puestosArr
-        };
-      }).sort((a, b) => b.totalVotos - a.totalVotos);
-
-      const totalVotos = topLocalidadesArr.reduce((sum, loc) => sum + loc.totalVotos, 0);
-
-      return {
-        totalVotos,
-        topPuestos: topPuestosArr,
-        topLocalidades: topLocalidadesArr,
-        topLideres: uniqueLeaders,
-        jerarquia
-      };
-    };
-
-    return {
-      bogota: formatRegionData(data.bogota),
-      nacional: formatRegionData(data.nacional),
-      timestamp: new Date()
-    };
+    return response;
   } catch (error) {
     logger.error('Error en advanced analytics', error);
-    throw AppError.serverError('Error al obtener analíticas avanzadas');
+    throw AppError.serverError('Error al obtener analÃ­ticas avanzadas');
+  }
+}
+
+export async function getAdvancedSummaryAnalytics(eventId = null, status = 'all', leaderId = null, region = 'all', includeCharts = true) {
+  try {
+    return await votingHierarchyService.getOfficialAnalyticsSummary({
+      eventId,
+      status,
+      leaderId,
+      region
+    }, {
+      includeCharts
+    });
+  } catch (error) {
+    logger.error('Error en advanced summary analytics', error);
+    throw AppError.serverError('Error al obtener resumen oficial de analíticas avanzadas');
+  }
+}
+
+export async function getAdvancedChartsAnalytics(eventId = null, status = 'all', leaderId = null, region = 'all') {
+  try {
+    return await votingHierarchyService.getOfficialAnalyticsCharts({
+      eventId,
+      status,
+      leaderId,
+      region
+    });
+  } catch (error) {
+    logger.error('Error en advanced charts analytics', error);
+    throw AppError.serverError('Error al obtener charts oficiales de analiticas avanzadas');
+  }
+}
+
+export async function getHierarchyLocalidades(filters = {}, options = {}) {
+  try {
+    return await votingHierarchyService.getOfficialLocalidadesSummary(filters, options);
+  } catch (error) {
+    logger.error('Error en hierarchy localidades', error);
+    throw AppError.serverError('Error al obtener resumen de localidades');
+  }
+}
+
+export async function getHierarchyPuestosByLocalidad(localidadId, filters = {}, options = {}) {
+  try {
+    return await votingHierarchyService.getOfficialPuestosByLocalidad(localidadId, filters, options);
+  } catch (error) {
+    logger.error('Error en hierarchy puestos', error);
+    throw AppError.serverError('Error al obtener puestos por localidad');
+  }
+}
+
+export async function getHierarchyMesasByPuesto(puestoId, filters = {}, options = {}) {
+  try {
+    return await votingHierarchyService.getOfficialMesasByPuesto(puestoId, filters, options);
+  } catch (error) {
+    logger.error('Error en hierarchy mesas', error);
+    throw AppError.serverError('Error al obtener mesas por puesto');
+  }
+}
+
+export async function getInvalidDataAnalytics(filters = {}, options = {}) {
+  try {
+    return await votingHierarchyService.getInvalidDataPage(filters, options);
+  } catch (error) {
+    logger.error('Error en invalid analytics', error);
+    throw AppError.serverError('Error al obtener datos erróneos o incompletos');
+  }
+}
+
+export async function getInvalidDataDetail(registrationId, options = {}) {
+  try {
+    return await votingHierarchyService.getInvalidDataDetail(registrationId, options);
+  } catch (error) {
+    logger.error('Error en invalid analytics detail', error);
+    throw AppError.serverError('Error al obtener detalle de dato erróneo o incompleto');
   }
 }
 
 export async function getSimulationData(eventId = null, targetDateStr = null) {
     try {
-  const matchQuery = eventId ? { eventId } : {};
-  matchQuery.dataIntegrityStatus = { $ne: 'invalid' };
-
-      const totalRegistrations = await Registration.countDocuments(matchQuery); 
-
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const recentRegistrations = await Registration.countDocuments({
-        ...matchQuery,
-        createdAt: { $gte: thirtyDaysAgo }
+      const scenario = await campaignSimulationService.runScenario({
+        eventId,
+        targetDate: targetDateStr || '2026-03-05',
+        scenarioType: 'moderado',
+        includeInvalidRecovery: true
       });
-      const dailyGrowthRate = recentRegistrations / 30;
-
-      // Calculate days remaining to target date
-      const currentDate = new Date();
-      // Default to March 5, 2026
-      const targetDate = targetDateStr ? new Date(`${targetDateStr}T00:00:00`) : new Date('2026-03-05T00:00:00');
-      
-      let daysRemaining = Math.ceil((targetDate - currentDate) / (1000 * 60 * 60 * 24));
-      if (daysRemaining < 0) daysRemaining = 0;
-
-      const topLocAgg = await Registration.aggregate([
-        { $match: { ...matchQuery, localidad: { $ne: null, $ne: '' } } },       
-        { $group: { _id: '$localidad', count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 1 }
-      ]);
-
-      const topPuestoAgg = await Registration.aggregate([
-        { $match: { ...matchQuery, puestoId: { $ne: null } } },
-        { $group: { _id: '$puestoId', count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 1 },
-        { $lookup: { from: 'puestos', localField: '_id', foreignField: '_id', as: 'puesto' } },
-        { $unwind: '$puesto' }
-      ]);
-
-      const topMesaAgg = await Registration.aggregate([
-        { $match: { ...matchQuery, puestoId: { $ne: null }, mesa: { $ne: null } } },
-        { $group: { _id: { puestoId: '$puestoId', mesa: '$mesa' }, count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 1 },
-        { $lookup: { from: 'puestos', localField: '_id.puestoId', foreignField: '_id', as: 'puesto' } },
-        { $unwind: '$puesto' }
-      ]);
-
-      const topLeaderAgg = await Registration.aggregate([
-        { $match: { ...matchQuery, leaderName: { $ne: null, $ne: '' } } },
-        { $group: { _id: '$leaderName', count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 1 }
-      ]);
-
       return {
-        currentTotal: totalRegistrations,
-        dailyGrowthRate: dailyGrowthRate > 0 ? dailyGrowthRate : 0,
-        daysRemaining,
-        projection30Days: Math.round(totalRegistrations + (dailyGrowthRate * 30)),
-        projection60Days: Math.round(totalRegistrations + (dailyGrowthRate * 60)),
-        projectedTotal: Math.round(totalRegistrations + (dailyGrowthRate * daysRemaining)),
-        topLocalidad: topLocAgg[0]?._id || 'Desconocida',
-        topLocalidadVotes: topLocAgg[0]?.count || 0,
-        topPuesto: topPuestoAgg[0]?.puesto?.nombre || 'Desconocido',
-        topPuestoVotes: topPuestoAgg[0]?.count || 0,
-      topMesa: topMesaAgg[0]?._id?.mesa || 'N/A',
-      topLeader: topLeaderAgg[0]?._id || 'Desconocido',
-      topLeaderVotes: topLeaderAgg[0]?.count || 0
-    };
+        ...scenario,
+        currentTotal: Number(scenario?.summary?.currentTotal || 0),
+        projectedTotal: Number(scenario?.summary?.simulatedTotal || 0),
+        topLocalidad: scenario?.highlights?.topLocalidad?.name || 'Sin Localidad',
+        topLocalidadVotes: Number(scenario?.highlights?.topLocalidad?.simulatedVotes || 0),
+        topPuesto: 'Escenario oficial',
+        topPuestoVotes: 0,
+        topMesa: 'N/A',
+        topLeader: scenario?.highlights?.topLeader?.name || 'Sin lider',
+        topLeaderVotes: Number(scenario?.highlights?.topLeader?.simulatedVotes || 0),
+        dailyGrowthRate: Number(scenario?.assumptions?.growthOfficialPercent || 0),
+        daysRemaining: Number(scenario?.assumptions?.daysToTarget || 0),
+        projection30Days: Number(scenario?.summary?.simulatedTotal || 0),
+        projection60Days: Number(scenario?.summary?.simulatedTotal || 0)
+      };
   } catch (error) {
     logger.error('Error en simulation data', error);
-    throw AppError.serverError('Error al obtener datos de simulación');
+    throw AppError.serverError('Error al obtener datos de simulaciÃ³n');
+  }
+}
+
+export async function getSimulationBaseData(filters = {}, options = {}) {
+  try {
+    return await campaignSimulationService.buildBaseScenario(filters, options);
+  } catch (error) {
+    logger.error('Error en simulation base', error);
+    throw AppError.serverError('Error al obtener base de simulacion');
+  }
+}
+
+export async function runCampaignSimulation(payload = {}, options = {}) {
+  try {
+    return await campaignSimulationService.runScenario(payload, options);
+  } catch (error) {
+    logger.error('Error en simulation run', error);
+    throw AppError.serverError('Error al ejecutar simulacion');
   }
 }
 
@@ -430,7 +372,7 @@ export async function getLeaderPerformance(eventId = null) {
     const matchQuery = eventId ? { eventId } : {};
     matchQuery.dataIntegrityStatus = { $ne: 'invalid' };
 
-    // 1. Agrupación general por líder para calcular métricas
+    // 1. AgrupaciÃ³n general por lÃ­der para calcular mÃ©tricas
     const leaderStats = await Registration.aggregate([
       { $match: matchQuery },
       {
@@ -496,14 +438,14 @@ export async function getLeaderPerformance(eventId = null) {
       }
     ]);
 
-    // Ordenar y extraer top 10 para cada categoría
+    // Ordenar y extraer top 10 para cada categorÃ­a
     const topErrores = [...leaderStats].sort((a, b) => b.errores - a.errores).slice(0, 10);
     const topImportaciones = [...leaderStats].sort((a, b) => b.importaciones - a.importaciones).slice(0, 10);
     const topVerificaciones = [...leaderStats].sort((a, b) => b.verificaciones - a.verificaciones).slice(0, 10);
     const peorDesempeno = [...leaderStats].sort((a, b) => a.performanceScore - b.performanceScore).slice(0, 10);
     const rankingGeneral = [...leaderStats].sort((a, b) => b.performanceScore - a.performanceScore);
 
-    // 2. Agrupación por localidad y líder
+    // 2. AgrupaciÃ³n por localidad y lÃ­der
     const locLeaderStats = await Registration.aggregate([
       { $match: { ...matchQuery, localidad: { $ne: null, $ne: '' } } },
       {
@@ -542,14 +484,24 @@ export async function getLeaderPerformance(eventId = null) {
     };
   } catch (error) {
     logger.error('Error en getLeaderPerformance', error);
-    throw AppError.serverError('Error al obtener rendimiento de líderes');
+    throw AppError.serverError('Error al obtener rendimiento de lÃ­deres');
   }
 }
 
 export default {
+  getAdvancedSummaryAnalytics,
+  getAdvancedChartsAnalytics,
+  getHierarchyLocalidades,
+  getHierarchyPuestosByLocalidad,
+  getHierarchyMesasByPuesto,
   getAdvancedAnalytics,
+  getInvalidDataAnalytics,
+  getInvalidDataDetail,
   getSimulationData,
+  getSimulationBaseData,
+  runCampaignSimulation,
   runGlobalVerification,
   validateAndFixLocation,
   getLeaderPerformance
 };
+

@@ -6,6 +6,7 @@
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import adminRepository from './admin.repository.js';
+import { applyPollingPlaceOverride } from '../../../shared/polling-place-overrides.js';
 
 const logger = createLogger('AdminService');
 
@@ -36,7 +37,7 @@ export async function importPuestos(puestosData) {
 
     const validPuestos = puestosData.filter(p => 
       p.codigoPuesto && p.nombre && p.localidad && Array.isArray(p.mesas)
-    );
+    ).map((puesto) => applyPollingPlaceOverride(puesto));
 
     if (validPuestos.length === 0) {
       throw AppError.badRequest('No valid puestos to import');

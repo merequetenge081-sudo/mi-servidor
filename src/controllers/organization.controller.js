@@ -1,55 +1,31 @@
-import { Organization } from '../models/Organization.js';
-import { AuditService } from '../services/audit.service.js';
-import logger from '../config/logger.js';
+﻿import { AuditService } from "../services/audit.service.js";
+import logger from "../config/logger.js";
+import { sendError } from "../utils/httpError.js";
+import organizationService from "../backend/modules/organization/organization.service.js";
+
+function handleOrganizationError(res, error, fallbackMessage, fallbackCode) {
+  logger.error(fallbackMessage, { error: error.message, stack: error.stack });
+  const status = error?.statusCode || 500;
+  const code = error?.name === "AppError" ? fallbackCode : `${fallbackCode}_UNEXPECTED`;
+  return sendError(res, status, error?.message || fallbackMessage, code, error?.details ?? error?.message);
+}
 
 export async function createOrganization(req, res) {
   try {
-    const { name, email, phone, plan = 'free', adminId } = req.body;
+    const { name, email, phone, plan = "free", adminId } = req.body;
     const user = req.user;
 
-    // Validation
-    if (!name || !email || !adminId) {
-      return res.status(400).json({ error: 'name, email, adminId sont requeridos' });
-    }
-
-    // Generate slug from name
-    const slug = name
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
-
-    // Check if slug already exists
-    const existing = await Organization.findOne({ slug });
-    if (existing) {
-      return res.status(400).json({ error: 'Una organización con ese nombre ya existe' });
-    }
-
-    // Create organization with plan limits
-    const maxLeaders = plan === 'free' ? 10 : (plan === 'pro' ? 100 : 10000);
-    const maxEvents = plan === 'free' ? 5 : (plan === 'pro' ? 50 : 10000);
-    const maxRegistrationsPerEvent = plan === 'free' ? 500 : (plan === 'pro' ? 5000 : 100000);
-
-    const org = new Organization({
+    const org = await organizationService.createOrganization({
       name,
-      slug,
       email,
       phone,
-      adminId,
       plan,
-      status: 'active',
-      maxLeaders,
-      maxEvents,
-      maxRegistrationsPerEvent,
-      leadersCount: 0,
-      eventsCount: 0,
-      registrationsCount: 0
+      adminId
     });
 
-    await org.save();
-
     await AuditService.log(
-      'CREATE',
-      'Organization',
+      "CREATE",
+      "Organization",
       org._id.toString(),
       user,
       { name, plan },
@@ -57,37 +33,30 @@ export async function createOrganization(req, res) {
       req
     );
 
-    logger.info('Organization created', { orgId: org._id, name });
-    res.status(201).json(org);
+    logger.info("Organization created", { orgId: org._id, name });
+    return res.status(201).json(org);
   } catch (error) {
-    logger.error('Create organization error:', { error: error.message });
-    res.status(400).json({ error: 'Error al crear organización' });
+    return handleOrganizationError(res, error, "Create organization error", "CREATE_ORGANIZATION_ERROR");
   }
 }
 
 export async function getOrganizations(req, res) {
   try {
-    const orgs = await Organization.find().sort({ createdAt: -1 });
-    res.json(orgs);
+    const { page = 1, limit = 1000 } = req.query;
+    const result = await organizationService.getOrganizations({}, page, limit);
+    return res.json(result.data);
   } catch (error) {
-    logger.error('Get organizations error:', { error: error.message });
-    res.status(500).json({ error: 'Error al obtener organizaciones' });
+    return handleOrganizationError(res, error, "Get organizations error", "GET_ORGANIZATIONS_ERROR");
   }
 }
 
 export async function getOrganizationDetails(req, res) {
   try {
     const { orgId } = req.params;
-    const org = await Organization.findById(orgId);
-
-    if (!org) {
-      return res.status(404).json({ error: 'Organización no encontrada' });
-    }
-
-    res.json(org);
+    const org = await organizationService.getOrganizationDetails(orgId);
+    return res.json(org);
   } catch (error) {
-    logger.error('Get organization error:', { error: error.message });
-    res.status(500).json({ error: 'Error al obtener organización' });
+    return handleOrganizationError(res, error, "Get organization error", "GET_ORGANIZATION_DETAILS_ERROR");
   }
 }
 
@@ -97,56 +66,28 @@ export async function updateOrganization(req, res) {
     const { name, email, phone, plan, status } = req.body;
     const user = req.user;
 
-    const org = await Organization.findById(orgId);
-    if (!org) {
-      return res.status(404).json({ error: 'Organización no encontrada' });
-    }
-
-    // Track changes for audit
-    const changes = {};
-    if (name !== undefined && name !== org.name) {
-      changes.name = { old: org.name, new: name };
-      org.name = name;
-    }
-    if (email !== undefined && email !== org.email) {
-      changes.email = { old: org.email, new: email };
-      org.email = email;
-    }
-    if (phone !== undefined && phone !== org.phone) {
-      changes.phone = { old: org.phone, new: phone };
-      org.phone = phone;
-    }
-    if (plan !== undefined && plan !== org.plan) {
-      changes.plan = { old: org.plan, new: plan };
-      org.plan = plan;
-      // Update limits based on plan
-      org.maxLeaders = plan === 'free' ? 10 : (plan === 'pro' ? 100 : 10000);
-      org.maxEvents = plan === 'free' ? 5 : (plan === 'pro' ? 50 : 10000);
-      org.maxRegistrationsPerEvent = plan === 'free' ? 500 : (plan === 'pro' ? 5000 : 100000);
-    }
-    if (status !== undefined && status !== org.status) {
-      changes.status = { old: org.status, new: status };
-      org.status = status;
-    }
-
-    org.updatedAt = new Date();
-    await org.save();
+    const result = await organizationService.updateOrganization(orgId, {
+      name,
+      email,
+      phone,
+      plan,
+      status
+    });
 
     await AuditService.log(
-      'UPDATE',
-      'Organization',
-      org._id.toString(),
+      "UPDATE",
+      "Organization",
+      result.org._id.toString(),
       user,
-      changes,
-      `Organización ${org.name} actualizada`,
+      result.changes,
+      `Organización ${result.org.name} actualizada`,
       req
     );
 
-    logger.info('Organization updated', { orgId: org._id });
-    res.json(org);
+    logger.info("Organization updated", { orgId: result.org._id });
+    return res.json(result.org);
   } catch (error) {
-    logger.error('Update organization error:', { error: error.message });
-    res.status(400).json({ error: 'Error al actualizar organización' });
+    return handleOrganizationError(res, error, "Update organization error", "UPDATE_ORGANIZATION_ERROR");
   }
 }
 
@@ -155,16 +96,11 @@ export async function deleteOrganization(req, res) {
     const { orgId } = req.params;
     const user = req.user;
 
-    const org = await Organization.findById(orgId);
-    if (!org) {
-      return res.status(404).json({ error: 'Organización no encontrada' });
-    }
-
-    await Organization.deleteOne({ _id: orgId });
+    const org = await organizationService.deleteOrganization(orgId);
 
     await AuditService.log(
-      'DELETE',
-      'Organization',
+      "DELETE",
+      "Organization",
       orgId,
       user,
       { name: org.name, plan: org.plan },
@@ -172,45 +108,31 @@ export async function deleteOrganization(req, res) {
       req
     );
 
-    logger.info('Organization deleted', { orgId });
-    res.json({ message: 'Organización eliminada' });
+    logger.info("Organization deleted", { orgId });
+    return res.json({ message: "Organización eliminada" });
   } catch (error) {
-    logger.error('Delete organization error:', { error: error.message });
-    res.status(500).json({ error: 'Error al eliminar organización' });
+    return handleOrganizationError(res, error, "Delete organization error", "DELETE_ORGANIZATION_ERROR");
   }
 }
 
 export async function getOrganizationStats(req, res) {
   try {
     const { orgId } = req.params;
+    const stats = await organizationService.getOrganizationStats(orgId);
 
-    const org = await Organization.findById(orgId);
-    if (!org) {
-      return res.status(404).json({ error: 'Organización no encontrada' });
-    }
-
-    res.json({
-      orgId: org._id,
-      name: org.name,
-      plan: org.plan,
-      status: org.status,
-      stats: {
-        leadersCount: org.leadersCount,
-        eventsCount: org.eventsCount,
-        registrationsCount: org.registrationsCount
-      },
-      limits: {
-        maxLeaders: org.maxLeaders,
-        maxEvents: org.maxEvents,
-        maxRegistrationsPerEvent: org.maxRegistrationsPerEvent
-      },
+    return res.json({
+      orgId: stats.orgId,
+      name: stats.name,
+      plan: stats.plan,
+      status: stats.status,
+      stats: stats.stats,
+      limits: stats.limits,
       usage: {
-        leaders: `${org.leadersCount}/${org.maxLeaders}`,
-        events: `${org.eventsCount}/${org.maxEvents}`
+        leaders: `${stats.usage.leaders.current}/${stats.usage.leaders.max}`,
+        events: `${stats.usage.events.current}/${stats.usage.events.max}`
       }
     });
   } catch (error) {
-    logger.error('Get organization stats error:', { error: error.message });
-    res.status(500).json({ error: 'Error al obtener estadísticas de la organización' });
+    return handleOrganizationError(res, error, "Get organization stats error", "GET_ORGANIZATION_STATS_ERROR");
   }
 }

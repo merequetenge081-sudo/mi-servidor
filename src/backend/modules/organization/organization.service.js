@@ -1,45 +1,24 @@
-/**
+﻿/**
  * Organization Service
- * Lógica de negocio para organizaciones
+ * LÃ³gica de negocio para organizaciones
  */
 
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import organizationRepository from './organization.repository.js';
+import {
+  getOrganizationPlanLimits,
+  getOrganizationPlanNames,
+  isValidOrganizationPlan,
+  generateOrganizationSlug
+} from '../../../shared/organization.utils.js';
 
 const logger = createLogger('OrganizationService');
 
-// Plan configuration
-const PLAN_CONFIG = {
-  free: {
-    maxLeaders: 10,
-    maxEvents: 5,
-    maxRegistrationsPerEvent: 500
-  },
-  pro: {
-    maxLeaders: 100,
-    maxEvents: 50,
-    maxRegistrationsPerEvent: 5000
-  },
-  enterprise: {
-    maxLeaders: 10000,
-    maxEvents: 10000,
-    maxRegistrationsPerEvent: 100000
-  }
-};
+
 
 /**
- * Genera slug a partir de nombre
- */
-function generateSlug(name) {
-  return name
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
-}
-
-/**
- * Crea una nueva organización
+ * Crea una nueva organizaciÃ³n
  */
 export async function createOrganization(orgData) {
   try {
@@ -51,12 +30,12 @@ export async function createOrganization(orgData) {
     }
 
     // Validar plan
-    if (!PLAN_CONFIG[plan]) {
-      throw AppError.badRequest(`Invalid plan: ${plan}. Must be one of: free, pro, enterprise`);
+    if (!isValidOrganizationPlan(plan)) {
+      throw AppError.badRequest(`Invalid plan: ${plan}. Must be one of: ${getOrganizationPlanNames().join(', ')}`);
     }
 
     // Generar slug
-    const slug = generateSlug(name);
+    const slug = generateOrganizationSlug(name);
 
     // Verificar que slug no exista
     const existing = await organizationRepository.getOrganizationBySlug(slug);
@@ -64,10 +43,10 @@ export async function createOrganization(orgData) {
       throw AppError.conflict('An organization with that name already exists');
     }
 
-    // Obtener límites según plan
-    const limits = PLAN_CONFIG[plan];
+    // Obtener lÃ­mites segÃºn plan
+    const limits = getOrganizationPlanLimits(plan);
 
-    // Crear organización
+    // Crear organizaciÃ³n
     const newOrg = await organizationRepository.createOrganization({
       name,
       slug,
@@ -118,7 +97,7 @@ export async function getOrganizations(filter = {}, page = 1, limit = 50) {
 }
 
 /**
- * Obtiene detalles de una organización
+ * Obtiene detalles de una organizaciÃ³n
  */
 export async function getOrganizationDetails(orgId) {
   try {
@@ -131,7 +110,7 @@ export async function getOrganizationDetails(orgId) {
 }
 
 /**
- * Actualiza una organización
+ * Actualiza una organizaciÃ³n
  */
 export async function updateOrganization(orgId, updateData) {
   try {
@@ -148,7 +127,7 @@ export async function updateOrganization(orgId, updateData) {
       changes.name = { old: current.name, new: updateData.name };
 
       // Si cambia nombre, actualizar slug
-      const newSlug = generateSlug(updateData.name);
+      const newSlug = generateOrganizationSlug(updateData.name);
       const existingSlug = await organizationRepository.getOrganizationBySlug(newSlug);
       if (existingSlug && existingSlug._id.toString() !== orgId) {
         throw AppError.conflict('An organization with that name already exists');
@@ -167,10 +146,10 @@ export async function updateOrganization(orgId, updateData) {
     }
 
     if (updateData.plan !== undefined && updateData.plan !== current.plan) {
-      if (!PLAN_CONFIG[updateData.plan]) {
+      if (!isValidOrganizationPlan(updateData.plan)) {
         throw AppError.badRequest(`Invalid plan: ${updateData.plan}`);
       }
-      const limits = PLAN_CONFIG[updateData.plan];
+      const limits = getOrganizationPlanLimits(updateData.plan);
       toUpdate.plan = updateData.plan;
       toUpdate.maxLeaders = limits.maxLeaders;
       toUpdate.maxEvents = limits.maxEvents;
@@ -196,7 +175,7 @@ export async function updateOrganization(orgId, updateData) {
 }
 
 /**
- * Elimina una organización
+ * Elimina una organizaciÃ³n
  */
 export async function deleteOrganization(orgId) {
   try {
@@ -210,7 +189,7 @@ export async function deleteOrganization(orgId) {
 }
 
 /**
- * Obtiene estadísticas de una organización
+ * Obtiene estadÃ­sticas de una organizaciÃ³n
  */
 export async function getOrganizationStats(orgId) {
   try {
@@ -256,7 +235,7 @@ export async function getOrganizationStats(orgId) {
 }
 
 /**
- * Verifica límites de una organización
+ * Verifica lÃ­mites de una organizaciÃ³n
  */
 export async function verifyLimits(orgId, resourceType) {
   try {
@@ -284,7 +263,7 @@ export async function incrementResourceCount(orgId, resourceType) {
       throw AppError.badRequest(`Invalid resource type: ${resourceType}`);
     }
 
-    // Verificar límites antes de incrementar
+    // Verificar lÃ­mites antes de incrementar
     const limits = await organizationRepository.checkLimits(orgId, resourceType);
     if (limits.exceeded) {
       throw AppError.conflict(`${resourceType} limit reached for this organization`);
@@ -308,3 +287,4 @@ export default {
   verifyLimits,
   incrementResourceCount
 };
+

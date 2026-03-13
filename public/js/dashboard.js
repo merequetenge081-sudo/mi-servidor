@@ -56,6 +56,10 @@ function getBogotaLocalidades() {
     return ['Usaquén', 'Chapinero', 'Santa Fe', 'San Cristóbal', 'Usme', 'Tunjuelito', 'Bosa', 'Kennedy', 'Fontibón', 'Engativá', 'Suba', 'Barrios Unidos', 'Teusaquillo', 'Los Mártires', 'Antonio Nariño', 'Puente Aranda', 'La Candelaria', 'Rafael Uribe Uribe', 'Ciudad Bolívar', 'Sumapaz'];
 }
 
+function getCanonicalPuestoDisplay(reg) {
+    return reg?.puestoId?.nombre || reg?.votingPlace || reg?.legacyVotingPlace || '-';
+}
+
 function showAlert(message, type = 'info') {
     return new Promise(resolve => {
         const isDarkMode = document.body.classList.contains('dark-mode');
@@ -196,6 +200,13 @@ function filterLeadersByName(searchTerm) {
 
     // Create filtered table using existing renderLeadersTable logic
     const html = filtered.map(leader => {
+        const leaderDisplayName = leader.name || 'Sin nombre';
+        const initials = leaderDisplayName
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => (part[0] || '').toUpperCase())
+            .join('') || 'L';
         let passwordStatus = '';
         if (leader.passwordResetRequested) {
             passwordStatus = '<span style="background: #fff3cd; color: #856404; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"><i class="bi bi-exclamation-triangle"></i> Reset Solicitado</span>';
@@ -209,10 +220,18 @@ function filterLeadersByName(searchTerm) {
 
         return `
         <tr>
-            <td><strong style="color: inherit;">${leader.name}</strong></td>
+            <td>
+                <div class="leader-cell">
+                    <span class="leader-avatar-initial">${initials}</span>
+                    <div class="leader-main-info">
+                        <strong class="leader-primary-text">${leaderDisplayName}</strong>
+                        <span class="leader-secondary-text">${leader.leaderId || leader._id || ''}</span>
+                    </div>
+                </div>
+            </td>
             <td style="color: inherit;">${leader.email || '<span style="color: #666;">Sin correo</span>'}</td>
             <td style="color: inherit;">${leader.phone || '-'}</td>
-            <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${leader.registrations || 0}</span></td>
+            <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${Number(leader?.metrics?.total ?? leader?.registrations ?? 0)}</span></td>
             <td>${passwordStatus}</td>
             <td>
                 ${leader.username ?
@@ -346,6 +365,65 @@ async function fetchDashboardMetrics(region = 'all', leaderId = null) {
     return dashboardMetrics;
 }
 
+async function apiCallV2(endpointV2, legacyEndpoint, options = {}) {
+    if (typeof window.DataService !== 'undefined' && typeof window.DataService.apiCall === 'function') {
+        console.debug('[V2 TRACE] dashboard.js <- ' + endpointV2);
+        return window.DataService.apiCall(endpointV2, options);
+    }
+    console.warn('[LEGACY TRACE] dashboard.js <- ' + legacyEndpoint);
+    return apiCall(legacyEndpoint, options);
+}
+
+async function fetchLeadersForDashboard() {
+    if (typeof window.DataService !== 'undefined' && window.DataService.getLeadersPaginated) {
+        const response = await window.DataService.getLeadersPaginated({
+            page: 1,
+            limit: 500,
+            sort: 'name',
+            order: 'asc',
+            includeMetrics: true
+        });
+        console.debug('[V2 TRACE] dashboard.js <- /api/v2/leaders', {
+            page: response.page,
+            total: response.total
+        });
+        return response.items || [];
+    }
+    console.warn('[LEGACY TRACE] dashboard.js <- /api/leaders (DataService v2 no disponible)');
+    const leadersRes = await apiCall(`/api/leaders${currentEventId ? '?eventId=' + currentEventId : ''}`);
+    const leadersData = await leadersRes.json();
+    return Array.isArray(leadersData) ? leadersData : (leadersData.data || []);
+}
+
+async function fetchRegistrationsForDashboard() {
+    if (typeof window.DataService !== 'undefined' && window.DataService.getRegistrationsPaginated) {
+        const limit = 500;
+        let page = 1;
+        let totalPages = 1;
+        const items = [];
+        do {
+            const response = await window.DataService.getRegistrationsPaginated({
+                page,
+                limit,
+                sort: 'createdAt',
+                order: 'desc'
+            });
+            items.push(...(response.items || []));
+            totalPages = response.totalPages || 1;
+            page += 1;
+        } while (page <= totalPages && page <= 200);
+        console.debug('[V2 TRACE] dashboard.js <- /api/v2/registrations', {
+            total: items.length,
+            pages: totalPages
+        });
+        return items;
+    }
+    console.warn('[LEGACY TRACE] dashboard.js <- /api/registrations?limit=10000 (DataService v2 no disponible)');
+    const regsRes = await apiCall(`/api/registrations${currentEventId ? '?eventId=' + currentEventId + '&' : '?'}limit=10000`);
+    const regsData = await regsRes.json();
+    return Array.isArray(regsData) ? regsData : (regsData.data || []);
+}
+
 async function loadDashboard() {
 
     // Fix for ID mismatch: sidebarUsername instead of adminUsername
@@ -361,14 +439,10 @@ async function loadDashboard() {
     updateEventNameDisplay();
 
     try {
-        const leadersRes = await apiCall(`/api/leaders${currentEventId ? '?eventId=' + currentEventId : ''}`);
-        const leadersData = await leadersRes.json();
-        const rawLeaders = Array.isArray(leadersData) ? leadersData : (leadersData.data || []);
+        const rawLeaders = await fetchLeadersForDashboard();
         allLeaders = processLeaders(rawLeaders);
 
-        const regsRes = await apiCall(`/api/registrations${currentEventId ? '?eventId=' + currentEventId + '&' : '?'}limit=10000`);
-        const regsData = await regsRes.json();
-        allRegistrations = Array.isArray(regsData) ? regsData : (regsData.data || []);
+        allRegistrations = await fetchRegistrationsForDashboard();
 
         await fetchDashboardMetrics();
         updateStats();
@@ -593,6 +667,13 @@ function loadRecentRegistrations() {
 function loadLeadersTable() {
     const html = allLeaders.map(leader => {
         console.log('📊 Renderizando líder:', leader.name, '| ID:', leader._id, '| Password status: passwordResetRequested=', leader.passwordResetRequested, 'isTemporaryPassword=', leader.isTemporaryPassword, 'username=', leader.username);
+        const leaderDisplayName = leader.name || 'Sin nombre';
+        const initials = leaderDisplayName
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => (part[0] || '').toUpperCase())
+            .join('') || 'L';
         
         // Determinar estado de contraseña
         let passwordStatus = '';
@@ -608,10 +689,18 @@ function loadLeadersTable() {
 
         return `
         <tr>
-            <td><strong style="color: inherit;">${leader.name}</strong></td>
+            <td>
+                <div class="leader-cell">
+                    <span class="leader-avatar-initial">${initials}</span>
+                    <div class="leader-main-info">
+                        <strong class="leader-primary-text">${leaderDisplayName}</strong>
+                        <span class="leader-secondary-text">${leader.leaderId || leader._id || ''}</span>
+                    </div>
+                </div>
+            </td>
             <td style="color: inherit;">${leader.email || '<span style="color: #666;">Sin correo</span>'}</td>
             <td style="color: inherit;">${leader.phone || '-'}</td>
-            <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${leader.registrations || 0}</span></td>
+            <td><span style="background: #e8f5e9; padding: 4px 12px; border-radius: 20px; color: #2e7d32; font-weight: 600; display: inline-block;">${Number(leader?.metrics?.total ?? leader?.registrations ?? 0)}</span></td>
             <td>${passwordStatus}</td>
             <td>
                 ${leader.username ?
@@ -837,22 +926,31 @@ async function confirmSendAccessEmail() {
             resultDiv.textContent = '📧 Enviando correos...';
         }
 
-        const res = await apiCall(`/api/leaders/${leaderId}/send-access`, {
-            method: 'POST',
-            body: JSON.stringify({
+        let result;
+        if (typeof window.DataService !== 'undefined' && typeof window.DataService.sendLeaderAccessEmail === 'function') {
+            console.debug('[V2 TRACE] dashboard.js.send-access <- DataService.sendLeaderAccessEmail', { leaderId });
+            result = await window.DataService.sendLeaderAccessEmail(leaderId, {
                 sendWelcomeEmail: sendWelcome,
                 sendCredentialsEmail: sendCredentials,
                 sendQRCodeEmail: sendQR,
                 sendWarningEmail: sendWarning
-            })
-        });
-
-        if (!res.ok) {
-            const error = await res.json();
-            throw new Error(error.error || 'Error al enviar correo');
+            });
+        } else {
+            const res = await apiCallV2(`/api/v2/leaders/${leaderId}/send-access`, `/api/leaders/${leaderId}/send-access`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    sendWelcomeEmail: sendWelcome,
+                    sendCredentialsEmail: sendCredentials,
+                    sendQRCodeEmail: sendQR,
+                    sendWarningEmail: sendWarning
+                })
+            });
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || 'Error al enviar correo');
+            }
+            result = await res.json();
         }
-
-        const result = await res.json();
 
         // Verificar success===true o que al menos un email fue enviado
         const anyEmailSent = result.emailResults && Object.values(result.emailResults).some(r => r && r.success === true);
@@ -1027,14 +1125,21 @@ async function showCredentials(leaderId) {
     const btnBg = isDarkMode ? '#4a5568' : '#6c757d';
 
     try {
-        const res = await apiCall(`/api/leaders/${leaderId}/credentials`);
-        
-        if (!res.ok) {
-            const errorData = await res.json();
-            return showAlert(errorData.error || 'Error al obtener credenciales', 'error');
+        let data;
+        if (typeof window.DataService !== 'undefined' && typeof window.DataService.getLeaderCredentials === 'function') {
+            console.debug('[V2 TRACE] dashboard.js.credentials <- DataService.getLeaderCredentials', { leaderId });
+            data = await window.DataService.getLeaderCredentials(leaderId);
+            if (data?.success === false) {
+                return showAlert(data.error || data.message || 'Error al obtener credenciales', 'error');
+            }
+        } else {
+            const res = await apiCallV2(`/api/v2/leaders/${leaderId}/credentials`, `/api/leaders/${leaderId}/credentials`);
+            if (!res.ok) {
+                const errorData = await res.json();
+                return showAlert(errorData.error || 'Error al obtener credenciales', 'error');
+            }
+            data = await res.json();
         }
-        
-        const data = await res.json();
 
         if (!data.hasCredentials) {
             return showAlert('Este líder no tiene credenciales configuradas', 'warning');
@@ -1149,7 +1254,7 @@ function renderRegistrationTable(tab, data) {
     const tableId = tab === 'bogota' ? 'bogotaTable' : 'restoTable';
     const html = paginated.map(reg => {
         const requiereRevision = reg.requiereRevisionPuesto && !reg.revisionPuestoResuelta;
-        const puestoDisplay = reg.votingPlace || (reg.puestoId?.nombre || '-');
+        const puestoDisplay = getCanonicalPuestoDisplay(reg);
         return `
         <tr>
             <td><strong>${reg.firstName} ${reg.lastName}</strong></td>
@@ -1279,8 +1384,14 @@ async function showQR(leaderId, leaderName) {
 // leaderToDeleteId and deleteLeader are defined below with other actions
 
 async function toggleConfirm(regId, isConfirmed) {
-    const endpoint = isConfirmed ? `/api/registrations/${regId}/unconfirm` : `/api/registrations/${regId}/confirm`;
-    await apiCall(endpoint, { method: 'POST' });
+    if (typeof window.DataService !== 'undefined' && typeof window.DataService.toggleRegistrationConfirmation === 'function') {
+        console.debug('[V2 TRACE] dashboard.js.toggleConfirm <- DataService.toggleRegistrationConfirmation', { regId, isConfirmed });
+        await window.DataService.toggleRegistrationConfirmation(regId, isConfirmed);
+    } else {
+        const v2Endpoint = isConfirmed ? `/api/v2/registrations/${regId}/unconfirm` : `/api/v2/registrations/${regId}/confirm`;
+        const legacyEndpoint = isConfirmed ? `/api/registrations/${regId}/unconfirm` : `/api/registrations/${regId}/confirm`;
+        await apiCallV2(v2Endpoint, legacyEndpoint, { method: 'POST' });
+    }
     loadDashboard();
 }
 
@@ -1307,7 +1418,7 @@ if (document.getElementById('saveEditLeaderBtn')) {
         if (!name) return showAlert('El nombre es obligatorio', 'warning');
 
         try {
-            const res = await apiCall(`/api/leaders/${id}`, {
+            const res = await apiCallV2(`/api/v2/leaders/${id}`, `/api/leaders/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify({ name, email, phone })
             });
@@ -2120,7 +2231,7 @@ async function handleConfirmDeleteLeader() {
     if (!leaderToDeleteId || deleteLeaderInFlight) return;
     deleteLeaderInFlight = true;
     try {
-        const res = await apiCall(`/api/leaders/${leaderToDeleteId}`, { method: 'DELETE' });
+        const res = await apiCallV2(`/api/v2/leaders/${leaderToDeleteId}`, `/api/leaders/${leaderToDeleteId}`, { method: 'DELETE' });
         if (res.ok) {
             closeDeleteLeaderModals();
             await loadDashboard();
@@ -2156,7 +2267,7 @@ addListener('saveLiderBtn', 'click', async () => {
     if (!name) return showAlert('Ingresa el nombre', 'warning');
 
     try {
-        const res = await apiCall('/api/leaders', {
+        const res = await apiCallV2('/api/v2/leaders', '/api/leaders', {
             method: 'POST',
             body: JSON.stringify({ name, email, phone, eventId: currentEventId, customUsername: customUsername || undefined })
         });
@@ -2251,7 +2362,7 @@ function exportAllRegistrations() {
         Municipio: r.capital || r.municipality || '',
         Localidad: r.localidad || '',
         Líder: r.leaderName || '',
-        Puesto: r.votingPlace || '',
+        Puesto: getCanonicalPuestoDisplay(r),
         Mesa: r.votingTable || '',
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
@@ -2338,7 +2449,7 @@ addListener('exportByLeaderBtn', 'click', () => {
         Departamento: r.departamento || r.department || '',
         Municipio: r.capital || r.municipality || '',
         Localidad: r.localidad || '',
-        Puesto: r.votingPlace || '',
+        Puesto: getCanonicalPuestoDisplay(r),
         Mesa: r.votingTable || '',
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
@@ -2372,7 +2483,7 @@ addListener('exportByLocalidadBtn', 'click', () => {
             Municipio: r.capital || r.municipality || '',
             Localidad: r.localidad || '',
             Líder: r.leaderName || '',
-            Puesto: r.votingPlace || '',
+            Puesto: getCanonicalPuestoDisplay(r),
             Mesa: r.votingTable || '',
             Fecha: new Date(r.date).toLocaleDateString('es-CO'),
             Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
@@ -2508,7 +2619,7 @@ addListener('exportBogotaBtn', 'click', () => {
         Teléfono: r.phone || '',
         Localidad: r.localidad || '',
         Líder: r.leaderName || '',
-        Puesto: r.votingPlace || '',
+        Puesto: getCanonicalPuestoDisplay(r),
         Mesa: r.votingTable || '',
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'
@@ -2526,7 +2637,7 @@ addListener('exportRestoBtn', 'click', () => {
         Departamento: r.departamento || r.department || '',
         Municipio: r.capital || r.municipality || '',
         Líder: r.leaderName || '',
-        Puesto: r.votingPlace || '',
+        Puesto: getCanonicalPuestoDisplay(r),
         Mesa: r.votingTable || '',
         Fecha: new Date(r.date).toLocaleDateString('es-CO'),
         Estado: r.confirmed ? 'Confirmado' : 'Pendiente'

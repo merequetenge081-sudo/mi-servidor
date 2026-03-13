@@ -392,7 +392,7 @@ console.log('✅ dashboard.js v3.0.0 - Compatibility layer loaded');
 
 ### **Paso 1: Backup**
 ```powershell
-Copy-Item public/js/dashboard.js public/js/dashboard.js.before-phase3
+Copy-Item public/js/dashboard.js public/js/dashboard.js.backup
 ```
 
 ### **Paso 2: Aplicar Bloque 1 (Variables)**

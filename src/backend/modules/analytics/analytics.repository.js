@@ -7,6 +7,7 @@ import { Registration } from '../../../models/Registration.js';
 import { Leader } from '../../../models/Leader.js';
 import { Event } from '../../../models/Event.js';
 import metricsService from '../../../services/metrics.service.js';
+import { applyCleanAnalyticsFilter } from '../../../shared/analyticsFilter.js';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 
@@ -44,12 +45,7 @@ export async function getLeaderStats(eventId = null) {
     });
 
     const registrationsPerLeader = await Registration.aggregate([
-      {
-        $match: {
-          ...(eventId && { eventId }),
-          dataIntegrityStatus: { $ne: 'invalid' }
-        }
-      },
+      { $match: applyCleanAnalyticsFilter({ ...(eventId && { eventId }) }) },
       {
         $group: {
           _id: '$leaderId',
@@ -86,10 +82,9 @@ export async function getEventStats(eventId = null) {
 
     const eventStats = [];
     for (const event of events) {
-      const registrations = await Registration.countDocuments({
-        eventId: event._id,
-        dataIntegrityStatus: { $ne: 'invalid' }
-      });
+      const registrations = await Registration.countDocuments(
+        applyCleanAnalyticsFilter({ eventId: event._id })
+      );
       eventStats.push({
         eventId: event._id,
         eventName: event.name,
@@ -161,17 +156,19 @@ export async function getEventDetailedStats(eventId) {
       throw AppError.notFound('Evento no encontrado');
     }
 
-    const registrations = await Registration.countDocuments({ eventId });
+    const registrations = await Registration.countDocuments(
+      applyCleanAnalyticsFilter({ eventId })
+    );
     
     const topPuestos = await Registration.aggregate([
-      { $match: { eventId } },
+      { $match: applyCleanAnalyticsFilter({ eventId }) },
       { $group: { _id: '$puestoId', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 10 }
     ]);
 
     const topLeaders = await Registration.aggregate([
-      { $match: { eventId } },
+      { $match: applyCleanAnalyticsFilter({ eventId }) },
       { $group: { _id: '$leaderId', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 10 }

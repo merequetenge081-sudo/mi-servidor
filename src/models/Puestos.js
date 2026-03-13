@@ -14,6 +14,17 @@ const puestoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  localidadId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Localidad",
+    default: null,
+    index: true
+  },
+  normalizedNombre: {
+    type: String,
+    default: "",
+    index: true
+  },
   ciudad: {
     type: String,
     default: 'Bogotá'
@@ -54,5 +65,6 @@ const puestoSchema = new mongoose.Schema({
 // Nota: codigoPuesto ya tiene índice único por 'unique: true'
 puestoSchema.index({ localidad: 1, activo: 1 });
 puestoSchema.index({ nombre: 1 });
+puestoSchema.index({ organizationId: 1, normalizedNombre: 1 });
 
 export const Puestos = mongoose.model("Puestos", puestoSchema);

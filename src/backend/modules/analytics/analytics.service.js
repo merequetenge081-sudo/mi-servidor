@@ -7,6 +7,10 @@ import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import analyticsRepository from './analytics.repository.js';
 import metricsService from '../../../services/metrics.service.js';
+import { DailyMetric } from '../../../models/DailyMetric.js';
+import { LeaderMetric } from '../../../models/LeaderMetric.js';
+import { TerritoryMetric } from '../../../models/TerritoryMetric.js';
+import { CampaignMetric } from '../../../models/CampaignMetric.js';
 
 const logger = createLogger('AnalyticsService');
 
@@ -37,14 +41,15 @@ export async function getDashboardSummary(eventId = null) {
 /**
  * Obtiene métricas del dashboard (stats + charts base)
  */
-export async function getDashboardMetrics({ eventId = null, region = 'all', leaderId = null } = {}) {
+export async function getDashboardMetrics({ eventId = null, region = 'all', leaderId = null, includeDetails = true } = {}) {
   try {
-    logger.info('Obteniendo dashboard metrics', { eventId, region, leaderId });
+    logger.info('Obteniendo dashboard metrics', { eventId, region, leaderId, includeDetails });
 
     return await metricsService.getDashboardMetrics({
       eventId,
       region,
-      leaderId
+      leaderId,
+      includeDetails
     });
   } catch (error) {
     if (error.isOperational) throw error;
@@ -283,6 +288,38 @@ export async function getEventDetail(eventId) {
   }
 }
 
+/**
+ * Obtiene métricas materializadas de tablas resumen
+ */
+export async function getMaterializedMetrics(eventId = null) {
+  try {
+    const campaignQuery = eventId ? { eventId } : {};
+    const dailyQuery = eventId ? { eventId } : {};
+    const leaderQuery = eventId ? { eventId } : {};
+    const territoryQuery = eventId ? { eventId } : {};
+
+    const [latestCampaign, latestDaily, topLeaders, topTerritories] = await Promise.all([
+      CampaignMetric.findOne(campaignQuery).sort({ date: -1, createdAt: -1 }).lean(),
+      DailyMetric.findOne(dailyQuery).sort({ date: -1, createdAt: -1 }).lean(),
+      LeaderMetric.find(leaderQuery).sort({ date: -1, totalUploaded: -1 }).limit(10).lean(),
+      TerritoryMetric.find(territoryQuery).sort({ date: -1, totalRecords: -1 }).limit(10).lean()
+    ]);
+
+    return {
+      campaign: latestCampaign || null,
+      daily: latestDaily || null,
+      leaders: topLeaders || [],
+      territories: topTerritories || [],
+      hasMaterializedData: Boolean(latestCampaign || latestDaily),
+      timestamp: new Date()
+    };
+  } catch (error) {
+    if (error.isOperational) throw error;
+    logger.error('Error obteniendo métricas materializadas', error);
+    throw AppError.serverError('Error al obtener métricas materializadas');
+  }
+}
+
 export default {
   getDashboardSummary,
   getDashboardMetrics,
@@ -292,5 +329,6 @@ export default {
   getPuestoAnalytics,
   getTrendAnalysis,
   getPeriodComparison,
-  getEventDetail
+  getEventDetail,
+  getMaterializedMetrics
 };

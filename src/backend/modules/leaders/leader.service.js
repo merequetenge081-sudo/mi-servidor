@@ -9,11 +9,13 @@ import { Leader } from '../../../models/Leader.js';
 import { createLogger } from '../../core/Logger.js';
 import { AppError } from '../../core/AppError.js';
 import bcryptjs from 'bcryptjs';
-import crypto from 'crypto';
 import { encrypt, decrypt } from '../../../utils/crypto.js';
 import { emailService } from '../../../services/emailService.js';
+import metricsCacheService from '../../../services/metricsCache.service.js';
 import config from '../../config/config.js';
 import { isTempPasswordExpired } from '../../../utils/tempPassword.js';
+import { generateTemporaryPassword } from '../../../utils/tempPasswordGenerator.js';
+import { generateLeaderId, generateLeaderToken } from '../../../utils/leaderIdentity.js';
 
 const logger = createLogger('LeaderService');
 
@@ -64,6 +66,10 @@ export class LeaderService {
     if (leader.email) {
       this._sendWelcomeEmailAsync(leader, tempPassword);
     }
+    await metricsCacheService.invalidateMetricsForLeaderScope({
+      organizationId,
+      eventId: leader.eventId || null
+    });
 
     logger.success('Líder creado exitosamente', { leaderId: leader._id });
 
@@ -172,6 +178,10 @@ export class LeaderService {
     }
 
     const leader = await leaderRepository.update(id, updateData);
+    await metricsCacheService.invalidateMetricsForLeaderScope({
+      organizationId: leader.organizationId || null,
+      eventId: leader.eventId || null
+    });
     logger.success('Líder actualizado', { leaderId: id });
 
     return leader;
@@ -181,7 +191,12 @@ export class LeaderService {
    * Eliminar líder (con cascade)
    */
   async deleteLeader(id) {
+    const leader = await leaderRepository.findById(id);
     const result = await leaderRepository.delete(id);
+    await metricsCacheService.invalidateMetricsForLeaderScope({
+      organizationId: leader?.organizationId || null,
+      eventId: leader?.eventId || null
+    });
     logger.success('Líder eliminado', { leaderId: id });
     return result;
   }
@@ -283,15 +298,15 @@ export class LeaderService {
    */
 
   _generateLeaderId() {
-    return `LID-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+    return generateLeaderId();
   }
 
   async _generateUniqueToken() {
-    let token = crypto.randomBytes(16).toString('hex');
+    let token = generateLeaderToken();
     
     // Verificar que no exista
     while (await leaderRepository.exists({ token })) {
-      token = crypto.randomBytes(16).toString('hex');
+      token = generateLeaderToken();
     }
 
     return token;
@@ -326,7 +341,7 @@ export class LeaderService {
   }
 
   _generateTemporaryPassword() {
-    return Math.random().toString(36).slice(-8) + 'Aa1!';
+    return generateTemporaryPassword();
   }
 
   _sendWelcomeEmailAsync(leader, tempPassword) {

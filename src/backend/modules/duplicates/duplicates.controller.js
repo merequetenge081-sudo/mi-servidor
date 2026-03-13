@@ -80,8 +80,37 @@ export async function getDuplicateDetails(req, res, next) {
   }
 }
 
+/**
+ * POST /api/v2/duplicates/scan
+ * Ejecuta barrido de deduplicación sobre datos existentes
+ */
+export async function runDeduplicationScan(req, res, next) {
+  try {
+    const {
+      eventId = null,
+      organizationId = req.user?.organizationId || null,
+      limit = 300
+    } = req.body || {};
+
+    const result = await duplicatesService.runDeduplicationScan({
+      eventId,
+      organizationId,
+      limit: Number(limit) || 300
+    });
+
+    res.json({
+      success: true,
+      message: "Deduplication scan completed",
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   getDuplicatesReport,
   getDuplicateStats,
-  getDuplicateDetails
+  getDuplicateDetails,
+  runDeduplicationScan
 };

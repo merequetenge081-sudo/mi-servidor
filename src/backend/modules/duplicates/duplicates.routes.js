@@ -7,7 +7,8 @@ import { Router } from 'express';
 import {
   getDuplicatesReport,
   getDuplicateStats,
-  getDuplicateDetails
+  getDuplicateDetails,
+  runDeduplicationScan
 } from './duplicates.controller.js';
 
 const router = Router();
@@ -23,6 +24,12 @@ router.get('/report', getDuplicatesReport);
  * Estadísticas de duplicados
  */
 router.get('/stats', getDuplicateStats);
+
+/**
+ * POST /api/v2/duplicates/scan
+ * Ejecuta scan de deduplicación en lote
+ */
+router.post('/scan', runDeduplicationScan);
 
 /**
  * GET /api/v2/duplicates/:cedula

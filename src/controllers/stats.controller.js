@@ -1,76 +1,76 @@
 import logger from "../config/logger.js";
 import StatsService from "../services/stats.service.js";
 import cacheService from "../services/cache.service.js";
+import { sendError } from "../utils/httpError.js";
 
 export async function getStats(req, res) {
   try {
     const { eventId } = req.query;
-    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
-    
-    // Use cache for stats
-    const cacheKey = cacheService.buildKey('stats', eventId || 'all', organizationId);
+    const organizationId = req.user.organizationId;
+
+    const cacheKey = cacheService.buildKey("stats", eventId || "all", organizationId);
     const stats = await cacheService.getOrFetch(
       cacheKey,
       () => StatsService.getStats(organizationId, eventId),
-      300 // 5 min TTL
+      300
     );
-    
-    res.json(stats);
+
+    return res.json(stats);
   } catch (error) {
-    logger.error('Get stats error:', { error: error.message });
-    res.status(500).json({ error: 'Error al obtener estad√≠sticas' });
+    logger.error("Get stats error:", { error: error.message });
+    return sendError(res, 500, "Error al obtener estadÌsticas", "GET_STATS_ERROR", error.message);
   }
 }
 
 export async function getDailyStats(req, res) {
   try {
     const { eventId, days = 30 } = req.query;
-    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
-    
-    const stats = await StatsService.getDailyStats(organizationId, eventId, parseInt(days));
-    res.json(stats);
+    const organizationId = req.user.organizationId;
+
+    const stats = await StatsService.getDailyStats(organizationId, eventId, parseInt(days, 10));
+    return res.json(stats);
   } catch (error) {
-    logger.error('Get daily stats error:', { error: error.message });
-    res.status(500).json({ error: 'Error al obtener estad√≠sticas diarias' });
+    logger.error("Get daily stats error:", { error: error.message });
+    return sendError(res, 500, "Error al obtener estadÌsticas diarias", "GET_DAILY_STATS_ERROR", error.message);
   }
 }
 
 export async function getLeaderStats(req, res) {
   try {
     const { leaderId } = req.params;
-    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
-    
+    const organizationId = req.user.organizationId;
+
     const stats = await StatsService.getLeaderStats(organizationId, leaderId);
     if (!stats) {
-      return res.status(404).json({ error: 'L√≠der no encontrado' });
+      return sendError(res, 404, "LÌder no encontrado");
     }
-    
-    res.json(stats);
+
+    return res.json(stats);
   } catch (error) {
-    logger.error('Get leader stats error:', { error: error.message });
-    res.status(500).json({ error: 'Error al obtener estad√≠sticas del l√≠der' });
+    logger.error("Get leader stats error:", { error: error.message });
+    return sendError(res, 500, "Error al obtener estadÌsticas del lÌder", "GET_LEADER_STATS_ERROR", error.message);
   }
 }
 
 export async function getEventStats(req, res) {
   try {
-    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
+    const organizationId = req.user.organizationId;
     const stats = await StatsService.getEventStats(organizationId);
-    res.json(stats);
+    return res.json(stats);
   } catch (error) {
-    logger.error('Get event stats error:', { error: error.message });
-    res.status(500).json({ error: 'Error al obtener estad√≠sticas de eventos' });
+    logger.error("Get event stats error:", { error: error.message });
+    return sendError(res, 500, "Error al obtener estadÌsticas de eventos", "GET_EVENT_STATS_ERROR", error.message);
   }
 }
 
 export async function getGeographicStats(req, res) {
   try {
     const { eventId } = req.query;
-    const organizationId = req.user.organizationId; // Multi-tenant filter (required)
+    const organizationId = req.user.organizationId;
     const stats = await StatsService.getGeographicStats(organizationId, eventId);
-    res.json(stats);
+    return res.json(stats);
   } catch (error) {
-    logger.error('Get geographic stats error:', { error: error.message });
-    res.status(500).json({ error: 'Error al obtener estad√≠sticas geogr√°ficas' });
+    logger.error("Get geographic stats error:", { error: error.message });
+    return sendError(res, 500, "Error al obtener estadÌsticas geogr·ficas", "GET_GEOGRAPHIC_STATS_ERROR", error.message);
   }
 }

@@ -43,6 +43,15 @@ archive/
 # Archivos de datos locales
 *.local.json
 
+# Artefactos temporales en raíz
+/sync-output.txt
+/verify-output.txt
+/output.txt
+/rec_out.txt
+/recovery_out.txt
+/recover_ideca_output.txt
+/unmapped.json
+
 # Agent skills and configs
 .agents/
 .opencode/

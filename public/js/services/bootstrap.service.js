@@ -51,17 +51,23 @@ const BootstrapService = (() => {
      * Cargar líderes desde API
      */
     async function loadLeaders() {
-        if (typeof DataService === 'undefined' || !DataService.getLeaders) {
+        if (typeof DataService === 'undefined' || !DataService.getLeadersPaginated) {
             throw new Error('[Bootstrap] DataService no disponible');
         }
 
         try {
-            const leaders = await DataService.getLeaders();
+            const leadersPage = await DataService.getLeadersPaginated({
+                page: 1,
+                limit: 200,
+                sort: 'name',
+                order: 'asc'
+            });
+            const leaders = leadersPage.items || [];
             AppState.setData({ leaders });
-            console.log('[Bootstrap] ✅ Líderes cargados:', leaders.length);
+            console.log('[Bootstrap] [V2 TRACE] leaders.table <- /api/v2/leaders (snapshot):', leaders.length);
             return leaders;
         } catch (err) {
-            console.error('[Bootstrap] Error cargando líderes:', err);
+            console.error('[Bootstrap] Error cargando lideres:', err);
             throw err;
         }
     }
@@ -70,14 +76,20 @@ const BootstrapService = (() => {
      * Cargar registos desde API
      */
     async function loadRegistrations() {
-        if (typeof DataService === 'undefined' || !DataService.getRegistrations) {
+        if (typeof DataService === 'undefined' || !DataService.getRegistrationsPaginated) {
             throw new Error('[Bootstrap] DataService no disponible');
         }
 
         try {
-            const registrations = await DataService.getRegistrations();
+            const registrationsPage = await DataService.getRegistrationsPaginated({
+                page: 1,
+                limit: 50,
+                sort: 'createdAt',
+                order: 'desc'
+            });
+            const registrations = registrationsPage.items || [];
             AppState.setData({ registrations });
-            console.log('[Bootstrap] ✅ Registraciones cargadas:', registrations.length);
+            console.log('[Bootstrap] [V2 TRACE] registrations.table <- /api/v2/registrations (snapshot):', registrations.length);
             return registrations;
         } catch (err) {
             console.error('[Bootstrap] Error cargando registraciones:', err);
@@ -118,15 +130,21 @@ const BootstrapService = (() => {
             NotificationsModule.init();
             console.log('[Bootstrap] ✅ NotificationsModule inicializado');
         }
+
+        // Skills Module
+        if (typeof SkillsModule !== 'undefined' && SkillsModule.init) {
+            SkillsModule.init();
+            console.log('[Bootstrap] ✅ SkillsModule inicializado');
+        }
     }
 
     /**
      * Actualizar stats del dashboard
      */
-    function updateDashboardStats() {
-        if (typeof DashboardModule !== 'undefined' && DashboardModule.updateStats) {
-            DashboardModule.updateStats();
-            console.log('[Bootstrap] ✅ Stats actualizados');
+    async function updateDashboardStats() {
+        if (typeof DashboardModule !== 'undefined' && DashboardModule.refresh) {
+            await DashboardModule.refresh();
+            console.log('[Bootstrap] ✅ Dashboard limpio actualizado');
         }
     }
 
@@ -265,9 +283,8 @@ const BootstrapService = (() => {
 
             // 4. Cargar datos en UI
             console.log('[Bootstrap] Cargando datos en UI...');
-            updateDashboardStats();
+            await updateDashboardStats();
             loadLeadersTable();
-            loadRecentRegistrations();
             loadRegistrationsTabbed();
 
             // 5. Poblar filtros y selectores
@@ -276,13 +293,8 @@ const BootstrapService = (() => {
             populateExportLeader();
             populateAnalyticsLeaderFilter();
 
-            // 6. Cargar charts deferred (cuando estén visibles)
-            console.log('[Bootstrap] Deferred: Charts se cargarán cuando sean visibles');
-            if (document.getElementById('dashboard').classList.contains('active')) {
-                requestAnimationFrame(() => {
-                    loadCharts();
-                });
-            }
+            // 6. Dashboard charts/recientes ya vienen de DashboardModule.refresh()
+            console.log('[Bootstrap] Dashboard cards/charts sincronizados con métricas limpias');
 
             // 7. Actualizar notificaciones
             await updateNotificationsBadge();
@@ -343,3 +355,4 @@ window.loadDashboard = async function() {
     }
     console.warn('[Bootstrap] loadDashboard fallback: BootstrapService no disponible');
 };
+

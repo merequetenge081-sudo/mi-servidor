@@ -1,80 +1,80 @@
-# Sistema de Gestión de Eventos y Líderes
+﻿# Sistema de GestiÃ³n de Eventos y LÃ­deres
 
-**Una plataforma profesional de API REST completa para la gestión integral de eventos, líderes, registros y auditoría**
+**Una plataforma profesional de API REST completa para la gestiÃ³n integral de eventos, lÃ­deres, registros y auditorÃ­a**
 
 ---
 
-## 📋 Tabla de Contenidos
+## ðŸ“‹ Tabla de Contenidos
 
-- [Descripción General](#descripción-general)
-- [Características Principales](#características-principales)
+- [DescripciÃ³n General](#descripciÃ³n-general)
+- [CaracterÃ­sticas Principales](#caracterÃ­sticas-principales)
 - [Requisitos del Sistema](#requisitos-del-sistema)
-- [Instalación](#instalación)
+- [InstalaciÃ³n](#instalaciÃ³n)
 - [Variables de Entorno](#variables-de-entorno)
 - [Arquitectura del Proyecto](#arquitectura-del-proyecto)
 - [Endpoints Principales](#endpoints-principales)
-- [Flujo de Autenticación](#flujo-de-autenticación)
+- [Flujo de AutenticaciÃ³n](#flujo-de-autenticaciÃ³n)
 - [Ejemplos de Requests](#ejemplos-de-requests)
 - [Despliegue](#despliegue)
 - [Licencia](#licencia)
 
 ---
 
-## 🎯 Descripción General
+## ðŸŽ¯ DescripciÃ³n General
 
-Este proyecto es un **Sistema Profesional de Gestión de Eventos** construido con **Node.js y Express**, que proporciona una API REST completa y modular para:
+Este proyecto es un **Sistema Profesional de GestiÃ³n de Eventos** construido con **Node.js y Express**, que proporciona una API REST completa y modular para:
 
-✅ **Gestión de Líderes** - Crear, actualizar, eliminar y gestionar líderes de eventos  
-✅ **Gestión de Eventos** - Administrar eventos, asignar líderes y gestionar registros  
-✅ **Registro de Personas** - Sistema robusto de registro con validación  
-✅ **Auditoría Integral** - Trazabilidad completa de todas las operaciones  
-✅ **Autenticación JWT** - Sistema seguro de autenticación basado en roles  
-✅ **API REST Modular** - Arquitectura profesional y escalable  
+âœ… **GestiÃ³n de LÃ­deres** - Crear, actualizar, eliminar y gestionar lÃ­deres de eventos  
+âœ… **GestiÃ³n de Eventos** - Administrar eventos, asignar lÃ­deres y gestionar registros  
+âœ… **Registro de Personas** - Sistema robusto de registro con validaciÃ³n  
+âœ… **AuditorÃ­a Integral** - Trazabilidad completa de todas las operaciones  
+âœ… **AutenticaciÃ³n JWT** - Sistema seguro de autenticaciÃ³n basado en roles  
+âœ… **API REST Modular** - Arquitectura profesional y escalable  
 
 ---
 
-## ⭐ Características Principales
+## â­ CaracterÃ­sticas Principales
 
-### Autenticación y Seguridad
-- 🔐 Autenticación basada en **JWT (JSON Web Tokens)**
-- 👥 Sistema de roles: **Admin** y **Líder**
-- 🛡️ Middlewares de protección en todas las rutas sensibles
-- 💾 Hashing seguro de contraseñas con **bcryptjs**
+### AutenticaciÃ³n y Seguridad
+- ðŸ” AutenticaciÃ³n basada en **JWT (JSON Web Tokens)**
+- ðŸ‘¥ Sistema de roles: **Admin** y **LÃ­der**
+- ðŸ›¡ï¸ Middlewares de protecciÃ³n en todas las rutas sensibles
+- ðŸ’¾ Hashing seguro de contraseÃ±as con **bcryptjs**
 
-### Gestión de Datos
+### GestiÃ³n de Datos
 - **MongoDB** como base de datos principal
 - Modelos CRUD completos para todas las entidades
 - Relaciones correctamente configuradas entre documentos
-- Validación de datos en controladores
+- ValidaciÃ³n de datos en controladores
 
-### Auditoría y Trazabilidad
-- 📊 Sistema de auditoría que registra todas las operaciones
-- 🔍 Filtrado por usuario, acción y tipo de recurso
-- 📈 Análisis completo del historial de cambios
+### AuditorÃ­a y Trazabilidad
+- ðŸ“Š Sistema de auditorÃ­a que registra todas las operaciones
+- ðŸ” Filtrado por usuario, acciÃ³n y tipo de recurso
+- ðŸ“ˆ AnÃ¡lisis completo del historial de cambios
 
 ### Notificaciones
-- 📧 Sistema de notificaciones por email
-- 💬 Integración con WhatsApp Web
-- 📱 Envío de SMS
-- Notificación automática al registrar usuarios
+- ðŸ“§ Sistema de notificaciones por email
+- ðŸ’¬ IntegraciÃ³n con WhatsApp Web
+- ðŸ“± EnvÃ­o de SMS
+- NotificaciÃ³n automÃ¡tica al registrar usuarios
 
 ### API REST Modular
-- Arquitectura de **N capas** (routes → controllers → models → services)
-- Separación clara de responsabilidades
-- Fácil de mantener y escalar
+- Arquitectura de **N capas** (routes â†’ controllers â†’ models â†’ services)
+- SeparaciÃ³n clara de responsabilidades
+- FÃ¡cil de mantener y escalar
 
 ---
 
-## 💻 Requisitos del Sistema
+## ðŸ’» Requisitos del Sistema
 
-| Requisito | Versión |
+| Requisito | VersiÃ³n |
 |-----------|---------|
 | **Node.js** | 18.x o superior |
 | **npm** | 9.x o superior |
 | **MongoDB** | 5.x o superior |
-| **Git** | Última versión |
+| **Git** | Ãšltima versiÃ³n |
 
-### Verificar Instalación
+### Verificar InstalaciÃ³n
 
 ```bash
 node --version
@@ -84,7 +84,7 @@ mongod --version
 
 ---
 
-## 🚀 Instalación
+## ðŸš€ InstalaciÃ³n
 
 ### Paso 1: Clonar el Repositorio
 
@@ -119,17 +119,17 @@ PORT=5000
 npm start
 ```
 
-El servidor estará disponible en: **http://localhost:5000**
+El servidor estarÃ¡ disponible en: **http://localhost:5000**
 
 ---
 
-## 🔑 Variables de Entorno
+## ðŸ”‘ Variables de Entorno
 
-| Variable | Descripción | Ejemplo |
+| Variable | DescripciÃ³n | Ejemplo |
 |----------|-------------|---------|
-| `MONGO_URL` | Cadena de conexión a MongoDB | `mongodb://localhost:27017/mi-servidor` |
+| `MONGO_URL` | Cadena de conexiÃ³n a MongoDB | `mongodb://localhost:27017/mi-servidor` |
 | `JWT_SECRET` | Clave secreta para firmar JWT | `mi-secreto-super-seguro-123` |
-| `PORT` | Puerto de ejecución del servidor | `5000` |
+| `PORT` | Puerto de ejecuciÃ³n del servidor | `5000` |
 
 ### Crear archivo `.env.example`
 
@@ -142,113 +142,111 @@ PORT=5000
 
 ---
 
-## 🏗️ Arquitectura del Proyecto
+## ðŸ—ï¸ Arquitectura del Proyecto
 
 ```
 proyecto/
-│
-├── src/
-│   ├── config/              # Configuración de la aplicación
-│   │   ├── db.js           # Conexión a MongoDB
-│   │   └── env.js          # Variables de entorno
-│   │
-│   ├── controllers/         # Lógica de negocios
-│   │   ├── auth.controller.js
-│   │   ├── events.controller.js
-│   │   ├── leaders.controller.js
-│   │   ├── registrations.controller.js
-│   │   └── audit.controller.js
-│   │
-│   ├── middleware/          # Middlewares de Express
-│   │   ├── auth.middleware.js       # Verificar JWT
-│   │   ├── role.middleware.js       # Validar roles
-│   │   └── owner.middleware.js      # Autorización por propietario
-│   │
-│   ├── models/              # Esquemas de MongoDB
-│   │   ├── Admin.js
-│   │   ├── Leader.js
-│   │   ├── Event.js
-│   │   ├── Registration.js
-│   │   └── AuditLog.js
-│   │
-│   ├── routes/              # Definición de rutas
-│   │   ├── index.js         # Rutas principales
-│   │   ├── auth.routes.js
-│   │   ├── events.routes.js
-│   │   ├── leaders.routes.js
-│   │   ├── registrations.routes.js
-│   │   └── audit.routes.js
-│   │
-│   ├── services/            # Servicios reutilizables
-│   │   ├── audit.service.js       # Auditoría
-│   │   └── notification.service.js # Notificaciones
-│   │
-│   └── app.js              # Configuración principal de Express
-│
-├── public/                  # Archivos estáticos
-│   ├── login.html
-│   ├── index.html
-│   ├── app.html
-│   ├── leader.html
-│   ├── audit-logs.html
-│   └── form.html
-│
-├── scripts/                 # Scripts de utilidad
-│
-├── server.js               # Punto de entrada
-├── package.json            # Dependencias
-├── .env                    # Variables de entorno
-├── .gitignore
-└── README.md
+â”‚
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ config/              # ConfiguraciÃ³n de la aplicaciÃ³n
+â”‚   â”‚   â”œâ”€â”€ db.js           # ConexiÃ³n a MongoDB
+â”‚   â”‚   â””â”€â”€ env.js          # Variables de entorno
+â”‚   â”‚
+â”‚   â”œâ”€â”€ controllers/         # LÃ³gica de negocios
+â”‚   â”‚   â”œâ”€â”€ auth.controller.js
+â”‚   â”‚   â”œâ”€â”€ events.controller.js
+â”‚   â”‚   â”œâ”€â”€ leaders.controller.js
+â”‚   â”‚   â”œâ”€â”€ registrations.controller.js
+â”‚   â”‚   â””â”€â”€ audit.controller.js
+â”‚   â”‚
+â”‚   â”œâ”€â”€ middleware/          # Middlewares de Express
+â”‚   â”‚   â”œâ”€â”€ auth.middleware.js       # Verificar JWT
+â”‚   â”‚   â”œâ”€â”€ role.middleware.js       # Validar roles
+â”‚   â”‚   â””â”€â”€ owner.middleware.js      # AutorizaciÃ³n por propietario
+â”‚   â”‚
+â”‚   â”œâ”€â”€ models/              # Esquemas de MongoDB
+â”‚   â”‚   â”œâ”€â”€ Admin.js
+â”‚   â”‚   â”œâ”€â”€ Leader.js
+â”‚   â”‚   â”œâ”€â”€ Event.js
+â”‚   â”‚   â”œâ”€â”€ Registration.js
+â”‚   â”‚   â””â”€â”€ AuditLog.js
+â”‚   â”‚
+â”‚   â”œâ”€â”€ routes/              # DefiniciÃ³n de rutas
+â”‚   â”‚   â”œâ”€â”€ index.js         # Rutas principales
+â”‚   â”‚   â”œâ”€â”€ auth.routes.js
+â”‚   â”‚   â”œâ”€â”€ events.routes.js
+â”‚   â”‚   â”œâ”€â”€ leaders.routes.js
+â”‚   â”‚   â”œâ”€â”€ registrations.routes.js
+â”‚   â”‚   â””â”€â”€ audit.routes.js
+â”‚   â”‚
+â”‚   â”œâ”€â”€ services/            # Servicios reutilizables
+â”‚   â”‚   â”œâ”€â”€ audit.service.js       # AuditorÃ­a
+â”‚   â”‚
+â”‚   â””â”€â”€ app.js              # ConfiguraciÃ³n principal de Express
+â”‚
+â”œâ”€â”€ public/                  # Archivos estÃ¡ticos
+â”‚   â”œâ”€â”€ login.html
+â”‚   â”œâ”€â”€ index.html
+â”‚   â”œâ”€â”€ app.html
+â”‚   â”œâ”€â”€ leader.html
+â”‚   â”œâ”€â”€ audit-logs.html
+â”‚   â””â”€â”€ form.html
+â”‚
+â”œâ”€â”€ scripts/                 # Scripts de utilidad
+â”‚
+â”œâ”€â”€ server.js               # Punto de entrada
+â”œâ”€â”€ package.json            # Dependencias
+â”œâ”€â”€ .env                    # Variables de entorno
+â”œâ”€â”€ .gitignore
+â””â”€â”€ README.md
 
 ```
 
-### Descripción de Capas
+### DescripciÃ³n de Capas
 
-#### 🔹 `src/config/`
-Configuración centralizada de la aplicación:
-- **db.js**: Conexión a MongoDB con reintentos automáticos
-- **env.js**: Validación de variables de entorno requeridas
+#### ðŸ”¹ `src/config/`
+ConfiguraciÃ³n centralizada de la aplicaciÃ³n:
+- **db.js**: ConexiÃ³n a MongoDB con reintentos automÃ¡ticos
+- **env.js**: ValidaciÃ³n de variables de entorno requeridas
 
-#### 🔹 `src/controllers/`
-Contiene toda la lógica de negocios:
-- Validación de datos
+#### ðŸ”¹ `src/controllers/`
+Contiene toda la lÃ³gica de negocios:
+- ValidaciÃ³n de datos
 - Procesamiento de solicitudes
 - Respuestas formateadas
-- Integración con servicios
+- IntegraciÃ³n con servicios
 
-#### 🔹 `src/middleware/`
-Middlewares de protección:
+#### ðŸ”¹ `src/middleware/`
+Middlewares de protecciÃ³n:
 - **auth.middleware.js**: Verifica JWT en todas las rutas protegidas
 - **role.middleware.js**: Valida que el usuario tenga permisos suficientes
-- **owner.middleware.js**: Autorización a nivel de recurso
+- **owner.middleware.js**: AutorizaciÃ³n a nivel de recurso
 
-#### 🔹 `src/models/`
+#### ðŸ”¹ `src/models/`
 Esquemas Mongoose de MongoDB:
-- Definición de estructura de datos
-- Índices y relaciones
-- Métodos personalizados si aplica
+- DefiniciÃ³n de estructura de datos
+- Ãndices y relaciones
+- MÃ©todos personalizados si aplica
 
-#### 🔹 `src/routes/`
-Definición de endpoints REST:
-- Asignación de controladores
-- Aplicación de middlewares
-- Métodos HTTP (GET, POST, PUT, DELETE)
+#### ðŸ”¹ `src/routes/`
+DefiniciÃ³n de endpoints REST:
+- AsignaciÃ³n de controladores
+- AplicaciÃ³n de middlewares
+- MÃ©todos HTTP (GET, POST, PUT, DELETE)
 
-#### 🔹 `src/services/`
-Lógica reutilizable independiente de rutas:
-- **audit.service.js**: Registro de auditoría
-- **notification.service.js**: Envío de notificaciones
+#### ðŸ”¹ `src/services/`
+LÃ³gica reutilizable independiente de rutas:
+- **audit.service.js**: Registro de auditorÃ­a
 
 ---
 
-## 🔌 Endpoints Principales
+## ðŸ”Œ Endpoints Principales
 
-### Autenticación
+### AutenticaciÃ³n
 ```
-POST   /api/auth/login                    # Login (admin o líder)
+POST   /api/auth/login                    # Login (admin o lÃ­der)
 POST   /api/auth/admin/create             # Crear nuevo admin (admin only)
-POST   /api/auth/leader/register          # Registrar nuevo líder (admin only)
+POST   /api/auth/leader/register          # Registrar nuevo lÃ­der (admin only)
 ```
 
 ### Eventos
@@ -260,40 +258,40 @@ PUT    /api/events/:id                    # Actualizar evento (admin only)
 DELETE /api/events/:id                    # Eliminar evento (admin only)
 ```
 
-### Líderes
+### LÃ­deres
 ```
-GET    /api/leaders                       # Obtener todos los líderes (admin only)
-GET    /api/leaders/:id                   # Obtener líder por ID
-POST   /api/leaders                       # Crear líder (admin only)
-PUT    /api/leaders/:id                   # Actualizar líder (admin/owner)
-DELETE /api/leaders/:id                   # Eliminar líder (admin only)
+GET    /api/leaders                       # Obtener todos los lÃ­deres (admin only)
+GET    /api/leaders/:id                   # Obtener lÃ­der por ID
+POST   /api/leaders                       # Crear lÃ­der (admin only)
+PUT    /api/leaders/:id                   # Actualizar lÃ­der (admin/owner)
+DELETE /api/leaders/:id                   # Eliminar lÃ­der (admin only)
 ```
 
 ### Registros
 ```
 GET    /api/registrations                 # Obtener todos (admin only)
 GET    /api/registrations/:id             # Obtener por ID
-GET    /api/registrations/leader/:leaderId # Registros del líder
+GET    /api/registrations/leader/:leaderId # Registros del lÃ­der
 POST   /api/registrations                 # Crear registro
 PUT    /api/registrations/:id             # Actualizar (admin/owner)
 DELETE /api/registrations/:id             # Eliminar (admin/owner)
 ```
 
-### Auditoría
+### AuditorÃ­a
 ```
-GET    /api/audit                         # Obtener logs de auditoría (admin only)
+GET    /api/audit                         # Obtener logs de auditorÃ­a (admin only)
 ```
 
 ---
 
-## 🔐 Flujo de Autenticación
+## ðŸ” Flujo de AutenticaciÃ³n
 
 ### 1. Login y Obtener Token
 
 El usuario se autentica con sus credenciales:
 
 ```
-cliente → POST /api/auth/login → servidor
+cliente â†’ POST /api/auth/login â†’ servidor
 ```
 
 **El servidor devuelve un JWT** con los datos del usuario:
@@ -318,23 +316,23 @@ En cada solicitud protegida, enviar el token en el header:
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-### 3. Validación en Servidor
+### 3. ValidaciÃ³n en Servidor
 
 El middleware `auth.middleware.js` verifica:
-- ✅ Que el token esté presente
-- ✅ Que sea válido y no haya expirado
-- ✅ Que se decodifique correctamente
+- âœ… Que el token estÃ© presente
+- âœ… Que sea vÃ¡lido y no haya expirado
+- âœ… Que se decodifique correctamente
 
 ### Sistema de Roles
 
 | Rol | Permisos |
 |-----|----------|
 | **Admin** | Acceso total a todas las operaciones |
-| **Líder** | Acceso a sus propios datos y registros |
+| **LÃ­der** | Acceso a sus propios datos y registros |
 
 ---
 
-## 📨 Ejemplos de Requests
+## ðŸ“¨ Ejemplos de Requests
 
 ### Ejemplo 1: Login
 
@@ -344,7 +342,7 @@ curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin@example.com",
-    "password": "contraseña",
+    "password": "contraseÃ±a",
     "role": "admin"
   }'
 ```
@@ -397,7 +395,7 @@ curl -X POST http://localhost:5000/api/events \
 
 ---
 
-### Ejemplo 3: Crear un Líder
+### Ejemplo 3: Crear un LÃ­der
 
 **Request:**
 ```bash
@@ -405,10 +403,10 @@ curl -X POST http://localhost:5000/api/leaders \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer eyJhbGc..." \
   -d '{
-    "name": "Juan Pérez",
+    "name": "Juan PÃ©rez",
     "email": "juan@example.com",
     "phone": "+57 3001234567",
-    "area": "Bogotá",
+    "area": "BogotÃ¡",
     "eventId": "65abc456...",
     "password": "segura123"
   }'
@@ -417,13 +415,13 @@ curl -X POST http://localhost:5000/api/leaders \
 **Response (201):**
 ```json
 {
-  "message": "Líder creado exitosamente",
+  "message": "LÃ­der creado exitosamente",
   "leader": {
     "_id": "65abc789...",
-    "name": "Juan Pérez",
+    "name": "Juan PÃ©rez",
     "email": "juan@example.com",
     "phone": "+57 3001234567",
-    "area": "Bogotá",
+    "area": "BogotÃ¡",
     "token": "leader-1706123456-abc123def",
     "active": true,
     "registrations": 0,
@@ -443,10 +441,10 @@ curl -X POST http://localhost:5000/api/registrations \
   -H "Authorization: Bearer eyJhbGc..." \
   -d '{
     "leaderId": "65abc789...",
-    "leaderName": "Juan Pérez",
+    "leaderName": "Juan PÃ©rez",
     "eventId": "65abc456...",
     "firstName": "Carlos",
-    "lastName": "González",
+    "lastName": "GonzÃ¡lez",
     "cedula": "12345678",
     "email": "carlos@example.com",
     "phone": "+57 3109876543",
@@ -464,10 +462,10 @@ curl -X POST http://localhost:5000/api/registrations \
   "registration": {
     "_id": "65abcdef0...",
     "leaderId": "65abc789...",
-    "leaderName": "Juan Pérez",
+    "leaderName": "Juan PÃ©rez",
     "eventId": "65abc456...",
     "firstName": "Carlos",
-    "lastName": "González",
+    "lastName": "GonzÃ¡lez",
     "email": "carlos@example.com",
     "phone": "+57 3109876543",
     "cedula": "12345678",
@@ -483,7 +481,7 @@ curl -X POST http://localhost:5000/api/registrations \
 
 ---
 
-### Ejemplo 5: Obtener Logs de Auditoría
+### Ejemplo 5: Obtener Logs de AuditorÃ­a
 
 **Request:**
 ```bash
@@ -503,7 +501,7 @@ curl -X GET "http://localhost:5000/api/audit?action=CREATE&limit=10" \
       "userId": "65abc789...",
       "userRole": "admin",
       "userName": "admin@example.com",
-      "description": "Nuevo registro creado para: Carlos González",
+      "description": "Nuevo registro creado para: Carlos GonzÃ¡lez",
       "ipAddress": "192.168.1.100",
       "createdAt": "2024-01-25T10:35:00.000Z"
     }
@@ -516,11 +514,11 @@ curl -X GET "http://localhost:5000/api/audit?action=CREATE&limit=10" \
 
 ---
 
-## 🚢 Despliegue
+## ðŸš¢ Despliegue
 
-### Opción 1: Servidor VPS (Linux)
+### OpciÃ³n 1: Servidor VPS (Linux)
 
-#### Instalación Inicial
+#### InstalaciÃ³n Inicial
 
 ```bash
 # Actualizar sistema
@@ -538,7 +536,7 @@ sudo systemctl start mongodb
 sudo systemctl enable mongodb
 ```
 
-#### Desplegar Aplicación
+#### Desplegar AplicaciÃ³n
 
 ```bash
 # Clonar repositorio
@@ -552,7 +550,7 @@ npm install
 nano .env
 # Configurar variables
 
-# Iniciar con PM2 (recomendado para producción)
+# Iniciar con PM2 (recomendado para producciÃ³n)
 npm install -g pm2
 pm2 start server.js --name "mi-servidor"
 pm2 save
@@ -560,7 +558,7 @@ pm2 save
 
 ---
 
-### Opción 2: Docker
+### OpciÃ³n 2: Docker
 
 #### Dockerfile
 
@@ -615,7 +613,7 @@ docker-compose up -d
 
 ---
 
-### Opción 3: Railway (PaaS)
+### OpciÃ³n 3: Railway (PaaS)
 
 1. **Crear cuenta en [Railway.app](https://railway.app)**
 2. **Conectar repositorio de GitHub**
@@ -623,11 +621,11 @@ docker-compose up -d
    - `MONGO_URL`
    - `JWT_SECRET`
    - `PORT=5000`
-4. **Railway desplegará automáticamente**
+4. **Railway desplegarÃ¡ automÃ¡ticamente**
 
 ---
 
-### Opción 4: Render (PaaS)
+### OpciÃ³n 4: Render (PaaS)
 
 1. **Crear cuenta en [Render.com](https://render.com)**
 2. **Crear nuevo Web Service**
@@ -636,38 +634,38 @@ docker-compose up -d
    - Build Command: `npm install`
    - Start Command: `npm start`
    - Variables de entorno
-5. **Render desplegará automáticamente**
+5. **Render desplegarÃ¡ automÃ¡ticamente**
 
 ---
 
-## 📝 Consideraciones de Producción
+## ðŸ“ Consideraciones de ProducciÃ³n
 
-- ✅ Usar HTTPS en vez de HTTP
-- ✅ Configurar CORS apropiadamente
-- ✅ Implementar rate limiting
-- ✅ Usar variables de entorno sensibles
-- ✅ Mantener logs centralizados
-- ✅ Configurar Backup automático de BD
-- ✅ Monitoreo de uptime y errores
+- âœ… Usar HTTPS en vez de HTTP
+- âœ… Configurar CORS apropiadamente
+- âœ… Implementar rate limiting
+- âœ… Usar variables de entorno sensibles
+- âœ… Mantener logs centralizados
+- âœ… Configurar Backup automÃ¡tico de BD
+- âœ… Monitoreo de uptime y errores
 
 ---
 
-## 📄 Licencia
+## ðŸ“„ Licencia
 
 MIT License - Ver archivo `LICENSE` para detalles.
 
-Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+Este proyecto es de cÃ³digo abierto y estÃ¡ disponible bajo la licencia MIT.
 
 ---
 
-## 👥 Créditos
+## ðŸ‘¥ CrÃ©ditos
 
 **Desarrollador:** [Tu Nombre]  
 **Fecha:** Enero 2024  
-**Versión:** 1.0.0
+**VersiÃ³n:** 1.0.0
 
 ---
 
-**Última actualización:** Enero 25, 2024
+**Ãšltima actualizaciÃ³n:** Enero 25, 2024
 
 Para soporte o preguntas, contactar a: support@example.com

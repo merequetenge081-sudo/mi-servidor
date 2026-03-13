@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -757,13 +757,13 @@
                 <label class="form-label" style="font-weight:600; margin-bottom:8px; display:block; color: #334155; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Nombre del
                     Evento</label>
                 <div class="modern-input-group">
-                    <input type="text" id="eventName" class="modern-input" placeholder="Ej: Campaña Bogotá 2026">
+                    <input type="text" id="eventName" class="modern-input" placeholder="Ej: CampaÃ±a BogotÃ¡ 2026">
                     <i class="bi bi-flag input-icon"></i>
                 </div>
             </div>
 
             <div class="form-group mb-4">
-                <label class="form-label" style="font-weight:600; margin-bottom:8px; display:block; color: #334155; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Descripción
+                <label class="form-label" style="font-weight:600; margin-bottom:8px; display:block; color: #334155; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">DescripciÃ³n
                     (Opcional)</label>
                 <div class="modern-input-group">
                     <input type="text" id="eventDesc" class="modern-input" placeholder="Detalles adicionales...">
@@ -790,7 +790,7 @@
                     <i class="bi bi-calendar-check"></i>
                 </div>
                 <h3 style="color: #1e293b; font-weight: 700; font-size: 1.4rem; margin-bottom: 8px;">Seleccionar Evento</h3>
-                <p style="color: #94a3b8; font-weight: 500; font-size: 0.9rem; margin: 0;">¿Qué deseas hacer?</p>
+                <p style="color: #94a3b8; font-weight: 500; font-size: 0.9rem; margin: 0;">Â¿QuÃ© deseas hacer?</p>
             </div>
 
             <div class="event-buttons-container">
@@ -807,7 +807,7 @@
             </div>
 
             <button id="backBtn3" type="button" class="btn-modern btn-secondary w-100"
-                onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='/';">
+                onclick="window.AppCommon?.clearAuthSession(); window.location.href='/'">
                 <i class="bi bi-arrow-left"></i> Volver a Login
             </button>
         </div>
@@ -839,7 +839,7 @@
     <!-- Hidden back button element for script compatibility if needed, though we updated IDs above in event section -->
     <button id="backBtn" style="display:none;"></button>
 
-    <!-- Modal de Recuperación de Contraseña -->
+    <!-- Modal de RecuperaciÃ³n de ContraseÃ±a -->
     <div id="forgotPasswordModal"
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
         <div class="login-card glass-panel animate-fade-in" style="max-width: 450px; position: relative;">
@@ -877,9 +877,10 @@
         </div>
     </div>
 
+    <script src="/js/app-common.js"></script>
     <!-- JS LOGIC - PRESERVED EXACTLY -->
     <script>
-        const API_URL = window.location.origin;
+        const API_URL = window.AppCommon?.getApiBaseUrl() || window.location.origin;
         let currentRole = null;
         let adminToken = null;
 
@@ -892,12 +893,12 @@
                 input.type = 'text';
                 icon.classList.remove('bi-eye-slash');
                 icon.classList.add('bi-eye');
-                button.setAttribute('aria-label', 'Ocultar contraseña');
+                button.setAttribute('aria-label', 'Ocultar contraseÃ±a');
             } else {
                 input.type = 'password';
                 icon.classList.remove('bi-eye');
                 icon.classList.add('bi-eye-slash');
-                button.setAttribute('aria-label', 'Mostrar contraseña');
+                button.setAttribute('aria-label', 'Mostrar contraseÃ±a');
             }
         }
 
@@ -967,18 +968,11 @@
 
                 if (res.ok && data.token) {
                     adminToken = data.token;
-                    localStorage.removeItem('admin_token');
-                    sessionStorage.removeItem('admin_token');
-                    // Guardar token en ambos localStorage y sessionStorage para máxima compatibilidad
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('role', 'admin');
-                    localStorage.setItem('username', user);
-                    // Critical: Set last activity to now to prevent immediate logout on dashboard load
-                    localStorage.setItem('lastActivity', Date.now().toString());
-
-                    sessionStorage.setItem('token', data.token);
-                    sessionStorage.setItem('role', 'admin');
-                    sessionStorage.setItem('username', user);
+                    window.AppCommon?.setAuthSession({
+                        token: data.token,
+                        role: 'admin',
+                        username: user
+                    });
 
                     // Load events and show correct selection screen
                     loadEvents();
@@ -1037,21 +1031,15 @@
 
                 if (res.ok && data.token) {
                     if (data.requirePasswordChange) {
-                        localStorage.setItem('temp_token', data.token);
+                        window.AppCommon?.setStorageBoth('temp_token', data.token);
                         window.location.href = `/reset-password.html?token=${data.token}&force=true`;
                     } else {
-                        localStorage.removeItem('admin_token');
-                        sessionStorage.removeItem('admin_token');
-                        localStorage.setItem('token', data.token);
-                        localStorage.setItem('role', 'leader');
-                        localStorage.setItem('leaderId', data.leaderId || '');
-                        localStorage.setItem('username', data.username || user);
-                        localStorage.setItem('lastActivity', Date.now().toString());
-
-                        sessionStorage.setItem('token', data.token);
-                        sessionStorage.setItem('role', 'leader');
-                        sessionStorage.setItem('leaderId', data.leaderId || '');
-                        sessionStorage.setItem('username', data.username || user);
+                        window.AppCommon?.setAuthSession({
+                            token: data.token,
+                            role: 'leader',
+                            leaderId: data.leaderId || '',
+                            username: data.username || user
+                        });
 
                         setTimeout(() => {
                             window.location.href = '/leader.html';
@@ -1122,9 +1110,9 @@
 
                 if (res.ok) {
                     if (data.alreadyRequested) {
-                        showCustomAlert('⏳ Solicitud Pendiente', 'Ya se solicitó el cambio de contraseña anteriormente.', 'warning');
+                        showCustomAlert('â³ Solicitud Pendiente', 'Ya se solicitÃ³ el cambio de contraseÃ±a anteriormente.', 'warning');
                     } else {
-                        showCustomAlert('✓ Solicitud Enviada', 'Tu solicitud ha sido enviada exitosamente.', 'success');
+                        showCustomAlert('âœ“ Solicitud Enviada', 'Tu solicitud ha sido enviada exitosamente.', 'success');
                     }
                     setTimeout(() => {
                         closeForgotPasswordModal();
@@ -1135,7 +1123,7 @@
                 }
             } catch (err) {
                 console.error('Error:', err);
-                error.textContent = 'Error de conexión';
+                error.textContent = 'Error de conexiÃ³n';
                 error.style.display = 'block';
             } finally {
                 btn.disabled = false;
@@ -1148,7 +1136,7 @@
             const modal = document.createElement('div');
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);';
 
-            const icons = { success: '✓', warning: '⏳', error: '✗', info: 'ℹ' };
+            const icons = { success: 'âœ“', warning: 'â³', error: 'âœ—', info: 'â„¹' };
             const colors = { success: '#28a745', warning: '#ffc107', error: '#dc3545', info: '#17a2b8' };
 
             modal.innerHTML = `
@@ -1211,8 +1199,7 @@
                 });
                 const data = await res.json();
                 if (res.ok && data._id) {
-                    localStorage.setItem('eventId', data._id);
-                    localStorage.setItem('eventName', name);
+                    window.AppCommon?.setSelectedEvent(data._id, name);
                     setTimeout(() => { window.location.href = '/dashboard.html'; }, 500);
                 } else {
                     error.textContent = data.error || 'Error al crear el evento';
@@ -1220,7 +1207,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                error.textContent = 'Error de conexión';
+                error.textContent = 'Error de conexiÃ³n';
                 error.classList.add('show');
             } finally {
                 btn.disabled = false;
@@ -1237,10 +1224,7 @@
 
         document.getElementById('backBtn3').addEventListener('click', () => {
             // Logout and back to login
-            localStorage.removeItem('token');
-            localStorage.removeItem('role');
-            localStorage.removeItem('username');
-            sessionStorage.clear();
+            window.AppCommon?.clearAuthSession();
             showScreen('loginScreen');
         });
 
@@ -1273,12 +1257,9 @@
         }
 
         function selectEvent(eventId, eventName) {
-            localStorage.setItem('eventId', eventId);
-            localStorage.setItem('eventName', eventName);
-            sessionStorage.setItem('eventId', eventId);
-            sessionStorage.setItem('eventName', eventName);
-            const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-            const role = sessionStorage.getItem('role') || localStorage.getItem('role');
+            window.AppCommon?.setSelectedEvent(eventId, eventName);
+            const token = window.AppCommon?.getAuthToken();
+            const role = window.AppCommon?.getAuthRole();
             if (!token || !role) {
                 window.location.href = '/';
                 return;
@@ -1288,8 +1269,8 @@
 
         // ============== INIT ==============
         window.addEventListener('load', () => {
-            const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-            const role = sessionStorage.getItem('role') || localStorage.getItem('role');
+            const token = window.AppCommon?.getAuthToken();
+            const role = window.AppCommon?.getAuthRole();
             if (token && role) {
                 if (role === 'admin') {
                     adminToken = token;
@@ -1341,3 +1322,5 @@
 </body>
 
 </html>
+
+

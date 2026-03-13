@@ -3,6 +3,7 @@ import { jest } from "@jest/globals";
 const aggregateMock = jest.fn();
 const leaderCountMock = jest.fn();
 const leaderFindMock = jest.fn();
+const puestosFindMock = jest.fn();
 
 jest.unstable_mockModule("../../src/models/Registration.js", () => ({
   Registration: { aggregate: aggregateMock }
@@ -20,7 +21,7 @@ jest.unstable_mockModule("../../src/models/Event.js", () => ({
 }));
 
 jest.unstable_mockModule("../../src/models/Puestos.js", () => ({
-  Puestos: { countDocuments: jest.fn(), aggregate: jest.fn() }
+  Puestos: { countDocuments: jest.fn(), aggregate: jest.fn(), find: puestosFindMock }
 }));
 
 const metricsService = await import("../../src/services/metrics.service.js");
@@ -30,15 +31,19 @@ describe("metrics.service", () => {
     aggregateMock.mockReset();
     leaderCountMock.mockReset();
     leaderFindMock.mockReset();
+    puestosFindMock.mockReset();
   });
 
-  test("getRegistrationStats filters invalid data", async () => {
+  test("getRegistrationStats filters only clean analytics data", async () => {
     aggregateMock.mockResolvedValue([{}]);
 
     await metricsService.getRegistrationStats({ organizationId: "org1" });
 
     const pipeline = aggregateMock.mock.calls[0][0];
-    expect(pipeline[0].$match.dataIntegrityStatus).toEqual({ $ne: "invalid" });
+    expect(pipeline[0].$match.dataIntegrityStatus).toEqual("valid");
+    expect(pipeline[0].$match.workflowStatus).toEqual({
+      $nin: ["archived", "invalid", "rejected"]
+    });
   });
 
   test("getDashboardMetrics applies integrity filter in match", async () => {
@@ -46,11 +51,12 @@ describe("metrics.service", () => {
       .mockResolvedValueOnce([]) // leader aggregation
       .mockResolvedValueOnce([]); // locality aggregation
     leaderCountMock.mockResolvedValue(0);
-    leaderFindMock.mockResolvedValue([]);
+    leaderFindMock.mockReturnValue({ lean: async () => [] });
+    puestosFindMock.mockReturnValue({ lean: async () => [] });
 
     await metricsService.getDashboardMetrics({ organizationId: "org1" });
 
     const firstPipeline = aggregateMock.mock.calls[0][0];
-    expect(firstPipeline[0].$match.dataIntegrityStatus).toEqual({ $ne: "invalid" });
+    expect(firstPipeline[0].$match.dataIntegrityStatus).toEqual("valid");
   });
 });

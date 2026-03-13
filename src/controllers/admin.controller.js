@@ -9,6 +9,8 @@ import logger from "../config/logger.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import registraduriaSyncService from "../services/registraduria-sync.service.js";
+import e14ConfirmationService from "../services/e14-confirmation.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -277,6 +279,167 @@ export async function importarPuestosDesdeGeoJSON(req, res) {
       success: false,
       error: error.message,
       details: error.stack
+    });
+  }
+}
+
+/**
+ * POST /api/admin/sync-mesas-bogota
+ * Endpoint legacy para sincronizaciÃ³n oficial de mesas de BogotÃ¡
+ */
+export async function syncMesasBogotaHandler(req, res) {
+  try {
+    const result = await registraduriaSyncService.syncBogotaMesas();
+    return res.status(200).json({
+      success: true,
+      message: "SincronizaciÃ³n de mesas de BogotÃ¡ completada",
+      ...result
+    });
+  } catch (error) {
+    logger.error(`Error syncMesasBogotaHandler: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "No se pudo sincronizar mesas de BogotÃ¡"
+    });
+  }
+}
+
+/**
+ * GET /api/admin/validacion-datos-reales
+ * Endpoint legacy para consulta de validaciÃ³n paginada
+ */
+export async function getRealDataValidationHandler(req, res) {
+  try {
+    const result = await e14ConfirmationService.getE14ConfirmationData(req.query || {}, {
+      organizationId: req.user?.organizationId || null
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Confirmacion E14 por mesa",
+      data: result,
+      ...result
+    });
+  } catch (error) {
+    logger.error(`Error getRealDataValidationHandler: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "No se pudo obtener validaciÃ³n real"
+    });
+  }
+}
+
+/**
+ * POST /api/admin/validacion-datos-reales/run
+ * Endpoint legacy para ejecutar validaciÃ³n masiva y marcar flags
+ */
+export async function runRealDataValidationHandler(req, res) {
+  try {
+    const result = await e14ConfirmationService.recalculateE14Confirmation(req.body || {}, {
+      organizationId: req.user?.organizationId || null
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Recalculo de confirmacion E14 completado",
+      data: result,
+      ...result
+    });
+  } catch (error) {
+    logger.error(`Error runRealDataValidationHandler: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "No se pudo ejecutar validaciÃ³n masiva"
+    });
+  }
+}
+
+/**
+ * GET /api/admin/e14-confirmation
+ * Endpoint legacy para consulta de confirmacion E14 paginada
+ */
+export async function getE14ConfirmationHandler(req, res) {
+  try {
+    const result = await e14ConfirmationService.getE14ConfirmationByMesaData(req.query || {}, {
+      organizationId: req.user?.organizationId || null
+    });
+    return res.status(200).json({
+      success: true,
+      data: result,
+      ...result
+    });
+  } catch (error) {
+    logger.error(`Error getE14ConfirmationHandler: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "No se pudo obtener confirmacion E14"
+    });
+  }
+}
+
+/**
+ * POST /api/admin/e14-confirmation/manual-save
+ * Endpoint legacy para guardar confirmacion manual por registro
+ */
+export async function saveE14ConfirmationManualHandler(req, res) {
+  try {
+    const result = await e14ConfirmationService.saveManualE14Confirmation(req.body || {}, {
+      organizationId: req.user?.organizationId || null,
+      validatedBy: req.user?.username || req.user?.email || req.user?._id || "admin"
+    });
+    return res.status(200).json({
+      success: true,
+      data: result,
+      ...result
+    });
+  } catch (error) {
+    logger.error(`Error saveE14ConfirmationManualHandler: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "No se pudo guardar confirmacion E14 manual"
+    });
+  }
+}
+
+/**
+ * GET /api/admin/e14-confirmation/by-mesa
+ */
+export async function getE14ConfirmationByMesaHandler(req, res) {
+  try {
+    const result = await e14ConfirmationService.getE14ConfirmationByMesaData(req.query || {}, {
+      organizationId: req.user?.organizationId || null
+    });
+    return res.status(200).json({
+      success: true,
+      data: result,
+      ...result
+    });
+  } catch (error) {
+    logger.error(`Error getE14ConfirmationByMesaHandler: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "No se pudo obtener confirmacion E14 por mesa"
+    });
+  }
+}
+
+/**
+ * POST /api/admin/e14-confirmation/by-mesa/manual-save
+ */
+export async function saveE14ConfirmationByMesaManualHandler(req, res) {
+  try {
+    const result = await e14ConfirmationService.saveManualByMesa(req.body || {}, {
+      organizationId: req.user?.organizationId || null,
+      validatedBy: req.user?.username || req.user?.email || req.user?._id || "admin"
+    });
+    return res.status(200).json({
+      success: true,
+      data: result,
+      ...result
+    });
+  } catch (error) {
+    logger.error(`Error saveE14ConfirmationByMesaManualHandler: ${error.message}`);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "No se pudo guardar confirmacion E14 por mesa"
     });
   }
 }
