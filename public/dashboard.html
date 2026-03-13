@@ -16,6 +16,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Tailwind Mod -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            prefix: 'tw-',
+            corePlugins: { preflight: false }
+        }
+    </script>
 </head>
 
 <body>
@@ -586,282 +594,661 @@
                 </div>
             </section>
 
-            <!-- VALIDACIÓN DE DATOS REALES -->
-            <section id="validacion-datos-reales" class="section">
-                <div class="section-header">
-                    <h2>Confirmacion E14 por mesa</h2>
-                    <p>Compara votos reportados vs votos oficiales E14 (CAMARA, Bogota, candidata 105).</p>
-                </div>
-
-                <div class="stats-grid rdv-kpis">
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="rdvKpiAnalizados">0</h3>
-                            <span>Mesas analizadas</span>
+            <!-- VALIDACION DE DATOS REALES -->
+            <section id="validacion-datos-reales" class="section tw-bg-slate-50 tw-font-sans tw-text-slate-900 tw-pb-12" style="display: none;">
+                <header class="tw-bg-gradient-to-r tw-from-slate-950 tw-via-slate-900 tw-to-indigo-950 tw-border-b tw-border-slate-800 tw-px-4 md:tw-px-8 tw-py-8 tw-text-white">
+                    <div class="tw-max-w-7xl tw-mx-auto tw-flex tw-flex-col lg:tw-flex-row lg:tw-items-center lg:tw-justify-between tw-gap-5">
+                        <div class="tw-space-y-3 tw-max-w-3xl">
+                            <span class="tw-inline-flex tw-items-center tw-gap-2 tw-bg-white/10 tw-text-slate-100 tw-text-xs tw-font-semibold tw-uppercase tw-rounded-full tw-px-3 tw-py-1.5 tw-border tw-border-white/10 tw-backdrop-blur">
+                                <i class="bi bi-check2-square"></i> Conciliación mesa a mesa
+                            </span>
+                            <div>
+                                <h2 class="tw-text-3xl md:tw-text-4xl tw-font-semibold tw-tracking-tight tw-text-white tw-m-0" style="margin-bottom:0 !important;">Confirmación E14 por Mesa</h2>
+                                <p class="tw-text-base tw-leading-7 tw-text-slate-300 tw-mt-3" style="margin-top:0.75rem;">Compara los votos registrados en el sistema contra los votos del formulario E14 y te muestra qué mesas están confirmadas, cuáles tienen diferencia y cuáles requieren revisión.</p>
+                            </div>
+                            <div class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-2xl tw-bg-white/5 tw-border tw-border-white/10 tw-px-4 tw-py-3 tw-text-sm tw-text-slate-200 tw-shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                                <i class="bi bi-stars tw-text-amber-300"></i>
+                                <span>Empieza por <strong class="tw-text-white">Revisar mesas</strong>, usa <strong class="tw-text-white">Comparar votos</strong> para entender la brecha y deja <strong class="tw-text-white">Importar Excel</strong> para cargar verificaciones externas.</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="rdvKpiPendientes">0</h3>
-                            <span>Pendientes E14</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="rdvKpiConfirmados">0</h3>
-                            <span>Confirmados</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="rdvKpiPromedio">0%</h3>
-                            <span>Confirmacion promedio</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="rdvKpiVotosReportados">0</h3>
-                            <span>Votos reportados</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h3 id="rdvKpiVotosE14">0</h3>
-                            <span>Votos E14</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-header rdv-toolbar">
-                        <h3><i class="bi bi-clipboard-data"></i> Confirmacion E14 por mesa</h3>
-                        <div class="rdv-actions">
-                            <button class="btn btn-outline" id="rdvOpenE14BaseBtn">
-                                <i class="bi bi-box-arrow-up-right"></i> Abrir E14 Bogota
+                        <div class="tw-flex tw-flex-col tw-gap-3 tw-w-full lg:tw-w-auto">
+                            <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-3 rdv-actions">
+                            <button id="rdvOpenE14BaseBtn" class="tw-bg-white/10 tw-text-white tw-border tw-border-white/15 tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-medium tw-flex tw-items-center tw-gap-2 tw-backdrop-blur">
+                                <i class="bi bi-box-arrow-up-right"></i> Abrir E14
                             </button>
-                            <button class="btn btn-outline" id="rdvRunValidationBtn">
-                                <i class="bi bi-arrow-repeat"></i> Recalcular estados
+                            <button id="rdvOpenImportBtn" class="tw-bg-emerald-500 tw-text-white tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold tw-flex tw-items-center tw-gap-2 tw-shadow-lg tw-shadow-emerald-950/20" style="border:none;">
+                                <i class="bi bi-file-earmark-arrow-up"></i> Importar Excel
                             </button>
-                            <button class="btn btn-primary" id="rdvSyncBtn">
-                                <i class="bi bi-cloud-download"></i> Sincronizar referencia E14 (opcional)
+                            <button id="rdvOpenProgressTreeBtn" class="tw-bg-amber-400 tw-text-slate-950 tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold tw-flex tw-items-center tw-gap-2 tw-shadow-lg tw-shadow-amber-950/20" style="border:none;">
+                                <i class="bi bi-diagram-3"></i> Informe hasta ahora
                             </button>
+                            <button id="rdvRunValidationBtn" class="tw-bg-white tw-text-slate-900 tw-border tw-border-white tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold tw-flex tw-items-center tw-gap-2 tw-shadow-lg tw-shadow-slate-950/15">
+                                <i class="bi bi-arrow-repeat"></i> Recalcular
+                            </button>
+                            </div>
+                            <div class="tw-flex tw-justify-end">
+                                <button id="rdvSyncBtn" class="tw-bg-white/5 tw-text-slate-200 tw-border tw-border-white/10 tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-medium tw-flex tw-items-center tw-gap-2 tw-backdrop-blur" style="border:none;">
+                                    <i class="bi bi-cloud-download"></i> Integrar E14
+                                </button>
+                            </div>
                         </div>
                     </div>
+                </header>
 
-                    <div id="rdvSyncProgress" class="rdv-progress" style="display:none;">
+                <main class="tw-max-w-7xl tw-mx-auto tw-px-4 md:tw-px-8 tw-py-8 tw-space-y-6">
+                    <div id="rdvSyncProgress" class="tw-hidden tw-bg-blue-50 tw-text-blue-800 tw-px-4 tw-py-3 tw-rounded-md tw-text-sm tw-font-medium tw-items-center tw-gap-2">
                         <div class="loader-inline"></div>
-                        <span>Sincronizando referencia E14...</span>
+                        <span>Actualizando referencias E14 y recalculando la conciliación...</span>
                     </div>
-                    <div id="rdvSyncResult" class="alert" style="display:none;"></div>
+                    <div id="rdvSyncResult" class="tw-hidden tw-px-4 tw-py-3 tw-rounded-md tw-text-sm tw-font-medium"></div>
 
-                    <div class="filter-bar rdv-filters">
-                        <input id="rdvFilterSearch" class="search-input" type="text" placeholder="Buscar por localidad, puesto, mesa o archivo...">
-                        <select id="rdvFilterLocalidad" class="form-select">
-                            <option value="">Todas las localidades</option>
-                        </select>
-                        <select id="rdvFilterEstado" class="form-select">
-                            <option value="">Todo estado de confirmacion</option>
-                            <option value="pendiente_e14">Solo pendientes E14</option>
-                            <option value="confirmado">Solo confirmados</option>
-                            <option value="confirmacion_alta">Confirmacion alta</option>
-                            <option value="confirmacion_baja">Confirmacion baja</option>
-                            <option value="manual_only">Captura manual</option>
-                        </select>
-                        <select id="rdvFilterSourceStatus" class="form-select">
-                            <option value="">Todo estado OCR</option>
-                            <option value="ok">OCR OK</option>
-                            <option value="needs_manual_review">Revision manual</option>
-                            <option value="ocr_low_confidence">OCR baja confianza</option>
-                            <option value="page_not_found">Pagina no encontrada</option>
-                            <option value="download_error">Error descarga</option>
-                        </select>
-                        <button class="btn btn-primary" id="rdvApplyFiltersBtn">Aplicar</button>
-                        <button class="btn btn-outline" id="rdvResetFiltersBtn">Limpiar</button>
-                    </div>
-
-                    <div id="rdvLoading" class="rdv-loading" style="display:none;">
-                        <div class="loader-inline"></div>
-                        <span>Cargando confirmacion E14...</span>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Localidad</th>
-                                    <th>Puesto</th>
-                                    <th>Mesa</th>
-                                    <th># Registros</th>
-                                    <th>Votos reportados</th>
-                                    <th>Votos E14 (105)</th>
-                                    <th>% confirmacion</th>
-                                    <th>Diferencia</th>
-                                    <th>Estado</th>
-                                    <th>Evidencia OCR</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="rdvTableBody">
-                                <tr><td colspan="11" class="text-center text-muted">Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="pagination-container">
-                        <button id="rdvPrevPageBtn" class="page-btn"><i class="bi bi-chevron-left"></i></button>
-                        <span id="rdvPaginationInfo" class="page-indicator">Página 1 de 1</span>
-                        <button id="rdvNextPageBtn" class="page-btn"><i class="bi bi-chevron-right"></i></button>
-                    </div>
-                </div>
-
-                <div id="rdvManualModal" class="modal" style="display:none;">
-                    <div class="modal-content" style="max-width: 880px;">
-                        <div class="modal-header">
-                            <h3>Capturar votos E14</h3>
-                            <button id="rdvManualCloseBtn" class="close-btn">&times;</button>
+                    <section class="tw-grid tw-grid-cols-1 xl:tw-grid-cols-[2fr,1fr] tw-gap-5">
+                        <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 xl:tw-grid-cols-5 tw-gap-4">
+                            <article class="tw-bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] tw-border tw-border-slate-200 tw-rounded-3xl tw-p-5 tw-shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+                                <p class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Registros totales</p>
+                                <div id="rdvKpiRegistrosTotal" class="tw-text-3xl tw-font-bold tw-text-slate-900">0</div>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-2">Votos internos capturados en el sistema para el alcance actual.</p>
+                            </article>
+                            <article class="tw-bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] tw-border tw-border-slate-200 tw-rounded-3xl tw-p-5 tw-shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+                                <p class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Mesas totales</p>
+                                <div id="rdvKpiMesasTotal" class="tw-text-3xl tw-font-bold tw-text-slate-900">0</div>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-2">Cantidad de mesas unicas que hoy se pueden conciliar.</p>
+                            </article>
+                            <article class="tw-bg-[linear-gradient(160deg,#ecfdf5_0%,#ffffff_100%)] tw-border tw-border-emerald-200 tw-rounded-3xl tw-p-5 tw-shadow-[0_18px_40px_rgba(16,185,129,0.08)]">
+                                <p class="tw-text-xs tw-font-semibold tw-uppercase tw-text-emerald-700">Votos esperados</p>
+                                <div id="rdvKpiVerificadas" class="tw-text-3xl tw-font-bold tw-text-emerald-700">0</div>
+                                <p class="tw-text-sm tw-text-emerald-800 tw-mt-2">Votos internos que el sistema espera conciliar contra el E14.</p>
+                            </article>
+                            <article class="tw-bg-[linear-gradient(160deg,#eff6ff_0%,#ffffff_100%)] tw-border tw-border-indigo-200 tw-rounded-3xl tw-p-5 tw-shadow-[0_18px_40px_rgba(79,70,229,0.08)]">
+                                <p class="tw-text-xs tw-font-semibold tw-uppercase tw-text-amber-700">Votos reales</p>
+                                <div id="rdvKpiPendientes" class="tw-text-3xl tw-font-bold tw-text-amber-700">0</div>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-2">Mesas sin E14 o que siguen pendientes de revisión.</p>
+                            </article>
+                            <article class="tw-bg-[linear-gradient(160deg,#fff7ed_0%,#ffffff_100%)] tw-border tw-border-amber-200 tw-rounded-3xl tw-p-5 tw-shadow-[0_18px_40px_rgba(245,158,11,0.08)]">
+                                <p class="tw-text-xs tw-font-semibold tw-uppercase tw-text-rose-700">Votos faltantes</p>
+                                <div id="rdvKpiDiferencias" class="tw-text-3xl tw-font-bold tw-text-rose-700">0</div>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-2">Mesas donde los votos internos no coinciden con el E14.</p>
+                            </article>
                         </div>
-                        <div class="modal-body">
+                        <aside class="tw-bg-[linear-gradient(165deg,#020617_0%,#111827_55%,#1e293b_100%)] tw-border tw-border-slate-800 tw-rounded-3xl tw-p-6 tw-shadow-[0_28px_80px_rgba(15,23,42,0.45)] tw-space-y-5 tw-text-white">
+                            <div>
+                                <p class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-300">Avance real de conciliacion</p>
+                                <div class="tw-flex tw-items-end tw-justify-between tw-gap-4 tw-mt-2">
+                                    <div id="rdvProgressLabel" class="tw-text-4xl tw-font-bold tw-text-white">0% conciliado</div>
+                                    <div class="tw-text-sm tw-leading-6 tw-text-slate-300 tw-max-w-[13rem] tw-text-right">Mesas con E14 cargado frente al total de mesas conciliables.</div>
+                                </div>
+                            </div>
+                            <div class="tw-h-3.5 tw-bg-white/10 tw-rounded-full tw-overflow-hidden tw-ring-1 tw-ring-white/10">
+                                <div id="rdvProgressBar" class="tw-h-full tw-bg-[linear-gradient(90deg,#34d399_0%,#22c55e_100%)] tw-rounded-full" style="width:0%;"></div>
+                            </div>
+                            <dl class="tw-grid tw-grid-cols-3 tw-gap-3 tw-text-sm">
+                                <div class="tw-bg-white/5 tw-rounded-xl tw-p-3"><dt class="tw-text-slate-300">Pendientes</dt><dd id="rdvSummaryPendingCount" class="tw-text-lg tw-font-semibold tw-text-amber-300">0</dd></div>
+                                <div class="tw-bg-white/5 tw-rounded-xl tw-p-3"><dt class="tw-text-slate-300">Diferencias</dt><dd id="rdvSummaryDifferenceCount" class="tw-text-lg tw-font-semibold tw-text-rose-300">0</dd></div>
+                                <div class="tw-bg-white/5 tw-rounded-xl tw-p-3"><dt class="tw-text-slate-300">Excluidos</dt><dd id="rdvSummaryInvalidCount" class="tw-text-lg tw-font-semibold tw-text-slate-100">0</dd></div>
+                            </dl>
+                            <div class="tw-grid tw-grid-cols-2 tw-gap-3">
+                                <div class="tw-border tw-border-white/10 tw-rounded-xl tw-p-3 tw-bg-white/5"><div class="tw-text-xs tw-uppercase tw-text-slate-300 tw-font-semibold">Votos internos</div><div id="rdvKpiVotosReportados" class="tw-text-xl tw-font-semibold tw-text-white">0</div></div>
+                                <div class="tw-border tw-border-white/10 tw-rounded-xl tw-p-3 tw-bg-white/5"><div class="tw-text-xs tw-uppercase tw-text-slate-300 tw-font-semibold">Votos E14</div><div id="rdvKpiVotosE14" class="tw-text-xl tw-font-semibold tw-text-white">0</div></div>
+                            </div>
+                            <div class="tw-grid tw-grid-cols-2 tw-gap-3">
+                                <div class="tw-border tw-border-white/10 tw-rounded-xl tw-p-3 tw-bg-white/5"><div class="tw-text-xs tw-uppercase tw-text-slate-300 tw-font-semibold">Promedio por mesa</div><div id="rdvKpiPromedioMesa" class="tw-text-xl tw-font-semibold tw-text-white">0</div></div>
+                                <div class="tw-border tw-border-white/10 tw-rounded-xl tw-p-3 tw-bg-white/5"><div class="tw-text-xs tw-uppercase tw-text-slate-300 tw-font-semibold">Registros excluidos</div><div id="rdvKpiExcluidos" class="tw-text-xl tw-font-semibold tw-text-white">0</div></div>
+                            </div>
+                        </aside>
+                    </section>
+
+                    <section class="tw-grid tw-grid-cols-1 xl:tw-grid-cols-[1.45fr,1fr] tw-gap-5">
+                        <article class="tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] tw-shadow-[0_18px_40px_rgba(15,23,42,0.08)] tw-p-6 tw-space-y-5">
+                            <div class="tw-flex tw-items-center tw-justify-between tw-gap-4">
+                                <div>
+                                    <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Resultados hasta ahora</h3>
+                                    <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Lo reportado por el sistema frente a lo confirmado con E14 hasta este momento.</p>
+                                </div>
+                                <div class="tw-inline-flex tw-rounded-full tw-bg-slate-100 tw-p-1.5 tw-shadow-inner">
+                                    <span class="tw-px-3.5 tw-py-1.5 tw-text-sm tw-font-semibold tw-rounded-full tw-bg-white tw-text-slate-800 tw-shadow-sm">Por mesas</span>
+                                    <span class="tw-px-3.5 tw-py-1.5 tw-text-sm tw-font-semibold tw-text-slate-500">Por registros</span>
+                                </div>
+                            </div>
+                            <div class="tw-grid md:tw-grid-cols-3 tw-gap-4">
+                                <div class="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-p-4"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Registros actuales</div><div id="rdvResultsRegistros" class="tw-mt-2 tw-text-2xl tw-font-bold tw-text-slate-900">0</div></div>
+                                <div class="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-p-4"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Mesas actuales</div><div id="rdvResultsMesas" class="tw-mt-2 tw-text-2xl tw-font-bold tw-text-slate-900">0</div></div>
+                                <div class="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-p-4"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Promedio por mesa</div><div id="rdvResultsAverage" class="tw-mt-2 tw-text-2xl tw-font-bold tw-text-slate-900">0</div></div>
+                            </div>
+                            <div class="tw-grid md:tw-grid-cols-3 tw-gap-4">
+                                <div class="tw-rounded-xl tw-border tw-border-slate-900 tw-bg-slate-950 tw-p-4"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-300">Votos internos acumulados</div><div id="rdvResultsInternalVotes" class="tw-mt-2 tw-text-2xl tw-font-bold tw-text-white">0</div></div>
+                                <div class="tw-rounded-xl tw-border tw-border-indigo-200 tw-bg-indigo-50 tw-p-4"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-indigo-700">Votos E14 conciliados</div><div id="rdvResultsE14Votes" class="tw-mt-2 tw-text-2xl tw-font-bold tw-text-indigo-900">0</div></div>
+                                <div class="tw-rounded-xl tw-border tw-border-amber-200 tw-bg-amber-50 tw-p-4"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-amber-700">Diferencia acumulada</div><div id="rdvResultsDifference" class="tw-mt-2 tw-text-2xl tw-font-bold tw-text-amber-900">0</div></div>
+                            </div>
+                        </article>
+                        <article class="tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] tw-shadow-[0_18px_40px_rgba(15,23,42,0.08)] tw-p-6 tw-space-y-4">
+                            <div>
+                                <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Cómo leer el avance</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Así evitamos confundir registros con mesas durante la conciliación.</p>
+                            </div>
+                            <div class="tw-space-y-3 tw-text-sm">
+                                <div class="tw-rounded-xl tw-bg-slate-50 tw-border tw-border-slate-200 tw-p-3"><strong class="tw-text-slate-900">Registros totales</strong><div class="tw-text-slate-600 tw-mt-1">Cantidad de votos internos capturados en el sistema.</div></div>
+                                <div class="tw-rounded-xl tw-bg-slate-50 tw-border tw-border-slate-200 tw-p-3"><strong class="tw-text-slate-900">Mesas totales</strong><div class="tw-text-slate-600 tw-mt-1">Cantidad de mesas únicas donde esos registros están agrupados.</div></div>
+                                <div class="tw-rounded-xl tw-bg-slate-50 tw-border tw-border-slate-200 tw-p-3"><strong class="tw-text-slate-900">% conciliado</strong><div class="tw-text-slate-600 tw-mt-1">Porcentaje de mesas con dato E14 cargado. No significa que todas coincidan.</div></div>
+                            </div>
+                        </article>
+                    </section>
+
+                    <section class="tw-grid lg:tw-grid-cols-3 tw-gap-5">
+                        <article class="tw-rounded-3xl tw-border tw-border-slate-800 tw-bg-[linear-gradient(160deg,#020617_0%,#111827_100%)] tw-p-6 tw-text-white tw-shadow-[0_24px_60px_rgba(15,23,42,0.28)]">
+                            <div class="tw-flex tw-items-start tw-gap-3">
+                                <span class="tw-inline-flex tw-h-11 tw-w-11 tw-items-center tw-justify-center tw-rounded-2xl tw-bg-white/10"><i class="bi bi-check2-square tw-text-lg"></i></span>
+                                <div>
+                                    <h3 class="tw-text-lg tw-font-semibold tw-m-0">Conciliar mesas</h3>
+                                    <p class="tw-text-sm tw-text-slate-300 tw-mt-2">Revisa mesa por mesa, confirma votos E14 y resuelve diferencias operativas.</p>
+                                </div>
+                            </div>
+                            <button id="rdvWorkflowPendingBtn" class="tw-mt-5 tw-inline-flex tw-items-center tw-gap-2 tw-rounded-2xl tw-bg-white tw-text-slate-900 tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-shadow-lg tw-shadow-slate-950/20" style="border:none;">
+                                <i class="bi bi-list-task"></i> Ir a pendientes
+                            </button>
+                        </article>
+                        <article class="tw-rounded-3xl tw-border tw-border-indigo-200 tw-bg-[linear-gradient(160deg,#eef2ff_0%,#ffffff_100%)] tw-p-6 tw-shadow-[0_18px_40px_rgba(79,70,229,0.10)]">
+                            <div class="tw-flex tw-items-start tw-gap-3">
+                                <span class="tw-inline-flex tw-h-11 tw-w-11 tw-items-center tw-justify-center tw-rounded-2xl tw-bg-indigo-100 tw-text-indigo-700"><i class="bi bi-diagram-3 tw-text-lg"></i></span>
+                                <div>
+                                    <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Comparar votos</h3>
+                                    <p class="tw-text-sm tw-text-slate-600 tw-mt-2">Explora rápidamente dónde faltan votos por localidad, puesto y mesa.</p>
+                                </div>
+                            </div>
+                            <button id="rdvWorkflowCompareBtn" class="tw-mt-5 tw-inline-flex tw-items-center tw-gap-2 tw-rounded-2xl tw-bg-indigo-600 tw-text-white tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-shadow-lg tw-shadow-indigo-900/20" style="border:none;">
+                                <i class="bi bi-graph-up-arrow"></i> Abrir árbol de votos
+                            </button>
+                        </article>
+                        <article class="tw-rounded-3xl tw-border tw-border-emerald-200 tw-bg-[linear-gradient(160deg,#ecfdf5_0%,#ffffff_100%)] tw-p-6 tw-shadow-[0_18px_40px_rgba(16,185,129,0.10)]">
+                            <div class="tw-flex tw-items-start tw-gap-3">
+                                <span class="tw-inline-flex tw-h-11 tw-w-11 tw-items-center tw-justify-center tw-rounded-2xl tw-bg-emerald-100 tw-text-emerald-700"><i class="bi bi-file-earmark-arrow-up tw-text-lg"></i></span>
+                                <div>
+                                    <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Importar validación</h3>
+                                    <p class="tw-text-sm tw-text-slate-600 tw-mt-2">Carga Excel del equipo territorial, revisa la vista previa y aplica solo filas seguras.</p>
+                                </div>
+                            </div>
+                            <button id="rdvWorkflowImportBtn" class="tw-mt-5 tw-inline-flex tw-items-center tw-gap-2 tw-rounded-2xl tw-bg-emerald-600 tw-text-white tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-shadow-lg tw-shadow-emerald-950/15" style="border:none;">
+                                <i class="bi bi-upload"></i> Importar verificación
+                            </button>
+                        </article>
+                    </section>
+
+                    <section class="tw-bg-white/90 tw-backdrop-blur tw-border tw-border-slate-200 tw-rounded-3xl tw-p-5 tw-shadow-[0_18px_40px_rgba(15,23,42,0.08)] tw-space-y-5">
+                        <div class="tw-flex tw-flex-col lg:tw-flex-row lg:tw-items-center lg:tw-justify-between tw-gap-3">
+                            <div>
+                                <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Organiza la revisión</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Enfócate primero en pendientes y diferencias. Las inconsistencias y las importaciones viven en espacios separados.</p>
+                            </div>
+                            <div class="tw-flex tw-flex-wrap tw-gap-2 tw-rounded-2xl tw-bg-slate-100 tw-p-1.5">
+                                <button id="rdvViewResumenBtn" class="tw-bg-slate-900 tw-text-white tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold" style="border:none;">Resumen</button>
+                                <button id="rdvViewPendingBtn" class="tw-bg-white tw-text-slate-600 tw-border tw-border-slate-200 tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold tw-shadow-sm">Mesas pendientes</button>
+                                <button id="rdvViewCompareBtn" class="tw-bg-white tw-text-slate-600 tw-border tw-border-slate-200 tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold tw-shadow-sm">Comparar votos</button>
+                                <button id="rdvViewDifferencesBtn" class="tw-bg-white tw-text-slate-600 tw-border tw-border-slate-200 tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold tw-shadow-sm">Diferencias</button>
+                                <button id="rdvViewInvalidBtn" class="tw-bg-white tw-text-slate-600 tw-border tw-border-slate-200 tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold tw-shadow-sm">Inconsistencias <span id="rdvInvalidCountBadge" class="tw-ml-2 tw-inline-flex tw-min-w-[1.5rem] tw-items-center tw-justify-center tw-rounded-full tw-bg-amber-100 tw-text-amber-800 tw-px-2 tw-text-xs">0</span></button>
+                                <button id="rdvViewImportsBtn" class="tw-bg-white tw-text-slate-600 tw-border tw-border-slate-200 tw-px-4 tw-py-2.5 tw-rounded-xl tw-text-sm tw-font-semibold tw-shadow-sm">Importaciones</button>
+                            </div>
+                        </div>
+                        <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 xl:tw-grid-cols-4 tw-gap-3">
+                            <div class="xl:tw-col-span-2">
+                                <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Buscar</label>
+                                <input id="rdvFilterSearch" type="text" placeholder="Localidad, puesto, mesa o archivo importado" class="tw-mt-1 tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm">
+                            </div>
+                            <div>
+                                <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Territorio</label>
+                                <select id="rdvFilterRegionScope" class="tw-mt-1 tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm">
+                                    <option value="">Todos</option>
+                                    <option value="bogota">Bogotá</option>
+                                    <option value="resto">Resto del país</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Localidad</label>
+                                <select id="rdvFilterLocalidad" class="tw-mt-1 tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm"><option value="">Todas</option></select>
+                            </div>
+                            <div>
+                                <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Estado</label>
+                                <select id="rdvFilterEstado" class="tw-mt-1 tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm" title="Filtra las mesas según su estado de conciliación.">
+                                        <option value="">Todos</option>
+                                        <option value="pendiente_e14">Sin E14</option>
+                                        <option value="confirmado">Confirmada</option>
+                                        <option value="confirmacion_alta">Confirmación alta</option>
+                                        <option value="confirmacion_baja">Confirmación baja</option>
+                                        <option value="manual_only">Manual</option>
+                                    </select>
+                            </div>
+                        </div>
+                        <div class="tw-flex tw-flex-wrap tw-items-center tw-justify-between tw-gap-3">
+                            <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-2">
+                                <button id="rdvToggleAdvancedFiltersBtn" class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-slate-100 tw-text-slate-700 tw-px-3 tw-py-2 tw-text-sm tw-font-medium" title="Muestra filtros técnicos como OCR y revisión manual." style="border:none;">
+                                    <i class="bi bi-sliders2"></i> Filtros avanzados
+                                </button>
+                                <span class="tw-text-xs tw-text-slate-500">Usa búsqueda, territorio, localidad y estado para el filtro rápido.</span>
+                            </div>
+                            <div class="tw-flex tw-flex-wrap tw-gap-2 tw-justify-end">
+                                <button id="rdvApplyFiltersBtn" class="tw-bg-slate-900 tw-text-white tw-px-4 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium" style="border:none;">Aplicar filtros</button>
+                                <button id="rdvResetFiltersBtn" class="tw-bg-white tw-text-slate-600 tw-border tw-border-slate-300 tw-px-4 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium">Limpiar</button>
+                            </div>
+                        </div>
+                        <div id="rdvAdvancedFiltersPanel" class="tw-hidden tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-4">
+                            <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-3">
+                                <div>
+                                    <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Estado OCR</label>
+                                    <select id="rdvFilterSourceStatus" class="tw-mt-1 tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm">
+                                        <option value="">Todo</option>
+                                        <option value="ok">OCR OK</option>
+                                        <option value="needs_manual_review">Revisión</option>
+                                        <option value="ocr_low_confidence">Baja confianza</option>
+                                    </select>
+                                </div>
+                                <div class="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-text-sm tw-text-slate-600">
+                                    <div class="tw-font-semibold tw-text-slate-900">Ayuda rápida</div>
+                                    <p class="tw-mt-2">Usa OCR solo cuando quieras aislar mesas con lectura automática, revisión manual o baja confianza.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:none;">
+                            <button id="rdvTabOfficialBtn" type="button"></button>
+                            <button id="rdvTabInvalidBtn" type="button"></button>
+                            <input id="rdvFilterPuesto" type="hidden">
+                            <input id="rdvFilterMesa" type="hidden">
+                        </div>
+                    </section>
+
+                    <section id="rdvSummaryPanel" class="tw-bg-white tw-border tw-border-slate-200 tw-rounded-xl tw-p-5 tw-shadow-sm tw-space-y-4">
+                        <div class="tw-flex tw-flex-col lg:tw-flex-row lg:tw-items-center lg:tw-justify-between tw-gap-4">
+                            <div>
+                                <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Cómo usar esta pantalla</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Empieza por las mesas pendientes. Si importas un Excel verificado manualmente, la conciliación se actualizará automáticamente mesa por mesa.</p>
+                            </div>
+                            <div class="tw-inline-flex tw-items-center tw-gap-3 tw-rounded-full tw-bg-slate-100 tw-px-4 tw-py-2 tw-text-sm tw-text-slate-700">
+                                <span><strong id="rdvSummaryPendingCountInline">0</strong> pendientes</span>
+                                <span class="tw-text-slate-300">•</span>
+                                <span><strong id="rdvSummaryDifferenceCountInline">0</strong> con diferencia</span>
+                                <span class="tw-text-slate-300">•</span>
+                                <span><strong id="rdvSummaryInvalidCountInline">0</strong> inconsistencias</span>
+                            </div>
+                        </div>
+                        <div class="tw-grid md:tw-grid-cols-3 tw-gap-4">
+                            <article class="tw-rounded-xl tw-border tw-border-amber-200 tw-bg-amber-50 tw-p-4">
+                                <div class="tw-text-sm tw-font-semibold tw-text-amber-900">1. Revisa pendientes</div>
+                                <p class="tw-text-sm tw-text-amber-800 tw-mt-2">Concéntrate primero en las mesas que aún no tienen voto E14 o requieren validación manual.</p>
+                            </article>
+                            <article class="tw-rounded-xl tw-border tw-border-rose-200 tw-bg-rose-50 tw-p-4">
+                                <div class="tw-text-sm tw-font-semibold tw-text-rose-900">2. Resuelve diferencias</div>
+                                <p class="tw-text-sm tw-text-rose-800 tw-mt-2">Una diferencia positiva significa que faltan votos en el sistema; una negativa indica votos de más respecto al E14.</p>
+                            </article>
+                            <article class="tw-rounded-xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-4">
+                                <div class="tw-text-sm tw-font-semibold tw-text-slate-900">3. Importa verificaciones</div>
+                                <p class="tw-text-sm tw-text-slate-700 tw-mt-2">Carga archivos Excel del equipo territorial para actualizar muchas mesas en un solo paso y mantener trazabilidad.</p>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section id="rdvComparisonPanel" class="tw-bg-white tw-border tw-border-slate-200 tw-rounded-xl tw-shadow-sm">
+                        <div class="tw-flex tw-flex-col lg:tw-flex-row lg:tw-items-center lg:tw-justify-between tw-gap-3 tw-px-5 tw-py-4 tw-border-b tw-border-slate-200">
+                            <div>
+                                <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Mesa de conciliación</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Cada fila compara votos internos vs E14. Abre el detalle para confirmar, anotar o corregir la mesa.</p>
+                            </div>
+                            <div id="rdvOfficialMeta" class="tw-text-sm tw-font-medium tw-text-slate-500">Resultados encontrados: 0</div>
+                        </div>
+                        <div id="rdvLoading" class="tw-hidden tw-flex tw-items-center tw-justify-center tw-gap-3 tw-py-8">
+                            <div class="loader-inline"></div>
+                            <span class="tw-text-sm tw-text-slate-500">Cargando mesas...</span>
+                        </div>
+                        <div class="tw-overflow-x-auto">
+                            <table class="tw-w-full tw-text-sm tw-text-left">
+                                <thead class="tw-bg-slate-50 tw-border-b tw-border-slate-200">
+                                    <tr>
+                                        <th class="tw-px-4 tw-py-3">Localidad</th>
+                                        <th class="tw-px-4 tw-py-3">Puesto</th>
+                                        <th class="tw-px-4 tw-py-3">Mesa</th>
+                                        <th class="tw-px-4 tw-py-3 tw-text-right">Votos internos</th>
+                                        <th class="tw-px-4 tw-py-3 tw-text-right">Votos E14</th>
+                                        <th class="tw-px-4 tw-py-3 tw-text-right">Diferencia</th>
+                                        <th class="tw-px-4 tw-py-3">Estado</th>
+                                        <th class="tw-px-4 tw-py-3">Fuente</th>
+                                        <th class="tw-px-4 tw-py-3 tw-text-right">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rdvTableBody">
+                                    <tr><td colspan="9" class="tw-text-center tw-text-slate-500 tw-py-8">Cargando mesas...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tw-flex tw-items-center tw-justify-between tw-gap-3 tw-px-5 tw-py-4 tw-border-t tw-border-slate-200 tw-bg-slate-50">
+                            <button id="rdvPrevPageBtn" class="tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm tw-text-slate-700"><i class="bi bi-chevron-left"></i> Anterior</button>
+                            <span id="rdvPaginationInfo" class="tw-text-sm tw-text-slate-500">Página 1</span>
+                            <button id="rdvNextPageBtn" class="tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm tw-text-slate-700">Siguiente <i class="bi bi-chevron-right"></i></button>
+                        </div>
+                    </section>
+
+                    <section id="rdvComparePanel" class="tw-hidden tw-bg-white tw-border tw-border-slate-200 tw-rounded-3xl tw-shadow-[0_24px_60px_rgba(15,23,42,0.12)] tw-overflow-hidden">
+                        <div class="tw-flex tw-flex-col lg:tw-flex-row lg:tw-items-center lg:tw-justify-between tw-gap-4 tw-px-6 tw-py-5 tw-border-b tw-border-slate-200 tw-bg-[linear-gradient(135deg,#ffffff_0%,#f8fafc_45%,#eef2ff_100%)]">
+                            <div>
+                                <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Comparación directa de votos</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Entiende la brecha por localidad, puesto y mesa. Cuando una mesa requiera validación completa, abre su revisión con OCR o E14 desde aquí.</p>
+                            </div>
+                            <div class="tw-flex tw-flex-wrap tw-items-center tw-gap-3">
+                                <button id="rdvCompareGapOnlyToggle" type="button" class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-border tw-border-slate-300 tw-bg-white tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-slate-600 tw-shadow-sm">
+                                    <i class="bi bi-funnel"></i>
+                                    Solo con brecha
+                                </button>
+                                <div id="rdvCompareMeta" class="tw-inline-flex tw-items-center tw-gap-2 tw-self-start lg:tw-self-auto tw-text-sm tw-font-medium tw-text-slate-600 tw-bg-white tw-border tw-border-slate-200 tw-rounded-full tw-px-4 tw-py-2 tw-shadow-sm"><i class="bi bi-compass tw-text-indigo-500"></i> Abre una rama para encontrar dónde faltan votos.</div>
+                            </div>
+                        </div>
+                        <div class="tw-grid lg:tw-grid-cols-[320px,1fr]">
+                            <aside class="tw-border-r tw-border-slate-200 tw-bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] tw-p-6 tw-space-y-4">
+                                <div class="tw-rounded-3xl tw-border tw-border-white/70 tw-bg-white/90 tw-p-5 tw-shadow-[0_12px_30px_rgba(15,23,42,0.08)]"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.18em] tw-text-slate-500">Votos esperados</div><div id="rdvCompareExpectedVotes" class="tw-mt-3 tw-text-3xl tw-font-bold tw-text-slate-900">0</div><div class="tw-mt-2 tw-text-sm tw-text-slate-500">Lo que hoy esperamos del sistema en el alcance activo.</div></div>
+                                <div class="tw-rounded-3xl tw-border tw-border-indigo-200 tw-bg-white/90 tw-p-5 tw-shadow-[0_12px_30px_rgba(79,70,229,0.08)]"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.18em] tw-text-indigo-700">Votos reales</div><div id="rdvCompareRealVotes" class="tw-mt-3 tw-text-3xl tw-font-bold tw-text-indigo-900">0</div><div class="tw-mt-2 tw-text-sm tw-text-slate-500">Lo que ya fue confirmado con E14, OCR o carga manual.</div></div>
+                                <div class="tw-rounded-3xl tw-border tw-border-amber-200 tw-bg-white/90 tw-p-5 tw-shadow-[0_12px_30px_rgba(245,158,11,0.08)]"><div class="tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.18em] tw-text-amber-700">Votos faltantes</div><div id="rdvCompareMissingVotes" class="tw-mt-3 tw-text-3xl tw-font-bold tw-text-amber-900">0</div><div class="tw-mt-2 tw-text-sm tw-text-slate-500">La brecha de votos que todavía requiere revisión.</div></div>
+                            </aside>
+                            <div class="tw-flex tw-flex-col tw-min-h-[260px]">
+                                <div id="rdvCompareLoading" class="tw-hidden tw-flex tw-items-center tw-gap-3 tw-px-6 tw-py-5 tw-text-sm tw-text-slate-500"><div class="loader-inline"></div> Generando comparación editable de votos...</div>
+                                <div id="rdvCompareError" class="tw-hidden tw-m-6 tw-rounded-2xl tw-border tw-border-rose-200 tw-bg-rose-50 tw-px-5 tw-py-4 tw-text-sm tw-text-rose-700"></div>
+                                <div id="rdvCompareTreeBody" class="tw-flex-1 tw-overflow-y-auto tw-px-6 tw-py-6 tw-space-y-4">
+                                    <div class="tw-rounded-2xl tw-border tw-border-dashed tw-border-slate-300 tw-bg-slate-50 tw-p-6 tw-text-sm tw-text-slate-500">Abre esta vista para explorar la diferencia entre votos esperados y votos reales.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="rdvInvalidPanel" class="tw-hidden tw-bg-white tw-border tw-border-slate-200 tw-rounded-xl tw-shadow-sm tw-p-5 tw-space-y-4">
+                        <div class="tw-flex tw-flex-col lg:tw-flex-row lg:tw-items-center lg:tw-justify-between tw-gap-3">
+                            <div>
+                                <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Inconsistencias y datos erróneos</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Registros que no se pueden conciliar de forma segura con el comparativo oficial.</p>
+                            </div>
+                            <div class="tw-flex tw-items-center tw-gap-3">
+                                <div id="rdvInvalidMeta" class="tw-text-sm tw-font-semibold tw-text-amber-700">0 registros excluidos</div>
+                                <a href="/invalid-data.html" target="_blank" class="tw-text-sm tw-font-medium tw-text-indigo-700 hover:tw-text-indigo-900">Abrir revisión completa</a>
+                            </div>
+                        </div>
+                        <div id="rdvInvalidReasons" class="tw-flex tw-flex-wrap tw-gap-2"></div>
+                        <div id="rdvInvalidLoading" class="tw-hidden tw-flex tw-items-center tw-justify-center tw-gap-3 tw-py-6">
+                            <div class="loader-inline"></div>
+                            <span class="tw-text-sm tw-text-slate-500">Cargando inconsistencias...</span>
+                        </div>
+                        <div class="tw-overflow-x-auto">
+                            <table class="tw-w-full tw-text-sm tw-text-left">
+                                <thead class="tw-bg-slate-50 tw-border-b tw-border-slate-200">
+                                    <tr>
+                                        <th class="tw-px-4 tw-py-3">Líder</th>
+                                        <th class="tw-px-4 tw-py-3">Registro</th>
+                                        <th class="tw-px-4 tw-py-3">Raw</th>
+                                        <th class="tw-px-4 tw-py-3">Normalizado</th>
+                                        <th class="tw-px-4 tw-py-3">Sugerencia</th>
+                                        <th class="tw-px-4 tw-py-3">Razón</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rdvInvalidTableBody">
+                                    <tr><td colspan="6" class="tw-text-center tw-text-slate-500 tw-py-6">Abre esta sección para cargar las inconsistencias.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="rdvImportsPanel" class="tw-hidden tw-bg-white tw-border tw-border-slate-200 tw-rounded-xl tw-shadow-sm tw-p-5 tw-space-y-4">
+                        <div class="tw-flex tw-flex-col lg:tw-flex-row lg:tw-items-center lg:tw-justify-between tw-gap-3">
+                            <div>
+                                <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Importaciones de verificación</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Historial de archivos Excel usados para validar mesas manualmente.</p>
+                            </div>
+                            <button id="rdvOpenImportFromPanelBtn" class="tw-bg-emerald-600 tw-text-white tw-px-4 tw-py-2 tw-rounded-md tw-text-sm tw-font-medium" style="border:none;"><i class="bi bi-file-earmark-arrow-up"></i> Nueva importación</button>
+                        </div>
+                        <div id="rdvImportHistoryMeta" class="tw-text-sm tw-text-slate-500">No hay importaciones cargadas todavía.</div>
+                        <div id="rdvImportHistoryLoading" class="tw-hidden tw-flex tw-items-center tw-gap-3 tw-text-sm tw-text-slate-500"><div class="loader-inline"></div> Cargando historial...</div>
+                        <div class="tw-overflow-x-auto">
+                            <table class="tw-w-full tw-text-sm tw-text-left">
+                                <thead class="tw-bg-slate-50 tw-border-b tw-border-slate-200">
+                                    <tr>
+                                        <th class="tw-px-4 tw-py-3">Archivo</th>
+                                        <th class="tw-px-4 tw-py-3">Importado por</th>
+                                        <th class="tw-px-4 tw-py-3">Fecha</th>
+                                        <th class="tw-px-4 tw-py-3 tw-text-right">Filas</th>
+                                        <th class="tw-px-4 tw-py-3 tw-text-right">Aplicadas</th>
+                                        <th class="tw-px-4 tw-py-3">Resumen</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rdvImportHistoryBody">
+                                    <tr><td colspan="6" class="tw-text-center tw-text-slate-500 tw-py-6">Abre esta sección para consultar el historial de importaciones.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                <div id="rdvManualModal" class="tw-fixed tw-inset-0 tw-z-[9999] tw-hidden tw-justify-end">
+                    <div id="rdvManualCloseBackdropBtn" class="tw-absolute tw-inset-0 tw-bg-slate-950/55 tw-backdrop-blur-sm"></div>
+                    <div class="tw-relative tw-w-full tw-max-w-xl tw-h-full tw-bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] tw-shadow-[0_28px_90px_rgba(15,23,42,0.28)] tw-border-l tw-border-slate-200 tw-flex tw-flex-col">
+                        <div class="tw-flex tw-items-start tw-justify-between tw-gap-4 tw-border-b tw-border-slate-200 tw-px-6 tw-py-5 tw-bg-[linear-gradient(135deg,#ffffff_0%,#eef2ff_45%,#f8fafc_100%)]">
+                            <div>
+                                <h3 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Detalle de mesa</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Revisa los votos internos contra el E14 y guarda la validación de esta mesa.</p>
+                            </div>
+                            <button id="rdvManualCloseBtn" class="tw-inline-flex tw-h-10 tw-w-10 tw-items-center tw-justify-center tw-rounded-2xl tw-bg-white tw-border tw-border-slate-200 tw-text-slate-400 hover:tw-text-slate-700 hover:tw-border-slate-300 tw-shadow-sm" style="background:none;"><i class="bi bi-x-lg"></i></button>
+                        </div>
+                        <div class="tw-flex-1 tw-overflow-y-auto tw-px-6 tw-py-5 tw-space-y-5">
                             <input type="hidden" id="rdvManualMesaKey">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Localidad</label>
-                                    <input id="rdvManualLocalidad" class="form-input" type="text" readonly>
+                            <input type="hidden" id="rdvManualZone">
+                            <input type="hidden" id="rdvManualGroupCount">
+                            <input type="hidden" id="rdvManualPreviewDifference">
+                            <input type="hidden" id="rdvManualPriority">
+                            <input type="hidden" id="rdvManualTaskId">
+                            <input type="hidden" id="rdvManualSourceStatus">
+                            <input type="hidden" id="rdvManualSourceConfidence">
+                            <input type="hidden" id="rdvManualSourceMethod">
+                            <input type="hidden" id="rdvManualSourceFile">
+                            <input type="hidden" id="rdvManualSourceDocument">
+                            <input type="hidden" id="rdvManualSourceLocalFile">
+                            <input type="hidden" id="rdvManualSourceDebug">
+                            <input type="hidden" id="rdvManualSourceCapture">
+                            <input type="hidden" id="rdvManualOverlayPath">
+                            <input type="hidden" id="rdvManualCellPath">
+                            <input type="hidden" id="rdvManualMaskPath">
+                            <input type="hidden" id="rdvManualPartyBlockPath">
+                            <div class="tw-hidden">
+                                <input id="rdvManualLocalidad" readonly>
+                                <input id="rdvManualPuesto" readonly>
+                                <input id="rdvManualMesa" readonly>
+                                <input id="rdvManualReportedVotes" readonly>
+                                <input id="rdvManualPreviewPercentage" readonly>
+                            </div>
+                            <div class="tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-white tw-p-5 tw-shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
+                                <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Ubicación</div>
+                                <div id="rdvManualLocationSummary" class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-mt-2">-</div>
+                                <div class="tw-flex tw-flex-wrap tw-gap-2 tw-mt-4">
+                                    <span id="rdvManualStatusBadge" class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-slate-100 tw-border tw-border-slate-200 tw-px-3 tw-py-1.5 tw-text-xs tw-font-semibold tw-text-slate-700">Sin estado</span>
+                                    <span id="rdvManualEvidenceBadge" class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-slate-100 tw-border tw-border-slate-200 tw-px-3 tw-py-1.5 tw-text-xs tw-font-semibold tw-text-slate-700">Sin evidencia OCR</span>
                                 </div>
-                                <div class="form-group">
-                                    <label>Zona calculada</label>
-                                    <input id="rdvManualZone" class="form-input" type="text" readonly>
+                                <div class="tw-grid tw-grid-cols-3 tw-gap-3 tw-mt-4 tw-text-sm">
+                                    <div><div class="tw-text-slate-500">Localidad</div><div id="rdvManualLocalidadLabel" class="tw-font-medium tw-text-slate-900">-</div></div>
+                                    <div><div class="tw-text-slate-500">Puesto</div><div id="rdvManualPuestoLabel" class="tw-font-medium tw-text-slate-900">-</div></div>
+                                    <div><div class="tw-text-slate-500">Mesa</div><div id="rdvManualMesaLabel" class="tw-font-medium tw-text-slate-900">-</div></div>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Puesto</label>
-                                    <input id="rdvManualPuesto" class="form-input" type="text" readonly>
+                            <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-4">
+                                <div class="tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+                                    <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Votos internos</div>
+                                    <div id="rdvManualReportedVotesDisplay" class="tw-text-2xl tw-font-bold tw-text-slate-900 tw-mt-2">0</div>
                                 </div>
-                                <div class="form-group">
-                                    <label>Mesa</label>
-                                    <input id="rdvManualMesa" class="form-input" type="text" readonly>
+                                <div class="tw-rounded-3xl tw-border tw-border-indigo-200 tw-bg-[linear-gradient(160deg,#eef2ff_0%,#ffffff_100%)] tw-p-4 tw-shadow-[0_10px_24px_rgba(79,70,229,0.08)]">
+                                    <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-indigo-700">Votos E14</div>
+                                    <input id="rdvManualE14Votes" type="number" min="0" class="tw-mt-2 tw-w-full tw-bg-white tw-border tw-border-indigo-200 tw-rounded-md tw-px-3 tw-py-2 tw-text-2xl tw-font-bold tw-text-slate-900">
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label># registros agrupados</label>
-                                    <input id="rdvManualGroupCount" class="form-input" type="number" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Referencia E14</label>
-                                    <input id="rdvManualHint" class="form-input" type="text" readonly>
+                                <div id="rdvManualDifferenceCard" class="tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-white tw-p-4 tw-shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+                                    <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Diferencia</div>
+                                    <div id="rdvManualDifferenceDisplay" class="tw-text-2xl tw-font-bold tw-text-slate-900 tw-mt-2">0</div>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Votos reportados</label>
-                                    <input id="rdvManualReportedVotes" class="form-input" type="number" readonly>
+                            <div class="tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-white tw-p-5 tw-shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+                                <div class="tw-flex tw-items-center tw-gap-2 tw-text-xs tw-font-semibold tw-uppercase tw-tracking-[0.16em] tw-text-slate-500">
+                                    <i class="bi bi-file-earmark-text tw-text-indigo-500"></i>
+                                    Referencia y evidencia
                                 </div>
-                                <div class="form-group">
-                                    <label>Votos E14 candidata 105</label>
-                                    <input id="rdvManualE14Votes" class="form-input" type="number" min="0">
+                                <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4 tw-mt-4">
+                                <div>
+                                    <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Referencia E14</label>
+                                    <input id="rdvManualHint" class="tw-mt-1 tw-w-full tw-border tw-border-slate-200 tw-rounded-xl tw-bg-white tw-px-3 tw-py-2.5 tw-text-sm tw-shadow-sm" readonly>
                                 </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>% confirmacion (preview)</label>
-                                    <input id="rdvManualPreviewPercentage" class="form-input" type="text" readonly>
+                                <div>
+                                    <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Observaciones OCR</label>
+                                    <textarea id="rdvManualSourceNotes" rows="2" class="tw-mt-1 tw-w-full tw-border tw-border-slate-200 tw-rounded-xl tw-bg-white tw-px-3 tw-py-2.5 tw-text-sm tw-shadow-sm" readonly></textarea>
                                 </div>
-                                <div class="form-group">
-                                    <label>Diferencia (preview)</label>
-                                    <input id="rdvManualPreviewDifference" class="form-input" type="text" readonly>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Prioridad revision</label>
-                                    <input id="rdvManualPriority" class="form-input" type="text" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Task ID</label>
-                                    <input id="rdvManualTaskId" class="form-input" type="text" readonly>
-                                </div>
+                            <div>
+                                <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Notas de conciliación</label>
+                                <textarea id="rdvManualNotes" rows="3" class="tw-mt-1 tw-w-full tw-border tw-border-slate-300 tw-rounded-2xl tw-bg-white tw-px-4 tw-py-3 tw-text-sm tw-shadow-sm" placeholder="Qué encontraste en esta mesa, por qué queda confirmada o inconsistente..."></textarea>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Estado OCR origen</label>
-                                    <input id="rdvManualSourceStatus" class="form-input" type="text" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Confianza OCR</label>
-                                    <input id="rdvManualSourceConfidence" class="form-input" type="text" readonly>
-                                </div>
+                        </div>
+                        <div class="tw-border-t tw-border-slate-200 tw-px-6 tw-py-5 tw-space-y-3 tw-bg-white/80 tw-backdrop-blur">
+                            <div class="tw-grid tw-grid-cols-2 tw-gap-3">
+                                <button id="rdvManualOpenSourceBtn" type="button" class="tw-border tw-border-slate-300 tw-rounded-2xl tw-bg-white tw-px-4 tw-py-2.5 tw-text-sm tw-font-medium tw-text-slate-700 tw-shadow-sm">Abrir OCR</button>
+                                <button id="rdvManualOpenE14Btn" type="button" class="tw-border tw-border-slate-300 tw-rounded-2xl tw-bg-white tw-px-4 tw-py-2.5 tw-text-sm tw-font-medium tw-text-slate-700 tw-shadow-sm">Abrir E14</button>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Metodo de lectura</label>
-                                    <input id="rdvManualSourceMethod" class="form-input" type="text" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Archivo fuente</label>
-                                    <input id="rdvManualSourceFile" class="form-input" type="text" readonly>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Documento E14</label>
-                                    <input id="rdvManualSourceDocument" class="form-input" type="text" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>PDF local</label>
-                                    <input id="rdvManualSourceLocalFile" class="form-input" type="text" readonly>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Directorio debug</label>
-                                    <input id="rdvManualSourceDebug" class="form-input" type="text" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Capturas disponibles</label>
-                                    <input id="rdvManualSourceCapture" class="form-input" type="text" readonly>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Overlay</label>
-                                    <input id="rdvManualOverlayPath" class="form-input" type="text" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Celda 105</label>
-                                    <input id="rdvManualCellPath" class="form-input" type="text" readonly>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Mask</label>
-                                    <input id="rdvManualMaskPath" class="form-input" type="text" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label>Party block</label>
-                                    <input id="rdvManualPartyBlockPath" class="form-input" type="text" readonly>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Observaciones OCR / revision</label>
-                                <textarea id="rdvManualSourceNotes" class="form-input" rows="3" readonly></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Observaciones manuales</label>
-                                <textarea id="rdvManualNotes" class="form-input" rows="3" placeholder="Validado manualmente desde E14 mesa..."></textarea>
-                            </div>
-                            <div class="modal-actions">
-                                <button id="rdvManualOpenSourceBtn" class="btn btn-outline" type="button">Abrir PDF fuente</button>
-                                <button id="rdvManualOpenE14Btn" class="btn btn-outline" type="button">Abrir E14</button>
-                                <button id="rdvManualCopyRefBtn" class="btn btn-outline" type="button">Copiar referencia</button>
-                                <button id="rdvManualSaveBtn" class="btn btn-primary" type="button">Guardar validacion manual</button>
-                            </div>
+                            <button id="rdvManualCopyRefBtn" type="button" class="tw-w-full tw-border tw-border-slate-300 tw-rounded-2xl tw-bg-white tw-px-4 tw-py-2.5 tw-text-sm tw-font-medium tw-text-slate-700 tw-shadow-sm">Copiar referencia</button>
+                            <button id="rdvManualSaveBtn" type="button" class="tw-w-full tw-bg-[linear-gradient(90deg,#0f172a_0%,#1d4ed8_100%)] tw-text-white tw-rounded-2xl tw-px-4 tw-py-3 tw-text-sm tw-font-semibold tw-shadow-lg tw-shadow-indigo-950/20" style="border:none;">Guardar validación</button>
                         </div>
                     </div>
                 </div>
-            </section>
 
-            <!-- DELETION REQUESTS SECTION -->
+                <div id="rdvImportModal" class="tw-fixed tw-inset-0 tw-z-[9999] tw-hidden tw-items-center tw-justify-center tw-p-4">
+                    <div class="tw-absolute tw-inset-0 tw-bg-slate-950/55 tw-backdrop-blur-sm" id="rdvImportCloseBackdropBtn"></div>
+                    <div class="tw-relative tw-w-full tw-max-w-6xl tw-bg-white tw-rounded-3xl tw-border tw-border-slate-200 tw-shadow-[0_30px_90px_rgba(15,23,42,0.28)] tw-overflow-hidden">
+                        <div class="tw-flex tw-items-start tw-justify-between tw-gap-4 tw-border-b tw-border-slate-200 tw-px-6 tw-py-5 tw-bg-[linear-gradient(135deg,#ffffff_0%,#eef2ff_40%,#f8fafc_100%)]">
+                            <div>
+                                <h3 class="tw-text-xl tw-font-semibold tw-text-slate-900 tw-m-0">Importar verificación Excel</h3>
+                                <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Carga un archivo manual, revisa cómo conciliará cada fila y aplica solo las filas seguras.</p>
+                            </div>
+                            <button id="rdvImportCloseBtn" class="tw-inline-flex tw-h-10 tw-w-10 tw-items-center tw-justify-center tw-rounded-2xl tw-bg-white tw-border tw-border-slate-200 tw-text-slate-400 hover:tw-text-slate-700 hover:tw-border-slate-300 tw-shadow-sm" style="background:none;"><i class="bi bi-x-lg"></i></button>
+                        </div>
+                        <div class="tw-grid lg:tw-grid-cols-[340px,1fr]">
+                            <aside class="tw-border-r tw-border-slate-200 tw-bg-[linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] tw-p-6 tw-space-y-5">
+                                <div>
+                                    <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Archivo</label>
+                                    <input id="rdvImportFileInput" type="file" accept=".xlsx,.xls,.csv" class="tw-mt-2 tw-block tw-w-full tw-text-sm">
+                                    <div id="rdvImportFileMeta" class="tw-text-xs tw-text-slate-500 tw-mt-2 tw-rounded-2xl tw-border tw-border-white/70 tw-bg-white/80 tw-px-3 tw-py-2 tw-shadow-sm">Selecciona un archivo con columnas de Localidad, Puesto, Mesa y Votos E14.</div>
+                                </div>
+                                <div class="tw-space-y-3 tw-rounded-3xl tw-border tw-border-white/70 tw-bg-white/85 tw-p-4 tw-shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+                                    <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Mapeo de columnas</div>
+                                    <div class="tw-space-y-2">
+                                        <select id="rdvImportMapLocalidad" class="tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm"><option value="">Localidad</option></select>
+                                        <select id="rdvImportMapPuesto" class="tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm"><option value="">Puesto</option></select>
+                                        <select id="rdvImportMapMesa" class="tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm"><option value="">Mesa</option></select>
+                                        <select id="rdvImportMapVotes" class="tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm"><option value="">Votos E14</option></select>
+                                        <select id="rdvImportMapObservation" class="tw-w-full tw-border tw-border-slate-300 tw-rounded-md tw-px-3 tw-py-2 tw-text-sm"><option value="">Observación</option></select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Notas de importación</label>
+                                    <textarea id="rdvImportNotes" rows="3" class="tw-mt-2 tw-w-full tw-border tw-border-slate-300 tw-rounded-2xl tw-bg-white tw-px-3 tw-py-2.5 tw-text-sm tw-shadow-sm" placeholder="Ejemplo: Verificación manual entregada por equipo territorial."></textarea>
+                                </div>
+                                <div class="tw-grid tw-gap-2">
+                                    <button id="rdvImportPreviewBtn" class="tw-bg-[linear-gradient(90deg,#0f172a_0%,#1d4ed8_100%)] tw-text-white tw-rounded-2xl tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-shadow-lg tw-shadow-indigo-950/20" style="border:none;">Vista previa</button>
+                                    <button id="rdvImportApplyBtn" class="tw-bg-emerald-600 tw-text-white tw-rounded-2xl tw-px-4 tw-py-2.5 tw-text-sm tw-font-semibold tw-shadow-lg tw-shadow-emerald-950/20" style="border:none;" disabled>Aplicar importación</button>
+                                </div>
+                            </aside>
+                            <section class="tw-p-6 tw-space-y-5">
+                                <div class="tw-flex tw-flex-col md:tw-flex-row md:tw-items-center md:tw-justify-between tw-gap-3">
+                                    <div>
+                                        <h4 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Vista previa de conciliación</h4>
+                                        <p class="tw-text-sm tw-text-slate-500 tw-mt-1">Sigue los pasos: carga el archivo, valida el mapeo, revisa la vista previa y aplica solo las filas seguras.</p>
+                                    </div>
+                                    <div id="rdvImportStatus" class="tw-text-sm tw-font-medium tw-text-slate-500">Sin archivo cargado</div>
+                                </div>
+                                <div class="tw-flex tw-flex-wrap tw-gap-2">
+                                    <span id="rdvImportStageArchivo" class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-slate-900 tw-text-white tw-px-3 tw-py-1.5 tw-text-xs tw-font-semibold"><i class="bi bi-1-circle"></i> Archivo</span>
+                                    <span id="rdvImportStageMapeo" class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-slate-100 tw-text-slate-500 tw-px-3 tw-py-1.5 tw-text-xs tw-font-semibold"><i class="bi bi-2-circle"></i> Mapeo</span>
+                                    <span id="rdvImportStagePreview" class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-slate-100 tw-text-slate-500 tw-px-3 tw-py-1.5 tw-text-xs tw-font-semibold"><i class="bi bi-3-circle"></i> Vista previa</span>
+                                    <span id="rdvImportStageApply" class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-slate-100 tw-text-slate-500 tw-px-3 tw-py-1.5 tw-text-xs tw-font-semibold"><i class="bi bi-4-circle"></i> Aplicar</span>
+                                </div>
+                                <div id="rdvImportPreviewSummary" class="tw-grid sm:tw-grid-cols-5 tw-gap-3"></div>
+                                <div id="rdvImportPreviewLoading" class="tw-hidden tw-space-y-3 tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-slate-50 tw-p-4">
+                                    <div class="tw-flex tw-items-center tw-gap-3 tw-text-sm tw-text-slate-500"><div class="loader-inline"></div> Analizando archivo...</div>
+                                    <div class="tw-h-2.5 tw-overflow-hidden tw-rounded-full tw-bg-slate-100">
+                                        <div id="rdvImportProgressBar" class="tw-h-full tw-bg-gradient-to-r tw-from-indigo-500 tw-to-emerald-500 tw-transition-all tw-duration-300" style="width:0%;"></div>
+                                    </div>
+                                    <div class="tw-flex tw-items-center tw-justify-between tw-text-xs tw-text-slate-500">
+                                        <span id="rdvImportProgressLabel">Preparando archivo...</span>
+                                        <span id="rdvImportProgressCount">0 / 0 filas</span>
+                                    </div>
+                                </div>
+                                <div id="rdvImportPreviewMeta" class="tw-text-sm tw-text-slate-500 tw-rounded-2xl tw-border tw-border-dashed tw-border-slate-300 tw-bg-slate-50 tw-px-4 tw-py-3">Carga un archivo y genera la vista previa para ver el impacto en la conciliación.</div>
+                                <div class="tw-overflow-x-auto tw-border tw-border-slate-200 tw-rounded-2xl tw-shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+                                    <table class="tw-w-full tw-text-sm tw-text-left">
+                                        <thead class="tw-bg-slate-50 tw-border-b tw-border-slate-200">
+                                            <tr>
+                                                <th class="tw-px-4 tw-py-3">Fila</th>
+                                                <th class="tw-px-4 tw-py-3">Raw</th>
+                                                <th class="tw-px-4 tw-py-3">Mesa conciliada</th>
+                                                <th class="tw-px-4 tw-py-3 tw-text-right">Internos</th>
+                                                <th class="tw-px-4 tw-py-3 tw-text-right">E14</th>
+                                                <th class="tw-px-4 tw-py-3 tw-text-right">Diferencia</th>
+                                                <th class="tw-px-4 tw-py-3">Estado</th>
+                                                <th class="tw-px-4 tw-py-3">Mensajes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="rdvImportPreviewBody">
+                                            <tr><td colspan="8" class="tw-text-center tw-text-slate-500 tw-py-8">Todavía no hay vista previa para este archivo.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+                <div id="rdvProgressTreeModal" class="tw-fixed tw-inset-0 tw-z-[9999] tw-hidden tw-items-center tw-justify-center tw-p-4">
+                    <div id="rdvProgressTreeCloseBackdropBtn" class="tw-absolute tw-inset-0 tw-bg-slate-950/50"></div>
+                    <div class="tw-relative tw-w-full tw-max-w-6xl tw-max-h-[88vh] tw-overflow-hidden tw-rounded-3xl tw-border tw-border-slate-200 tw-bg-white tw-shadow-2xl">
+                        <div class="tw-flex tw-items-start tw-justify-between tw-gap-4 tw-border-b tw-border-slate-200 tw-bg-gradient-to-r tw-from-slate-950 tw-to-slate-800 tw-px-6 tw-py-5 tw-text-white">
+                            <div>
+                                <h3 class="tw-text-xl tw-font-semibold tw-m-0">Informe hasta ahora</h3>
+                                <p class="tw-text-sm tw-text-slate-300 tw-mt-1">Arbol de conciliacion por localidad, puesto y mesa para ubicar rapidamente donde faltan votos.</p>
+                            </div>
+                            <button id="rdvProgressTreeCloseBtn" class="tw-text-slate-300 hover:tw-text-white" style="background:none; border:none;"><i class="bi bi-x-lg"></i></button>
+                        </div>
+                        <div class="tw-grid lg:tw-grid-cols-[320px,1fr] tw-max-h-[calc(88vh-84px)]">
+                            <aside class="tw-border-r tw-border-slate-200 tw-bg-slate-50 tw-p-6 tw-space-y-4">
+                                <div class="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4">
+                                    <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Votos esperados</div>
+                                    <div id="rdvTreeExpectedVotes" class="tw-mt-2 tw-text-3xl tw-font-bold tw-text-slate-900">0</div>
+                                </div>
+                                <div class="tw-rounded-2xl tw-border tw-border-indigo-200 tw-bg-indigo-50 tw-p-4">
+                                    <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-indigo-700">Votos reales E14</div>
+                                    <div id="rdvTreeRealVotes" class="tw-mt-2 tw-text-3xl tw-font-bold tw-text-indigo-900">0</div>
+                                </div>
+                                <div class="tw-rounded-2xl tw-border tw-border-amber-200 tw-bg-amber-50 tw-p-4">
+                                    <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-amber-700">Votos faltantes</div>
+                                    <div id="rdvTreeMissingVotes" class="tw-mt-2 tw-text-3xl tw-font-bold tw-text-amber-900">0</div>
+                                </div>
+                                <div class="tw-rounded-2xl tw-border tw-border-slate-200 tw-bg-white tw-p-4">
+                                    <div class="tw-text-xs tw-font-semibold tw-uppercase tw-text-slate-500">Estructura observada</div>
+                                    <div class="tw-mt-3 tw-space-y-2 tw-text-sm tw-text-slate-600">
+                                        <div><strong id="rdvTreeLocalidadesCount">0</strong> localidades</div>
+                                        <div><strong id="rdvTreePuestosCount">0</strong> puestos</div>
+                                        <div><strong id="rdvTreeMesasCount">0</strong> mesas</div>
+                                    </div>
+                                </div>
+                            </aside>
+                            <section class="tw-flex tw-flex-col tw-min-h-0">
+                                <div class="tw-flex tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-slate-200 tw-px-6 tw-py-4 tw-bg-[linear-gradient(135deg,#ffffff_0%,#f8fafc_55%,#eef2ff_100%)]">
+                                    <div>
+                                        <h4 class="tw-text-lg tw-font-semibold tw-text-slate-900 tw-m-0">Donde estan las diferencias</h4>
+                                        <p id="rdvProgressTreeMeta" class="tw-text-sm tw-text-slate-500 tw-mt-1">Abre una localidad para ver puestos y luego mesas.</p>
+                                    </div>
+                                    <div class="tw-inline-flex tw-items-center tw-gap-2 tw-rounded-full tw-bg-white tw-border tw-border-slate-200 tw-px-4 tw-py-2 tw-text-xs tw-font-semibold tw-text-slate-600 tw-shadow-sm"><i class="bi bi-arrows-expand tw-text-indigo-500"></i> Drilldown por jerarquía</div>
+                                </div>
+                                <div id="rdvProgressTreeLoading" class="tw-hidden tw-flex tw-items-center tw-gap-3 tw-px-6 tw-py-5 tw-text-sm tw-text-slate-500"><div class="loader-inline"></div> Generando informe...</div>
+                                <div id="rdvProgressTreeError" class="tw-hidden tw-m-6 tw-rounded-2xl tw-border tw-border-rose-200 tw-bg-rose-50 tw-px-5 tw-py-4 tw-text-sm tw-text-rose-700"></div>
+                                <div id="rdvProgressTreeBody" class="tw-flex-1 tw-overflow-y-auto tw-px-6 tw-py-5 tw-space-y-3">
+                                    <div class="tw-rounded-2xl tw-border tw-border-dashed tw-border-slate-300 tw-bg-slate-50 tw-p-6 tw-text-sm tw-text-slate-500">Abre el informe para ver la conciliación jerárquica por localidad, puesto y mesa.</div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+<!-- DELETION REQUESTS SECTION -->
             <section id="deletion-requests" class="section" style="background: #f8fafc; min-height: 100vh;">
                 <!-- Header con KPIs -->
                 <div style="max-width: 1400px; margin: 0 auto; padding: 32px 24px;">
